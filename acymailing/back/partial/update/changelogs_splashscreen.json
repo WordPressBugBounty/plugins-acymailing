@@ -1,0 +1,111 @@
+{
+    "max_version": "9.8.0",
+    "splash_content": [
+        {
+            "menu_title": "Top feature 🔥",
+            "title": "DISCOVER THE BEST FEATURE OF THIS RELEASE",
+            "articles": [
+                {
+                    "title": "🔥 New installation wizard",
+                    "desc": "The step by step guide on first installation has been greatly simplified."
+                },
+                {
+                    "title": "🔥 [WordPress] ACF integration",
+                    "desc": "We added a new integration with Advanced Custom Fields (ACF) for WordPress. You can now use ACF fields in your AcyMailing templates."
+                },
+                {
+                    "title": "🔥 [Joomla] New contact integration",
+                    "desc": "You can now synchronize you Joomla contact with AcyMailing."
+                },
+                {
+                    "title": "🔥 [Joomla] Contact email override",
+                    "desc": "You can now override the contact email using AcyMailing override feature."
+                }
+            ]
+        },
+        {
+            "menu_title": "Miscellaneous 🎁",
+            "title": "DISCOVER WHAT CHANGED IN GENERAL",
+            "articles": [
+                {
+                    "title": "🎁 ElasticEmail integration updated",
+                    "desc": "The ElasticEmail integration has been updated to use the version 4 of their API. It should improve the sending speed when attachments are on the sent emails."
+                },
+                {
+                    "title": "🎁 Security checks improved",
+                    "desc": "We improved the security checks on file uploads: new rules and verifications when uploading a new template and removed unused code on the add-ons menu."
+                },
+                {
+                    "title": "🎁 List edition improvmements",
+                    "desc": "The list edition page is now divided in 3 parts to gain performance on the page loading time"
+                },
+                {
+                    "title": "🎁 REST-API improvements",
+                    "desc": "You can now specify more mail parameters when creating a follow-up via the REST API"
+                }
+            ]
+        },
+        {
+            "menu_title": "Joomla 🧩 ",
+            "title": "DISCOVER WHAT CHANGED FOR JOOMLA",
+            "articles": [
+                {
+                    "title": "🧩 Installation process improved",
+                    "desc": "We adapted the AcyMailing code to better match the Joomla package guidelines. This should make smoother installations and updates and a better handling of plugin dependencies."
+                },
+                {
+                    "title": "🧩 Contact synchronization",
+                    "desc": "You can now synchronise your Joomla! contact creation with the creation of AcyMailing user."
+                },
+                {
+                    "title": "🧩 Contact email override",
+                    "desc": "You can now override the email sent via the single contact email form in front-end"
+                }
+            ]
+        },
+        {
+            "menu_title": "WordPress 🧩 ",
+            "title": "DISCOVER WHAT CHANGED FOR WORDPRESS",
+            "articles": [
+                {
+                    "title": "🧩 Improve multi-site compatibility",
+                    "desc": "On WordPress multisite, we fixed the issue when a super admin created a new site, he could not access AcyMailing on it"
+                },
+                {
+                    "title": "🧩 Fixed Divi compatibility",
+                    "desc": "Fixed compatibility issue with Divi Supreme Pro plugin breaking select fields"
+                }
+            ]
+        },
+        {
+            "menu_title": "Bug fixes 🛠",
+            "title": "DISCOVER WHAT CHANGED IN GENERAL",
+            "articles": [
+                {
+                    "title": "🛠 Auto-save feature style",
+                    "desc": "The text blocks can now be edited and dynamic content have the correct styling when applying the auto-save version of an email."
+                },
+                {
+                    "title": "🛠 PHP notices",
+                    "desc": "We removed some notices when using the mass actions for the first time."
+                },
+                {
+                    "title": "🛠 Migration list access rights",
+                    "desc": "The v5 data migration could break in some cases depending on the lists access rights, it has been fixed now."
+                },
+                {
+                    "title": "🛠 Click map compatibility",
+                    "desc": "The click map is now compatible with links tracked using Google Analytics in the statistics of an email."
+                },
+                {
+                    "title": "🛠 hcaptcha integration",
+                    "desc": "Fixed an issue that could occur when submitting a form with hCaptcha"
+                },
+                {
+                    "title": "🛠 Multiple subscription forms",
+                    "desc": "Fixed an error when multiple subscription forms type popup are displayed on the same page"
+                }
+            ]
+        }
+    ]
+}
