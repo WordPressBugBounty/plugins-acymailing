@@ -1,5 +1,5 @@
 === AcyMailing - An Ultimate Newsletter Plugin and Marketing Automation Solution for WordPress ===
-Contributors: AcyMailing team
+Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 4.7
 Tested up to: 6.6.1
