@@ -547,7 +547,8 @@
                         'acym__wysid__built-with__text__color',
                         'black',
                         ['class' => 'acym__select']
-                    ); ?>
+                    );
+                    ?>
 				</div>
 			</div>
 		</div>

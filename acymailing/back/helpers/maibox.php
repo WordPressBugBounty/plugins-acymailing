@@ -20,6 +20,8 @@ class MailboxHelper extends BounceHelper
             'secure_method' => $this->action->secure_method,
             'self_signed' => $this->action->self_signed,
             'timeout' => 10,
+            'bounce_token' => $this->action->bounce_token,
+            'connection_method' => $this->action->connection_method,
         ];
 
         return $this->isConfigurationValid();
@@ -29,7 +31,7 @@ class MailboxHelper extends BounceHelper
     {
         $error = false;
         foreach ($this->mailboxConfig as $key => $oneConfig) {
-            if (empty($oneConfig) && !in_array($key, ['self_signed', 'secure_method'])) {
+            if (empty($oneConfig) && !in_array($key, ['self_signed', 'secure_method', 'bounce_token'])) {
                 $error = true;
                 break;
             }

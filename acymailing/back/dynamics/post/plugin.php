@@ -40,7 +40,7 @@ class plgAcymPost extends acymPlugin
         $this->pluginDescription->icon = '<i class="cell acymicon-wordpress"></i>';
         $this->pluginDescription->icontype = 'raw';
 
-        if ($this->installed) {
+        if (ACYM_CMS === 'wordpress') {
             $this->displayOptions = [
                 'title' => ['ACYM_TITLE', true],
                 'image' => ['ACYM_FEATURED_IMAGE', true],

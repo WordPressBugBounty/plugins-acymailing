@@ -85,12 +85,12 @@ class UserClass extends acymClass
         $results['total'] = acym_loadResult($queryCount);
 
         if (!empty($results['elements']) && !empty($settings['cms_username'])) {
-            $cmsIds = array_diff(array_column($results['elements'], 'cms_id'), [0]);
+            $cmsIds = array_diff(array_column($results['elements'], 'cms_id'), [0, '']);
             if (!empty($cmsIds)) {
                 $userNames = acym_loadObjectList(
                     'SELECT '.$this->cmsUserVars->id.' AS id, '.$this->cmsUserVars->username.' AS `cms_username` 
                     FROM '.$this->cmsUserVars->table.' 
-                    WHERE id IN ('.implode(', ', $cmsIds).')',
+                    WHERE id IN ('.implode(', ', array_values($cmsIds)).')',
                     'id'
                 );
                 foreach ($results['elements'] as $key => $oneElement) {
@@ -378,6 +378,15 @@ class UserClass extends acymClass
         }
 
         return $lists;
+    }
+
+    public function getUserStandardListIdById(int $userId)
+    {
+        $query = 'SELECT list.id FROM #__acym_list AS list 
+	              JOIN #__acym_user_has_list AS user_list ON list.id = user_list.list_id AND user_list.status = 1 AND user_list.user_id = '.$userId.' 
+	              WHERE list.visible = 1 AND list.type = '.acym_escapeDB(ListClass::LIST_TYPE_STANDARD);
+
+        return acym_loadResultArray($query);
     }
 
     public function getAllListsUserSubscriptionById($userId, $key = 'id', $needTranslation = false)
@@ -891,7 +900,7 @@ class UserClass extends acymClass
 
                 $value = preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $value);
                 $value = preg_replace('/\s+/', ' ', $value);
-                $customFields[$key] = trim($value);
+                $customFields[$key] = $value;
             }
         }
         $fieldClass->store($userID, $customFields, $ajax);

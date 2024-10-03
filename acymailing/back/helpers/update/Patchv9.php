@@ -116,4 +116,23 @@ trait Patchv9
         $this->updateQuery('UPDATE #__acym_plugin SET `type` = "CORE" WHERE `type` = "ADDON" AND `folder_name` = "contact"');
         $this->updateQuery('ALTER TABLE #__acym_mail ADD COLUMN `bounce_email` VARCHAR(100) NULL');
     }
+
+    private function updateFor990()
+    {
+        if ($this->isPreviousVersionAtLeast('9.9.0')) {
+            return;
+        }
+
+        $this->updateQuery(
+            'UPDATE #__acym_mail 
+            SET `body` = REPLACE(`body`, "images/poweredby_", "images/editor/poweredby_") 
+            WHERE `body` LIKE "%images/poweredby_%"'
+        );
+
+        $this->updateQuery(
+            'UPDATE #__acym_mail_archive 
+            SET `body` = REPLACE(`body`, "images/poweredby_", "images/editor/poweredby_") 
+            WHERE `body` LIKE "%images/poweredby_%"'
+        );
+    }
 }

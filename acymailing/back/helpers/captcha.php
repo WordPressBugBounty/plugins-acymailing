@@ -105,7 +105,7 @@ class CaptchaHelper extends acymObject
 
             $responseData = acym_makeCurlCall(
                 'https://hcaptcha.com/siteverify',
-                $data
+                ['data' => $data, 'method' => 'POST']
             );
 
             return !empty($responseData['success']);

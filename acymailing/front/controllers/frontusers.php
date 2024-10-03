@@ -132,15 +132,15 @@ class FrontusersController extends UsersController
         $msgtype = 'success';
         $extraMsg = '';
         if (empty($myuser->confirmed) && $this->config->get('require_confirmation', 1) == 1) {
+            $extraMsg = strip_tags(acym_getVar('string', 'confirmation_message'));
             if ($userClass->confirmationSentSuccess || empty($userClass->confirmationSentError)) {
-                $msg = 'ACYM_CONFIRMATION_SENT';
+                $msg = !empty($extraMsg) ? $extraMsg : 'ACYM_CONFIRMATION_SENT';
                 $code = 2;
             } else {
                 $msg = $userClass->confirmationSentError;
                 $code = 7;
                 $msgtype = 'error';
             }
-            $extraMsg = strip_tags(acym_getVar('string', 'confirmation_message'));
         } else {
             if ($userClass->subscribed) {
                 $msg = strip_tags(acym_getVar('string', 'confirmation_message'));
@@ -348,10 +348,18 @@ class FrontusersController extends UsersController
     {
         $userClass = new UserClass();
         if ($userClass->identify(true, 'user_id', 'user_key') === false) {
-            $this->displayMessage('ACYM_USER_NOT_FOUND', false);
+            acym_enqueueMessage(acym_translation('ACYM_USER_NOT_FOUND'), 'error');
+
+            acym_redirect(acym_rootURI());
         }
 
-        $this->unsubscribeAllInner();
+        $user = $this->getUserFromUnsubPage();
+
+        $displayedCheckedLists = explode(',', acym_getVar('string', 'displayed_checked_lists', ''));
+
+        if (!empty($displayedCheckedLists)) {
+            $userClass->unsubscribe($user->id, $displayedCheckedLists);
+        }
 
         $ajax = acym_getVar('int', 'ajax', 0);
         if (!$ajax) {
@@ -366,23 +374,22 @@ class FrontusersController extends UsersController
             $this->displayMessage('ACYM_USER_NOT_FOUND', false);
         }
 
-        $user = $this->getUserFromUnsubPage();
-        $listsChecked = acym_getVar('array', 'lists');
-        if (empty($listsChecked)) {
-            $this->unsubscribeAllInner(true);
-            $this->redirectUnsubWorked();
-        }
-        $listsChecked = array_keys($listsChecked);
 
+        $user = $this->getUserFromUnsubPage();
+        $listsChecked = acym_getVar('array', 'lists', []);
+        $listsChecked = is_array($listsChecked) ? array_keys($listsChecked) : [];
+        $displayedCheckedLists = explode(',', acym_getVar('string', 'displayed_checked_lists', ''));
         $userSubscriptions = $userClass->getUserSubscriptionById($user->id);
 
         $userClass->subscribe($user->id, $listsChecked);
 
         $listsToUnsub = [];
         foreach ($userSubscriptions as $subscription) {
-            if (intval($subscription->visible) === 0 || in_array($subscription->id, $listsChecked) || intval($subscription->status) !== 1) continue;
-
-            $listsToUnsub[] = $subscription->id;
+            if (!in_array($subscription->id, $listsChecked)
+                && in_array($subscription->id, $displayedCheckedLists)
+                && intval($subscription->status) === 1) {
+                $listsToUnsub[] = $subscription->id;
+            }
         }
 
         $userClass->unsubscribe($user->id, $listsToUnsub);

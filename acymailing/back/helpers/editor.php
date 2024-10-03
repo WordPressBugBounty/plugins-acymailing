@@ -175,7 +175,7 @@ class EditorHelper extends acymObject
 
         $mail = $mailClass->getOneById($this->mailId);
         $stylesheet = empty($mail) ? '' : trim(preg_replace('/\s\s+/', ' ', $mailClass->buildCSS($mail->stylesheet)));
-        $stylesheet = str_replace('"', '\"', $stylesheet);
+        $stylesheet = str_replace(['"', "\r\n", "\n"], ['\"', '', ''], $stylesheet);
 
         $options = [
             'editor_css' => '<style type="text/css">

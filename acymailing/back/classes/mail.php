@@ -713,9 +713,9 @@ class MailClass extends acymClass
         $allowedFileType = true;
         if ($extension !== 'zip') {
             $allowedFileType = false;
-        } elseif ($importFile['type'] !== 'application/zip') {
+        } elseif (!in_array($importFile['type'], ['application/zip', 'application/x-zip-compressed'])) {
             $allowedFileType = false;
-        } elseif (function_exists('mime_content_type') && mime_content_type($importFile['tmp_name']) !== 'application/zip') {
+        } elseif (function_exists('mime_content_type') && !in_array(mime_content_type($importFile['tmp_name']), ['application/zip', 'application/x-zip-compressed'])) {
             $allowedFileType = false;
         }
 
@@ -1319,6 +1319,20 @@ class MailClass extends acymClass
     public function isTransactionalMail($mail): bool
     {
         return $mail->type !== self::TYPE_STANDARD;
+    }
+
+    public function isOneTimeMail($mail): bool
+    {
+        return in_array(
+            $mail->type,
+            [
+                self::TYPE_NOTIFICATION,
+                self::TYPE_OVERRIDE,
+                self::TYPE_WELCOME,
+                self::TYPE_UNSUBSCRIBE,
+                self::TYPE_TEMPLATE,
+            ]
+        );
     }
 
     public function getAutomaticMailIds($mailIds)

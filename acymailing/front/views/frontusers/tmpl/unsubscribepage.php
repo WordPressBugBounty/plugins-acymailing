@@ -8,14 +8,14 @@ if (!empty($data['languages'])) {
         null,
         'value',
         'text',
-        'acym__unusbscribe__language__select'
+        'acym__unsubscribe__language__select'
     );
     ?>
 	<script>
-        var select = document.getElementById('acym__unusbscribe__language__select');
-        var link = '<?php echo acym_currentURL();?>';
+        const select = document.getElementById('acym__unsubscribe__language__select');
+        let link = '<?php echo acym_currentURL();?>';
 
-        var languageParam = link.match(/&language=[^&]+/);
+        const languageParam = link.match(/&language=[^&]+/);
         if (null !== languageParam && languageParam.length > 0) {
             link = link.replace(languageParam[0], '');
         }
@@ -92,5 +92,6 @@ if (!empty($data['languages'])) {
 	<input type="hidden" name="user_id" value="<?php echo $data['user']->id; ?>">
 	<input type="hidden" name="user_key" value="<?php echo acym_escape($data['user']->key); ?>">
 	<input type="hidden" name="mail_id" value="<?php echo $data['mail_id']; ?>">
+	<input type="hidden" name="displayed_checked_lists" id="displayed_checked_lists">
 </form>
 <?php if ('wordpress' == ACYM_CMS) exit; ?>

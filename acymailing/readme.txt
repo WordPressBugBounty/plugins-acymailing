@@ -2,8 +2,8 @@
 Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 4.7
-Tested up to: 6.6.1
-Stable tag: 9.8.1
+Tested up to: 6.6.2
+Stable tag: 9.9.0
 Requires PHP: 7.2.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,11 +113,25 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 9.8.1 - August 21, 2024 =
-* Added a new route on the REST-API to get statistics for every email from a follow-up
+= 9.9.0 - October 3, 2024 =
+* Added Oauth support for bounce handling
 
-* Fixed the campaigns creation and templates selection step.
-* For the ElasticEmail integration, we added a verification on the access rights for attachments and fixed the attachments names when they contain characters not handled by ElasticEmail
+* The Giphy service pricing changed, this integration has been replaced by the Tenor integration in the editor, allowing you to continue inserting GIFs in your emails.
+* The Website dynamic text type in the editor has been improved, allowing you to insert more dynamic content from your website in your emails.
+* Add a new tooltip on the resume/pause button in the queue.
+* Design improvement.
+
+* Fixed the footer image for free versions that could be shown incorrectly.
+* Fixed an issue for the TinyMCE editor when importing a template with custom CSS that has irregular line return characters.
+* Fixed an issue for few hosting providers not able to contact our license API
+* Fixed a PHP warning that could occur in some cases.
+* Fixed error preventing to display the listing of mailbox actions
+* Fixed an issue when connecting from Make.com to AcyMailing
+* Fixed the issue of the unsubscription of a user from lists that are not displayed in the unsubscribe page
+* The templates import has been fixed for Windows users. The file type verification didn't handle non-standard mime types.
+* Fixed the issue of the Check Database Integrity button that was cycling with the same messages of resolved problems for default column values.
+* Fixed a display issue when the plugin WPC Product Bundles for WooCommerce is active.
+* Fixed a warning error on our external plugins for the uninstall script definition.
 
 
 [See the whole changelog here.](https://www.acymailing.com/change-log)

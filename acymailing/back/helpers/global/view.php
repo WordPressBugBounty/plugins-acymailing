@@ -200,7 +200,7 @@ function acym_getJSMessages()
         'ACYM_SEARCH_FOR_GIFS',
         'ACYM_NO_RESULTS_FOUND',
         'ACYM_SEARCH_GIFS',
-        'ACYM_COULD_NOT_LOAD_GIF_TRY_FEW_MINUTES',
+        'ACYM_COULD_NOT_LOAD_GIF_TRY_AGAIN',
         'ACYM_DONT_APPLY_STYLE_TAG_A',
         'ACYM_TITLE',
         'ACYM_PRICE',
@@ -394,6 +394,7 @@ function acym_getJSMessages()
         'ACYM_GET_ONE_HERE',
         'ACYM_ENTITY',
         'ACYM_DELETE_DOMAIN_CONFIRMATION',
+        'ACYM_TENOR_KEY_NEEDED',
     ];
 
     foreach ($keysToLoad as $oneKey) {

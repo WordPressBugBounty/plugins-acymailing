@@ -130,3 +130,10 @@ function acym_isValidUrl($url): bool
 
     return !empty($headers) && strpos($headers[0], '200');
 }
+
+function acym_isImageUrl(string $url): bool
+{
+    $extension = strtolower(pathinfo($url, PATHINFO_EXTENSION));
+
+    return in_array($extension, acym_getImageFileExtensions());
+}

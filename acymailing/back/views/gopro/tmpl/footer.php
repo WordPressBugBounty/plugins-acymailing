@@ -1,4 +1,5 @@
-<div class="cell grid-x align-center grid-margin-x grid-margin-y acym__gopro__footer acym__gopro__blueblock">
+<?php $class = (acym_getVar('string', 'page') === 'acymailing_gopro') ? 'medium-8' : 'medium-12'; ?>
+<div class="cell grid-x align-center grid-margin-x grid-margin-y acym__gopro__footer align-center acym__gopro__blueblock margin-bottom-2 <?php echo $class; ?>">
 	<div class="cell grid-x large-6">
 		<div class="cell large-1 small-2 text-center acym__gopro__footer__i"><i class="acymicon-group"></i></div>
 		<h3 class="cell large-11 small-10 acym__gopro__footer__title"><?php echo acym_translation('ACYM_SEGMENT'); ?></h3>

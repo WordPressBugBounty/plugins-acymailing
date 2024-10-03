@@ -2,6 +2,10 @@
 
 function acym_escapeDB($value)
 {
+    if (is_null($value)) {
+        $value = '';
+    }
+    
     return "'".esc_sql($value)."'";
 }
 

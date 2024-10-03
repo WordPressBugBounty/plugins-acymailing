@@ -89,6 +89,9 @@ class MailerHelper extends AcyMailerPhp
 
     public $isAbTest = false;
     public $isTransactional = false;
+    public $isOneTimeMail = false;
+    private $currentSendingMethod = '';
+    public $isSendingMethodByListActive = false;
 
     public function __construct()
     {
@@ -193,6 +196,7 @@ class MailerHelper extends AcyMailerPhp
         $externalSendingMethod = array_keys($externalSendingMethod['sendingMethods']);
 
         $mailerMethodConfig = $this->getSendingMethod();
+        $this->currentSendingMethod = $mailerMethodConfig;
 
         if ($mailerMethodConfig === 'smtp') {
             $this->isSMTP();
@@ -436,9 +440,15 @@ class MailerHelper extends AcyMailerPhp
 
         $externalSending = false;
 
-        $this->isTransactional = $this->isForward || $this->isTest || $this->isSpamTest;
-        if (!empty($this->mailId) && !empty($this->defaultMail[$this->mailId]) && $this->mailClass->isTransactionalMail($this->defaultMail[$this->mailId])) {
-            $this->isTransactional = true;
+        $this->isOneTimeMail = $this->isTransactional = $this->isForward || $this->isTest || $this->isSpamTest;
+        if (!empty($this->mailId) && !empty($this->defaultMail[$this->mailId])) {
+            if ($this->mailClass->isTransactionalMail($this->defaultMail[$this->mailId])) {
+                $this->isTransactional = true;
+            }
+
+            if ($this->mailClass->isOneTimeMail($this->defaultMail[$this->mailId])) {
+                $this->isOneTimeMail = true;
+            }
         }
 
         acym_trigger('onAcymProcessQueueExternalSendingCampaign', [&$externalSending, $this->isTransactional]);
@@ -487,7 +497,16 @@ class MailerHelper extends AcyMailerPhp
                 acym_enqueueMessage(nl2br($this->reportMessage), 'error');
             }
         } else {
-            $this->reportMessage = acym_translationSprintf('ACYM_SEND_SUCCESS', '<b>'.$this->Subject.'</b>', '<b>'.implode(' , ', $receivers).'</b>');
+            if ($this->isSendingMethodByListActive) {
+                $this->reportMessage = acym_translationSprintf(
+                    'ACYM_SEND_SUCCESS_WITH_SENDING_METHOD',
+                    '<b>'.$this->Subject.'</b>',
+                    '<b>'.implode(' , ', $receivers).'</b>',
+                    '<b>'.$this->currentSendingMethod.'</b>'
+                );
+            } else {
+                $this->reportMessage = acym_translationSprintf('ACYM_SEND_SUCCESS', '<b>'.$this->Subject.'</b>', '<b>'.implode(' , ', $receivers).'</b>');
+            }
             if (!empty($warnings)) {
                 $this->reportMessage .= " \n\n ".$warnings;
             }
@@ -730,7 +749,7 @@ class MailerHelper extends AcyMailerPhp
         }
         $this->addAddress($this->cleanText($receiver->email), $addedName);
 
-        $this->isHTML(true);
+        $this->isHTML();
 
         $this->Subject = $this->defaultMail[$mailId]->subject;
         $this->Body = $this->defaultMail[$mailId]->body;

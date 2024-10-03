@@ -5,7 +5,7 @@
  * Author: AcyMailing Newsletter Team
  * Author URI: https://www.acymailing.com
  * License: GPLv3
- * Version: 9.8.1
+ * Version: 9.9.0
  * Text Domain: acymailing
  * Domain Path: /language
  * Requires at least: 5.0
@@ -56,6 +56,7 @@ class acymailingLoader
         remove_action('plugins_loaded', '_imagify_init');
         remove_action('plugins_loaded', 'plugins_loaded_wps_hide_login_plugin');
         remove_action('plugins_loaded', ['WPAS_Gas', 'get_instance'], 11);
+        remove_action('plugins_loaded', 'woosb_init', 12);
     }
 
     public function disableWpml(): bool

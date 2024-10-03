@@ -47,7 +47,8 @@ trait Listing
                 'status' => $status,
             ],
             $status,
-            $page
+            $page,
+            'mailbox'
         );
 
         $totalElement = $matchingMailboxes['total'];

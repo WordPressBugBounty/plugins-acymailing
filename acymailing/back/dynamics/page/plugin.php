@@ -13,7 +13,7 @@ class plgAcymPage extends acymPlugin
         $this->pluginDescription->icon = '<div class="wp-menu-image dashicons-before dashicons-admin-page"></div>';
         $this->pluginDescription->icontype = 'raw';
 
-        if ($this->installed && ACYM_CMS == 'wordpress') {
+        if (ACYM_CMS === 'wordpress') {
             $this->displayOptions = [
                 'title' => ['ACYM_TITLE', true],
                 'image' => ['ACYM_FEATURED_IMAGE', true],

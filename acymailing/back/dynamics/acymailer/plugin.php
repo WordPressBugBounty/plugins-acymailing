@@ -115,37 +115,6 @@ class plgAcymAcymailer extends acymPlugin
         <?php
     }
 
-    private function getRateColor($rate, $allowedRate, $warningRate): array
-    {
-        if (empty($rate) || empty($allowedRate) || empty($warningRate)) {
-            return ['color' => '', 'icon' => ''];
-        }
-
-        if ($rate > $allowedRate) {
-            return [
-                'color' => 'acym__color__red',
-                'icon' => acym_tooltip(
-                    [
-                        'hoveredText' => '<i class="acym__config__acymailer__rate-status__icon acymicon-remove acym__color__red"></i>',
-                        'textShownInTooltip' => acym_translation('ACYM_RATE_BLOCKED'),
-                    ]
-                ),
-            ];
-        } elseif ($rate >= $warningRate) {
-            return [
-                'color' => 'acym__color__orange',
-                'icon' => acym_tooltip(
-                    [
-                        'hoveredText' => '<i class="acym__config__acymailer__rate-status__icon acymicon-exclamation-triangle acym__color__orange"></i>',
-                        'textShownInTooltip' => acym_translation('ACYM_RATE_WARNING'),
-                    ]
-                ),
-            ];
-        }
-
-        return ['color' => '', 'icon' => ''];
-    }
-
     public function onAcymGetSendingMethodsHtmlSetting(&$data)
     {
         $licenseKey = $this->config->get('license_key');
@@ -501,26 +470,6 @@ class plgAcymAcymailer extends acymPlugin
         }
     }
 
-    private function updateDomainRates($domainsRates)
-    {
-        $domains = $this->config->get(self::SENDING_METHOD_ID.'_domains', []);
-
-        if (empty($domains)) {
-            return;
-        }
-
-        $domains = @json_decode($domains, true);
-
-        foreach ($domainsRates as $oneDomain => $oneRate) {
-            if (empty($domains[$oneDomain])) continue;
-            foreach ($oneRate as $rateKey => $rateValue) {
-                $domains[$oneDomain][$rateKey] = $rateValue;
-            }
-        }
-
-        $this->config->save([self::SENDING_METHOD_ID.'_domains' => json_encode($domains)]);
-    }
-
     public function onAcymProcessQueueExternalSendingCampaign(&$externalSending, $transactional = false)
     {
         if ($this->config->get('mailer_method') == self::SENDING_METHOD_ID) $externalSending = false;
@@ -577,6 +526,7 @@ class plgAcymAcymailer extends acymPlugin
                 'email' => $mailerHelper->getSentMIMEMessage(),
                 'domainsUsed' => $domainsUsed,
                 'isTransactional' => $mailerHelper->isTransactional,
+                'isOneTimeMail' => $mailerHelper->isOneTimeMail,
             ],
             [],
             'POST'
@@ -835,53 +785,6 @@ class plgAcymAcymailer extends acymPlugin
         }
     }
 
-    public function getDomainsUnVerified(): array
-    {
-        if ($this->config->get('mailer_method') !== self::SENDING_METHOD_ID) {
-            return [];
-        }
-
-        $allDomains = [];
-
-        $allDomains[] = acym_getDomain($this->config->get('from_email'));
-        if ($this->config->get('from_as_replyto') === '0') {
-            $allDomains[] = acym_getDomain($this->config->get('replyto_email'));
-        }
-
-        if ($this->config->get('multilingual') === '1') {
-            $senderInfoTranslation = $this->config->get('sender_info_translation');
-            if (!empty($senderInfoTranslation)) {
-                $senderInfoTranslation = json_decode($senderInfoTranslation, true);
-                foreach ($senderInfoTranslation as $oneSenderInfo) {
-                    $allDomains[] = acym_getDomain($oneSenderInfo['from_email']);
-                    $allDomains[] = acym_getDomain($oneSenderInfo['replyto_email']);
-                }
-            }
-        }
-
-        $allDomains[] = acym_getDomain($this->config->get('bounce_email'));
-        $allDomains = array_filter(array_unique($allDomains));
-
-        $verifiedDomains = $this->getVerifiedDomains();
-
-        return array_diff($allDomains, $verifiedDomains);
-    }
-
-    private function getVerifiedDomains(): array
-    {
-        $verifiedDomains = [];
-        $domainStatuses = json_decode($this->config->get(self::SENDING_METHOD_ID.'_domains', '[]'), true);
-        if (!empty($domainStatuses)) {
-            foreach ($domainStatuses as $domain => $info) {
-                if ($info['status'] === 'SUCCESS') {
-                    $verifiedDomains[] = $domain;
-                }
-            }
-        }
-
-        return $verifiedDomains;
-    }
-
     public function onAcymDisplayPage()
     {
         if (intval($this->config->get('walk_through', 0)) === 1) {
@@ -894,22 +797,6 @@ class plgAcymAcymailer extends acymPlugin
             $message = acym_translationSprintf('ACYM_UNVERIFIED_DOMAINS_PREVENTING_EMAILS_FROM_BEING_SENT_X', implode(', ', $unverifiedDomains));
             acym_enqueueMessage($message, 'warning');
         }
-    }
-
-    private function displayMessage($message): string
-    {
-        $correspondances = [
-            'AlreadyExistsException' => 'ACYM_DOMAIN_X_ALREADY_EXIST',
-            'TooManyRequestsException' => 'ACYM_DOMAIN_TO_MANY_REQUEST',
-            'NotFoundException' => 'ACYM_DOMAIN_NOT_FOUND',
-            'NotExistException' => 'ACYM_CANT_DELETE_DOMAIN',
-        ];
-
-        if (empty($message) || empty($correspondances[$message])) {
-            return 'ACYM_DOMAIN_DEFAULT_ERROR';
-        }
-
-        return $correspondances[$message];
     }
 
     public function onAcymGetCreditRemainingSendingMethod(&$html, $reloading = false)
@@ -975,6 +862,178 @@ class plgAcymAcymailer extends acymPlugin
         );
     }
 
+    public function onAcymCreditsLeft(&$creditsLeft)
+    {
+        $sendingMethod = $this->config->get('mailer_method', '');
+        if (empty($sendingMethod) || $sendingMethod != self::SENDING_METHOD_ID) return;
+
+        $apiKey = $this->config->get(self::SENDING_METHOD_ID.'_apikey', '');
+        if (empty($apiKey)) {
+            $creditsLeft = 0;
+
+            return;
+        }
+
+        $credits = $this->getRemainingCredits(true);
+        if (empty($credits['remaining_credits'])) {
+            $creditsLeft = 0;
+        } else {
+            $creditsLeft = $credits['remaining_credits'];
+        }
+    }
+
+    public function onAcymAttachLicense($licenseKey)
+    {
+        if (empty($licenseKey)) {
+            return;
+        }
+
+        $response = $this->callApiSendingMethod(self::SENDING_METHOD_API_URL.'public/licenses/'.$licenseKey);
+
+        if (!empty($response['id'])) {
+            $this->config->save([self::SENDING_METHOD_ID.'_apikey' => $response['id']]);
+        }
+    }
+
+    public function onAcymDetachLicense()
+    {
+        $this->config->save([self::SENDING_METHOD_ID.'_apikey' => '']);
+    }
+
+    public function onAcymCampaignSummary(&$data)
+    {
+        if ($this->config->get('mailer_method') !== self::SENDING_METHOD_ID) {
+            return;
+        }
+
+        $mail = $data['mailClass']->getOneById($data['mailId']);
+        if (empty($mail->body) || !$this->isContainingUnsubscribeLink($mail->body)) {
+            $data['notAllowedSendingError'] = acym_translation('ACYM_UNSUB_LINK');
+        }
+
+        $unverifiedDomains = $this->getDomainsUnVerified();
+        if (!empty($unverifiedDomains)) {
+            $data['notAllowedSendingError'] = acym_translationSprintf(
+                'ACYM_UNVERIFIED_DOMAINS_PREVENTING_EMAILS_FROM_BEING_SENT_X',
+                implode(', ', $unverifiedDomains)
+            );
+        }
+    }
+
+    private function getDomainsUnVerified(): array
+    {
+        if ($this->config->get('mailer_method') !== self::SENDING_METHOD_ID) {
+            return [];
+        }
+
+        $allDomains = [];
+
+        $allDomains[] = acym_getDomain($this->config->get('from_email'));
+        if ($this->config->get('from_as_replyto') === '0') {
+            $allDomains[] = acym_getDomain($this->config->get('replyto_email'));
+        }
+
+        if ($this->config->get('multilingual') === '1') {
+            $senderInfoTranslation = $this->config->get('sender_info_translation');
+            if (!empty($senderInfoTranslation)) {
+                $senderInfoTranslation = json_decode($senderInfoTranslation, true);
+                foreach ($senderInfoTranslation as $oneSenderInfo) {
+                    $allDomains[] = acym_getDomain($oneSenderInfo['from_email']);
+                    $allDomains[] = acym_getDomain($oneSenderInfo['replyto_email']);
+                }
+            }
+        }
+
+        $allDomains[] = acym_getDomain($this->config->get('bounce_email'));
+        $allDomains = array_filter(array_unique($allDomains));
+
+        $verifiedDomains = $this->getVerifiedDomains();
+
+        return array_diff($allDomains, $verifiedDomains);
+    }
+
+    private function getRateColor($rate, $allowedRate, $warningRate): array
+    {
+        if (empty($rate) || empty($allowedRate) || empty($warningRate)) {
+            return ['color' => '', 'icon' => ''];
+        }
+
+        if ($rate > $allowedRate) {
+            return [
+                'color' => 'acym__color__red',
+                'icon' => acym_tooltip(
+                    [
+                        'hoveredText' => '<i class="acym__config__acymailer__rate-status__icon acymicon-remove acym__color__red"></i>',
+                        'textShownInTooltip' => acym_translation('ACYM_RATE_BLOCKED'),
+                    ]
+                ),
+            ];
+        } elseif ($rate >= $warningRate) {
+            return [
+                'color' => 'acym__color__orange',
+                'icon' => acym_tooltip(
+                    [
+                        'hoveredText' => '<i class="acym__config__acymailer__rate-status__icon acymicon-exclamation-triangle acym__color__orange"></i>',
+                        'textShownInTooltip' => acym_translation('ACYM_RATE_WARNING'),
+                    ]
+                ),
+            ];
+        }
+
+        return ['color' => '', 'icon' => ''];
+    }
+
+    private function updateDomainRates($domainsRates)
+    {
+        $domains = $this->config->get(self::SENDING_METHOD_ID.'_domains', []);
+
+        if (empty($domains)) {
+            return;
+        }
+
+        $domains = @json_decode($domains, true);
+
+        foreach ($domainsRates as $oneDomain => $oneRate) {
+            if (empty($domains[$oneDomain])) continue;
+            foreach ($oneRate as $rateKey => $rateValue) {
+                $domains[$oneDomain][$rateKey] = $rateValue;
+            }
+        }
+
+        $this->config->save([self::SENDING_METHOD_ID.'_domains' => json_encode($domains)]);
+    }
+
+    private function getVerifiedDomains(): array
+    {
+        $verifiedDomains = [];
+        $domainStatuses = json_decode($this->config->get(self::SENDING_METHOD_ID.'_domains', '[]'), true);
+        if (!empty($domainStatuses)) {
+            foreach ($domainStatuses as $domain => $info) {
+                if ($info['status'] === 'SUCCESS') {
+                    $verifiedDomains[] = $domain;
+                }
+            }
+        }
+
+        return $verifiedDomains;
+    }
+
+    private function displayMessage($message): string
+    {
+        $correspondances = [
+            'AlreadyExistsException' => 'ACYM_DOMAIN_X_ALREADY_EXIST',
+            'TooManyRequestsException' => 'ACYM_DOMAIN_TO_MANY_REQUEST',
+            'NotFoundException' => 'ACYM_DOMAIN_NOT_FOUND',
+            'NotExistException' => 'ACYM_CANT_DELETE_DOMAIN',
+        ];
+
+        if (empty($message) || empty($correspondances[$message])) {
+            return 'ACYM_DOMAIN_DEFAULT_ERROR';
+        }
+
+        return $correspondances[$message];
+    }
+
     private function getRemainingCredits($forceReload = false)
     {
         $time = time();
@@ -997,26 +1056,6 @@ class plgAcymAcymailer extends acymPlugin
         }
 
         return $response;
-    }
-
-    public function onAcymCreditsLeft(&$creditsLeft)
-    {
-        $sendingMethod = $this->config->get('mailer_method', '');
-        if (empty($sendingMethod) || $sendingMethod != self::SENDING_METHOD_ID) return;
-
-        $apiKey = $this->config->get(self::SENDING_METHOD_ID.'_apikey', '');
-        if (empty($apiKey)) {
-            $creditsLeft = 0;
-
-            return;
-        }
-
-        $credits = $this->getRemainingCredits(true);
-        if (empty($credits['remaining_credits'])) {
-            $creditsLeft = 0;
-        } else {
-            $creditsLeft = $credits['remaining_credits'];
-        }
     }
 
     private function checkSuccessCode($responseCode): bool
@@ -1066,24 +1105,6 @@ class plgAcymAcymailer extends acymPlugin
         return $finalMessage;
     }
 
-    public function onAcymAttachLicense($licenseKey)
-    {
-        if (empty($licenseKey)) {
-            return;
-        }
-
-        $response = $this->callApiSendingMethod(self::SENDING_METHOD_API_URL.'public/licenses/'.$licenseKey);
-
-        if (!empty($response['id'])) {
-            $this->config->save([self::SENDING_METHOD_ID.'_apikey' => $response['id']]);
-        }
-    }
-
-    public function onAcymDetachLicense()
-    {
-        $this->config->save([self::SENDING_METHOD_ID.'_apikey' => '']);
-    }
-
     private function isUnsubscribeLinkMissing($mailerHelper): bool
     {
         if ($mailerHelper->isTest || $mailerHelper->isForward || $mailerHelper->isSpamTest || empty($mailerHelper->mail)) {
@@ -1094,13 +1115,15 @@ class plgAcymAcymailer extends acymPlugin
             return false;
         }
 
-        if (strpos($mailerHelper->mail->body, '{unsubscribe}') !== false
-            || strpos($mailerHelper->mail->body, 'task=unsubscribe') !== false
-            || strpos($mailerHelper->mail->body, 'frontusers/unsubscribe') !== false) {
-            return false;
-        }
+        return !$this->isContainingUnsubscribeLink($mailerHelper->mail->body);
+    }
 
-        return true;
+    private function isContainingUnsubscribeLink(string $text): bool
+    {
+        return strpos($text, '{unsubscribe}') !== false
+            || strpos($text, '{unsubscribeall}') !== false
+            || strpos($text, 'task=unsubscribe') !== false
+            || strpos($text, 'frontusers/unsubscribe') !== false;
     }
 
     private function checkDomainsDNS($domains): array

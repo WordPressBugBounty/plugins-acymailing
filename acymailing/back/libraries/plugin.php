@@ -1355,11 +1355,15 @@ class acymPlugin extends acymObject
 
     protected function cleanExtensionContent($text)
     {
-        if (!acym_isExtensionActive('classic-editor/classic-editor.php') || strpos($text, '<!-- wp:') !== false) {
-            return $text;
-        }
+        if (ACYM_CMS === 'wordpress') {
+            if (!acym_isExtensionActive('classic-editor/classic-editor.php') || strpos($text, '<!-- wp:') !== false) {
+                return $text;
+            }
 
-        return nl2br($text);
+            return nl2br($text);
+        } else {
+            return preg_replace('#\{igallery[^}]+\}#Ui', '', $text);
+        }
     }
 
     protected function callApiSendingMethod($url, $data = [], $headers = [], $type = 'GET', $authentication = [], $dataDecoded = false)
@@ -1538,5 +1542,19 @@ class acymPlugin extends acymObject
         $content = do_shortcode($content);
 
         return preg_replace('#<!-- wp:shortcode -->(.*)<!-- /wp:shortcode -->#Uis', '$1', $content);
+    }
+
+    protected function fixDivStructure(string $text): string
+    {
+        $nbOpeningDivs = substr_count($text, '<div');
+        $nbClosingDivs = substr_count($text, '</div>');
+
+        if ($nbOpeningDivs > $nbClosingDivs) {
+            $text .= str_repeat('</div>', $nbOpeningDivs - $nbClosingDivs);
+        } elseif ($nbOpeningDivs < $nbClosingDivs) {
+            $text = str_repeat('<div>', $nbClosingDivs - $nbOpeningDivs).$text;
+        }
+
+        return $text;
     }
 }

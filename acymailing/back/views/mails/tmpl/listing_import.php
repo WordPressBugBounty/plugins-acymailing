@@ -15,10 +15,10 @@ $maxSize = acym_translationSprintf(
 			<ul class="acym__ul">
 				<li><?php echo acym_translation('ACYM_TEMLPATE_ZIP_IMPORT'); ?></li>
 				<ul class="acym__ul">
-					<li>/template.html -> <?php echo acym_translation('ACYM_TEMPLATE_HTML_IMPORT'); ?></li>
-					<li>/css -> <?php echo acym_translation('ACYM_TEMPLATE_CSS_IMPORT'); ?></li>
-					<li>/images -> <?php echo acym_translation('ACYM_TEMPLATE_IMAGES_IMPORT'); ?></li>
-					<li>/thumbnail.png -> <?php echo acym_translation('ACYM_TEMPLATE_THUMBNAIL_IMPORT'); ?></li>
+					<li>/template.html -> <?php echo acym_translation('ACYM_TEMPLATE_HTML_IMPORT').' ('.acym_translation('ACYM_REQUIRED'); ?>)</li>
+					<li>/css -> <?php echo acym_translation('ACYM_TEMPLATE_CSS_IMPORT').' ('.acym_translation('ACYM_OPTIONAL'); ?>)</li>
+					<li>/images -> <?php echo acym_translation('ACYM_TEMPLATE_IMAGES_IMPORT').' ('.acym_translation('ACYM_OPTIONAL'); ?>)</li>
+					<li>/thumbnail.png -> <?php echo acym_translation('ACYM_TEMPLATE_THUMBNAIL_IMPORT').' ('.acym_translation('ACYM_OPTIONAL'); ?>)</li>
 				</ul>
 			</ul>
 		</div>

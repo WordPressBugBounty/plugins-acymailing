@@ -1,25 +1,25 @@
 {
-    "max_version": "9.8.0",
+    "max_version": "9.9.0",
     "splash_content": [
         {
             "menu_title": "Top feature 🔥",
             "title": "DISCOVER THE BEST FEATURE OF THIS RELEASE",
             "articles": [
                 {
-                    "title": "🔥 New installation wizard",
-                    "desc": "The step by step guide on first installation has been greatly simplified."
+                    "title": "🔥 Oauth support for bounce handling",
+                    "desc": "You can now use Oauth to authenticate with your Gmail or Outlook account to handle bounces."
                 },
                 {
-                    "title": "🔥 [WordPress] ACF integration",
-                    "desc": "We added a new integration with Advanced Custom Fields (ACF) for WordPress. You can now use ACF fields in your AcyMailing templates."
+                    "title": "🔥 New Gif integration in the editor",
+                    "desc": "The Giphy service pricing changed, this integration has been replaced by the Tenor integration in the editor, allowing you to continue inserting GIFs in your emails."
                 },
                 {
-                    "title": "🔥 [Joomla] New contact integration",
-                    "desc": "You can now synchronize you Joomla contact with AcyMailing."
+                    "title": "🔥 [Joomla] Integration with Phoca Download",
+                    "desc": "A new integration with Phoca Download has been added."
                 },
                 {
-                    "title": "🔥 [Joomla] Contact email override",
-                    "desc": "You can now override the contact email using AcyMailing override feature."
+                    "title": "🔥 [Joomla] Integration with jTicketing and Shika",
+                    "desc": "New integrations for jTicketing and Shika provided by their developers have been listed in the downloadable add-ons."
                 }
             ]
         },
@@ -28,20 +28,16 @@
             "title": "DISCOVER WHAT CHANGED IN GENERAL",
             "articles": [
                 {
-                    "title": "🎁 ElasticEmail integration updated",
-                    "desc": "The ElasticEmail integration has been updated to use the version 4 of their API. It should improve the sending speed when attachments are on the sent emails."
+                    "title": "🎁 New gif integration in the editor",
+                    "desc": "The Giphy service pricing changed, this integration has been replaced by the Tenor integration in the editor, allowing you to continue inserting GIFs in your emails."
                 },
                 {
-                    "title": "🎁 Security checks improved",
-                    "desc": "We improved the security checks on file uploads: new rules and verifications when uploading a new template and removed unused code on the add-ons menu."
+                    "title": "🎁 New dynamic text type for your emails",
+                    "desc": "The Website dynamic text type in the editor has been improved, allowing you to insert more dynamic content from your website in your emails."
                 },
                 {
-                    "title": "🎁 List edition improvmements",
-                    "desc": "The list edition page is now divided in 3 parts to gain performance on the page loading time"
-                },
-                {
-                    "title": "🎁 REST-API improvements",
-                    "desc": "You can now specify more mail parameters when creating a follow-up via the REST API"
+                    "title": "🎁 Improve the queue pause/resume button",
+                    "desc": "Add a new tooltip on the resume/pause button in the queue."
                 }
             ]
         },
@@ -50,16 +46,20 @@
             "title": "DISCOVER WHAT CHANGED FOR JOOMLA",
             "articles": [
                 {
-                    "title": "🧩 Installation process improved",
-                    "desc": "We adapted the AcyMailing code to better match the Joomla package guidelines. This should make smoother installations and updates and a better handling of plugin dependencies."
+                    "title": "🧩 Integration with Phoca Download",
+                    "desc": "A new integration with Phoca Download has been added."
                 },
                 {
-                    "title": "🧩 Contact synchronization",
-                    "desc": "You can now synchronise your Joomla! contact creation with the creation of AcyMailing user."
+                    "title": "🧩 Integration with jTicketing and Shika",
+                    "desc": "New integrations for jTicketing and Shika provided by their developers have been listed in the downloadable add-ons."
                 },
                 {
-                    "title": "🧩 Contact email override",
-                    "desc": "You can now override the email sent via the single contact email form in front-end"
+                    "title": "🧩 Better handling of Joomla articles images",
+                    "desc": "Inserted articles that do not have the intro image set will now be inserted with their full image in the email."
+                },
+                {
+                    "title": "🧩 JEvents add-on improvement",
+                    "desc": "A new option has been added in the JEvents add-on to let you specify the menu item ID to use when building event links."
                 }
             ]
         },
@@ -68,12 +68,12 @@
             "title": "DISCOVER WHAT CHANGED FOR WORDPRESS",
             "articles": [
                 {
-                    "title": "🧩 Improve multi-site compatibility",
-                    "desc": "On WordPress multisite, we fixed the issue when a super admin created a new site, he could not access AcyMailing on it"
+                    "title": "🧩 Improve external plugins compatibility",
+                    "desc": "Fixed a display issue when the plugin WPC Product Bundles for WooCommerce is active."
                 },
                 {
-                    "title": "🧩 Fixed Divi compatibility",
-                    "desc": "Fixed compatibility issue with Divi Supreme Pro plugin breaking select fields"
+                    "title": "🧩 Improve external plugins compatibility",
+                    "desc": "Fixed a warning error on our external plugins for the uninstall script definition."
                 }
             ]
         },
@@ -82,28 +82,32 @@
             "title": "DISCOVER WHAT CHANGED IN GENERAL",
             "articles": [
                 {
-                    "title": "🛠 Auto-save feature style",
-                    "desc": "The text blocks can now be edited and dynamic content have the correct styling when applying the auto-save version of an email."
+                    "title": "🛠 Footer image",
+                    "desc": "Fixed the footer image for free versions that could be shown incorrectly."
                 },
                 {
-                    "title": "🛠 PHP notices",
-                    "desc": "We removed some notices when using the mass actions for the first time."
+                    "title": "🛠 TinyMCE editor custom CSS edition",
+                    "desc": "Fixed an issue for the TinyMCE editor when importing a template with custom CSS that has irregular line return characters."
                 },
                 {
-                    "title": "🛠 Migration list access rights",
-                    "desc": "The v5 data migration could break in some cases depending on the lists access rights, it has been fixed now."
+                    "title": "🛠 Issues with our servers",
+                    "desc": "Fixed an issue for few hosting providers not able to contact our license API"
                 },
                 {
-                    "title": "🛠 Click map compatibility",
-                    "desc": "The click map is now compatible with links tracked using Google Analytics in the statistics of an email."
+                    "title": "🛠 Mailbox actions",
+                    "desc": "Fixed error preventing to display the listing of mailbox actions"
                 },
                 {
-                    "title": "🛠 hcaptcha integration",
-                    "desc": "Fixed an issue that could occur when submitting a form with hCaptcha"
+                    "title": "🛠 Make connection",
+                    "desc": "Fixed an issue when connecting from Make.com to AcyMailing"
                 },
                 {
-                    "title": "🛠 Multiple subscription forms",
-                    "desc": "Fixed an error when multiple subscription forms type popup are displayed on the same page"
+                    "title": "🛠 Import templates for Windows",
+                    "desc": "The templates import has been fixed for Windows users. The file type verification didn't handle non-standard mime types."
+                },
+                {
+                    "title": "🛠 Check database integrity",
+                    "desc": "Fixed the issue of the Check Database Integrity button that was cycling with the same messages of resolved problems for default column values."
                 }
             ]
         }

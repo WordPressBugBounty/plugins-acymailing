@@ -176,7 +176,10 @@
                                     $cancelText = 'ACYM_CANCEL_SCHEDULING';
                                     if (!empty($row->nbqueued) && $row->iscampaign) {
                                         $class = $row->active == 0 ? 'acymicon-play_circle_filled' : 'acymicon-pause-circle';
-                                        echo '<i campaignid="'.$row->campaign.'" class="'.$class.' acym__queue__play_pause__button"></i>';
+                                        echo acym_tooltip([
+                                            'hoveredText' => '<i campaignid="'.$row->campaign.'" class="'.$class.' acym__queue__play_pause__button"></i>',
+                                            'textShownInTooltip' => acym_translation($row->active == 0 ? 'ACYM_UNPAUSE_CAMPAIGN' : 'ACYM_PAUSE_CAMPAIGN'),
+                                        ]);
                                         $cancelText = 'ACYM_CANCEL_CAMPAIGN';
                                     }
 

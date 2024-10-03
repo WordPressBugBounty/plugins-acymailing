@@ -377,17 +377,47 @@
 				</div>
 			</div>
         <?php } ?>
-        <?php if ('joomla' === ACYM_CMS) { ?>
-			<div class="margin-bottom-2">
-				<div class="acym__title acym__title__secondary"><?php echo acym_translation('ACYM_FRONTEND_EDITION'); ?></div>
-                <?php
-                if (!acym_level(ACYM_ENTERPRISE)) {
-                    $data['version'] = 'enterprise';
-                    include acym_getView('dashboard', 'upgrade', true);
-                }
-                ?>
-			</div>
-        <?php } ?>
+        <?php if ('joomla' === ACYM_CMS) {
+            if (acym_level(ACYM_ENTERPRISE)) { ?>
+				<div class="margin-bottom-2">
+					<div class="acym__title acym__title__secondary"><?php echo acym_translation('ACYM_FRONTEND_EDITION'); ?></div>
+					<div class="grid-x grid-margin-x grid-margin-y">
+						<div class="cell large-3 small-12"><?php echo acym_translation('ACYM_FRONT_DELETE_BUTTON').acym_info('ACYM_FRONT_DELETE_BUTTON_DESC'); ?></div>
+						<div class="cell auto">
+                            <?php
+                            echo acym_radio(
+                                [
+                                    'delete' => acym_translation('ACYM_DELETE_THE_SUBSCRIBER'),
+                                    'removesub' => acym_translation('ACYM_REMOVE_USER_SUBSCRIPTION'),
+                                ],
+                                'config[frontend_delete_button]',
+                                $this->config->get('frontend_delete_button', 'delete')
+                            );
+                            ?>
+						</div>
+					</div>
+					<div class="grid-x grid-margin-x grid-margin-y">
+						<div class="cell large-3"><?php echo acym_translation('ACYM_FRONT_FILTER_CAMPAIGNS'); ?></div>
+						<div class="cell large-9">
+                            <?php
+                            echo acym_select(
+                                [
+                                    'own' => acym_translation('ACYM_FRONT_ONLY_CREATED_CAMPAIGNS'),
+                                    'allowed' => acym_translation('ACYM_FRONT_SENT_TO_ALLOWED_LISTS'),
+                                ],
+                                'config[front_campaigns_filter]',
+                                $this->config->get('front_campaigns_filter', 'own'),
+                                [
+                                    'class' => 'acym__select',
+                                ]
+                            );
+                            ?>
+						</div>
+					</div>
+				</div>
+                <?php // __END__enterprise_
+            }
+        } ?>
 		<div class="margin-bottom-2">
 			<div class="acym__title acym__title__secondary"><?php echo acym_translation('ACYM_FILES'); ?></div>
 			<div class="grid-x grid-margin-y margin-y">

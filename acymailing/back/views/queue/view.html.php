@@ -12,8 +12,9 @@ class QueueViewQueue extends acymView
 
         $this->steps = [
             'campaigns' => 'ACYM_MAILS',
-            'scheduled' => 'ACYM_SCHEDULED',
-            'detailed' => 'ACYM_QUEUE_DETAILED',
         ];
+
+
+        $this->steps['detailed'] = 'ACYM_QUEUE_DETAILED';
     }
 }

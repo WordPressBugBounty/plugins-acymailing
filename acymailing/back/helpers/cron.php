@@ -372,7 +372,7 @@ class CronHelper extends acymObject
             if (!empty($this->config->get('cron_security', 0)) && !empty($this->config->get('cron_key'))) {
                 $cronKey = '&cronKey='.$this->config->get('cron_key');
             }
-            acym_makeCurlCall(acym_frontendLink('cron&task=cron&external_sending_repeat=1&t='.time().$cronKey), [], [], true);
+            acym_makeCurlCall(acym_frontendLink('cron&task=cron&external_sending_repeat=1&t='.time().$cronKey), ['verifySsl' => false]);
         }
 
         return true;

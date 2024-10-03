@@ -21,6 +21,8 @@ trait Listing
     {
         acym_setVar('layout', 'listing');
 
+        $this->getAccessToken();
+
         $data = [];
         $data['tab'] = new TabHelper();
         $this->prepareLanguages($data);

@@ -301,6 +301,26 @@ trait Security
             if (strlen($defaultValue) === 0) {
                 continue;
             }
+            $currentDefault = trim($currentTableColumns[$oneColumn]->COLUMN_DEFAULT, "'\"");
+            $expectedDefault = trim($defaultValue, "'\"");
+
+            if (strtoupper($expectedDefault) === 'NULL') {
+                $expectedDefault = null;
+            }
+
+            $isNullable = strtoupper($currentTableColumns[$oneColumn]->IS_NULLABLE) === 'YES';
+
+            if ($isNullable && $currentDefault === '') {
+                $currentDefault = null;
+            }
+
+            if (!$isNullable && $currentDefault === null) {
+                $currentDefault = '';
+            }
+
+            if ($currentDefault === $expectedDefault) {
+                continue;
+            }
 
             if (!empty($currentTableColumns[$oneColumn]->COLUMN_DEFAULT) && substr($currentTableColumns[$oneColumn]->COLUMN_DEFAULT, 0, 1) === '"') {
                 $currentTableColumns[$oneColumn]->COLUMN_DEFAULT = '\''.substr($currentTableColumns[$oneColumn]->COLUMN_DEFAULT, 1, -1).'\'';

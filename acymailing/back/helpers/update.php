@@ -19,7 +19,7 @@ class UpdateHelper extends acymObject
     const FIRST_EMAIL_NAME_KEY = 'ACYM_FIRST_EMAIL_NAME';
 
     private $level = 'starter';
-    private $version = '9.8.1';
+    private $version = '9.9.0';
     private $previousVersion;
     private $isUpdating = false;
     private $bounceVersion = 5;

@@ -992,7 +992,9 @@ trait Edition
         $campaignId = acym_getVar('int', 'campaignId');
         $campaignClass = new CampaignClass();
         $campaign = empty($campaignId) ? null : $campaignClass->getOneByIdWithMail($campaignId);
-        if (is_null($campaign)) return false;
+        if (is_null($campaign)) {
+            return false;
+        }
 
         if (!$campaignClass->hasUserAccess($campaignId)) {
             die('Access denied for this campaign');
@@ -1022,6 +1024,8 @@ trait Edition
         ];
         $data['campaignInformation'] = $campaign;
         $data['mailId'] = $campaign->mail_id;
+
+        acym_trigger('onAcymCampaignSummary', [&$data]);
 
         return true;
     }

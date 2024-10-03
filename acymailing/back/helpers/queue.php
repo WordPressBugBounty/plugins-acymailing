@@ -2,8 +2,6 @@
 
 namespace AcyMailing\Helpers;
 
-use AcyMailing\Classes\CampaignClass;
-use AcyMailing\Classes\MailClass;
 use AcyMailing\Classes\MailStatClass;
 use AcyMailing\Classes\QueueClass;
 use AcyMailing\Classes\UserClass;
@@ -187,12 +185,16 @@ class QueueHelper extends acymObject
             $emailFrequency = 0;
         }
 
-        $mailAsList = [];
-        $campaignClass = new CampaignClass();
+        $userLists = [];
+        $userClass = new UserClass();
+        $isSendingMethodByListActive = false;
+        acym_trigger('sendingMethodByListActive', [&$isSendingMethodByListActive]);
+        $mailHelper->isSendingMethodByListActive = $isSendingMethodByListActive;
 
         foreach ($queueElements as $oneQueue) {
-            if (empty($mailAsList[$oneQueue->mail_id])) {
-                $mailAsList[$oneQueue->mail_id] = $campaignClass->getListsByMailId($oneQueue->mail_id);
+            if ($isSendingMethodByListActive && empty($userLists[$oneQueue->user_id])) {
+                $userSubscriptions = $userClass->getUserStandardListIdById($oneQueue->user_id);
+                $userLists[$oneQueue->user_id] = empty($userSubscriptions) ? [] : $userSubscriptions;
             }
             if (!empty($emailFrequency)) {
                 sleep($emailFrequency);
@@ -221,7 +223,7 @@ class QueueHelper extends acymObject
             $this->triggerSentHook($oneQueue->mail_id);
             try {
                 $mailHelper->isAbTest = $isAbTesting;
-                $mailHelper->listsIds = empty($mailAsList[$oneQueue->mail_id]) ? [] : $mailAsList[$oneQueue->mail_id];
+                $mailHelper->listsIds = empty($userLists[$oneQueue->user_id]) ? [] : $userLists[$oneQueue->user_id];
                 $mailHelper->setSendingMethodSetting();
                 $result = $mailHelper->sendOne($oneQueue->mail_id, $oneQueue->user_id);
             } catch (\Exception $e) {

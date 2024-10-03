@@ -3,18 +3,47 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitc59cb0ef0b379882568679111ffa7d56
+class ComposerStaticInited3d05ced117188e4f6fe31671bed19f
 {
+    public static $files = array (
+        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
+        'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
+        '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
+        '9b59d1b0dc9f17a96044da689a464ead' => __DIR__ . '/..' . '/javanile/php-imap2/bootstrap.php',
+        '941748b3c8cae4466c827dfb5ca9602a' => __DIR__ . '/..' . '/rmccue/requests/library/Deprecated.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
+        'Z' => 
+        array (
+            'ZBateson\\StreamDecorators\\' => 26,
+            'ZBateson\\MbWrapper\\' => 19,
+            'ZBateson\\MailMimeParser\\' => 24,
+        ),
+        'W' => 
+        array (
+            'WpOrg\\Requests\\' => 15,
+        ),
         'S' => 
         array (
+            'Symfony\\Polyfill\\Mbstring\\' => 26,
+            'Symfony\\Polyfill\\Iconv\\' => 23,
             'Symfony\\' => 8,
             'Sabberworm\\' => 11,
         ),
         'P' => 
         array (
+            'Psr\\Http\\Message\\' => 17,
             'Psr\\Container\\' => 14,
             'Pelago\\' => 7,
+        ),
+        'J' => 
+        array (
+            'Javanile\\Imap2\\' => 15,
+        ),
+        'G' => 
+        array (
+            'GuzzleHttp\\Psr7\\' => 16,
         ),
         'A' => 
         array (
@@ -24,6 +53,30 @@ class ComposerStaticInitc59cb0ef0b379882568679111ffa7d56
     );
 
     public static $prefixDirsPsr4 = array (
+        'ZBateson\\StreamDecorators\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zbateson/stream-decorators/src',
+        ),
+        'ZBateson\\MbWrapper\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zbateson/mb-wrapper/src',
+        ),
+        'ZBateson\\MailMimeParser\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src',
+        ),
+        'WpOrg\\Requests\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/rmccue/requests/src',
+        ),
+        'Symfony\\Polyfill\\Mbstring\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
+        ),
+        'Symfony\\Polyfill\\Iconv\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-iconv',
+        ),
         'Symfony\\' => 
         array (
             0 => __DIR__ . '/../..' . '/',
@@ -31,6 +84,11 @@ class ComposerStaticInitc59cb0ef0b379882568679111ffa7d56
         'Sabberworm\\' => 
         array (
             0 => __DIR__ . '/../..' . '/',
+        ),
+        'Psr\\Http\\Message\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-factory/src',
+            1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
         'Psr\\Container\\' => 
         array (
@@ -40,6 +98,14 @@ class ComposerStaticInitc59cb0ef0b379882568679111ffa7d56
         array (
             0 => __DIR__ . '/../..' . '/',
         ),
+        'Javanile\\Imap2\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/javanile/php-imap2/src',
+        ),
+        'GuzzleHttp\\Psr7\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
+        ),
         'AcyMailing\\' => 
         array (
             0 => __DIR__ . '/../..' . '/',
@@ -47,6 +113,16 @@ class ComposerStaticInitc59cb0ef0b379882568679111ffa7d56
         'AcyMailerPhp\\' => 
         array (
             0 => __DIR__ . '/../..' . '/',
+        ),
+    );
+
+    public static $prefixesPsr0 = array (
+        'P' => 
+        array (
+            'Pimple' => 
+            array (
+                0 => __DIR__ . '/..' . '/pimple/pimple/src',
+            ),
         ),
     );
 
@@ -285,6 +361,58 @@ class ComposerStaticInitc59cb0ef0b379882568679111ffa7d56
         'AcyMailing\\Views\\SegmentsViewSegments' => __DIR__ . '/../..' . '/back/views/segments/view.html.php',
         'AcyMailing\\Views\\StatsViewStats' => __DIR__ . '/../..' . '/back/views/stats/view.html.php',
         'AcyMailing\\Views\\UsersViewUsers' => __DIR__ . '/../..' . '/back/views/users/view.html.php',
+        'GuzzleHttp\\Psr7\\AppendStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/AppendStream.php',
+        'GuzzleHttp\\Psr7\\BufferStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/BufferStream.php',
+        'GuzzleHttp\\Psr7\\CachingStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/CachingStream.php',
+        'GuzzleHttp\\Psr7\\DroppingStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/DroppingStream.php',
+        'GuzzleHttp\\Psr7\\Exception\\MalformedUriException' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/Exception/MalformedUriException.php',
+        'GuzzleHttp\\Psr7\\FnStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/FnStream.php',
+        'GuzzleHttp\\Psr7\\Header' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/Header.php',
+        'GuzzleHttp\\Psr7\\HttpFactory' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/HttpFactory.php',
+        'GuzzleHttp\\Psr7\\InflateStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/InflateStream.php',
+        'GuzzleHttp\\Psr7\\LazyOpenStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/LazyOpenStream.php',
+        'GuzzleHttp\\Psr7\\LimitStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/LimitStream.php',
+        'GuzzleHttp\\Psr7\\Message' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/Message.php',
+        'GuzzleHttp\\Psr7\\MessageTrait' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/MessageTrait.php',
+        'GuzzleHttp\\Psr7\\MimeType' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/MimeType.php',
+        'GuzzleHttp\\Psr7\\MultipartStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/MultipartStream.php',
+        'GuzzleHttp\\Psr7\\NoSeekStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/NoSeekStream.php',
+        'GuzzleHttp\\Psr7\\PumpStream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/PumpStream.php',
+        'GuzzleHttp\\Psr7\\Query' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/Query.php',
+        'GuzzleHttp\\Psr7\\Request' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/Request.php',
+        'GuzzleHttp\\Psr7\\Response' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/Response.php',
+        'GuzzleHttp\\Psr7\\Rfc7230' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/Rfc7230.php',
+        'GuzzleHttp\\Psr7\\ServerRequest' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/ServerRequest.php',
+        'GuzzleHttp\\Psr7\\Stream' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/Stream.php',
+        'GuzzleHttp\\Psr7\\StreamDecoratorTrait' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/StreamDecoratorTrait.php',
+        'GuzzleHttp\\Psr7\\StreamWrapper' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/StreamWrapper.php',
+        'GuzzleHttp\\Psr7\\UploadedFile' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/UploadedFile.php',
+        'GuzzleHttp\\Psr7\\Uri' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/Uri.php',
+        'GuzzleHttp\\Psr7\\UriComparator' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/UriComparator.php',
+        'GuzzleHttp\\Psr7\\UriNormalizer' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/UriNormalizer.php',
+        'GuzzleHttp\\Psr7\\UriResolver' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/UriResolver.php',
+        'GuzzleHttp\\Psr7\\Utils' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/Utils.php',
+        'Javanile\\Imap2\\Acl' => __DIR__ . '/..' . '/javanile/php-imap2/src/Acl.php',
+        'Javanile\\Imap2\\BodyStructure' => __DIR__ . '/..' . '/javanile/php-imap2/src/BodyStructure.php',
+        'Javanile\\Imap2\\Connection' => __DIR__ . '/..' . '/javanile/php-imap2/src/Connection.php',
+        'Javanile\\Imap2\\Errors' => __DIR__ . '/..' . '/javanile/php-imap2/src/Errors.php',
+        'Javanile\\Imap2\\Functions' => __DIR__ . '/..' . '/javanile/php-imap2/src/Functions.php',
+        'Javanile\\Imap2\\HeaderInfo' => __DIR__ . '/..' . '/javanile/php-imap2/src/HeaderInfo.php',
+        'Javanile\\Imap2\\ImapHelpers' => __DIR__ . '/..' . '/javanile/php-imap2/src/ImapHelpers.php',
+        'Javanile\\Imap2\\Mail' => __DIR__ . '/..' . '/javanile/php-imap2/src/Mail.php',
+        'Javanile\\Imap2\\Mailbox' => __DIR__ . '/..' . '/javanile/php-imap2/src/Mailbox.php',
+        'Javanile\\Imap2\\Message' => __DIR__ . '/..' . '/javanile/php-imap2/src/Message.php',
+        'Javanile\\Imap2\\Polyfill' => __DIR__ . '/..' . '/javanile/php-imap2/src/Polyfill.php',
+        'Javanile\\Imap2\\Roundcube\\Charset' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/Charset.php',
+        'Javanile\\Imap2\\Roundcube\\ImapClient' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/ImapClient.php',
+        'Javanile\\Imap2\\Roundcube\\MessageHeader' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/MessageHeader.php',
+        'Javanile\\Imap2\\Roundcube\\MessageHeaderSorter' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/MessageHeaderSorter.php',
+        'Javanile\\Imap2\\Roundcube\\Mime' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/Mime.php',
+        'Javanile\\Imap2\\Roundcube\\ResultIndex' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/ResultIndex.php',
+        'Javanile\\Imap2\\Roundcube\\ResultThread' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/ResultThread.php',
+        'Javanile\\Imap2\\Roundcube\\Utils' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/Utils.php',
+        'Javanile\\Imap2\\Thread' => __DIR__ . '/..' . '/javanile/php-imap2/src/Thread.php',
+        'Javanile\\Imap2\\Timeout' => __DIR__ . '/..' . '/javanile/php-imap2/src/Timeout.php',
         'Pelago\\Emogrifier\\CssInliner' => __DIR__ . '/../..' . '/front/libraries/pelago/emogrifier/src/CssInliner.php',
         'Pelago\\Emogrifier\\Css\\CssDocument' => __DIR__ . '/../..' . '/front/libraries/pelago/emogrifier/src/Css/CssDocument.php',
         'Pelago\\Emogrifier\\Css\\StyleRule' => __DIR__ . '/../..' . '/front/libraries/pelago/emogrifier/src/Css/StyleRule.php',
@@ -294,9 +422,41 @@ class ComposerStaticInitc59cb0ef0b379882568679111ffa7d56
         'Pelago\\Emogrifier\\HtmlProcessor\\HtmlPruner' => __DIR__ . '/../..' . '/front/libraries/pelago/emogrifier/src/HtmlProcessor/HtmlPruner.php',
         'Pelago\\Emogrifier\\Utilities\\ArrayIntersector' => __DIR__ . '/../..' . '/front/libraries/pelago/emogrifier/src/Utilities/ArrayIntersector.php',
         'Pelago\\Emogrifier\\Utilities\\CssConcatenator' => __DIR__ . '/../..' . '/front/libraries/pelago/emogrifier/src/Utilities/CssConcatenator.php',
+        'Pimple\\Container' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Container.php',
+        'Pimple\\Exception\\ExpectedInvokableException' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Exception/ExpectedInvokableException.php',
+        'Pimple\\Exception\\FrozenServiceException' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Exception/FrozenServiceException.php',
+        'Pimple\\Exception\\InvalidServiceIdentifierException' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Exception/InvalidServiceIdentifierException.php',
+        'Pimple\\Exception\\UnknownIdentifierException' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Exception/UnknownIdentifierException.php',
+        'Pimple\\Psr11\\Container' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Psr11/Container.php',
+        'Pimple\\Psr11\\ServiceLocator' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Psr11/ServiceLocator.php',
+        'Pimple\\ServiceIterator' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/ServiceIterator.php',
+        'Pimple\\ServiceProviderInterface' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/ServiceProviderInterface.php',
+        'Pimple\\Tests\\Fixtures\\Invokable' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/Fixtures/Invokable.php',
+        'Pimple\\Tests\\Fixtures\\NonInvokable' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/Fixtures/NonInvokable.php',
+        'Pimple\\Tests\\Fixtures\\PimpleServiceProvider' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/Fixtures/PimpleServiceProvider.php',
+        'Pimple\\Tests\\Fixtures\\Service' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/Fixtures/Service.php',
+        'Pimple\\Tests\\PimpleServiceProviderInterfaceTest' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/PimpleServiceProviderInterfaceTest.php',
+        'Pimple\\Tests\\PimpleTest' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/PimpleTest.php',
+        'Pimple\\Tests\\Psr11\\ContainerTest' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/Psr11/ContainerTest.php',
+        'Pimple\\Tests\\Psr11\\ServiceLocatorTest' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/Psr11/ServiceLocatorTest.php',
+        'Pimple\\Tests\\ServiceIteratorTest' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/ServiceIteratorTest.php',
         'Psr\\Container\\ContainerExceptionInterface' => __DIR__ . '/..' . '/psr/container/src/ContainerExceptionInterface.php',
         'Psr\\Container\\ContainerInterface' => __DIR__ . '/..' . '/psr/container/src/ContainerInterface.php',
         'Psr\\Container\\NotFoundExceptionInterface' => __DIR__ . '/..' . '/psr/container/src/NotFoundExceptionInterface.php',
+        'Psr\\Http\\Message\\MessageInterface' => __DIR__ . '/..' . '/psr/http-message/src/MessageInterface.php',
+        'Psr\\Http\\Message\\RequestFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/RequestFactoryInterface.php',
+        'Psr\\Http\\Message\\RequestInterface' => __DIR__ . '/..' . '/psr/http-message/src/RequestInterface.php',
+        'Psr\\Http\\Message\\ResponseFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/ResponseFactoryInterface.php',
+        'Psr\\Http\\Message\\ResponseInterface' => __DIR__ . '/..' . '/psr/http-message/src/ResponseInterface.php',
+        'Psr\\Http\\Message\\ServerRequestFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/ServerRequestFactoryInterface.php',
+        'Psr\\Http\\Message\\ServerRequestInterface' => __DIR__ . '/..' . '/psr/http-message/src/ServerRequestInterface.php',
+        'Psr\\Http\\Message\\StreamFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/StreamFactoryInterface.php',
+        'Psr\\Http\\Message\\StreamInterface' => __DIR__ . '/..' . '/psr/http-message/src/StreamInterface.php',
+        'Psr\\Http\\Message\\UploadedFileFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/UploadedFileFactoryInterface.php',
+        'Psr\\Http\\Message\\UploadedFileInterface' => __DIR__ . '/..' . '/psr/http-message/src/UploadedFileInterface.php',
+        'Psr\\Http\\Message\\UriFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/UriFactoryInterface.php',
+        'Psr\\Http\\Message\\UriInterface' => __DIR__ . '/..' . '/psr/http-message/src/UriInterface.php',
+        'Requests' => __DIR__ . '/..' . '/rmccue/requests/library/Requests.php',
         'Sabberworm\\CSS\\CSSList\\AtRuleBlockList' => __DIR__ . '/../..' . '/front/libraries/sabberworm/php-css-parser/src/CSSList/AtRuleBlockList.php',
         'Sabberworm\\CSS\\CSSList\\CSSBlockList' => __DIR__ . '/../..' . '/front/libraries/sabberworm/php-css-parser/src/CSSList/CSSBlockList.php',
         'Sabberworm\\CSS\\CSSList\\CSSList' => __DIR__ . '/../..' . '/front/libraries/sabberworm/php-css-parser/src/CSSList/CSSList.php',
@@ -384,14 +544,190 @@ class ComposerStaticInitc59cb0ef0b379882568679111ffa7d56
         'Symfony\\Component\\CssSelector\\XPath\\Translator' => __DIR__ . '/../..' . '/front/libraries/symfony/css-selector/XPath/Translator.php',
         'Symfony\\Component\\CssSelector\\XPath\\TranslatorInterface' => __DIR__ . '/../..' . '/front/libraries/symfony/css-selector/XPath/TranslatorInterface.php',
         'Symfony\\Component\\CssSelector\\XPath\\XPathExpr' => __DIR__ . '/../..' . '/front/libraries/symfony/css-selector/XPath/XPathExpr.php',
+        'Symfony\\Polyfill\\Iconv\\Iconv' => __DIR__ . '/..' . '/symfony/polyfill-iconv/Iconv.php',
+        'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
+        'WpOrg\\Requests\\Auth' => __DIR__ . '/..' . '/rmccue/requests/src/Auth.php',
+        'WpOrg\\Requests\\Auth\\Basic' => __DIR__ . '/..' . '/rmccue/requests/src/Auth/Basic.php',
+        'WpOrg\\Requests\\Autoload' => __DIR__ . '/..' . '/rmccue/requests/src/Autoload.php',
+        'WpOrg\\Requests\\Capability' => __DIR__ . '/..' . '/rmccue/requests/src/Capability.php',
+        'WpOrg\\Requests\\Cookie' => __DIR__ . '/..' . '/rmccue/requests/src/Cookie.php',
+        'WpOrg\\Requests\\Cookie\\Jar' => __DIR__ . '/..' . '/rmccue/requests/src/Cookie/Jar.php',
+        'WpOrg\\Requests\\Exception' => __DIR__ . '/..' . '/rmccue/requests/src/Exception.php',
+        'WpOrg\\Requests\\Exception\\ArgumentCount' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/ArgumentCount.php',
+        'WpOrg\\Requests\\Exception\\Http' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status304' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status304.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status305' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status305.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status306' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status306.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status400' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status400.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status401' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status401.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status402' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status402.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status403' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status403.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status404' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status404.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status405' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status405.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status406' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status406.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status407' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status407.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status408' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status408.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status409' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status409.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status410' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status410.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status411' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status411.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status412' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status412.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status413' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status413.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status414' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status414.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status415' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status415.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status416' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status416.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status417' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status417.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status418' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status418.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status428' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status428.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status429' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status429.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status431' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status431.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status500' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status500.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status501' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status501.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status502' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status502.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status503' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status503.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status504' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status504.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status505' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status505.php',
+        'WpOrg\\Requests\\Exception\\Http\\Status511' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status511.php',
+        'WpOrg\\Requests\\Exception\\Http\\StatusUnknown' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/StatusUnknown.php',
+        'WpOrg\\Requests\\Exception\\InvalidArgument' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/InvalidArgument.php',
+        'WpOrg\\Requests\\Exception\\Transport' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Transport.php',
+        'WpOrg\\Requests\\Exception\\Transport\\Curl' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Transport/Curl.php',
+        'WpOrg\\Requests\\HookManager' => __DIR__ . '/..' . '/rmccue/requests/src/HookManager.php',
+        'WpOrg\\Requests\\Hooks' => __DIR__ . '/..' . '/rmccue/requests/src/Hooks.php',
+        'WpOrg\\Requests\\IdnaEncoder' => __DIR__ . '/..' . '/rmccue/requests/src/IdnaEncoder.php',
+        'WpOrg\\Requests\\Ipv6' => __DIR__ . '/..' . '/rmccue/requests/src/Ipv6.php',
+        'WpOrg\\Requests\\Iri' => __DIR__ . '/..' . '/rmccue/requests/src/Iri.php',
+        'WpOrg\\Requests\\Port' => __DIR__ . '/..' . '/rmccue/requests/src/Port.php',
+        'WpOrg\\Requests\\Proxy' => __DIR__ . '/..' . '/rmccue/requests/src/Proxy.php',
+        'WpOrg\\Requests\\Proxy\\Http' => __DIR__ . '/..' . '/rmccue/requests/src/Proxy/Http.php',
+        'WpOrg\\Requests\\Requests' => __DIR__ . '/..' . '/rmccue/requests/src/Requests.php',
+        'WpOrg\\Requests\\Response' => __DIR__ . '/..' . '/rmccue/requests/src/Response.php',
+        'WpOrg\\Requests\\Response\\Headers' => __DIR__ . '/..' . '/rmccue/requests/src/Response/Headers.php',
+        'WpOrg\\Requests\\Session' => __DIR__ . '/..' . '/rmccue/requests/src/Session.php',
+        'WpOrg\\Requests\\Ssl' => __DIR__ . '/..' . '/rmccue/requests/src/Ssl.php',
+        'WpOrg\\Requests\\Transport' => __DIR__ . '/..' . '/rmccue/requests/src/Transport.php',
+        'WpOrg\\Requests\\Transport\\Curl' => __DIR__ . '/..' . '/rmccue/requests/src/Transport/Curl.php',
+        'WpOrg\\Requests\\Transport\\Fsockopen' => __DIR__ . '/..' . '/rmccue/requests/src/Transport/Fsockopen.php',
+        'WpOrg\\Requests\\Utility\\CaseInsensitiveDictionary' => __DIR__ . '/..' . '/rmccue/requests/src/Utility/CaseInsensitiveDictionary.php',
+        'WpOrg\\Requests\\Utility\\FilteredIterator' => __DIR__ . '/..' . '/rmccue/requests/src/Utility/FilteredIterator.php',
+        'WpOrg\\Requests\\Utility\\InputValidator' => __DIR__ . '/..' . '/rmccue/requests/src/Utility/InputValidator.php',
+        'ZBateson\\MailMimeParser\\Container' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Container.php',
+        'ZBateson\\MailMimeParser\\Header\\AbstractHeader' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/AbstractHeader.php',
+        'ZBateson\\MailMimeParser\\Header\\AddressHeader' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/AddressHeader.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\AbstractConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/AbstractConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\AddressBaseConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/AddressBaseConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\AddressConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/AddressConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\AddressEmailConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/AddressEmailConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\AddressGroupConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/AddressGroupConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\CommentConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/CommentConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\ConsumerService' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/ConsumerService.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\DateConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/DateConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\GenericConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/GenericConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\IdBaseConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/IdBaseConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\IdConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/IdConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\ParameterConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/ParameterConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\QuotedStringConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/QuotedStringConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\ReceivedConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/ReceivedConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\Received\\DomainConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/Received/DomainConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\Received\\GenericReceivedConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/Received/GenericReceivedConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\Received\\ReceivedDateConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/Received/ReceivedDateConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\Consumer\\SubjectConsumer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Consumer/SubjectConsumer.php',
+        'ZBateson\\MailMimeParser\\Header\\DateHeader' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/DateHeader.php',
+        'ZBateson\\MailMimeParser\\Header\\GenericHeader' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/GenericHeader.php',
+        'ZBateson\\MailMimeParser\\Header\\HeaderConsts' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/HeaderConsts.php',
+        'ZBateson\\MailMimeParser\\Header\\HeaderFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/HeaderFactory.php',
+        'ZBateson\\MailMimeParser\\Header\\IHeader' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/IHeader.php',
+        'ZBateson\\MailMimeParser\\Header\\IHeaderPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/IHeaderPart.php',
+        'ZBateson\\MailMimeParser\\Header\\IdHeader' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/IdHeader.php',
+        'ZBateson\\MailMimeParser\\Header\\MimeEncodedHeader' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/MimeEncodedHeader.php',
+        'ZBateson\\MailMimeParser\\Header\\ParameterHeader' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/ParameterHeader.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\AddressGroupPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/AddressGroupPart.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\AddressPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/AddressPart.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\CommentPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/CommentPart.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\DatePart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/DatePart.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\HeaderPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/HeaderPart.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\HeaderPartFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/HeaderPartFactory.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\LiteralPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/LiteralPart.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\MimeLiteralPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/MimeLiteralPart.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\MimeLiteralPartFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/MimeLiteralPartFactory.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\ParameterPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/ParameterPart.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\ReceivedDomainPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/ReceivedDomainPart.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\ReceivedPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/ReceivedPart.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\SplitParameterToken' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/SplitParameterToken.php',
+        'ZBateson\\MailMimeParser\\Header\\Part\\Token' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/Part/Token.php',
+        'ZBateson\\MailMimeParser\\Header\\ReceivedHeader' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/ReceivedHeader.php',
+        'ZBateson\\MailMimeParser\\Header\\SubjectHeader' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/SubjectHeader.php',
+        'ZBateson\\MailMimeParser\\IMessage' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/IMessage.php',
+        'ZBateson\\MailMimeParser\\MailMimeParser' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/MailMimeParser.php',
+        'ZBateson\\MailMimeParser\\Message' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message.php',
+        'ZBateson\\MailMimeParser\\Message\\Factory\\IMessagePartFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/Factory/IMessagePartFactory.php',
+        'ZBateson\\MailMimeParser\\Message\\Factory\\IMimePartFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/Factory/IMimePartFactory.php',
+        'ZBateson\\MailMimeParser\\Message\\Factory\\IUUEncodedPartFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/Factory/IUUEncodedPartFactory.php',
+        'ZBateson\\MailMimeParser\\Message\\Factory\\PartChildrenContainerFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/Factory/PartChildrenContainerFactory.php',
+        'ZBateson\\MailMimeParser\\Message\\Factory\\PartHeaderContainerFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/Factory/PartHeaderContainerFactory.php',
+        'ZBateson\\MailMimeParser\\Message\\Factory\\PartStreamContainerFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/Factory/PartStreamContainerFactory.php',
+        'ZBateson\\MailMimeParser\\Message\\Helper\\AbstractHelper' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/Helper/AbstractHelper.php',
+        'ZBateson\\MailMimeParser\\Message\\Helper\\GenericHelper' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/Helper/GenericHelper.php',
+        'ZBateson\\MailMimeParser\\Message\\Helper\\MultipartHelper' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/Helper/MultipartHelper.php',
+        'ZBateson\\MailMimeParser\\Message\\Helper\\PrivacyHelper' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/Helper/PrivacyHelper.php',
+        'ZBateson\\MailMimeParser\\Message\\IMessagePart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/IMessagePart.php',
+        'ZBateson\\MailMimeParser\\Message\\IMimePart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/IMimePart.php',
+        'ZBateson\\MailMimeParser\\Message\\IMultiPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/IMultiPart.php',
+        'ZBateson\\MailMimeParser\\Message\\IUUEncodedPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/IUUEncodedPart.php',
+        'ZBateson\\MailMimeParser\\Message\\MessagePart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/MessagePart.php',
+        'ZBateson\\MailMimeParser\\Message\\MimePart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/MimePart.php',
+        'ZBateson\\MailMimeParser\\Message\\MultiPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/MultiPart.php',
+        'ZBateson\\MailMimeParser\\Message\\NonMimePart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/NonMimePart.php',
+        'ZBateson\\MailMimeParser\\Message\\PartChildrenContainer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/PartChildrenContainer.php',
+        'ZBateson\\MailMimeParser\\Message\\PartFilter' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/PartFilter.php',
+        'ZBateson\\MailMimeParser\\Message\\PartHeaderContainer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/PartHeaderContainer.php',
+        'ZBateson\\MailMimeParser\\Message\\PartStreamContainer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/PartStreamContainer.php',
+        'ZBateson\\MailMimeParser\\Message\\UUEncodedPart' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Message/UUEncodedPart.php',
+        'ZBateson\\MailMimeParser\\Parser\\AbstractParser' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/AbstractParser.php',
+        'ZBateson\\MailMimeParser\\Parser\\HeaderParser' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/HeaderParser.php',
+        'ZBateson\\MailMimeParser\\Parser\\IParser' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/IParser.php',
+        'ZBateson\\MailMimeParser\\Parser\\MessageParser' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/MessageParser.php',
+        'ZBateson\\MailMimeParser\\Parser\\MimeParser' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/MimeParser.php',
+        'ZBateson\\MailMimeParser\\Parser\\NonMimeParser' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/NonMimeParser.php',
+        'ZBateson\\MailMimeParser\\Parser\\ParserManager' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/ParserManager.php',
+        'ZBateson\\MailMimeParser\\Parser\\PartBuilder' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/PartBuilder.php',
+        'ZBateson\\MailMimeParser\\Parser\\PartBuilderFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/PartBuilderFactory.php',
+        'ZBateson\\MailMimeParser\\Parser\\Part\\ParserPartChildrenContainer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Part/ParserPartChildrenContainer.php',
+        'ZBateson\\MailMimeParser\\Parser\\Part\\ParserPartChildrenContainerFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Part/ParserPartChildrenContainerFactory.php',
+        'ZBateson\\MailMimeParser\\Parser\\Part\\ParserPartStreamContainer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Part/ParserPartStreamContainer.php',
+        'ZBateson\\MailMimeParser\\Parser\\Part\\ParserPartStreamContainerFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Part/ParserPartStreamContainerFactory.php',
+        'ZBateson\\MailMimeParser\\Parser\\Part\\UUEncodedPartHeaderContainer' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Part/UUEncodedPartHeaderContainer.php',
+        'ZBateson\\MailMimeParser\\Parser\\Part\\UUEncodedPartHeaderContainerFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Part/UUEncodedPartHeaderContainerFactory.php',
+        'ZBateson\\MailMimeParser\\Parser\\Proxy\\ParserMessageProxy' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Proxy/ParserMessageProxy.php',
+        'ZBateson\\MailMimeParser\\Parser\\Proxy\\ParserMessageProxyFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Proxy/ParserMessageProxyFactory.php',
+        'ZBateson\\MailMimeParser\\Parser\\Proxy\\ParserMimePartProxy' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Proxy/ParserMimePartProxy.php',
+        'ZBateson\\MailMimeParser\\Parser\\Proxy\\ParserMimePartProxyFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Proxy/ParserMimePartProxyFactory.php',
+        'ZBateson\\MailMimeParser\\Parser\\Proxy\\ParserNonMimeMessageProxy' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Proxy/ParserNonMimeMessageProxy.php',
+        'ZBateson\\MailMimeParser\\Parser\\Proxy\\ParserNonMimeMessageProxyFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Proxy/ParserNonMimeMessageProxyFactory.php',
+        'ZBateson\\MailMimeParser\\Parser\\Proxy\\ParserPartProxy' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Proxy/ParserPartProxy.php',
+        'ZBateson\\MailMimeParser\\Parser\\Proxy\\ParserPartProxyFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Proxy/ParserPartProxyFactory.php',
+        'ZBateson\\MailMimeParser\\Parser\\Proxy\\ParserUUEncodedPartProxy' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Proxy/ParserUUEncodedPartProxy.php',
+        'ZBateson\\MailMimeParser\\Parser\\Proxy\\ParserUUEncodedPartProxyFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Parser/Proxy/ParserUUEncodedPartProxyFactory.php',
+        'ZBateson\\MailMimeParser\\Stream\\HeaderStream' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Stream/HeaderStream.php',
+        'ZBateson\\MailMimeParser\\Stream\\MessagePartStream' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Stream/MessagePartStream.php',
+        'ZBateson\\MailMimeParser\\Stream\\StreamFactory' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Stream/StreamFactory.php',
+        'ZBateson\\MbWrapper\\MbWrapper' => __DIR__ . '/..' . '/zbateson/mb-wrapper/src/MbWrapper.php',
+        'ZBateson\\StreamDecorators\\Base64Stream' => __DIR__ . '/..' . '/zbateson/stream-decorators/src/Base64Stream.php',
+        'ZBateson\\StreamDecorators\\CharsetStream' => __DIR__ . '/..' . '/zbateson/stream-decorators/src/CharsetStream.php',
+        'ZBateson\\StreamDecorators\\ChunkSplitStream' => __DIR__ . '/..' . '/zbateson/stream-decorators/src/ChunkSplitStream.php',
+        'ZBateson\\StreamDecorators\\NonClosingStream' => __DIR__ . '/..' . '/zbateson/stream-decorators/src/NonClosingStream.php',
+        'ZBateson\\StreamDecorators\\PregReplaceFilterStream' => __DIR__ . '/..' . '/zbateson/stream-decorators/src/PregReplaceFilterStream.php',
+        'ZBateson\\StreamDecorators\\QuotedPrintableStream' => __DIR__ . '/..' . '/zbateson/stream-decorators/src/QuotedPrintableStream.php',
+        'ZBateson\\StreamDecorators\\SeekingLimitStream' => __DIR__ . '/..' . '/zbateson/stream-decorators/src/SeekingLimitStream.php',
+        'ZBateson\\StreamDecorators\\UUStream' => __DIR__ . '/..' . '/zbateson/stream-decorators/src/UUStream.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitc59cb0ef0b379882568679111ffa7d56::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitc59cb0ef0b379882568679111ffa7d56::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitc59cb0ef0b379882568679111ffa7d56::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInited3d05ced117188e4f6fe31671bed19f::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInited3d05ced117188e4f6fe31671bed19f::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInited3d05ced117188e4f6fe31671bed19f::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInited3d05ced117188e4f6fe31671bed19f::$classMap;
 
         }, null, ClassLoader::class);
     }
