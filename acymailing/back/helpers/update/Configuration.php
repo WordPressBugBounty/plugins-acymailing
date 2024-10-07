@@ -148,7 +148,7 @@ trait Configuration
         $allPref['delete_stats_enabled'] = 1;
         $allPref['delete_stats'] = 86400 * 360;
         $allPref['delete_archive_history_after'] = 86400 * 90;
-        $allPref['previous_version'] = '9.9.0';
+        $allPref['previous_version'] = '9.9.1';
 
         $allPref['display_built_by'] = acym_level(ACYM_ESSENTIAL) ? 0 : 1;
         $allPref['php_overrides'] = 0;

@@ -14,7 +14,7 @@ final class MultipartStream implements StreamInterface
 
     private $stream;
 
-    public function __construct(array $elements = [], string $boundary = null)
+    public function __construct(array $elements = [], ?string $boundary = null)
     {
         $this->boundary = $boundary ?: bin2hex(random_bytes(20));
         $this->stream = $this->createStream($elements);

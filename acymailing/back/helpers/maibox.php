@@ -20,8 +20,8 @@ class MailboxHelper extends BounceHelper
             'secure_method' => $this->action->secure_method,
             'self_signed' => $this->action->self_signed,
             'timeout' => 10,
-            'bounce_token' => $this->action->bounce_token,
-            'connection_method' => $this->action->connection_method,
+            'bounce_token' => empty($this->action->bounce_token) ? '' : $this->action->bounce_token,
+            'imap_connection_method' => empty($this->action->imap_connection_method) ? 'classic' : $this->action->imap_connection_method,
         ];
 
         return $this->isConfigurationValid();

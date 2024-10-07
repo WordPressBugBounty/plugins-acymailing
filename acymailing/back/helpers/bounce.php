@@ -21,7 +21,7 @@ class BounceHelper extends acymObject
     private $selfSigned;
     private $timeout;
     private $oAuthToken;
-    private $connectionMethod;
+    private $imapConnectionMethod;
 
     private $allowed_extensions = [];
     public $nbMessages = 0;
@@ -87,7 +87,7 @@ class BounceHelper extends acymObject
                 'self_signed' => $this->config->get('bounce_certif', false),
                 'timeout' => $this->config->get('bounce_timeout'),
                 'bounce_token' => $this->config->get('bounce_token', ''),
-                'connection_method' => $this->config->get('bounce_connection_method', 'classic'),
+                'imap_connection_method' => $this->config->get('imap_connection_method', 'classic'),
             ];
         }
 
@@ -100,7 +100,7 @@ class BounceHelper extends acymObject
         $this->selfSigned = $config['self_signed'];
         $this->timeout = $config['timeout'];
         $this->oAuthToken = str_replace('Bearer ', '', $config['bounce_token']);
-        $this->connectionMethod = $config['connection_method'];
+        $this->imapConnectionMethod = $config['imap_connection_method'];
 
         if ($this->connectMethod == 'pear') {
             $this->usePear = true;
@@ -264,7 +264,7 @@ class BounceHelper extends acymObject
             $serverName .= '/service='.$protocol;
         }
         $serverName .= '}';
-        if ($this->connectionMethod === 'oauth') {
+        if ($this->imapConnectionMethod === 'oauth') {
             $this->refreshToken();
             $this->mailbox = imap2_open($serverName, trim($this->username), $this->oAuthToken, OP_XOAUTH2);
         } else {
@@ -1437,7 +1437,7 @@ class BounceHelper extends acymObject
 
     private function callImapFunction($functionName, $params = [])
     {
-        if ($this->connectionMethod === 'oauth') {
+        if ($this->imapConnectionMethod === 'oauth') {
             $functionName = str_replace('imap_', 'imap2_', $functionName);
         }
 

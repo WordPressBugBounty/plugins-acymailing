@@ -157,7 +157,7 @@ class Uri implements UriInterface, \JsonSerializable
             && (!isset($uri->getPath()[0]) || $uri->getPath()[0] !== '/');
     }
 
-    public static function isSameDocumentReference(UriInterface $uri, UriInterface $base = null): bool
+    public static function isSameDocumentReference(UriInterface $uri, ?UriInterface $base = null): bool
     {
         if ($base !== null) {
             $uri = UriResolver::resolve($base, $uri);

@@ -3,14 +3,13 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInited3d05ced117188e4f6fe31671bed19f
+class ComposerStaticInit890b2e0eb139011317f3ed4a289db712
 {
     public static $files = array (
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '9b59d1b0dc9f17a96044da689a464ead' => __DIR__ . '/..' . '/javanile/php-imap2/bootstrap.php',
-        '941748b3c8cae4466c827dfb5ca9602a' => __DIR__ . '/..' . '/rmccue/requests/library/Deprecated.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -19,10 +18,6 @@ class ComposerStaticInited3d05ced117188e4f6fe31671bed19f
             'ZBateson\\StreamDecorators\\' => 26,
             'ZBateson\\MbWrapper\\' => 19,
             'ZBateson\\MailMimeParser\\' => 24,
-        ),
-        'W' => 
-        array (
-            'WpOrg\\Requests\\' => 15,
         ),
         'S' => 
         array (
@@ -64,10 +59,6 @@ class ComposerStaticInited3d05ced117188e4f6fe31671bed19f
         'ZBateson\\MailMimeParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src',
-        ),
-        'WpOrg\\Requests\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/rmccue/requests/src',
         ),
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
@@ -456,7 +447,6 @@ class ComposerStaticInited3d05ced117188e4f6fe31671bed19f
         'Psr\\Http\\Message\\UploadedFileInterface' => __DIR__ . '/..' . '/psr/http-message/src/UploadedFileInterface.php',
         'Psr\\Http\\Message\\UriFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/UriFactoryInterface.php',
         'Psr\\Http\\Message\\UriInterface' => __DIR__ . '/..' . '/psr/http-message/src/UriInterface.php',
-        'Requests' => __DIR__ . '/..' . '/rmccue/requests/library/Requests.php',
         'Sabberworm\\CSS\\CSSList\\AtRuleBlockList' => __DIR__ . '/../..' . '/front/libraries/sabberworm/php-css-parser/src/CSSList/AtRuleBlockList.php',
         'Sabberworm\\CSS\\CSSList\\CSSBlockList' => __DIR__ . '/../..' . '/front/libraries/sabberworm/php-css-parser/src/CSSList/CSSBlockList.php',
         'Sabberworm\\CSS\\CSSList\\CSSList' => __DIR__ . '/../..' . '/front/libraries/sabberworm/php-css-parser/src/CSSList/CSSList.php',
@@ -546,70 +536,6 @@ class ComposerStaticInited3d05ced117188e4f6fe31671bed19f
         'Symfony\\Component\\CssSelector\\XPath\\XPathExpr' => __DIR__ . '/../..' . '/front/libraries/symfony/css-selector/XPath/XPathExpr.php',
         'Symfony\\Polyfill\\Iconv\\Iconv' => __DIR__ . '/..' . '/symfony/polyfill-iconv/Iconv.php',
         'Symfony\\Polyfill\\Mbstring\\Mbstring' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/Mbstring.php',
-        'WpOrg\\Requests\\Auth' => __DIR__ . '/..' . '/rmccue/requests/src/Auth.php',
-        'WpOrg\\Requests\\Auth\\Basic' => __DIR__ . '/..' . '/rmccue/requests/src/Auth/Basic.php',
-        'WpOrg\\Requests\\Autoload' => __DIR__ . '/..' . '/rmccue/requests/src/Autoload.php',
-        'WpOrg\\Requests\\Capability' => __DIR__ . '/..' . '/rmccue/requests/src/Capability.php',
-        'WpOrg\\Requests\\Cookie' => __DIR__ . '/..' . '/rmccue/requests/src/Cookie.php',
-        'WpOrg\\Requests\\Cookie\\Jar' => __DIR__ . '/..' . '/rmccue/requests/src/Cookie/Jar.php',
-        'WpOrg\\Requests\\Exception' => __DIR__ . '/..' . '/rmccue/requests/src/Exception.php',
-        'WpOrg\\Requests\\Exception\\ArgumentCount' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/ArgumentCount.php',
-        'WpOrg\\Requests\\Exception\\Http' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status304' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status304.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status305' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status305.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status306' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status306.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status400' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status400.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status401' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status401.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status402' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status402.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status403' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status403.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status404' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status404.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status405' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status405.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status406' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status406.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status407' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status407.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status408' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status408.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status409' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status409.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status410' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status410.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status411' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status411.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status412' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status412.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status413' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status413.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status414' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status414.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status415' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status415.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status416' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status416.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status417' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status417.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status418' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status418.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status428' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status428.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status429' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status429.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status431' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status431.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status500' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status500.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status501' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status501.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status502' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status502.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status503' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status503.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status504' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status504.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status505' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status505.php',
-        'WpOrg\\Requests\\Exception\\Http\\Status511' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/Status511.php',
-        'WpOrg\\Requests\\Exception\\Http\\StatusUnknown' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Http/StatusUnknown.php',
-        'WpOrg\\Requests\\Exception\\InvalidArgument' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/InvalidArgument.php',
-        'WpOrg\\Requests\\Exception\\Transport' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Transport.php',
-        'WpOrg\\Requests\\Exception\\Transport\\Curl' => __DIR__ . '/..' . '/rmccue/requests/src/Exception/Transport/Curl.php',
-        'WpOrg\\Requests\\HookManager' => __DIR__ . '/..' . '/rmccue/requests/src/HookManager.php',
-        'WpOrg\\Requests\\Hooks' => __DIR__ . '/..' . '/rmccue/requests/src/Hooks.php',
-        'WpOrg\\Requests\\IdnaEncoder' => __DIR__ . '/..' . '/rmccue/requests/src/IdnaEncoder.php',
-        'WpOrg\\Requests\\Ipv6' => __DIR__ . '/..' . '/rmccue/requests/src/Ipv6.php',
-        'WpOrg\\Requests\\Iri' => __DIR__ . '/..' . '/rmccue/requests/src/Iri.php',
-        'WpOrg\\Requests\\Port' => __DIR__ . '/..' . '/rmccue/requests/src/Port.php',
-        'WpOrg\\Requests\\Proxy' => __DIR__ . '/..' . '/rmccue/requests/src/Proxy.php',
-        'WpOrg\\Requests\\Proxy\\Http' => __DIR__ . '/..' . '/rmccue/requests/src/Proxy/Http.php',
-        'WpOrg\\Requests\\Requests' => __DIR__ . '/..' . '/rmccue/requests/src/Requests.php',
-        'WpOrg\\Requests\\Response' => __DIR__ . '/..' . '/rmccue/requests/src/Response.php',
-        'WpOrg\\Requests\\Response\\Headers' => __DIR__ . '/..' . '/rmccue/requests/src/Response/Headers.php',
-        'WpOrg\\Requests\\Session' => __DIR__ . '/..' . '/rmccue/requests/src/Session.php',
-        'WpOrg\\Requests\\Ssl' => __DIR__ . '/..' . '/rmccue/requests/src/Ssl.php',
-        'WpOrg\\Requests\\Transport' => __DIR__ . '/..' . '/rmccue/requests/src/Transport.php',
-        'WpOrg\\Requests\\Transport\\Curl' => __DIR__ . '/..' . '/rmccue/requests/src/Transport/Curl.php',
-        'WpOrg\\Requests\\Transport\\Fsockopen' => __DIR__ . '/..' . '/rmccue/requests/src/Transport/Fsockopen.php',
-        'WpOrg\\Requests\\Utility\\CaseInsensitiveDictionary' => __DIR__ . '/..' . '/rmccue/requests/src/Utility/CaseInsensitiveDictionary.php',
-        'WpOrg\\Requests\\Utility\\FilteredIterator' => __DIR__ . '/..' . '/rmccue/requests/src/Utility/FilteredIterator.php',
-        'WpOrg\\Requests\\Utility\\InputValidator' => __DIR__ . '/..' . '/rmccue/requests/src/Utility/InputValidator.php',
         'ZBateson\\MailMimeParser\\Container' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Container.php',
         'ZBateson\\MailMimeParser\\Header\\AbstractHeader' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/AbstractHeader.php',
         'ZBateson\\MailMimeParser\\Header\\AddressHeader' => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src/Header/AddressHeader.php',
@@ -724,10 +650,10 @@ class ComposerStaticInited3d05ced117188e4f6fe31671bed19f
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInited3d05ced117188e4f6fe31671bed19f::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInited3d05ced117188e4f6fe31671bed19f::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInited3d05ced117188e4f6fe31671bed19f::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInited3d05ced117188e4f6fe31671bed19f::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit890b2e0eb139011317f3ed4a289db712::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit890b2e0eb139011317f3ed4a289db712::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit890b2e0eb139011317f3ed4a289db712::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit890b2e0eb139011317f3ed4a289db712::$classMap;
 
         }, null, ClassLoader::class);
     }

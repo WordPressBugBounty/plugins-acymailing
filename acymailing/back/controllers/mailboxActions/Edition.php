@@ -166,7 +166,8 @@ trait Edition
             } elseif (empty(trim($mailbox->password, '*'))) {
                 $mailbox->password = $this->config->get('bounce_password');
                 $mailbox->bounce_token = str_replace('Bearer ', '', $this->config->get('bounce_token', ''));
-                $mailbox->connection_method = $this->config->get('bounce_connection_method', 'classic');
+                $mailbox->connection_method = $this->config->get('connection_method', 'imap');
+                $mailbox->imap_connection_method = $this->config->get('imap_connection_method', 'classic');
             }
         }
 

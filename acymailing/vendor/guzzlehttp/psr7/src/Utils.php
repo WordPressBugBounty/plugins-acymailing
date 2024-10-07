@@ -168,7 +168,7 @@ final class Utils
         );
     }
 
-    public static function readLine(StreamInterface $stream, int $maxLength = null): string
+    public static function readLine(StreamInterface $stream, ?int $maxLength = null): string
     {
         $buffer = '';
         $size = 0;
@@ -184,6 +184,17 @@ final class Utils
         }
 
         return $buffer;
+    }
+
+    public static function redactUserInfo(UriInterface $uri): UriInterface
+    {
+        $userInfo = $uri->getUserInfo();
+
+        if (false !== ($pos = \strpos($userInfo, ':'))) {
+            return $uri->withUserInfo(\substr($userInfo, 0, $pos), '***');
+        }
+
+        return $uri;
     }
 
     public static function streamFor($resource = '', array $options = []): StreamInterface
