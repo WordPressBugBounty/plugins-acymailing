@@ -5,11 +5,11 @@
  * Author: AcyMailing Newsletter Team
  * Author URI: https://www.acymailing.com
  * License: GPLv3
- * Version: 9.9.1
+ * Version: 9.9.2
  * Text Domain: acymailing
  * Domain Path: /language
  * Requires at least: 5.0
- * Requires PHP: 7.2
+ * Requires PHP: 7.4
  */
 
 use AcyMailing\Init\acyActivation;

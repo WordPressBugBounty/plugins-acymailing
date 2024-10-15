@@ -283,7 +283,6 @@ class ComposerStaticInit890b2e0eb139011317f3ed4a289db712
         'AcyMailing\\Helpers\\PluginHelper' => __DIR__ . '/../..' . '/back/helpers/plugin.php',
         'AcyMailing\\Helpers\\QueueHelper' => __DIR__ . '/../..' . '/back/helpers/queue.php',
         'AcyMailing\\Helpers\\RegacyHelper' => __DIR__ . '/../..' . '/back/helpers/regacy.php',
-        'AcyMailing\\Helpers\\SplashscreenHelper' => __DIR__ . '/../..' . '/back/helpers/splashscreen.php',
         'AcyMailing\\Helpers\\TabHelper' => __DIR__ . '/../..' . '/back/helpers/tab.php',
         'AcyMailing\\Helpers\\ToolbarHelper' => __DIR__ . '/../..' . '/back/helpers/toolbar.php',
         'AcyMailing\\Helpers\\UpdateHelper' => __DIR__ . '/../..' . '/back/helpers/update.php',

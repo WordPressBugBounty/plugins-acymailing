@@ -28,7 +28,7 @@ class BounceHelper extends acymObject
     public $report = false;
     private $mailer;
     private $mailbox;
-    private $_message;
+    public $_message;
     private $userClass;
     private $blockedUsers = [];
     var $deletedUsers = [];

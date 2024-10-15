@@ -181,7 +181,7 @@ function acym_isLogFileErrorExist($prefix = ''): bool
 
 function acym_getJsonData(): array
 {
-    $rawData = acym_fileGetContent('php://input');
+    $rawData = file_get_contents('php://input');
     $decodedData = @json_decode($rawData, true);
 
     return empty($decodedData) ? [] : $decodedData;

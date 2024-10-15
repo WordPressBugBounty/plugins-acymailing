@@ -1,13 +1,16 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 9.9.1\n"
+"Project-Id-Version: AcyMailing 9.9.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-10-07\n"
+"POT-Creation-Date: 2024-10-15\n"
 "X-Domain: acymailing\n"
 
+
+msgid "The default bounce rules have been updated. You can click the reset button to apply the new version, but note that any custom rules will be overwritten."
+msgstr ""
 
 msgid "It's very simple. This tool will prevent your site from receiving new subscriptions from fake accounts."
 msgstr ""
@@ -2884,9 +2887,6 @@ msgid "If you use the subscription via URL and you want to enable the captcha, y
 msgstr ""
 
 msgid "See users"
-msgstr ""
-
-msgid "Let's go!"
 msgstr ""
 
 msgid "This will insert the customer note that you've just created"

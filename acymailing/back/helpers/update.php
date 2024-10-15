@@ -17,12 +17,12 @@ class UpdateHelper extends acymObject
     use Update\Patchv9;
 
     const FIRST_EMAIL_NAME_KEY = 'ACYM_FIRST_EMAIL_NAME';
+    const BOUNCE_VERSION = 5;
 
     private $level = 'starter';
-    private $version = '9.9.1';
+    private $version = '9.9.2';
     private $previousVersion;
     private $isUpdating = false;
-    private $bounceVersion = 5;
 
     public $firstInstallation = true;
 

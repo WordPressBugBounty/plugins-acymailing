@@ -59,9 +59,7 @@ class RuleClass extends acymClass
 
     public function getOrderingNumber()
     {
-        $query = 'SELECT COUNT(id) FROM #__acym_rule';
-
-        return acym_loadResult($query);
+        return acym_loadResult('SELECT COUNT(`id`) FROM #__acym_rule');
     }
 
     public function cleanTable()

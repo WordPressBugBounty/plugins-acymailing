@@ -10,7 +10,6 @@ use AcyMailing\Classes\MailClass;
 use AcyMailing\Classes\PluginClass;
 use AcyMailing\Controllers\PluginsController;
 use AcyMailing\Helpers\AutomationHelper;
-use AcyMailing\Helpers\SplashscreenHelper;
 use AcyMailing\Helpers\UpdateHelper;
 
 trait Patchv6
@@ -558,9 +557,6 @@ trait Patchv6
         if ($this->isPreviousVersionAtLeast('6.11.0')) {
             return;
         }
-
-        $splashscreenHelper = new SplashscreenHelper();
-        $splashscreenHelper->setDisplaySplashscreenForViewName('bounces', 1);
 
         $this->updateQuery('ALTER TABLE #__acym_mail ADD `access` VARCHAR(50) NOT NULL DEFAULT ""');
         $this->updateQuery('ALTER TABLE #__acym_list ADD `access` VARCHAR(50) NOT NULL DEFAULT ""');

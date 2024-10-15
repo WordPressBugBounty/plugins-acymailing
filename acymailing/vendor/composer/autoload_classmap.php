@@ -170,7 +170,6 @@ return array(
     'AcyMailing\\Helpers\\PluginHelper' => $baseDir . '/back/helpers/plugin.php',
     'AcyMailing\\Helpers\\QueueHelper' => $baseDir . '/back/helpers/queue.php',
     'AcyMailing\\Helpers\\RegacyHelper' => $baseDir . '/back/helpers/regacy.php',
-    'AcyMailing\\Helpers\\SplashscreenHelper' => $baseDir . '/back/helpers/splashscreen.php',
     'AcyMailing\\Helpers\\TabHelper' => $baseDir . '/back/helpers/tab.php',
     'AcyMailing\\Helpers\\ToolbarHelper' => $baseDir . '/back/helpers/toolbar.php',
     'AcyMailing\\Helpers\\UpdateHelper' => $baseDir . '/back/helpers/update.php',

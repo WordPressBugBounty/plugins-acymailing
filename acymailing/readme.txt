@@ -1,10 +1,10 @@
 === AcyMailing - An Ultimate Newsletter Plugin and Marketing Automation Solution for WordPress ===
 Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
-Requires at least: 4.7
+Requires at least: 5.5
 Tested up to: 6.6.2
-Stable tag: 9.9.1
-Requires PHP: 7.2.0
+Stable tag: 9.9.2
+Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -45,12 +45,12 @@ Boost audience engagement & lead generation with AcyMailing, an all-in-one newsl
 
 
 = ⤵️ EXPLORING MORE WITH ACYMAILING: =
-* Enjoy various integrations available: [Business Directory](https://wordpress.org/plugins/acymailing-integration-for-business-directory/), [Contact Form 7](https://wordpress.org/plugins/acymailing-integration-for-contact-form-7/), [Easy Digital Downloads](https://wordpress.org/plugins/acymailing-integration-for-easy-digital-downloads/), [Gravity Forms](https://wordpress.org/plugins/acymailing-integration-for-gravity-forms/), Zapier, Make.com, [WooCommerce](https://wordpress.org/plugins/acymailing-integration-for-woocommerce/), [The Events Calendar](https://wordpress.org/plugins/acymailing-integration-for-the-events-calendar/), etc...
+* Enjoy various integrations available: [Business Directory](https://wordpress.org/plugins/acymailing-integration-for-business-directory/), [Contact Form 7](https://wordpress.org/plugins/acymailing-integration-for-contact-form-7/), [Easy Digital Downloads](https://wordpress.org/plugins/acymailing-integration-for-easy-digital-downloads/), [Gravity Forms](https://wordpress.org/plugins/acymailing-integration-for-gravity-forms/), [Zapier](https://zapier.com/apps/acymailing/integrations), [Make.com](https://www.make.com/en/integrations/acymailing), [WooCommerce](https://wordpress.org/plugins/acymailing-integration-for-woocommerce/), [The Events Calendar](https://wordpress.org/plugins/acymailing-integration-for-the-events-calendar/), etc...
 * Experience the power of AcyMailing with [our demo site](https://demo.acymailing.com/?utm_source=wp_org&utm_campaign=test_acymailing&utm_medium=description_link).
 * Leverage diverse external sending services - [AcyMailing Sending Service](https://www.acymailing.com/our-own-sending-service/), [Brevo/Sendinblue](https://docs.acymailing.com/external-sending-method/sendinblue), [Mailgun](https://docs.acymailing.com/external-sending-method/mailgun), [SendGrid](https://docs.acymailing.com/external-sending-method/sendgrid), [Amazon SES](https://docs.acymailing.com/external-sending-method/amazon-ses), SMTP and more.
 
 
-🔎Stay tuned to know every update on our plugins. Follow us on [LinkedIn](https://www.linkedin.com/company/acymailing/), [Twitter](https://twitter.com/acymailingoff), [Facebook](https://www.facebook.com/AcyMailing/), or our [website](https://www.acymailing.com).
+🔎Stay tuned to know every update on our plugins. Follow us on [LinkedIn](https://www.linkedin.com/company/acymailing/), [Twitter](https://x.com/acymailingoff), [Facebook](https://www.facebook.com/AcyMailing/), or our [website](https://www.acymailing.com).
 
 
 == Installation ==
@@ -113,11 +113,15 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 9.9.1 - October 7, 2024 =
-* Added buttons in editor to choose between right-to-left and left-to-right text
+= 9.9.2 - October 15, 2024 =
+* When the bounce rules are updated, an information message is now shown on the dedicated listing.
+* The information on whether the recipient has unsubscribed has been added on the detailed statistics page.
 
-* Added tenant field for the IMAP connection with Outlook
-* Fixed classic authentication for the IMAP connection
+* We fixed an issue with the Make.com integration that could prevent the use of the user creation action.
+* Fixed the mailbox action
+* Fixed an issue with the splashscreen of the bounce feature that could not be removed
+* Fixed the issue with the unsubscribe from all lists link that redirected to an error page
+* Fixed an issue with WooCommerce HPOS integration
 
 
 [See the whole changelog here.](https://www.acymailing.com/change-log)

@@ -1,5 +1,6 @@
 <?php
 
+__('The default bounce rules have been updated. You can click the reset button to apply the new version, but note that any custom rules will be overwritten.', 'acymailing');
 __('It\'s very simple. This tool will prevent your site from receiving new subscriptions from fake accounts.', 'acymailing');
 __('Avoid being considered as spam (because you won\'t send emails to non-existent addresses)', 'acymailing');
 __('Save money (you won\'t send emails to fake users anymore)', 'acymailing');
@@ -960,7 +961,6 @@ __('Could not retrieve data', 'acymailing');
 __('Copy settings from %s', 'acymailing');
 __('If you use the subscription via URL and you want to enable the captcha, you will have to add this security key on your subscription via URL (by adding the argument seckey=YOUR_KEY) otherwise the subscription via URL won\'t work. This key is randomly generated during the install process but you can change it if you want.', 'acymailing');
 __('See users', 'acymailing');
-__('Let\'s go!', 'acymailing');
 __('This will insert the customer note that you\'ve just created', 'acymailing');
 __('Customer Note', 'acymailing');
 __('Customer note emails are sent when you add a note to an order.', 'acymailing');

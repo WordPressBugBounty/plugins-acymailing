@@ -49,6 +49,20 @@ trait Configuration
             $allPref['smtp_secured'] = '';
         }
 
+        $allPref['social_icons'] = json_encode([
+                'facebook' => ACYM_IMAGES.'logo/facebook.png',
+                'twitter' => ACYM_IMAGES.'logo/twitter.png',
+                'x' => ACYM_IMAGES.'logo/x.png',
+                'instagram' => ACYM_IMAGES.'logo/instagram.png',
+                'linkedin' => ACYM_IMAGES.'logo/linkedin.png',
+                'pinterest' => ACYM_IMAGES.'logo/pinterest.png',
+                'vimeo' => ACYM_IMAGES.'logo/vimeo.png',
+                'wordpress' => ACYM_IMAGES.'logo/wordpress.png',
+                'youtube' => ACYM_IMAGES.'logo/youtube.png',
+                'telegram' => ACYM_IMAGES.'logo/telegram.png',
+            ]
+        );
+
         $allPref['queue_nbmail'] = '40';
         $allPref['queue_nbmail_auto'] = '70';
         $allPref['queue_type'] = 'auto';
@@ -70,7 +84,6 @@ trait Configuration
         $allPref['cron_report'] = '';
         $allPref['cron_frequency'] = '900';
         $allPref['cron_sendreport'] = '2';
-
         $allPref['cron_fullreport'] = '1';
         $allPref['cron_savereport'] = '2';
         $allPref['uploadfolder'] = str_replace('\\', '/', ACYM_UPLOAD_FOLDER);
@@ -78,15 +91,12 @@ trait Configuration
         $allPref['notification_accept'] = '';
         $allPref['notification_refuse'] = '';
         $allPref['forward'] = '0';
-
         $allPref['priority_followup'] = '2';
         $allPref['unsub_redirect'] = '';
         $allPref['use_sef'] = '0';
         $allPref['css_frontend'] = '';
         $allPref['css_backend'] = '';
-
         $allPref['last_import'] = '';
-
         $allPref['unsub_reasons'] = serialize(['UNSUB_SURVEY_FREQUENT', 'UNSUB_SURVEY_RELEVANT']);
         $allPref['security_key'] = acym_generateKey(30);
         $allPref['export_excelsecurity'] = 1;
@@ -98,57 +108,35 @@ trait Configuration
         $allPref['trackingsystemexternalwebsite'] = 1;
         $allPref['generate_name'] = 1;
         $allPref['allow_modif'] = 'data';
+        $allPref['from_as_replyto'] = '1';
+        $allPref['templates_installed'] = '0';
+        $allPref['bounceVersion'] = self::BOUNCE_VERSION;
+        $allPref['numberThumbnail'] = 2;
+        $allPref['daily_hour'] = '12';
+        $allPref['daily_minute'] = '00';
+        $allPref['regacy'] = 1;
+        $allPref['regacy_delete'] = 1;
+        $allPref['regacy_forceconf'] = 0;
+        $allPref['remindme'] = '[]';
+        $allPref['notifications'] = '{}';
+        $allPref['unsubscribe_page'] = 1;
+        $allPref['delete_stats_enabled'] = 1;
+        $allPref['delete_stats'] = 86400 * 360;
+        $allPref['delete_archive_history_after'] = 86400 * 90;
+
+        $allPref['install_date'] = time();
+        $allPref['license_key'] = '';
+        $allPref['active_cron'] = 0;
+        $allPref['multilingual'] = 0;
 
         $allPref['walk_through'] = '1';
         $allPref['migration'] = '0';
-
         $allPref['installcomplete'] = '0';
 
         $allPref['Starter'] = ACYM_STARTER;
         $allPref['Essential'] = ACYM_ESSENTIAL;
         $allPref['Enterprise'] = ACYM_ENTERPRISE;
-        $allPref['from_as_replyto'] = '1';
-        $allPref['templates_installed'] = '0';
-
-        $allPref['bounceVersion'] = 2;
-
-        $allPref['numberThumbnail'] = 2;
-        $allPref['daily_hour'] = '12';
-        $allPref['daily_minute'] = '00';
-
-        $allPref['social_icons'] = json_encode([
-                'facebook' => ACYM_IMAGES.'logo/facebook.png',
-                'twitter' => ACYM_IMAGES.'logo/twitter.png',
-                'x' => ACYM_IMAGES.'logo/x.png',
-                'instagram' => ACYM_IMAGES.'logo/instagram.png',
-                'linkedin' => ACYM_IMAGES.'logo/linkedin.png',
-                'pinterest' => ACYM_IMAGES.'logo/pinterest.png',
-                'vimeo' => ACYM_IMAGES.'logo/vimeo.png',
-                'wordpress' => ACYM_IMAGES.'logo/wordpress.png',
-                'youtube' => ACYM_IMAGES.'logo/youtube.png',
-                'telegram' => ACYM_IMAGES.'logo/telegram.png',
-            ]
-        );
-
-        $allPref['regacy'] = 1;
-        $allPref['regacy_delete'] = 1;
-        $allPref['regacy_forceconf'] = 0;
-
-        $allPref['install_date'] = time();
-        $allPref['remindme'] = '[]';
-
-        $allPref['notifications'] = '{}';
-
-        $allPref['unsubscribe_page'] = 1;
-
-        $allPref['license_key'] = '';
-        $allPref['active_cron'] = 0;
-        $allPref['multilingual'] = 0;
-
-        $allPref['delete_stats_enabled'] = 1;
-        $allPref['delete_stats'] = 86400 * 360;
-        $allPref['delete_archive_history_after'] = 86400 * 90;
-        $allPref['previous_version'] = '9.9.1';
+        $allPref['previous_version'] = '9.9.2';
 
         $allPref['display_built_by'] = acym_level(ACYM_ESSENTIAL) ? 0 : 1;
         $allPref['php_overrides'] = 0;

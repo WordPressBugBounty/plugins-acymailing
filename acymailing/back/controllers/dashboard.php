@@ -46,7 +46,7 @@ class DashboardController extends acymController
 
         $splashJson = acym_fileGetContent(ACYM_NEW_FEATURES_SPLASHSCREEN_JSON);
         $version = json_decode($splashJson);
-        if (version_compare($this->config->get('previous_version', '9.9.1'), $version->max_version, '>=')) {
+        if (version_compare($this->config->get('previous_version', '9.9.2'), $version->max_version, '>=')) {
             @unlink(ACYM_NEW_FEATURES_SPLASHSCREEN_JSON);
             $this->listing();
 

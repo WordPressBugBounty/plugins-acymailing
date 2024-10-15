@@ -355,10 +355,11 @@ class FrontusersController extends UsersController
 
         $user = $this->getUserFromUnsubPage();
 
-        $displayedCheckedLists = explode(',', acym_getVar('string', 'displayed_checked_lists', ''));
-
-        if (!empty($displayedCheckedLists)) {
-            $userClass->unsubscribe($user->id, $displayedCheckedLists);
+        $displayCheckedLists = acym_getVar('string', 'displayed_checked_lists', '');
+        if (!empty($displayCheckedLists)) {
+            $userClass->unsubscribe($user->id, explode(',', $displayCheckedLists));
+        } else {
+            $this->unsubscribeAllInner();
         }
 
         $ajax = acym_getVar('int', 'ajax', 0);

@@ -38,7 +38,7 @@ trait DefaultData
         $query .= "(2, 'ACYM_SUPPRESSION_LIST', 'ACYM_SUPPRESSION_LIST_DESC', 2, 'suppression list', '[\"body\"]', '[\"delete_message\"]', '[\"unsubscribe_user\",\"block_user\",\"empty_queue_user\"]', 1, 1, 0),";
         $query .= "(3, 'ACYM_ACTION_REQUIRED', 'ACYM_ACTION_REQUIRED_DESC', 3, 'action *requ|verif', '[\"subject\"]', '{\"0\":\"delete_message\",\"1\":\"forward_message\",\"forward_to\":\"".$forwardEmail."\"}', '[]', 1, 0, 0),";
         $query .= "(4, 'ACYM_ACKNOWLEDGMENT_RECEIPT_SUBJECT', 'ACYM_ACKNOWLEDGMENT_RECEIPT_SUBJECT_DESC', 4, '(out|away) *(of|from)|vacation|vacanze|vacaciones|holiday|absen|congés|recept|acknowledg|thank you for|Auto *Response|Incident|Automati|Ticket|Resposta *automática', '[\"subject\"]', '[\"delete_message\"]', '[]', 1, 0, 0),";
-        $query .= "(5, 'ACYM_FEEDBACK_LOOP', 'ACYM_FEEDBACK_LOOP_DESC', 5, 'feedback|staff@hotmail.com|complaints@.{0,15}email-abuse.amazonses.com|complaint about message', '[\"senderInfo\",\"subject\"]', '[\"save_message\",\"delete_message\"]', '[\"unsubscribe_user\"]', 1, 0, 0),";
+        $query .= "(5, 'ACYM_FEEDBACK_LOOP', 'ACYM_FEEDBACK_LOOP_DESC', 5, 'feedback|staff@hotmail.com|complaints@.{0,15}email-abuse.amazonses.com|complaint about message', '[\"senderInfo\",\"subject\"]', '[\"save_message\",\"delete_message\"]', '[\"unsubscribe_user\",\"block_user\",\"empty_queue_user\"]', 1, 0, 0),";
         $query .= "(6, 'ACYM_FEEDBACK_LOOP_BODY', 'ACYM_FEEDBACK_LOOP_BODY_DESC', 6, 'Feedback-Type.{1,5}abuse', '[\"body\"]', '[\"save_message\",\"delete_message\"]', '[\"unsubscribe_user\"]', 1, 1, 0),";
         $query .= "(7, 'ACYM_MAILBOX_FULL', 'ACYM_MAILBOX_FULL_DESC', 7, '((mailbox|mailfolder|storage|quota|space|inbox) *(is)? *(over)? *(exceeded|size|storage|allocation|full|quota|maxi))|status(-code)? *(:|=)? *5.2.2|quota-issue|not *enough.{1,20}space|((over|exceeded|full|exhausted) *(allowed)? *(mail|storage|quota))|Space shortage', '[\"subject\",\"body\"]', '[\"save_message\",\"delete_message\"]', '[\"block_user\"]', 1, 1, 0),";
         $query .= "(8, 'ACYM_BLOCKED_GOOGLE_GROUPS', 'ACYM_BLOCKED_GOOGLE_GROUPS_DESC', 8, 'message *rejected *by *Google *Groups', '[\"body\"]', '[\"delete_message\"]', '[]', 1, 1, 0),";
@@ -54,7 +54,7 @@ trait DefaultData
 
         acym_query($query);
 
-        $this->config->save(['bounceVersion' => $this->bounceVersion]);
+        $this->config->save(['bounceVersion' => self::BOUNCE_VERSION]);
     }
 
     public function installFields()
