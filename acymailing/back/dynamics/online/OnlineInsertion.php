@@ -26,6 +26,7 @@ trait OnlineInsertion
 
         $information = [];
         if (ACYM_CMS == 'joomla') {
+            $baseUrlValue = ACYM_J50 ? \Joomla\CMS\Uri\Uri::root() : JURI::root();
             $information = [
                 'site_name' => [
                     'label' => acym_translation('ACYM_SITE_NAME'),
@@ -33,7 +34,7 @@ trait OnlineInsertion
                 ],
                 'base_url' => [
                     'label' => ucfirst(acym_translationSprintf('ACYM_X_URL', ACYM_CMS)),
-                    'value' => JURI::root(),
+                    'value' => $baseUrlValue,
                 ],
             ];
         } elseif (ACYM_CMS == 'wordpress') {

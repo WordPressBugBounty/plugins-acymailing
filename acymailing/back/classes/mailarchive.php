@@ -6,8 +6,6 @@ use AcyMailing\Libraries\acymClass;
 
 class MailArchiveClass extends acymClass
 {
-    const FIELDS_ENCODING = ['subject', 'body'];
-
     public function __construct()
     {
         parent::__construct();
@@ -19,7 +17,6 @@ class MailArchiveClass extends acymClass
     public function save($mailArchiveToSave)
     {
         $mailArchive = clone $mailArchiveToSave;
-        $mailArchive = $this->utf8Encode($mailArchive);
 
         foreach ($mailArchive as $oneAttribute => $value) {
             if (empty($value) || $oneAttribute === 'settings') {
@@ -36,43 +33,7 @@ class MailArchiveClass extends acymClass
 
     public function getOneByMailId($mailId)
     {
-        return $this->utf8Decode(acym_loadObject('SELECT * FROM #__acym_mail_archive WHERE `mail_id` = '.intval($mailId)));
-    }
-
-    protected function utf8Encode($mailArchive)
-    {
-        foreach (self::FIELDS_ENCODING as $oneField) {
-            if (is_array($mailArchive)) {
-                if (empty($mailArchive[$oneField])) continue;
-                $value = &$mailArchive[$oneField];
-            } else {
-                if (empty($mailArchive->$oneField)) continue;
-                $value = &$mailArchive->$oneField;
-            }
-
-            $value = acym_utf8Encode($value);
-        }
-
-        return $mailArchive;
-    }
-
-    protected function utf8Decode($mailArchive)
-    {
-        if (!empty($mailArchive)) {
-            foreach (self::FIELDS_ENCODING as $oneField) {
-                if (is_array($mailArchive)) {
-                    if (empty($mailArchive[$oneField])) continue;
-                    $value = &$mailArchive[$oneField];
-                } else {
-                    if (empty($mailArchive->$oneField)) continue;
-                    $value = &$mailArchive->$oneField;
-                }
-
-                $value = acym_utf8Decode($value);
-            }
-        }
-
-        return $mailArchive;
+        return acym_loadObject('SELECT * FROM #__acym_mail_archive WHERE `mail_id` = '.intval($mailId));
     }
 
     public function deleteArchivePeriod(): array
@@ -94,6 +55,9 @@ class MailArchiveClass extends acymClass
             $message = $e->getMessage();
         }
 
-        return ['status' => $status !== false, 'message' => $message];
+        return [
+            'status' => $status !== false,
+            'message' => $message,
+        ];
     }
 }

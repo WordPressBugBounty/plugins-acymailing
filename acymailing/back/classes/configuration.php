@@ -2,6 +2,7 @@
 
 namespace AcyMailing\Classes;
 
+use AcyMailing\Controllers\ConfigurationController;
 use AcyMailing\Libraries\acymClass;
 
 class ConfigurationClass extends acymClass
@@ -36,6 +37,8 @@ class ConfigurationClass extends acymClass
 
         $query = 'REPLACE INTO #__acym_configuration (`name`, `value`) VALUES ';
 
+        $previousCronSecurity = $this->get('cron_security', 0);
+        $previousCronSecurityKey = $this->get('cron_key');
         $params = [];
         foreach ($newConfig as $name => $value) {
             if (strpos($name, 'password') !== false && !empty($value) && trim($value, '*') == '') {
@@ -69,7 +72,19 @@ class ConfigurationClass extends acymClass
             }
         }
 
-        if (empty($params)) return true;
+        $activeCron = $this->get('active_cron', 0);
+        $newCronSecurity = $this->get('cron_security', 0);
+        $newCronSecurityKey = $this->get('cron_key');
+        if (!empty($activeCron) && !empty($newCronSecurity) && (empty($previousCronSecurity) || $previousCronSecurityKey !== $newCronSecurityKey)) {
+            $configurationController = new ConfigurationController();
+            if ($configurationController->modifyCron('deactivateCron') !== false) {
+                $configurationController->modifyCron('activateCron');
+            }
+        }
+
+        if (empty($params)) {
+            return true;
+        }
 
         $query .= implode(',', $params);
 

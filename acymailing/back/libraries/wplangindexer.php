@@ -1555,7 +1555,7 @@ __('Website not found, please contact us for more information', 'acymailing');
 __('An error occurred while calling acymailing.com', 'acymailing');
 __('Please set a license key', 'acymailing');
 __('Get my license key!', 'acymailing');
-__('Your license key:', 'acymailing');
+__('Your license key', 'acymailing');
 __('Attach my license', 'acymailing');
 __('Unlink my license', 'acymailing');
 __('License', 'acymailing');

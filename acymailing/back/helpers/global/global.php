@@ -160,9 +160,17 @@ function acym_getErrorLogFilename(string $prefix = ''): string
     return $prefix.'errors.log';
 }
 
-function acym_logError(string $message, string $prefix = '')
+function acym_logError(string $message, string $prefix = '', int $maxLines = 0)
 {
     $reportPath = acym_getLogPath(acym_getErrorLogFilename($prefix), true);
+
+    if ($maxLines > 0 && file_exists($reportPath)) {
+        $lines = file($reportPath);
+        if (!empty($lines)) {
+            $lines = array_slice($lines, -$maxLines);
+            file_put_contents($reportPath, implode("\n", $lines));
+        }
+    }
 
     $lr = "\r\n";
     file_put_contents(

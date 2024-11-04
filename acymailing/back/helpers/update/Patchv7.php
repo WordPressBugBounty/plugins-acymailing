@@ -48,7 +48,7 @@ trait Patchv7
             $licenseKey = $config->get('license_key', '');
             if (!empty($licenseKey)) {
                 $configurationController = new ConfigurationController();
-                $configurationController->modifyCron('activateCron', $licenseKey, 900);
+                $configurationController->modifyCron('activateCron', $licenseKey);
             }
         }
 

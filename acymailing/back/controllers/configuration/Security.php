@@ -415,9 +415,9 @@ trait Security
         $tableNameQuery = str_replace('#__', acym_getPrefix(), $oneTableName);
         $databaseName = acym_loadResult('SELECT DATABASE();');
         $foreignKeys = acym_loadObjectList(
-            'SELECT i.TABLE_NAME, i.CONSTRAINT_TYPE, i.CONSTRAINT_NAME, k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME, k.COLUMN_NAME
+            'SELECT i.CONSTRAINT_NAME, k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME, k.COLUMN_NAME
             FROM information_schema.TABLE_CONSTRAINTS AS i 
-            LEFT JOIN information_schema.KEY_COLUMN_USAGE AS k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME 
+            JOIN information_schema.KEY_COLUMN_USAGE AS k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME 
             WHERE i.TABLE_NAME = '.acym_escapeDB($tableNameQuery).' AND i.CONSTRAINT_TYPE = "FOREIGN KEY" AND i.TABLE_SCHEMA = '.acym_escapeDB($databaseName),
             'CONSTRAINT_NAME'
         );

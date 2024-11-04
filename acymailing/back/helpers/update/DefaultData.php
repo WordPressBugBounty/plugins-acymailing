@@ -106,7 +106,7 @@ trait DefaultData
         $listClass->addDefaultList();
     }
 
-    public function installNotifications()
+    public function installNotifications(): bool
     {
         $searchSettings = [
             'offset' => 0,

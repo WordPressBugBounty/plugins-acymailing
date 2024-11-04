@@ -848,7 +848,7 @@ class UserClass extends acymClass
             if (is_numeric($user->$oneAttribute)) continue;
 
             if (function_exists('mb_detect_encoding')) {
-                if (mb_detect_encoding($user->$oneAttribute, 'UTF-8', true) != 'UTF-8') {
+                if (mb_detect_encoding($user->$oneAttribute, 'UTF-8', true) !== 'UTF-8') {
                     $user->$oneAttribute = acym_utf8Encode($user->$oneAttribute);
                 }
             } elseif (!preg_match(
@@ -899,7 +899,11 @@ class UserClass extends acymClass
                 }
 
                 $value = preg_replace('/[\x{10000}-\x{10FFFF}]/u', '', $value);
-                $value = preg_replace('/\s+/', ' ', $value);
+
+                $field = $fieldClass->getOneById($key);
+                if (empty($field) || $field->type !== 'textarea') {
+                    $value = preg_replace('/\s+/', ' ', $value);
+                }
                 $customFields[$key] = $value;
             }
         }

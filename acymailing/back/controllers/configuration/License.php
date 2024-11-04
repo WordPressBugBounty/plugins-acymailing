@@ -158,7 +158,7 @@ trait License
         return true;
     }
 
-    public function modifyCron($functionToCall, $licenseKey = null)
+    public function modifyCron(string $functionToCall, ?string $licenseKey = null)
     {
         if (is_null($licenseKey)) {
             $config = acym_getVar('array', 'config', []);
@@ -174,11 +174,13 @@ trait License
         $data = [
             'domain' => ACYM_LIVE,
             'cms' => ACYM_CMS,
-            'version' => $this->config->get('version', ''),
-            'level' => $this->config->get('level', ''),
+            'version' => $this->config->get('version'),
+            'level' => $this->config->get('level'),
             'activate' => $functionToCall === 'activateCron',
             'url_version' => 'secured',
+            'security_key' => $this->config->get('cron_key'),
         ];
+
         $result = UpdatemeHelper::call('api/crons/modify', 'POST', $data);
 
         if (empty($result['success'])) {

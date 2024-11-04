@@ -135,4 +135,44 @@ trait Patchv9
             WHERE `body` LIKE "%images/poweredby_%"'
         );
     }
+
+    private function updateFor9100()
+    {
+        if ($this->isPreviousVersionAtLeast('9.10.0')) {
+            return;
+        }
+
+        $this->updateQuery('ALTER TABLE #__acym_mail_archive      CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_mailbox_action    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_custom_zone       CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_mail_override     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_followup_has_mail CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_followup          CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_segment           CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_form              CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_plugin            CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_action            CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_condition         CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_history           CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_rule              CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_user_has_field    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_field             CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_url_click         CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_url               CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_user_stat         CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_mail_stat         CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_queue             CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_mail_has_list     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_tag               CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_step              CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_automation        CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_user_has_list     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_campaign          CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_list              CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_mail              CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_configuration     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+        $this->updateQuery('ALTER TABLE #__acym_user              CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+
+        $this->updateQuery('TRUNCATE TABLE #__acym_mail_archive');
+    }
 }

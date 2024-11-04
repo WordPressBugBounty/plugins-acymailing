@@ -19,7 +19,7 @@ class CampaignClass extends acymClass
     ];
     const AB_TEST_VERSIONS = ['B'];
 
-    var $encodedColumns = ['sending_params'];
+    private array $jsonColumns = ['sending_params'];
 
     public function __construct()
     {
@@ -54,7 +54,7 @@ class CampaignClass extends acymClass
             }
         }
 
-        foreach ($this->encodedColumns as $oneColumn) {
+        foreach ($this->jsonColumns as $oneColumn) {
             if (!isset($campaign->$oneColumn)) continue;
 
             $campaign->$oneColumn = empty($campaign->$oneColumn) ? [] : json_decode($campaign->$oneColumn, true);
@@ -373,7 +373,7 @@ class CampaignClass extends acymClass
         }
 
         foreach ($campaign as $oneAttribute => $value) {
-            if (in_array($oneAttribute, $this->encodedColumns)) {
+            if (in_array($oneAttribute, $this->jsonColumns)) {
                 $campaign->$oneAttribute = json_encode(empty($value) ? [] : $value);
             } else {
                 if (empty($value)) continue;

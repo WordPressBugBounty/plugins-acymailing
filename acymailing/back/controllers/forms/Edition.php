@@ -19,7 +19,11 @@ trait Edition
                 $widgetUrl = 'index.php?option=com_modules&task=module.add&eid='.intval($moduleId);
             }
         } else {
-            $widgetUrl = 'widgets.php';
+            if (current_theme_supports('widgets')) {
+                $widgetUrl = 'widgets.php';
+            } else {
+                $widgetUrl = 'site-editor.php';
+            }
         }
 
         $data = [

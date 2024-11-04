@@ -147,13 +147,13 @@ class ConfigurationController extends acymController
             ],
             'outlook.office365.com' => [
                 'baseUrl' => 'https://login.microsoftonline.com/%s/oauth2/v2.0/authorize?',
-                'scope' => 'https%3A%2F%2Foutlook.office.com%2FIMAP.AccessAsUser.All',
+                'scope' => 'offline_access+https%3A%2F%2Foutlook.office.com%2FIMAP.AccessAsUser.All',
             ],
         ];
 
         $this->store();
 
-        $this->config->save('oauth_auth_type', $isSmtp ? 'smtp' : 'bounce');
+        $this->config->save(['oauth_auth_type' => $isSmtp ? 'smtp' : 'bounce']);
 
         $host = strtolower($this->config->get($isSmtp ? 'smtp_host' : 'bounce_server'));
         $clientId = $this->config->get($isSmtp ? 'smtp_clientId' : 'bounce_client_id');
@@ -227,7 +227,14 @@ class ConfigurationController extends acymController
             $params['scope'] = $scope;
         }
 
-        $response = acym_makeCurlCall($url, $params);
+        $requestOption = [
+            'method' => 'POST',
+            'data' => $params,
+        ];
+
+        $response = acym_makeCurlCall($url, $requestOption);
+
+        acym_logError('Response from OAuth call: '.json_encode($response), 'imap_oauth');
 
         if (empty($response['error'])) {
             $token = $response['token_type'].' '.$response['access_token'];

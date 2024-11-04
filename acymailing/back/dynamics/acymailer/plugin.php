@@ -139,7 +139,7 @@ class plgAcymAcymailer extends acymPlugin
 						<label for="acym__configuration__license-key" class="cell">
                             <?php echo acym_translation('ACYM_YOUR_LICENSE_KEY'); ?>
 						</label>
-						<input type="text" name="config[license_key]" id="acym__configuration__license-key" class="cell" value="<?php echo acym_escape($licenseKey); ?>">
+						<input type="text" name="config[license_key]" id="acym__configuration__license-key" class="cell auto" value="<?php echo acym_escape($licenseKey); ?>">
 						<button type="button"
 								id="acym__configuration__button__license"
 								class="cell shrink medium-3 button margin-top-1 medium-margin-top-0 medium-margin-left-1"

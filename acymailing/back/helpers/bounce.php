@@ -1414,15 +1414,21 @@ class BounceHelper extends acymObject
             $url = 'https://login.microsoftonline.com/'.$tenant.'/oauth2/v2.0/token';
         }
 
-        $response = acym_makeCurlCall(
-            $url,
-            [
+        $requestOptions = [
+            'method' => 'POST',
+            'data' => [
                 'client_id' => $this->config->get('bounce_client_id'),
                 'grant_type' => 'refresh_token',
                 'refresh_token' => $this->config->get('bounce_refresh_token'),
                 'client_secret' => $this->config->get('bounce_client_secret'),
-            ]
+            ],
+        ];
+        $response = acym_makeCurlCall(
+            $url,
+            $requestOptions
         );
+
+        acym_logError('Response from OAuth refresh token call: '.json_encode($response), 'imap_oauth', 100);
 
         if (empty($response['error'])) {
             $token = $response['token_type'].' '.$response['access_token'];

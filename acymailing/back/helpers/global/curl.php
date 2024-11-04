@@ -2,10 +2,7 @@
 
 function acym_makeCurlCall(string $url, array $options = []): array
 {
-    $verifySSL = true;
-    if ($options['verifySsl'] === false) {
-        $verifySSL = false;
-    }
+    $options['verifySsl'] = $options['verifySsl'] ?? true;
 
     $headers = [];
     if (!empty($options['headers']) && is_array($options['headers'])) {
@@ -17,9 +14,9 @@ function acym_makeCurlCall(string $url, array $options = []): array
         $data = $options['data'];
     }
 
-    $allowedMethod = ['GET', 'POST'];
+    $allowedMethods = ['GET', 'POST'];
     $method = 'GET';
-    if (!empty($options['method']) && in_array($options['method'], $allowedMethod)) {
+    if (!empty($options['method']) && in_array($options['method'], $allowedMethods)) {
         $method = $options['method'];
     }
 
@@ -29,11 +26,7 @@ function acym_makeCurlCall(string $url, array $options = []): array
         if ($method === 'POST' && $isHeaderContentTypeJson) {
             $dataFormatted = json_encode($data);
         } else {
-            foreach ($data as $key => $value) {
-                $dataFormatted .= $key.'='.urlencode($value).'&';
-            }
-
-            $dataFormatted = trim($dataFormatted, '&');
+            $dataFormatted = http_build_query($data);
         }
     }
 
@@ -51,7 +44,7 @@ function acym_makeCurlCall(string $url, array $options = []): array
             curl_setopt($ch, CURLOPT_POSTFIELDS, $dataFormatted);
         }
     }
-    if ($verifySSL === false) {
+    if (!$options['verifySsl']) {
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
     }
