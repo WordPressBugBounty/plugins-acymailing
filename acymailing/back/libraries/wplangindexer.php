@@ -275,7 +275,6 @@ __('Cron security key', 'acymailing');
 __('Enter the security key you want to use in cron url.', 'acymailing');
 __('The security key cannot be found or is invalid.', 'acymailing');
 __('Enable security key in cron url.', 'acymailing');
-__('Use this only if you want to trigger the cron on your own. It will add the cron security key to the cron url. BE CAREFUL, IF YOU ACTIVATE THIS, WE WON\'T BE ABLE TO TRIGGER IT FOR YOU!', 'acymailing');
 __('Order status', 'acymailing');
 __('With order status in', 'acymailing');
 __('A cache of the campaign has been generated for the archive and online version. Press this button to refresh this cache if you modified the content of your email and want it to be visible for your subscribers.', 'acymailing');

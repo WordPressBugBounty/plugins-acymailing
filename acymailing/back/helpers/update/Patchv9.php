@@ -136,11 +136,14 @@ trait Patchv9
         );
     }
 
-    private function updateFor9100()
+    private function updateFor9101()
     {
-        if ($this->isPreviousVersionAtLeast('9.10.0')) {
+        if ($this->isPreviousVersionAtLeast('9.10.1')) {
             return;
         }
+
+        $this->updateQuery('ALTER TABLE #__acym_user DROP INDEX `email_UNIQUE`');
+        $this->updateQuery('ALTER TABLE #__acym_configuration CHANGE `name` `name` VARCHAR(190) NOT NULL');
 
         $this->updateQuery('ALTER TABLE #__acym_mail_archive      CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
         $this->updateQuery('ALTER TABLE #__acym_mailbox_action    CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');

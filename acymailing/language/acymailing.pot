@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 9.10.0\n"
+"Project-Id-Version: AcyMailing 9.10.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-11-04\n"
+"POT-Creation-Date: 2024-11-05\n"
 "X-Domain: acymailing\n"
 
 
@@ -832,9 +832,6 @@ msgid "The security key cannot be found or is invalid."
 msgstr ""
 
 msgid "Enable security key in cron url."
-msgstr ""
-
-msgid "Use this only if you want to trigger the cron on your own. It will add the cron security key to the cron url. BE CAREFUL, IF YOU ACTIVATE THIS, WE WON'T BE ABLE TO TRIGGER IT FOR YOU!"
 msgstr ""
 
 msgid "Order status"

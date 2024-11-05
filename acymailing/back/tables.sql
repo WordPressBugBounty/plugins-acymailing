@@ -17,14 +17,13 @@ CREATE TABLE IF NOT EXISTS `#__acym_user` (
 	`last_open_date` DATETIME NULL,
 	`last_click_date` DATETIME NULL,
 	PRIMARY KEY (`id`),
-	UNIQUE INDEX `email_UNIQUE`(`email` ASC),
 	INDEX `#__index_acym_user1`(`cms_id`)
 )
 	ENGINE = InnoDB
 	/*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;
 
 CREATE TABLE IF NOT EXISTS `#__acym_configuration` (
-	`name` VARCHAR(255) NOT NULL,
+	`name` VARCHAR(190) NOT NULL,
 	`value` TEXT NOT NULL,
 	PRIMARY KEY (`name`)
 )
@@ -560,8 +559,7 @@ CREATE TABLE IF NOT EXISTS `#__acym_mailbox_action` (
 	`senderfrom` tinyint(4) NOT NULL DEFAULT 0,
 	`senderto` tinyint(4) NOT NULL DEFAULT 0,
 	`active` tinyint(4) NOT NULL DEFAULT 0,
-	PRIMARY KEY (`id`),
-	INDEX `#__index_acym_mailbox_action1`(`name` ASC)
+	PRIMARY KEY (`id`)
 )
 	ENGINE = InnoDB
 	/*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;

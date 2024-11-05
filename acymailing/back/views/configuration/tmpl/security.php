@@ -491,7 +491,7 @@
 			<div class="grid-x grid-margin-x margin-y">
 				<div class="cell grid-x acym_vcenter">
 					<label class="cell large-3" for="cron_security">
-                        <?php echo acym_translation('ACYM_ADD_SECURITY_KEY_CRON').acym_info('ACYM_ADD_SECURITY_KEY_CRON_DESC'); ?>
+                        <?php echo acym_translation('ACYM_ADD_SECURITY_KEY_CRON'); ?>
 					</label>
 					<div class="cell grid-x large-9">
                         <?php
