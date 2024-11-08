@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS `#__acym_user` (
 	`last_open_date` DATETIME NULL,
 	`last_click_date` DATETIME NULL,
 	PRIMARY KEY (`id`),
+	UNIQUE INDEX `email_UNIQUE` (`email`(191) ASC),
 	INDEX `#__index_acym_user1`(`cms_id`)
 )
 	ENGINE = InnoDB

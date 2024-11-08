@@ -178,4 +178,39 @@ trait Patchv9
 
         $this->updateQuery('TRUNCATE TABLE #__acym_mail_archive');
     }
+
+    private function updateFor9102()
+    {
+        if ($this->isPreviousVersionAtLeast('9.10.2')) {
+            return;
+        }
+
+        $duplicatedUsers = acym_loadObjectList(
+            'SELECT GROUP_CONCAT(`id` ORDER BY `creation_date` SEPARATOR "-") AS `concatenated_ids`, COUNT(*) AS `nb_duplicates` 
+            FROM #__acym_user 
+            GROUP BY `email` 
+            HAVING `nb_duplicates` > 1'
+        );
+
+        if (!empty($duplicatedUsers)) {
+            $userIdsToDelete = [];
+
+            foreach ($duplicatedUsers as $duplicatedUser) {
+                $ids = explode('-', $duplicatedUser->concatenated_ids);
+                $userIdsToDelete = array_merge($userIdsToDelete, array_slice($ids, 1));
+            }
+
+            acym_arrayToInteger($userIdsToDelete);
+            $idsToDelete = implode(',', $userIdsToDelete);
+
+            $this->updateQuery('DELETE FROM #__acym_user_has_list WHERE user_id IN ('.$idsToDelete.')');
+            $this->updateQuery('DELETE FROM #__acym_queue WHERE user_id IN ('.$idsToDelete.')');
+            $this->updateQuery('DELETE FROM #__acym_user_has_field WHERE user_id IN ('.$idsToDelete.')');
+            $this->updateQuery('DELETE FROM #__acym_history WHERE user_id IN ('.$idsToDelete.')');
+            $this->updateQuery('DELETE FROM #__acym_user_stat WHERE user_id IN ('.$idsToDelete.')');
+            $this->updateQuery('DELETE FROM #__acym_user WHERE id IN ('.$idsToDelete.')');
+        }
+
+        $this->updateQuery('ALTER TABLE #__acym_user ADD UNIQUE INDEX `email_UNIQUE` (`email`(191) ASC)');
+    }
 }

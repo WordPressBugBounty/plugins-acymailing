@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 6.6.2
-Stable tag: 9.10.1
+Stable tag: 9.10.2
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,8 +113,8 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 9.10.1 - November 5, 2024 =
-* Fixed an issue that could occur on some server configurations during installation or update.
+= 9.10.2 - November 8, 2024 =
+* Fixed an issue on the subscriber import feature that could create duplicated subscribers.
 
 
 [See the whole changelog here.](https://www.acymailing.com/change-log)
