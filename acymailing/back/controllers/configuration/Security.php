@@ -301,7 +301,10 @@ trait Security
             if (strlen($defaultValue) === 0) {
                 continue;
             }
-            $currentDefault = trim($currentTableColumns[$oneColumn]->COLUMN_DEFAULT, "'\"");
+            $currentDefault = $currentTableColumns[$oneColumn]->COLUMN_DEFAULT;
+            if (!empty($currentDefault)) {
+                $currentDefault = trim($currentDefault, "'\"");
+            }
             $expectedDefault = trim($defaultValue, "'\"");
 
             if (strtoupper($expectedDefault) === 'NULL') {

@@ -142,13 +142,13 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
                                 'acym__modal__users__summary__container'
                             );
                             echo '<div class="cell grid-x acym__listing__row">
-							<span class="cell medium-6">
+							<span class="cell small-6">
 							<i class="acymicon-circle acym__campaign__summary__recipients__list__color margin-right-1" 
 							style="color: '.$oneList->color.'">
 							</i>
 							<b>'.$oneList->name.'</b>
 							</span>
-							<span class="cell medium-6">'.$subscribers.'</span>
+							<span class="cell small-6">'.$subscribers.'</span>
 						</div>';
                         } ?>
 					</div>

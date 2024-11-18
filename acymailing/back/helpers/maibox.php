@@ -29,12 +29,11 @@ class MailboxHelper extends BounceHelper
 
     private function isConfigurationValid(): bool
     {
-        $keysShouldNotBeEmpty = ['self_signed', 'secure_method'];
-        $keysShouldNotBeEmpty[] = $this->mailboxConfig['imap_connection_method'] === 'classic' ? 'password' : 'bounce_token';
+        $keyShouldNotBeEmpty = $this->mailboxConfig['imap_connection_method'] === 'classic' ? 'password' : 'bounce_token';
 
         $error = false;
         foreach ($this->mailboxConfig as $key => $oneConfig) {
-            if (empty($oneConfig) && !in_array($key, $keysShouldNotBeEmpty)) {
+            if (empty($oneConfig) && $key === $keyShouldNotBeEmpty) {
                 $error = true;
                 break;
             }

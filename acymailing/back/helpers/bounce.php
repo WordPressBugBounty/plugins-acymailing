@@ -217,12 +217,12 @@ class BounceHelper extends acymObject
         }
 
         ob_start();
-        $buff = imap_alerts();
-        $buff = imap_errors();
+        $buff = $this->callImapFunction('imap_alerts', []);
+        $buff = $this->callImapFunction('imap_errors', []);
 
         $timeout = intval($this->timeout);
         if (!empty($timeout)) {
-            imap_timeout(IMAP_OPENTIMEOUT, $timeout);
+            $this->callImapFunction('imap_timeout', [IMAP_OPENTIMEOUT, $timeout]);
         }
 
         $port = intval($this->port);
@@ -304,7 +304,7 @@ class BounceHelper extends acymObject
                 return false;
             }
         } else {
-            $message = imap_headerinfo($this->mailbox, $msgNB);
+            $this->callImapFunction('imap_headerinfo', [$this->mailbox, $msgNB]);
         }
 
         return $message;
@@ -315,8 +315,8 @@ class BounceHelper extends acymObject
         if ($this->usePear) {
             $this->mailbox->deleteMsg($msgNB);
         } else {
-            imap_delete($this->mailbox, $msgNB);
-            imap_expunge($this->mailbox);
+            $this->callImapFunction('imap_delete', [$this->mailbox, $msgNB]);
+            $this->callImapFunction('imap_expunge', [$this->mailbox]);
         }
     }
 
@@ -481,12 +481,14 @@ class BounceHelper extends acymObject
 
     private function decodeMessageImap($attachments)
     {
-        $this->_message->structure = imap_fetchstructure($this->mailbox, $this->_message->messageNB);
+
+        $this->_message->structure = $this->callImapFunction('imap_fetchstructure', [$this->mailbox, $this->_message->messageNB]);
 
         if (empty($this->_message->structure)) {
             return false;
         }
-        $this->_message->headerinfo = imap_fetchheader($this->mailbox, $this->_message->messageNB);
+
+        $this->_message->headerinfo = $this->callImapFunction('imap_fetchheader', [$this->mailbox, $this->_message->messageNB]);
 
         $this->_message->html = '';
         $this->_message->text = '';
@@ -501,7 +503,7 @@ class BounceHelper extends acymObject
 
             $text = '';
             foreach ($allParts as $num => $onePart) {
-                $decodedContent = $this->decodeContent(imap_fetchbody($this->mailbox, $this->_message->messageNB, $num), $onePart);
+                $decodedContent = $this->decodeContent($this->callImapFunction('imap_fetchbody', [$this->mailbox, $this->_message->messageNB, $num]), $onePart);
                 if ($onePart->subtype == 'HTML') {
                     $this->_message->html .= $decodedContent;
                 } else {
@@ -531,10 +533,10 @@ class BounceHelper extends acymObject
         } else {
             if ($this->_message->structure->subtype == 'HTML') {
                 $this->_message->contentType = 1;
-                $this->_message->html = $this->decodeContent(imap_body($this->mailbox, $this->_message->messageNB), $this->_message->structure);
+                $this->_message->html = $this->decodeContent($this->callImapFunction('imap_body', [$this->mailbox, $this->_message->messageNB]), $this->_message->structure);
             } else {
                 $this->_message->contentType = 0;
-                $this->_message->text = $this->decodeContent(imap_body($this->mailbox, $this->_message->messageNB), $this->_message->structure);
+                $this->_message->text = $this->decodeContent($this->callImapFunction('imap_body', [$this->mailbox, $this->_message->messageNB]), $this->_message->structure);
             }
         }
 
@@ -590,7 +592,7 @@ class BounceHelper extends acymObject
             $filename = $filename.'_('.$fileNumber.')';
         }
 
-        $data = $this->decodeContent(imap_fetchbody($this->mailbox, $this->_message->messageNB, $num), $attachment);
+        $data = $this->decodeContent($this->callImapFunction('imap_fetchbody', [$this->mailbox, $this->_message->messageNB, $num]), $attachment);
 
         try {
             if (acym_writeFile($pathToUpload.$filename.'.'.$extension, $data)) {
@@ -1335,11 +1337,11 @@ class BounceHelper extends acymObject
         $encoding = $structure->encoding;
 
         if ($encoding == 2) {
-            $content = imap_binary($content);
+            $content = $this->callImapFunction('imap_binary', [$content]);
         } elseif ($encoding == 3) {
-            $content = imap_base64($content);
+            $content = $this->callImapFunction('imap_base64', [$content]);
         } elseif ($encoding == 4) {
-            $content = imap_qprint($content);
+            $content = $this->callImapFunction('imap_qprint', [$content]);
         }
 
         if (!empty($this->action)) {
@@ -1385,8 +1387,8 @@ class BounceHelper extends acymObject
 
                 return $return;
             }
-            $alerts = imap_alerts();
-            $errors = imap_errors();
+            $alerts = $this->callImapFunction('imap_alerts', []);
+            $errors = $this->callImapFunction('imap_errors', []);
             if (!empty($alerts)) {
                 $return = array_merge($return, $alerts);
             }
