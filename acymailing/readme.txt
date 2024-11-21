@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 6.7
-Stable tag: 9.10.4
+Stable tag: 9.10.5
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,11 +113,8 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 9.10.4 - November 18, 2024 =
-
-* Fixed an issue on the test connection of an IMAP connection, not impacting the actual process of bounce handling and mailbox action
-* Fixed the US date format in the detailed statistics page
-* Removed the input hidden added by TinyMCE on the editor content, which could cause issues with the editor content when saving the email for some host provider.
+= 9.10.5 - November 21, 2024 =
+* Fixed bounce handling not processing messages
 
 
 [See the whole changelog here.](https://www.acymailing.com/change-log)

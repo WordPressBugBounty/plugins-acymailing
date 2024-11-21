@@ -304,7 +304,7 @@ class BounceHelper extends acymObject
                 return false;
             }
         } else {
-            $this->callImapFunction('imap_headerinfo', [$this->mailbox, $msgNB]);
+            $message = $this->callImapFunction('imap_headerinfo', [$this->mailbox, $msgNB]);
         }
 
         return $message;
