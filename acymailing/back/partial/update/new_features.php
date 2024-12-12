@@ -6,8 +6,8 @@
 			<div class="acym__splashscreen__menu">
 				<div class="acym__splashscreen__menu__title">
 					<h2>
-						<span class="acym__splashscreen__menu__title-big">BIG</span>
-						<span class="acym__splashscreen__menu__title-updates">UPDATES</span>
+						<span class="acym__splashscreen__menu__title-big">NEW</span>
+						<span class="acym__splashscreen__menu__title-updates">VERSION</span>
 					</h2>
 
 					<button class="acym_vcenter align-center large-shrink button"

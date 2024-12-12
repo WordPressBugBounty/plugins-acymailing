@@ -25,6 +25,12 @@ class ConfigurationController extends acymController
     {
         parent::__construct();
         $this->breadcrumb[acym_translation('ACYM_CONFIGURATION')] = acym_completeLink('configuration');
+
+        $this->loadScripts = [
+            'listing' => [
+                'colorpicker',
+            ],
+        ];
     }
 
     public function getAjax()

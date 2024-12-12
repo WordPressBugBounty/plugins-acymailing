@@ -593,7 +593,7 @@ class plgAcymPost extends acymPlugin
 
     private function initAcfData(): void
     {
-        if (!acym_isExtensionActive('advanced-custom-fields/acf.php')) {
+        if (!acym_isExtensionActive('advanced-custom-fields/acf.php') || !function_exists('acf_get_field_groups')) {
             return;
         }
 

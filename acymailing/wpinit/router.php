@@ -62,6 +62,7 @@ class acyRouter
         add_action('admin_print_scripts-toplevel_page_acymailing_dashboard', [$this, 'disableJsBreakingPages']);
         add_action('admin_print_styles-toplevel_page_acymailing_dashboard', [$this, 'removeCssBreakingPages']);
         add_action('wp_enqueue_media', [$this, 'protectAcyMailingPages'], 100);
+        add_action('init', [$this, 'autologin']);
     }
 
     public function protectAcyMailingPages()
@@ -226,6 +227,39 @@ class acyRouter
         }
 
         $controller->call($task);
+    }
+
+    public function autologin()
+    {
+        $subId = acym_getVar('int', 'autoSubId');
+        $subKey = acym_getVar('string', 'subKey');
+
+        if (empty($subId) || empty($subKey)) {
+            return;
+        }
+
+        $currentUrl = acym_currentURL();
+        $cleanedUrl = acym_cleanUrl($currentUrl, ['autoSubId', 'subKey']);
+
+        $config = acym_config();
+        if ($config->get('autologin_urls', 0) == 0) {
+            acym_redirect($cleanedUrl);
+        }
+
+        $cmsId = acym_loadResult('SELECT `cms_id` FROM #__acym_user WHERE `id` = '.intval($subId).' AND `key` = '.acym_escapeDB($subKey));
+        if (empty($cmsId) || $cmsId === acym_currentUserId()) {
+            acym_redirect($cleanedUrl);
+        }
+
+        $user = get_user_by('id', $cmsId);
+
+        if (!is_wp_error($user)) {
+            wp_clear_auth_cookie();
+            wp_set_current_user($user->ID);
+            wp_set_auth_cookie($user->ID);
+
+            acym_redirect($cleanedUrl);
+        }
     }
 
     private function deactivateHookAdminFooter()

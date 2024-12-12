@@ -228,7 +228,7 @@ class MailClass extends acymClass
 
         if (!empty($mail)) {
             $tagsClass = new TagClass();
-            $mail->tags = $tagsClass->getAllTagsByElementId('mail', $id);
+            $mail->tags = $tagsClass->getAllTagsByElementId(TagClass::TYPE_MAIL, intval($id));
         }
 
         if (isset($mail->access) && !is_array($mail->access)) $mail->access = explode(',', $mail->access);
@@ -277,7 +277,7 @@ class MailClass extends acymClass
 
         if (!empty($mail)) {
             $tagsClass = new TagClass();
-            $mail->tags = $tagsClass->getAllTagsByElementId('mail', $mail->id);
+            $mail->tags = $tagsClass->getAllTagsByElementId(TagClass::TYPE_MAIL, intval($mail->id));
         }
 
         if (!empty($mail->parent_id) && $needTranslatedSettings) {
@@ -457,7 +457,7 @@ class MailClass extends acymClass
 
         if (!empty($mailID) && isset($tags)) {
             $tagClass = new TagClass();
-            $tagClass->setTags('mail', $mailID, $tags);
+            $tagClass->setTags(TagClass::TYPE_MAIL, intval($mailID), $tags);
         }
 
         return $mailID;

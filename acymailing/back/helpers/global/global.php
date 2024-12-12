@@ -2,13 +2,20 @@
 
 use AcyMailing\Classes\ConfigurationClass;
 
-function acydump($arg, $ajax = false, $indent = true, $htmlentities = false)
+function acydump($arg, $ajax = false, array $options = [])
 {
+    $indent = $options['indent'] ?? true;
+    $htmlentities = $options['htmlentities'] ?? true;
+
     ob_start();
     var_dump($arg);
     $result = ob_get_clean();
 
     if ($ajax) {
+        if ($options['clear_file'] === true) {
+            file_put_contents(ACYM_ROOT.'acydebug.txt', '');
+        }
+
         file_put_contents(ACYM_ROOT.'acydebug.txt', $result, FILE_APPEND);
     } else {
         $style = $indent ? 'margin-left: 220px;' : '';
@@ -26,7 +33,7 @@ function acym_debug(bool $file = false, bool $indent = true)
         if (empty($step['file']) || empty($step['line'])) continue;
         $takenPath[] = $step['file'].' => '.$step['line'];
     }
-    acydump(implode($file ? "\n" : '<br/>', $takenPath), $file, $indent);
+    acydump(implode($file ? "\n" : '<br/>', $takenPath), $file, ['indent' => $indent]);
 }
 
 function acym_config($reload = false)

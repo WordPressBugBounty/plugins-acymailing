@@ -5,6 +5,7 @@ namespace AcyMailing\Helpers;
 use AcyMailing\Classes\MailClass;
 use AcyMailing\Classes\ZoneClass;
 use AcyMailing\Libraries\acymObject;
+use AcyMailing\Types\DtextType;
 use Joomla\CMS\Editor\Editor as Editor;
 use Joomla\CMS\Factory;
 
@@ -75,6 +76,9 @@ class EditorHelper extends acymObject
 
             echo '</div><div class="acym_no_foundation">';
 
+            $dtextType = new DtextType();
+            $dtextType->display(['withButton' => false]);
+
             $method = 'displayWordPress';
             $this->$method();
 
@@ -89,6 +93,15 @@ class EditorHelper extends acymObject
 
     private function displayJoomla()
     {
+        $dtextType = new DtextType();
+        $dtextType->displayButton(
+            [
+                'icon' => 'acymicon-chevrons',
+                'text' => acym_translation('ACYM_INSERT_DYNAMIC_TEXT'),
+                'class' => 'button button-secondary margin-bottom-0 margin-top-1',
+            ]
+        );
+
         $this->editor = acym_getCMSConfig('editor', 'tinymce');
 
         if (!class_exists('Joomla\CMS\Editor\Editor')) {
@@ -105,15 +118,16 @@ class EditorHelper extends acymObject
             $classMail = new MailClass();
             $filepath = $classMail->createTemplateFile($this->mailId);
 
-            if ($this->editor == 'tinymce') {
+            if ($this->editor === 'tinymce') {
                 $this->editorConfig['content_css_custom'] = $cssurl.'&local=http';
                 $this->editorConfig['content_css'] = '0';
 
-                $access = [];
-                for ($i = 1 ; $i < 20 ; $i++) {
-                    $access[] = $i;
-                }
                 if (!ACYM_J40) {
+                    $access = [];
+                    for ($i = 1 ; $i < 20 ; $i++) {
+                        $access[] = $i;
+                    }
+
                     $this->editorConfig['configuration'] = (object)[
                         'toolbars' => (object)['AcyCustomCSS' => []],
                         'setoptions' => [
@@ -125,7 +139,7 @@ class EditorHelper extends acymObject
                         ],
                     ];
                 }
-            } elseif ($this->editor == 'jckeditor' || $this->editor == 'fckeditor') {
+            } elseif ($this->editor === 'jckeditor' || $this->editor === 'fckeditor') {
                 $this->editorConfig['content_css_custom'] = $filepath;
                 $this->editorConfig['content_css'] = '0';
                 $this->editorConfig['editor_css'] = '0';
@@ -141,6 +155,7 @@ class EditorHelper extends acymObject
         if (empty($this->editorContent)) {
             $this->content = acym_escape($this->content);
             ob_start();
+
             echo $this->myEditor->display(
                 $this->name,
                 $this->content,
@@ -170,6 +185,7 @@ class EditorHelper extends acymObject
         add_filter('mce_external_plugins', [$this, 'addPlugins']);
         add_filter('mce_buttons', [$this, 'addButtons']);
         add_filter('mce_buttons_2', [$this, 'addButtonsToolbar']);
+        add_action('media_buttons', [$this, 'addDtextButton']);
 
         $mailClass = new MailClass();
 
@@ -193,6 +209,20 @@ class EditorHelper extends acymObject
         ];
 
         wp_editor($this->content, $this->name, $options);
+    }
+
+    public function addDtextButton($editor_id = 'content')
+    {
+        static $instance = 0;
+        ++$instance;
+
+        $img = '<i class="acymicon-chevrons"></i> ';
+
+        printf(
+            '<button type="button" class="button" id="acym__dtext__button" data-editor="%s">%s</button>',
+            esc_attr($editor_id),
+            $img.acym_translation('ACYM_INSERT_DYNAMIC_TEXT')
+        );
     }
 
     private function getWYSIDSettings(): string

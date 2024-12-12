@@ -51,7 +51,7 @@ class QueueClass extends acymClass
             ];
 
             if (empty($allowedStatus[$settings['status']])) {
-                die('Unauthorized filter: '.$settings['status']);
+                die('Unauthorized filter: '.acym_escape($settings['status']));
             }
 
             $filters[] = $allowedStatus[$settings['status']];

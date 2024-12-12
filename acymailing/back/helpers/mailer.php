@@ -1366,13 +1366,13 @@ class MailerHelper extends AcyMailerPhp
         $this->parameters[$tagName] = $value;
     }
 
-    public function overrideEmail($subject, $body, $to)
+    public function overrideEmail(array $options): bool
     {
         $overrideClass = new OverrideClass();
-        $override = $overrideClass->getMailByBaseContent($subject, $body);
+        $override = $overrideClass->getMailByBaseContent($options['subject'], $options['message']);
 
         if (empty($override)) {
-            return false;
+            return $this->overrideAllEmails($options);
         }
 
         $this->trackEmail = true;
@@ -1393,17 +1393,16 @@ class MailerHelper extends AcyMailerPhp
             $this->addParam('param'.$i, $oneParam);
         }
 
-        $this->addParam('subject', $subject);
+        $this->addParam('subject', $options['subject']);
 
         $this->overrideEmailToSend = $override;
-        $statusSend = $this->sendOne($override->id, $to);
+        $statusSend = $this->sendOne($override->id, $options['to']);
         if (!$statusSend && !empty($this->reportMessage)) {
             $cronHelper = new CronHelper();
-            $cronHelper->messages[] = $this->reportMessage;
-            $cronHelper->saveReport();
+            $cronHelper->saveReport($this->reportMessage);
         }
 
-        return $statusSend;
+        return $statusSend === true;
     }
 
     private function getSendSettings($type, $mailId = 0)
@@ -1582,5 +1581,56 @@ class MailerHelper extends AcyMailerPhp
     public static function validateAddress($address, $patternselect = null)
     {
         return true;
+    }
+
+    private function overrideAllEmails(array $options): bool
+    {
+        if ($this->config->get('send_website_emails', 0) == 0) {
+            return false;
+        }
+
+        $this->trackEmail = false;
+        $this->autoAddUser = true;
+
+        $this->addParam('subject', $options['subject']);
+        $this->addParam('body', $options['message']);
+
+        $mailClass = new MailClass();
+        $this->overrideEmailToSend = $mailClass->getOneByName('acy_notification_cms');
+
+        if (!empty($options['headers'])) {
+            if (!is_array($options['headers'])) {
+                $options['headers'] = explode("\n", str_replace("\r\n", "\n", $options['headers']));
+            }
+
+            foreach ($options['headers'] as $header) {
+                if (strpos($header, ':') === false) {
+                    continue;
+                }
+
+                [$name, $content] = explode(':', trim($header), 2);
+                $this->addCustomHeader(trim($name), trim($content));
+            }
+        }
+
+        if (!empty($options['attachments'])) {
+            if (!is_array($options['attachments'])) {
+                $options['attachments'] = explode("\n", str_replace("\r\n", "\n", $options['attachments']));
+            }
+
+            foreach ($options['attachments'] as $fileName => $attachmentUrl) {
+                $fileName = is_string($fileName) ? $fileName : '';
+                $this->addAttachment($attachmentUrl, $fileName);
+            }
+        }
+
+        $statusSend = $this->sendOne($this->overrideEmailToSend->id, $options['to']);
+        if (!$statusSend && !empty($this->reportMessage)) {
+            $cronHelper = new CronHelper();
+            $cronHelper->messages[] = $this->reportMessage;
+            $cronHelper->saveReport();
+        }
+
+        return $statusSend === true;
     }
 }

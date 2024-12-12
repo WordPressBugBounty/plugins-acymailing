@@ -162,9 +162,7 @@ trait Listing
         $bounceHelper->handleMessages();
 
         $cronHelper = new CronHelper();
-        $cronHelper->messages[] = $nbMessagesReport;
-        $cronHelper->detailMessages = $bounceHelper->messages;
-        $cronHelper->saveReport();
+        $cronHelper->saveReport($nbMessagesReport, $bounceHelper->messages);
 
         if ($this->config->get('bounce_max', 0) != 0 && $nbMessages > $this->config->get('bounce_max', 0)) {
             $url = acym_completeLink('bounces&task=process&continuebounce=1', true, true);

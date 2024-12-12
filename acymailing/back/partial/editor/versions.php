@@ -1,5 +1,10 @@
 <?php
-if (empty($data['mailInformation'])) $data['mailInformation'] = $data['mail'];
+
+use AcyMailing\Classes\TagClass;
+
+if (empty($data['mailInformation'])) {
+    $data['mailInformation'] = $data['mail'];
+}
 
 $isAbTest = !empty($data['abtest']);
 
@@ -115,7 +120,7 @@ $isAbTest = !empty($data['abtest']);
         <?php echo acym_translation('ACYM_START_FROM_TEMPLATE'); ?>
 	</button>
     <?php
-    $dataForTemplate = ['allTags' => $data['tagClass']->getAllTagsByType('mail')];
+    $dataForTemplate = ['allTags' => $data['tagClass']->getAllTagsByType(TagClass::TYPE_MAIL)];
     echo acym_modal_include(
         '',
         ACYM_VIEW.'mails'.DS.'tmpl'.DS.'choose_template_ajax.php',

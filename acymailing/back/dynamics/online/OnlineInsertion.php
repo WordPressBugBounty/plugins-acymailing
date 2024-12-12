@@ -25,7 +25,7 @@ trait OnlineInsertion
         ];
 
         $information = [];
-        if (ACYM_CMS == 'joomla') {
+        if (ACYM_CMS === 'joomla') {
             $baseUrlValue = ACYM_J50 ? \Joomla\CMS\Uri\Uri::root() : JURI::root();
             $information = [
                 'site_name' => [
@@ -37,7 +37,7 @@ trait OnlineInsertion
                     'value' => $baseUrlValue,
                 ],
             ];
-        } elseif (ACYM_CMS == 'wordpress') {
+        } elseif (ACYM_CMS === 'wordpress') {
             $information = [
                 'site_name' => [
                     'label' => acym_translation('ACYM_SITE_NAME'),
@@ -82,7 +82,7 @@ trait OnlineInsertion
                     echo 'defaultText["info_'.$infoKey.'"] = \''.str_replace("'", "\\'", $info['value']).'\';';
                 }
                 ?>
-                jQuery('.acym__online__link').removeClass('selected_row');
+                jQuery('.selected_row').removeClass('selected_row');
                 jQuery('#tr_' + tagName).addClass('selected_row');
 
                 if (infoKey === '') {

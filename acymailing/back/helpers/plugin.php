@@ -2,6 +2,7 @@
 
 namespace AcyMailing\Helpers;
 
+use AcyMailing\Classes\MailClass;
 use AcyMailing\Libraries\acymObject;
 
 class PluginHelper extends acymObject
@@ -924,6 +925,10 @@ class PluginHelper extends acymObject
                     });
                     if(_checked'.$option['name'].$suffix.'.length) otherinfo += "| '.$option['name'].':" + _checked'.$option['name'].$suffix.'.join("'.$option['separator'].'");';
             } elseif ($option['type'] === 'boolean') {
+                if ($option['name'] === 'autologin' && $this->config->get('autologin_urls', 0) != 1) {
+                    continue;
+                }
+
                 $currentOption .= acym_boolean(
                     $option['name'].$suffix,
                     $option['default'],
@@ -1304,5 +1309,48 @@ class PluginHelper extends acymObject
             $translatedfield = $oneTranslation->reference_field;
             $item->$translatedfield = $oneTranslation->value;
         }
+    }
+
+    public function createDummyEmailObject(int $mailId, string $code, string $previewBody)
+    {
+        if (!empty($mailId)) {
+            $mailClass = new MailClass();
+            $email = $mailClass->getOneById($mailId);
+        }
+
+        if (empty($email)) {
+            $email = new \stdClass();
+            $email->id = 0;
+            $email->name = '';
+            $email->subject = '';
+            $email->from_name = '';
+            $email->from_email = '';
+            $email->reply_to_name = '';
+            $email->reply_to_email = '';
+            $email->bcc = '';
+            $email->links_language = '';
+        }
+
+        $language = acym_getVar('string', 'language', 'main');
+        if (!empty($language)) {
+            if ($language === 'main') {
+                $language = $this->config->get('multilingual_default', ACYM_DEFAULT_LANGUAGE);
+            }
+            $email->links_language = $language;
+        }
+
+        $email->creation_date = acym_date('now', 'Y-m-d H:i:s', false);
+        $email->creator_id = acym_currentUserId();
+        $email->thumbnail = '';
+        $email->drag_editor = '1';
+        $email->type = MailClass::TYPE_STANDARD;
+        $email->settings = '';
+        $email->stylesheet = '';
+        $email->attachments = '';
+
+        $email->body = $code;
+        $email->previewBody = $previewBody;
+
+        return $email;
     }
 }

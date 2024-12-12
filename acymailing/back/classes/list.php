@@ -456,7 +456,7 @@ class ListClass extends acymClass
 
         if (!empty($listID) && isset($tags)) {
             $tagClass = new TagClass();
-            $tagClass->setTags('list', $listID, $tags);
+            $tagClass->setTags(TagClass::TYPE_LIST, intval($listID), $tags);
         }
 
         $list->id = $listID;

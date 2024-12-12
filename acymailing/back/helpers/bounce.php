@@ -1139,7 +1139,10 @@ class BounceHelper extends acymObject
                 $this->mailer->isHTML();
                 if (!empty($this->_message->userid)) {
                     $info .= ' ('.acym_translation('ACYM_USER_ID').': '.$this->_message->userid.')';
+                } elseif (!empty($this->_message->subemail)) {
+                    $info .= ' ('.acym_translation('ACYM_USER_EMAIL').': '.$this->_message->subemail.')';
                 }
+
                 $this->mailer->Body = $info.'<br />'.$this->_message->html;
                 if (!empty($this->_message->text)) {
                     $this->mailer->Body .= '<br /><br />-------<br />'.nl2br($this->_message->text);

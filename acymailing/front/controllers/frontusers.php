@@ -377,7 +377,10 @@ class FrontusersController extends UsersController
 
         $user = $this->getUserFromUnsubPage();
         $listsChecked = acym_getVar('array', 'lists', []);
-        $listsChecked = is_array($listsChecked) ? array_keys($listsChecked) : [];
+        $listsChecked = array_filter($listsChecked, function ($status) {
+            return intval($status) === 1;
+        });
+        $listsChecked = array_keys($listsChecked);
         $displayedCheckedLists = explode(',', acym_getVar('string', 'displayed_checked_lists', ''));
         $userSubscriptions = $userClass->getUserSubscriptionById($user->id);
 
@@ -404,6 +407,8 @@ class FrontusersController extends UsersController
         $campaignListOnly = $this->config->get('unsubscribe_campaign_list_only', '0') === '1';
         $displaySurvey = $this->config->get('unsubpage_survey', '0') === '1';
         $surveyAnswers = $this->config->get('unsub_survey', '[]');
+        $unsubscribeColor = $this->config->get('unsubscribe_color', '#00a4ff');
+        $hoverColor = $this->darkenRGBColor($unsubscribeColor, 20);
 
         $surveyAnswers = json_decode($surveyAnswers, true);
 
@@ -448,8 +453,59 @@ class FrontusersController extends UsersController
             $data['surveyAnswers'] = array_combine($data['surveyAnswers'], $data['surveyAnswers']);
         }
 
+        if (!empty($this->config->get('unsubscribe_color'))) {
+            $unsubscribeColor = $this->config->get('unsubscribe_color');
+            $hoverColor = $this->darkenRGBColor($unsubscribeColor, 20);
+            $data['unsubscribeColor'] = $unsubscribeColor;
+            $data['hoverColor'] = $hoverColor;
+        }
+        $data['svgImage'] = $this->getSVGImage($unsubscribeColor, $hoverColor);
+
         acym_setVar('layout', 'unsubscribepage');
         parent::display($data);
+    }
+
+    public function getSVGImage($unsubscribeColor, $hoverColor)
+    {
+        if ($this->config->get('display_unsub_image') === '1') {
+            $svgPath = ACYM_IMAGES.'unsubscribe/unsub_image.svg';
+
+            $svgContent = acym_fileGetContent($svgPath);
+
+            return str_replace(
+                ['#B118C8', '#C794CF'],
+                [$unsubscribeColor, $hoverColor],
+                $svgContent
+            );
+        }
+
+        return '';
+    }
+
+    public function hexToRGB($hexColor)
+    {
+        $hexColor = ltrim($hexColor, '#');
+
+        if (strlen($hexColor) === 3) {
+            $hexColor = $hexColor[0].$hexColor[0].$hexColor[1].$hexColor[1].$hexColor[2].$hexColor[2];
+        }
+
+        $r = hexdec(substr($hexColor, 0, 2));
+        $g = hexdec(substr($hexColor, 2, 2));
+        $b = hexdec(substr($hexColor, 4, 2));
+
+        return [$r, $g, $b];
+    }
+
+    public function darkenRGBColor($hexColor, $percent)
+    {
+        $rgbValues = $this->hexToRGB($hexColor);
+
+        $darkenedRGB = array_map(function ($value) use ($percent) {
+            return max(0, $value - ($value * $percent / 100));
+        }, $rgbValues);
+
+        return sprintf('rgb(%d, %d, %d)', $darkenedRGB[0], $darkenedRGB[1], $darkenedRGB[2]);
     }
 
     public function confirm()

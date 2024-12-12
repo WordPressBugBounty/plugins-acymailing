@@ -723,16 +723,19 @@ class ImportHelper extends acymObject
         $this->totalInserted = $countUsersAfterImport - $countUsersBeforeImport;
 
         if ($this->dispresults) {
-            acym_enqueueMessage(
-                acym_translationSprintf(
-                    'ACYM_IMPORT_REPORTING',
-                    $this->totalTry,
-                    $this->totalInserted,
-                    $this->totalTry - $this->totalValid,
-                    $this->totalValid - $this->totalInserted
-                ),
-                'info'
+            $maybeUpdated = acym_translation('ACYM_NOT_UPDATED');
+            if ($this->overwrite) {
+                $maybeUpdated = acym_translation('ACYM_UPDATED');
+            }
+            $reportMsg = acym_translationSprintf(
+                'ACYM_IMPORT_REPORTING_UPDATED',
+                $this->totalTry,
+                $this->totalInserted,
+                $this->totalTry - $this->totalValid,
+                $this->totalValid - $this->totalInserted,
+                $maybeUpdated
             );
+            acym_enqueueMessage($reportMsg, 'info');
         }
 
         $this->_subscribeUsers();

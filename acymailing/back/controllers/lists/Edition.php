@@ -137,9 +137,9 @@ trait Edition
     private function prepareTagsSettings(&$data, $listId)
     {
         $tagClass = new TagClass();
-        $data['allTags'] = $tagClass->getAllTagsByType('list');
+        $data['allTags'] = $tagClass->getAllTagsByType(TagClass::TYPE_LIST);
         $data['listTagsName'] = [];
-        $listsTags = $tagClass->getAllTagsByElementId('list', $listId);
+        $listsTags = $tagClass->getAllTagsByElementId(TagClass::TYPE_LIST, intval($listId));
         foreach ($listsTags as $oneTag) {
             $data['listTagsName'][] = $oneTag;
         }
@@ -307,7 +307,7 @@ trait Edition
         }
 
         if (!$listClass->hasUserAccess($id)) {
-            die('Access denied for list '.$id);
+            die('Access denied for list '.acym_escape($id));
         }
 
         $list->$type = null;
@@ -364,7 +364,7 @@ trait Edition
         if (acym_isAdmin()) {
             $listInformation->access = empty($listInformation->access) ? '' : ','.implode(',', $listInformation->access).',';
         } elseif (!empty($formData->id) && !$listClass->hasUserAccess($formData->id)) {
-            die('Cannot save list '.$formData->id);
+            die('Cannot save list '.acym_escape($formData->id));
         }
 
         $listId = $listClass->save($listInformation);

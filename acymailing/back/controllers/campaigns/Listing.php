@@ -140,7 +140,7 @@ trait Listing
         $tagClass = new TagClass();
         $data['search'] = $this->getVarFiltersListing('string', 'campaigns_search', '');
         $data['tag'] = $this->getVarFiltersListing('string', 'campaigns_tag', '');
-        $data['allTags'] = $tagClass->getAllTagsByType('mail');
+        $data['allTags'] = $tagClass->getAllTagsByType(TagClass::TYPE_MAIL);
         $data['pagination'] = new PaginationHelper();
         $data['status'] = '';
         if (isset($data['campaign_type'])) {

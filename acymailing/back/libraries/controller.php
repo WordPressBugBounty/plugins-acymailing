@@ -141,6 +141,11 @@ class acymController extends acymObject
             acym_addStyle(false, ACYM_CSS.'libraries/material-datetime-picker.min.css?v='.filemtime(ACYM_MEDIA.'css'.DS.'libraries'.DS.'material-datetime-picker.min.css'));
         }
 
+        if (in_array('dtextPicker', $scripts)) {
+            acym_addScript(false, ACYM_JS.'dtext_picker.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'dtext_picker.min.js'));
+            acym_addStyle(false, ACYM_CSS.'dtext_picker.min.css?v='.filemtime(ACYM_MEDIA.'css'.DS.'dtext_picker.min.css'));
+        }
+
         if (in_array('thumbnail', $scripts)) {
             acym_addScript(false, ACYM_JS.'libraries/html2canvas.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'libraries'.DS.'html2canvas.min.js'));
         }
@@ -257,7 +262,7 @@ class acymController extends acymObject
         if (!empty($step)) {
             $saveMethod = 'save'.ucfirst($step);
             if (!method_exists($this, $saveMethod)) {
-                die('Save method '.$saveMethod.' not found');
+                die('Save method '.acym_escape($saveMethod).' not found');
             }
 
             return $this->$saveMethod();

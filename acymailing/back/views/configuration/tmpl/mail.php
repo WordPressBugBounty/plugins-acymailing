@@ -229,6 +229,9 @@
                 'archive_index' => [
                     'label' => 'ACYM_CONFIGURATION_INDEX_ARCHIVE',
                 ],
+                'send_website_emails' => [
+                    'label' => 'ACYM_SEND_WEBSITE_EMAILS',
+                ],
             ];
 
             foreach ($options as $oneOption => $option) {

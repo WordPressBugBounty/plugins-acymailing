@@ -17,7 +17,7 @@ class QueueHelper extends acymObject
     var $error = false;
     var $nbprocess = 0;
     var $start = 0;
-    var $stoptime = 0;
+    public int $stoptime = 0;
     var $successSend = 0;
     var $errorSend = 0;
     var $consecutiveError = 0;

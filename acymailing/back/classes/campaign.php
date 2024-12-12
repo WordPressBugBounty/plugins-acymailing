@@ -176,11 +176,11 @@ class CampaignClass extends acymClass
         $results['elements'] = $this->decode(acym_loadObjectList($query, '', $settings['offset'], $settings['elementsPerPage']));
 
         foreach ($results['elements'] as $oneCampaign) {
-            array_push($mailIds, $oneCampaign->mail_id);
+            $mailIds[] = $oneCampaign->mail_id;
             $oneCampaign->tags = '';
         }
 
-        $tags = $tagClass->getAllTagsByTypeAndElementIds('mail', $mailIds);
+        $tags = $tagClass->getAllTagsByTypeAndElementIds(TagClass::TYPE_MAIL, $mailIds);
         $lists = $mailClass->getAllListsByMailIds($mailIds);
 
         $isMultilingual = acym_isMultilingual();
@@ -385,7 +385,7 @@ class CampaignClass extends acymClass
 
         if (!empty($campaignID) && isset($tags)) {
             $tagClass = new TagClass();
-            $tagClass->setTags('mail', $campaign->mail_id, $tags);
+            $tagClass->setTags(TagClass::TYPE_MAIL, intval($campaign->mail_id), $tags);
         }
 
         return $campaignID;

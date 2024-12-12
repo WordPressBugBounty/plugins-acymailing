@@ -358,29 +358,29 @@
 				   id="acym__wysid__context__image__url"
 				   placeholder="https://www.example.com/image.png"
 				   class="cell small-8">
-			<label for="acym__wysid__context__image__alt" class="cell small-4">
+			<label for="acym__upload__context__image__alt" class="cell small-4">
                 <?php echo acym_translation('ACYM_IMAGE_ALT').acym_info('ACYM_IMAGE_ALT_DESCRIPTION'); ?>
 			</label>
 			<input type="text"
 				   name="image_alt"
 				   value=""
-				   id="acym__wysid__context__image__alt"
+				   id="acym__upload__context__image__alt"
 				   class="cell small-8">
-			<label for="acym__wysid__context__image__title" class="cell small-4">
+			<label for="acym__upload_context__image__title" class="cell small-4">
                 <?php echo acym_translation('ACYM_IMAGE_TITLE').acym_info('ACYM_IMAGE_TITLE_DESCRIPTION'); ?>
 			</label>
 			<input type="text"
 				   name="image_title"
 				   value=""
-				   id="acym__wysid__context__image__title"
+				   id="acym__upload_context__image__title"
 				   class="cell small-8">
-			<label for="acym__wysid__context__image__caption" class="cell small-4">
+			<label for="acym__upload__context__image__caption" class="cell small-4">
                 <?php echo acym_translation('ACYM_CAPTION'); ?>
 			</label>
 			<input type="text"
 				   name="image_caption"
 				   value=""
-				   id="acym__wysid__context__image__caption"
+				   id="acym__upload__context__image__caption"
 				   class="cell small-8">
 			<button type="button" class="cell shrink button button-secondary margin-top-1" id="acym__wysid__context__image__change">
                 <?php echo acym_translation('ACYM_MEDIA_MANAGE'); ?>

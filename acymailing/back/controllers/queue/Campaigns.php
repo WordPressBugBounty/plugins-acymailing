@@ -51,7 +51,7 @@ trait Campaigns
             'pagination' => $pagination,
             'search' => $searchFilter,
             'tag' => $tagFilter,
-            'allTags' => $tagClass->getAllTagsByType('mail'),
+            'allTags' => $tagClass->getAllTagsByType(TagClass::TYPE_MAIL),
             'numberPerStatus' => $matchingElements['status'],
             'status' => $status,
             'campaignClass' => new CampaignClass(),

@@ -57,7 +57,7 @@ trait Listing
         $tagClass = new TagClass();
         $mailsData = [
             'allMails' => $matchingMails['elements'],
-            'allTags' => $tagClass->getAllTagsByType('mail'),
+            'allTags' => $tagClass->getAllTagsByType(TagClass::TYPE_MAIL),
             'pagination' => $pagination,
             'search' => $searchFilter,
             'tag' => $tagFilter,

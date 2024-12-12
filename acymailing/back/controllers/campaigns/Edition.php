@@ -136,7 +136,7 @@ trait Edition
 
         $data = [
             'allMails' => $matchingMails['elements'],
-            'allTags' => $tagClass->getAllTagsByType('mail'),
+            'allTags' => $tagClass->getAllTagsByType(TagClass::TYPE_MAIL),
             'pagination' => $pagination,
             'search' => $searchFilter,
             'tag' => $tagFilter,
@@ -285,6 +285,8 @@ trait Edition
         if ($data['editor']->isDragAndDrop()) {
             $this->loadScripts['edit_email'][] = 'editor-wysid';
             $this->loadScripts['edit_email']['vue-applications'] = ['custom_view'];
+        } else {
+            $this->loadScripts['edit_email'][] = 'dtextPicker';
         }
     }
 
@@ -356,7 +358,7 @@ trait Edition
         $data = [
             'containerClass' => $this->stepContainerClass,
             'social_icons' => $this->config->get('social_icons', '{}'),
-            'allTags' => $tagClass->getAllTagsByType('mail'),
+            'allTags' => $tagClass->getAllTagsByType(TagClass::TYPE_MAIL),
             'campaign_type' => acym_getVar('string', 'campaign_type', 'now'),
             'typeEditor' => acym_getVar('string', 'type_editor', ''),
             'uploadFileType' => new UploadfileType(),
@@ -370,7 +372,11 @@ trait Edition
         $this->prepareListingClasses($data);
         $this->prepareSegmentDisplay($data, empty($data['mailInformation']->sending_params) ? false : $data['mailInformation']->sending_params);
 
-        $data['before-save'] = $data['editor']->editor != 'acyEditor' ? '' : 'acym-data-before="acym_editorWysidVersions.storeCurrentValues(true);"';
+        $data['before-save'] = '';
+
+        if ($data['editor']->editor === 'acyEditor') {
+            $data['before-save'] = 'acym-data-before="acym_editorWysidVersions.storeCurrentValues(true);acym_editorWysidFormAction.cleanMceInput();"';
+        }
 
         $data['menuClass'] = $this->menuClass;
 

@@ -213,6 +213,7 @@ return array(
     'AcyMailing\\Types\\AclType' => $baseDir . '/back/types/acl.php',
     'AcyMailing\\Types\\CharsetType' => $baseDir . '/back/types/charset.php',
     'AcyMailing\\Types\\DelayType' => $baseDir . '/back/types/delay.php',
+    'AcyMailing\\Types\\DtextType' => $baseDir . '/back/types/dtext.php',
     'AcyMailing\\Types\\FailactionType' => $baseDir . '/back/types/failaction.php',
     'AcyMailing\\Types\\FileTreeType' => $baseDir . '/back/types/fileTree.php',
     'AcyMailing\\Types\\OperatorType' => $baseDir . '/back/types/operator.php',

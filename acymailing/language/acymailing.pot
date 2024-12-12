@@ -1,13 +1,67 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 9.10.5\n"
+"Project-Id-Version: AcyMailing 9.11.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2024-11-21\n"
+"POT-Creation-Date: 2024-12-12\n"
 "X-Domain: acymailing\n"
 
+
+msgid "There is no content for your search"
+msgstr ""
+
+msgid "Copy code"
+msgstr ""
+
+msgid "Activate auto login URLs"
+msgstr ""
+
+msgid "When active, URLs containing the AcyMailing subscriber ID and key will automatically log the user in when clicked. The expected format is https://example.com?autoSubId=123&subKey=abc."
+msgstr ""
+
+msgid "updated"
+msgstr ""
+
+msgid "not updated"
+msgstr ""
+
+msgid "<b>%1$s</b> entries in the imported file: <br /> - <b>%2$s</b> new subscribers <b>imported</b><br /> - <b>%3$s</b> <b>invalid</b> lines or email addresses<br /> - <b>%4$s</b> already <b>existing</b> subscribers or <b>duplicate</b> entries (%5$s)"
+msgstr ""
+
+msgid "The automated tasks reached the server time limit, the process stopped. Please either reduce the number of sent emails per batch or increase the time limit in your server configuration."
+msgstr ""
+
+msgid "An AcyMailing subscriber will be created for the recipient."
+msgstr ""
+
+msgid "Send website emails with AcyMailing"
+msgstr ""
+
+msgid "With this option you can customize the answers of the unsubscribe survey in the language of your choice."
+msgstr ""
+
+msgid "Display an image on the unsubscribe page"
+msgstr ""
+
+msgid "Replace the default image"
+msgstr ""
+
+msgid "Unsubscribe page logo"
+msgstr ""
+
+msgid "Select unsubscribe page color theme"
+msgstr ""
+
+msgid "Can you tell us more?"
+msgstr ""
+
+msgid "Update my preferences"
+msgstr ""
+
+msgid "Email preferences"
+msgstr ""
 
 msgid "The default bounce rules have been updated. You can click the reset button to apply the new version, but note that any custom rules will be overwritten."
 msgstr ""
@@ -2595,9 +2649,6 @@ msgstr ""
 msgid "The e-mail address %s is not in the list of subscribers"
 msgstr ""
 
-msgid "<b>%1$s</b> entries in the imported file: <br /> - <b>%2$s</b> new subscribers <b>imported</b><br /> - <b>%3$s</b> <b>invalid</b> lines or email addresses<br /> - <b>%4$s</b> already <b>existing</b> subscribers or <b>duplicate</b> entries"
-msgstr ""
-
 msgid "%s new subscribers imported"
 msgstr ""
 
@@ -4845,9 +4896,6 @@ msgstr ""
 msgid "Redirect to an unsubscribe page after the user clicks on an unsubscribe link"
 msgstr ""
 
-msgid "Show the site's header"
-msgstr ""
-
 msgid "Unsubscribe page"
 msgstr ""
 
@@ -4978,12 +5026,6 @@ msgid "Please edit the source code only if you know what you're doing. This migh
 msgstr ""
 
 msgid "Edit block's HTML"
-msgstr ""
-
-msgid "Here are the lists you're subscribed to:"
-msgstr ""
-
-msgid "Your newsletter subscriptions"
 msgstr ""
 
 msgid "Could not submit the form, please contact the admin of the website."

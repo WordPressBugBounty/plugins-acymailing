@@ -470,7 +470,6 @@
                         }
                         $allowedHostsFormatted = [];
                         if (!empty($allowedHosts)) {
-                            $allowedHostsFormatted = [];
                             foreach ($allowedHosts as $host) {
                                 $allowedHostsFormatted[$host] = $host;
                             }
@@ -480,6 +479,19 @@
                             'config[allowed_hosts]',
                             $allowedHosts,
                             ['class' => 'acym__allowed__hosts__select', 'placeholder' => acym_translation('ACYM_ENTER_NEW_DOMAIN')]
+                        );
+                        ?>
+					</div>
+				</div>
+				<div class="cell grid-x acym_vcenter">
+					<label class="cell large-3" for="allowed_files">
+                        <?php echo acym_translation('ACYM_ACTIVATE_AUTOLOGIN_URLS').acym_info('ACYM_ACTIVATE_AUTOLOGIN_URLS_DESC'); ?>
+					</label>
+					<div class="cell grid-x large-9">
+                        <?php
+                        echo acym_switch(
+                            'config[autologin_urls]',
+                            $this->config->get('autologin_urls', 0)
                         );
                         ?>
 					</div>

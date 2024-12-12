@@ -213,4 +213,21 @@ trait Patchv9
 
         $this->updateQuery('ALTER TABLE #__acym_user ADD UNIQUE INDEX `email_UNIQUE` (`email`(191) ASC)');
     }
+
+    private function updateFor9110()
+    {
+        if ($this->isPreviousVersionAtLeast('9.11.0')) {
+            return;
+        }
+
+        $templateThumbnails = acym_loadResultArray('SELECT `thumbnail` FROM #__acym_mail WHERE `thumbnail` IS NOT NULL');
+        if (!empty($templateThumbnails)) {
+            $generatedThumbnails = acym_getFiles(ACYM_UPLOAD_FOLDER_THUMBNAIL, 'thumbnail_.*');
+            foreach ($generatedThumbnails as $generatedThumbnail) {
+                if (!in_array($generatedThumbnail, $templateThumbnails)) {
+                    acym_deleteFile(ACYM_UPLOAD_FOLDER_THUMBNAIL.$generatedThumbnail);
+                }
+            }
+        }
+    }
 }

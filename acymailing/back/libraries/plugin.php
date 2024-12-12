@@ -1414,7 +1414,9 @@ class acymPlugin extends acymObject
         if ($error) {
             return ['error_curl' => $error];
         } else {
-            return json_decode($response, true);
+            $response = json_decode($response, true);
+
+            return empty($response) ? ['error_curl' => 'Malformed response'] : $response;
         }
     }
 

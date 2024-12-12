@@ -30,7 +30,7 @@ function acym_makeCurlCall(string $url, array $options = []): array
         }
     }
 
-    if ($method === 'GET') {
+    if ($method === 'GET' && !empty($dataFormatted)) {
         $url .= strpos($url, '?') === false ? '?'.$dataFormatted : '&'.$dataFormatted;
     }
 

@@ -395,6 +395,7 @@ function acym_getJSMessages()
         'ACYM_ENTITY',
         'ACYM_DELETE_DOMAIN_CONFIRMATION',
         'ACYM_TENOR_KEY_NEEDED',
+        'ACYM_COPY_CODE',
     ];
 
     foreach ($keysToLoad as $oneKey) {

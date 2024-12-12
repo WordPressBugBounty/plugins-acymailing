@@ -41,7 +41,7 @@ trait SubscriptionInsertion
                     echo 'defaultText["'.$tagname.'"] = "'.acym_translation($tag['default'], true).'";';
                 }
                 ?>
-                jQuery('.acym__subscription__subscription').removeClass('selected_row');
+                jQuery('.selected_row').removeClass('selected_row');
                 jQuery('#tr_' + tagName).addClass('selected_row');
                 jQuery('#acym__popup__subscription__tagtext').val(defaultText[tagName]);
                 setSubscriptionTag();

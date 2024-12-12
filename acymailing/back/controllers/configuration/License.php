@@ -177,7 +177,6 @@ trait License
             'version' => $this->config->get('version'),
             'level' => $this->config->get('level'),
             'activate' => $functionToCall === 'activateCron',
-            'url_version' => 'secured',
             'security_key' => $this->config->get('cron_key'),
         ];
 

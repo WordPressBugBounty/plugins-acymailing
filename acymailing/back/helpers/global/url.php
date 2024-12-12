@@ -97,6 +97,24 @@ function acym_currentURL(): string
     return $protocol.'://'.$host.$_SERVER['REQUEST_URI'];
 }
 
+function acym_cleanUrl(string $url, array $parametersToRemove): string
+{
+    $parts = parse_url($url);
+
+    if (empty($parts['query'])) {
+        return $url;
+    }
+
+    $queryParams = [];
+    parse_str($parts['query'], $queryParams);
+
+    foreach ($parametersToRemove as $parameter) {
+        unset($queryParams[$parameter]);
+    }
+
+    return $parts['scheme'].'://'.$parts['host'].$parts['path'].'?'.http_build_query($queryParams);
+}
+
 function acym_isLocalWebsite(): bool
 {
     return strpos(ACYM_LIVE, 'localhost') !== false || strpos(ACYM_LIVE, '127.0.0.1') !== false;

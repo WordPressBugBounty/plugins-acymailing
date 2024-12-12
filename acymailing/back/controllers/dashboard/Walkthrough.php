@@ -130,7 +130,6 @@ trait Walkthrough
             'version' => $this->config->get('version', ''),
             'level' => $this->config->get('level', ''),
             'activate' => true,
-            'url_version' => 'secured',
         ];
         $result = UpdatemeHelper::call('api/crons/modify', 'POST', $data);
 

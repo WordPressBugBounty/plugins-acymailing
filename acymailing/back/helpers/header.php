@@ -144,7 +144,7 @@ class HeaderHelper extends acymObject
             if ('wordpress' === ACYM_CMS) {
                 $downloadLink = admin_url().'update-core.php';
             } else {
-                $downloadLink = ACYM_ACYMAILING_WEBSITE.'account/subscriptions/" target="_blank';
+                $downloadLink = ACYM_ACYMAILING_WEBSITE.'account/license/" target="_blank';
             }
             $version .= acym_tooltip(
                 [
@@ -173,7 +173,7 @@ class HeaderHelper extends acymObject
                     [
                         'hoveredText' => '<span class="acy_subscriptionexpired acym__color__red">'.acym_translation('ACYM_SUBSCRIPTION_EXPIRED').'</span>',
                         'textShownInTooltip' => acym_translation('ACYM_SUBSCRIPTION_EXPIRED_LINK'),
-                        'link' => ACYM_ACYMAILING_WEBSITE.'account/subscriptions/',
+                        'link' => ACYM_ACYMAILING_WEBSITE.'account/license/',
                     ]
                 );
             } else {

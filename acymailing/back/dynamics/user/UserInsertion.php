@@ -27,7 +27,7 @@ trait UserInsertion
                 const iscf = tagname.toLowerCase().indexOf('custom');
 
                 if (iscf >= 0) {
-                    dText = '{usertag:' + tagname.substr(0, iscf) + '|type:custom';
+                    dText = '{usertag:' + tagname.substring(0, iscf) + '|type:custom';
                 } else {
                     dText = '{usertag:' + tagname;
                 }

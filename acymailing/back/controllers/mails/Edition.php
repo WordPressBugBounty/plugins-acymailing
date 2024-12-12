@@ -240,7 +240,7 @@ trait Edition
         $tagClass = new TagClass();
         $data = [
             'mail' => $mail,
-            'allTags' => $tagClass->getAllTagsByType('mail'),
+            'allTags' => $tagClass->getAllTagsByType(TagClass::TYPE_MAIL),
             'isAutomationAdmin' => $isAutomationAdmin,
             'social_icons' => $this->config->get('social_icons', '{}'),
             'fromId' => $fromId,
@@ -325,6 +325,8 @@ trait Edition
         if ($data['editor']->isDragAndDrop()) {
             $this->loadScripts['edit'][] = 'editor-wysid';
             $this->loadScripts['edit']['vue-applications'] = ['custom_view'];
+        } else {
+            $this->loadScripts['edit'][] = 'dtextPicker';
         }
     }
 
@@ -341,11 +343,16 @@ trait Edition
         $fromId = acym_getVar('int', 'fromId', '');
         $return = acym_getVar('string', 'return');
         $fromAutomation = false;
-        if (!empty($return) && strpos($return, 'automation') !== false) $fromAutomation = true;
+
+        if (!empty($return) && strpos($return, 'automation') !== false) {
+            $fromAutomation = true;
+        }
+
         foreach ($formData as $name => $data) {
             if (!in_array($name, $allowedFields)) {
                 continue;
             }
+
             $mail->{$name} = $data;
         }
 
@@ -356,13 +363,14 @@ trait Edition
             $previousMail = $mailClass->getOneById($mail->id);
         }
 
-
+        $saveAsTmpl = acym_getVar('int', 'saveAsTmpl', 0);
         if (!empty($versions)) {
-            if (!empty($versions['main']['subject'])) $mail->subject = $versions['main']['subject'];
-            if (!empty($versions['main']['preview'])) $mail->preheader = $versions['main']['preview'];
-            if (!empty($versions['main']['content'])) $mail->body = $versions['main']['content'];
-            if (!empty($versions['main']['content'])) $mail->settings = $versions['main']['settings'];
-            if (!empty($versions['main']['content'])) $mail->stylesheet = $versions['main']['stylesheet'];
+            $saveAsTmplVersion = $saveAsTmpl === 1 ? acym_getVar('string', 'saveAsTmplVersion', 'main') : 'main';
+            if (!empty($versions[$saveAsTmplVersion]['subject'])) $mail->subject = $versions[$saveAsTmplVersion]['subject'];
+            if (!empty($versions[$saveAsTmplVersion]['preview'])) $mail->preheader = $versions[$saveAsTmplVersion]['preview'];
+            if (!empty($versions[$saveAsTmplVersion]['content'])) $mail->body = $versions[$saveAsTmplVersion]['content'];
+            if (!empty($versions[$saveAsTmplVersion]['settings'])) $mail->settings = $versions[$saveAsTmplVersion]['settings'];
+            if (!empty($versions[$saveAsTmplVersion]['stylesheet'])) $mail->stylesheet = $versions[$saveAsTmplVersion]['stylesheet'];
 
             if ($versionType === 'multilingual') {
                 $mail->links_language = $this->config->get('multilingual_default');
@@ -371,7 +379,6 @@ trait Edition
             unset($versions['main']);
         }
 
-        $saveAsTmpl = acym_getVar('int', 'saveAsTmpl', 0);
         if ($saveAsTmpl === 1) {
             unset($mail->id);
             $mail->type = MailClass::TYPE_TEMPLATE;
@@ -387,10 +394,10 @@ trait Edition
             $mail->subject = acym_translation('ACYM_EMAIL_SUBJECT');
         }
 
-        $inputNameBody = $saveAsTmpl ? 'editor_content_template' : 'editor_content';
-        $inputNameSettings = $saveAsTmpl ? 'editor_settings_template' : 'editor_settings';
-        $inputNameStylesheet = $saveAsTmpl ? 'editor_stylesheet_template' : 'editor_stylesheet';
-        $inputNameColors = $saveAsTmpl ? 'main_colors_template' : 'main_colors';
+        $inputNameBody = $saveAsTmpl === 1 ? 'editor_content_template' : 'editor_content';
+        $inputNameSettings = $saveAsTmpl === 1 ? 'editor_settings_template' : 'editor_settings';
+        $inputNameStylesheet = $saveAsTmpl === 1 ? 'editor_stylesheet_template' : 'editor_stylesheet';
+        $inputNameColors = $saveAsTmpl === 1 ? 'main_colors_template' : 'main_colors';
 
         $mail->tags = acym_getVar('array', 'template_tags', []);
         $mail->body = acym_getVar('string', $inputNameBody, '', 'REQUEST', ACYM_ALLOWRAW);
@@ -413,16 +420,22 @@ trait Edition
             $mail->creation_date = acym_date('now', 'Y-m-d H:i:s', false);
         }
 
-        if (acym_getVar('bool', 'custom_thumbnail_reset', false)) {
+        $uploadedThumbnail = $this->setThumbnailFromInput();
+        if (!empty($uploadedThumbnail)) {
+            if (!empty($previousMail->thumbnail)) {
+                acym_deleteFile(ACYM_UPLOAD_FOLDER_THUMBNAIL.$previousMail->thumbnail);
+            }
+
+            $mail->thumbnail = $uploadedThumbnail;
+        } elseif (acym_getVar('bool', 'custom_thumbnail_reset', false)) {
+            if (!empty($previousMail->thumbnail)) {
+                acym_deleteFile(ACYM_UPLOAD_FOLDER_THUMBNAIL.$previousMail->thumbnail);
+            }
+
             $mail->thumbnail = null;
         }
 
-        $uploadedThumbnail = $this->setThumbnailFromInput();
-        if ($uploadedThumbnail) {
-            $mail->thumbnail = $uploadedThumbnail;
-        }
-
-        if (isset($previousMail) && !empty($previousMail->mail_settings)) {
+        if (!empty($previousMail->mail_settings)) {
             $mailSettings = json_decode($previousMail->mail_settings, false);
         } else {
             $mailSettings = new \stdClass();
@@ -432,7 +445,13 @@ trait Edition
 
         if (!empty($fromId) && empty($mail->thumbnail) && !$fromAutomation) {
             $thumbnail = $this->setThumbnailFrom($fromId);
-            if (!empty($thumbnail)) $mail->thumbnail = $thumbnail;
+            if (!empty($thumbnail)) {
+                if (!empty($previousMail->thumbnail)) {
+                    acym_deleteFile(ACYM_UPLOAD_FOLDER_THUMBNAIL.$previousMail->thumbnail);
+                }
+
+                $mail->thumbnail = $thumbnail;
+            }
         }
 
         if (empty($mail->name) && !in_array($mail->type, MailClass::TYPES_NO_NAME) && empty($mail->id)) {
@@ -460,7 +479,10 @@ trait Edition
                 }
             }
 
-            if (!$ajax) acym_enqueueMessage(acym_translation('ACYM_SUCCESSFULLY_SAVED'), 'success');
+            if (!$ajax) {
+                acym_enqueueMessage(acym_translation('ACYM_SUCCESSFULLY_SAVED'), 'success');
+            }
+
             if ($fromAutomation) {
                 acym_setVar('type', MailClass::TYPE_AUTOMATION);
                 acym_setVar('type_editor', 'acyEditor');
@@ -468,7 +490,7 @@ trait Edition
                 acym_setVar('mailID', $mailID);
             }
 
-            if (!empty($versions) && in_array($versionType, ['multilingual', 'abtest'])) {
+            if (!empty($versions) && in_array($versionType, ['multilingual', 'abtest']) && $saveAsTmpl !== 1) {
                 $abTestSendingParams = empty($campaign->sending_params['abtest']) ? [] : $campaign->sending_params['abtest'];
                 foreach ($versions as $code => $version) {
                     if (empty($version['subject'])) {
@@ -853,7 +875,7 @@ trait Edition
             acym_sendAjaxResponse('This file is not allowed.', [], false);
         }
 
-        $mailId = acym_getVar('int', 'id', 0);
+        $mailId = acym_getVar('int', 'mailId', 0);
         if (!empty($mailId)) {
             $mailClass = new MailClass();
             $mail = $mailClass->getOneById($mailId);
