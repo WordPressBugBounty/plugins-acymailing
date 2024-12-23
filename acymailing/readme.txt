@@ -2,8 +2,8 @@
 Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
-Tested up to: 6.7
-Stable tag: 9.11.0
+Tested up to: 6.7.1
+Stable tag: 9.11.1
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,19 +113,9 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 9.11.0 - December 12, 2024 =
-* A new option has been added on the website editor to let you insert dynamic texts such as user name or unsubscribe links.
-* A new option lets you send all the website emails with AcyMailing
-* A new option lets you auto login recipients when they click on a link in your email.
-
-* You can now set BCC on Automation emails
-* The unsubscribe page has been renewed with a new design and new customisable settings.
-* Improved import subscribers report information
-
-* A new thumbnail was generated each time a template was saved, this has been fixed.
-* Removed the input hidden added by TinyMCE on the campaign editor content, which could cause issues with the editor content when saving the email for some host provider.
-* Fixed responsiveness of the text editor toolbar not displaying all buttons on some window sizes
-* Fixed an XSS vulnerability on the queue listing that could impact connected administrator clicking on a external malicious link
-* Fixed an issue on the template creation that could create 2 templates
+= 9.11.1 - December 23, 2024 =
+* The Sendgrid integration now handles the new result sent by Sendgrid when an email is sent.
+* Fixed a PHP error that could happen when running the bounce handling manually
+* A warning has been fixed on the queue listing when only follow-up campaigns were queued.
 
 [See the whole changelog here.](https://www.acymailing.com/change-log)
