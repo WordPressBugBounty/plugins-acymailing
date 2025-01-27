@@ -1,6 +1,6 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 use AcyMailing\Classes\UserClass;
 use Joomla\Registry\Registry;
 use Joomla\CMS\Access\Access;
@@ -11,7 +11,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Application\ApplicationHelper;
 
-class plgAcymcreateuser extends acymPlugin
+class plgAcymcreateuser extends AcymPlugin
 {
     public function __construct()
     {

@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 6.7.1
-Stable tag: 9.11.1
+Stable tag: 10.0.0
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,9 +113,19 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 9.11.1 - December 23, 2024 =
-* The Sendgrid integration now handles the new result sent by Sendgrid when an email is sent.
-* Fixed a PHP error that could happen when running the bounce handling manually
-* A warning has been fixed on the queue listing when only follow-up campaigns were queued.
+= 10.0.0 - January 27, 2025 =
+* All icons have been updated to a new design, more modern and more consistent with the AcyMailing brand.
+* New scenario feature to execute complex sequences on your subscribers actions
+* [add-ons] A new integration with Learndash lets you filter your AcyMailing users by groups and courses.
+
+* Updated the code structure to comply with PSR-4 standards. This change improves code organization, autoloading compatibility, and overall maintainability.
+* [add-ons] WooCommerce products can now be searched by SKU when inserting them in emails.
+* [add-ons] It is now possible to add dynamic information through dynamic text and dynamic content about an order in a WooCommerce purchase follow-up e-mail.
+
+* The image of the social icon is now refreshed immediately when uploading a new icon in the editor.
+* The filter by email confirmation status is not shown anymore on the users listing when the double opt-in is disabled.
+* Fixed PHP warnings that could appear in user and form edition
+* Fix the automatic bounce handling
+* Fixed a PHP error that could happen when running bounce handling
 
 [See the whole changelog here.](https://www.acymailing.com/change-log)

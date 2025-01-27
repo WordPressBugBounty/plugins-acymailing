@@ -1,10 +1,10 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 use AcyChecker\Classes\ConfigurationClass;
 use AcyChecker\Services\ApiService;
 
-class plgAcymAcychecker extends acymPlugin
+class plgAcymAcychecker extends AcymPlugin
 {
     private function loadAcychecker()
     {

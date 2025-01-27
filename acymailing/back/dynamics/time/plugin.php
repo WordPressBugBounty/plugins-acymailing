@@ -1,11 +1,11 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'TimeAutomationTriggers.php';
 require_once __DIR__.DIRECTORY_SEPARATOR.'TimeInsertion.php';
 
-class plgAcymTime extends acymPlugin
+class plgAcymTime extends AcymPlugin
 {
     use TimeAutomationTriggers;
     use TimeInsertion;

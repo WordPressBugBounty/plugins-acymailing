@@ -18,56 +18,28 @@ trait SubscriptionAutomationActions
 
         $actions['acy_list'] = new stdClass();
         $actions['acy_list']->name = acym_translation('ACYM_ACYMAILING_LIST');
-        $actions['acy_list']->option = '<div class="intext_select_automation cell">';
-        $actions['acy_list']->option .= acym_select(
-            $listActions,
-            'acym_action[actions][__and__][acy_list][list_actions]',
-            null,
-            ['class' => 'acym__select']
-        );
-        $actions['acy_list']->option .= '</div>';
-        $actions['acy_list']->option .= '<div class="intext_select_automation cell">';
-        $actions['acy_list']->option .= acym_select(
-            $lists,
-            'acym_action[actions][__and__][acy_list][list_id]',
-            null,
-            ['class' => 'acym__select']
-        );
-        $actions['acy_list']->option .= '</div>';
-
-        $actions['subscribe_followup'] = new stdClass();
-        $actions['subscribe_followup']->name = acym_translation('ACYM_SUBSCRIBE_FOLLOW_UP');
+        ob_start();
+        include acym_getPartial('actions', 'acy_list');
+        $actions['acy_list']->option = ob_get_clean();
 
         $followupClass = new FollowupClass();
         $allListFollowups = $followupClass->getAll();
-
-        $actions['subscribe_followup']->option = '<div class="intext_select_automation cell">'.acym_select(
-                $allListFollowups,
-                'acym_action[actions][__and__][subscribe_followup][followup_id]',
-                null,
-                [
-                    'class' => 'acym__select',
-                    'data-placeholder' => (!empty($listFollowups) ? acym_translation('ACYM_SELECT_FOLLOWUP', true) : acym_translation('ACYM_FOLLOWUP_NOT_FOUND', true)),
-                ],
-                'id',
-                'name'
-            ).'</div>';
+        $actions['subscribe_followup'] = new stdClass();
+        $actions['subscribe_followup']->name = acym_translation('ACYM_SUBSCRIBE_FOLLOW_UP');
+        ob_start();
+        include acym_getPartial('actions', 'subscribe_followup');
+        $actions['subscribe_followup']->option = ob_get_clean();
 
         $actions['unsubscribe_followup'] = new stdClass();
         $actions['unsubscribe_followup']->name = acym_translation('ACYM_UNSUBSCRIBE_FOLLOW_UP');
-        $actions['unsubscribe_followup']->option = '<div class="intext_select_automation cell">';
-        $actions['unsubscribe_followup']->option .= acym_select(
-            $allListFollowups,
-            'acym_action[actions][__and__][unsubscribe_followup][followup_id]',
-            null,
-            [
-                'class' => 'acym__select',
-                'data-placeholder' => acym_translation(empty($listFollowups) ? 'ACYM_FOLLOWUP_NOT_FOUND' : 'ACYM_SELECT_FOLLOWUP', true),
-            ],
-            'id',
-            'name'
-        );
-        $actions['unsubscribe_followup']->option .= '</div>';
+        ob_start();
+        include acym_getPartial('actions', 'unsubscribe_followup');
+        $actions['unsubscribe_followup']->option = ob_get_clean();
+    }
+
+    public function onAcymDeclareActionsScenario(&$actions)
+    {
+        $this->onAcymDeclareActions($actions);
     }
 
     public function onAcymProcessAction_acy_list(&$query, $action)

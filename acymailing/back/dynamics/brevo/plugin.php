@@ -1,8 +1,8 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
-class plgAcymBrevo extends acymPlugin
+class plgAcymBrevo extends AcymPlugin
 {
     const SENDING_METHOD_ID = 'brevo-smtp';
     const SENDING_METHOD_NAME = 'Brevo';

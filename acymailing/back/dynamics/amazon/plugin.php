@@ -1,8 +1,8 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
-class plgAcymAmazon extends acymPlugin
+class plgAcymAmazon extends AcymPlugin
 {
     const SENDING_METHOD_ID = 'amazon';
     const SENDING_METHOD_NAME = 'Amazon SES';

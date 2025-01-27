@@ -1,6 +1,6 @@
 <?php
 
-use AcyMailing\Types\OperatorinType;
+use AcyMailing\Types\OperatorInType;
 use AcyMailing\Types\OperatorType;
 
 trait UserAutomationConditions
@@ -12,32 +12,14 @@ trait UserAutomationConditions
         foreach ($allGroups as $group) {
             $groups[$group->id] = $group->text;
         }
-        $operatorIn = new OperatorinType();
+        $operatorIn = new OperatorInType();
 
         $conditions['user']['acy_group'] = new stdClass();
         $conditions['user']['acy_group']->name = acym_translation('ACYM_GROUP');
-        $conditions['user']['acy_group']->option = '<div class="intext_select_automation cell">';
-        $conditions['user']['acy_group']->option .= $operatorIn->display('acym_condition[conditions][__numor__][__numand__][acy_group][in]');
-        $conditions['user']['acy_group']->option .= '</div>';
-        $conditions['user']['acy_group']->option .= '<div class="intext_select_automation cell">';
-        $conditions['user']['acy_group']->option .= acym_select(
-            $groups,
-            'acym_condition[conditions][__numor__][__numand__][acy_group][group]',
-            null,
-            ['class' => 'acym__select']
-        );
-        $conditions['user']['acy_group']->option .= '</div>';
-
-        if (ACYM_CMS == 'joomla') {
-            $conditions['user']['acy_group']->option .= '<div class="cell grid-x medium-3">';
-            $conditions['user']['acy_group']->option .= acym_switch(
-                'acym_condition[conditions][__numor__][__numand__][acy_group][subgroup]',
-                1,
-                acym_translation('ACYM_INCLUDE_SUB_GROUPS')
-            );
-            $conditions['user']['acy_group']->option .= '</div>';
-        }
-
+        $isJoomla = ACYM_CMS == 'joomla';
+        ob_start();
+        include acym_getPartial('conditions', 'acy_group');
+        $conditions['user']['acy_group']->option = ob_get_clean();
 
         $cmsFields = [];
         foreach (acym_getColumns('users', false) as $key => $column) {
@@ -65,18 +47,9 @@ trait UserAutomationConditions
 
         $conditions['user']['acy_cmsfield'] = new stdClass();
         $conditions['user']['acy_cmsfield']->name = acym_translation('ACYM_ACCOUNT_USER_FIELD');
-        $conditions['user']['acy_cmsfield']->option = '<div class="intext_select_automation cell">';
-        $conditions['user']['acy_cmsfield']->option .= acym_select(
-            $cmsFields,
-            'acym_condition[conditions][__numor__][__numand__][acy_cmsfield][field]',
-            null,
-            ['class' => 'acym__select']
-        );
-        $conditions['user']['acy_cmsfield']->option .= '</div>';
-        $conditions['user']['acy_cmsfield']->option .= '<div class="intext_select_automation cell">';
-        $conditions['user']['acy_cmsfield']->option .= $operator->display('acym_condition[conditions][__numor__][__numand__][acy_cmsfield][operator]');
-        $conditions['user']['acy_cmsfield']->option .= '</div>';
-        $conditions['user']['acy_cmsfield']->option .= '<input class="intext_input_automation cell" type="text" name="acym_condition[conditions][__numor__][__numand__][acy_cmsfield][value]">';
+        ob_start();
+        include acym_getPartial('conditions', 'acy_cmsfield');
+        $conditions['user']['acy_cmsfield']->option = ob_get_clean();
 
         $conditions['classic']['acy_totaluser'] = new stdClass();
         $conditions['classic']['acy_totaluser']->name = acym_translation('ACYM_NUMBER_OF_SUBSCRIBERS');
@@ -97,6 +70,10 @@ trait UserAutomationConditions
         $conditions['both']['acy_toss']->option = '<input type="hidden" name="acym_condition[conditions][__numor__][__numand__][acy_toss][toss]" value="true"><div class="acym__automation__inner__text">'.acym_translation(
                 'ACYM_TOSS_DESC'
             ).'</div>';
+    }
+
+    public function onAcymDeclareConditionsScenario(&$conditions){
+        $this->onAcymDeclareConditions($conditions);
     }
 
     public function onAcymProcessCondition_acy_toss(&$query, $option, $num, &$conditionNotValid)

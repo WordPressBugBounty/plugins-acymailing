@@ -1,10 +1,10 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'OnlineInsertion.php';
 
-class plgAcymOnline extends acymPlugin
+class plgAcymOnline extends AcymPlugin
 {
     use OnlineInsertion;
 

@@ -1,8 +1,8 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
-class plgAcymSendgrid extends acymPlugin
+class plgAcymSendgrid extends AcymPlugin
 {
     const SENDING_METHOD_ID = 'sendgrid';
     const SENDING_METHOD_NAME = 'SendGrid';

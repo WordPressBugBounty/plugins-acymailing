@@ -2,9 +2,9 @@
 
 use AcyMailing\Classes\MailClass;
 use AcyMailing\Classes\QueueClass;
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
-class plgAcymAcymailer extends acymPlugin
+class plgAcymAcymailer extends AcymPlugin
 {
     const SENDING_METHOD_ID = 'acymailer';
     const SENDING_METHOD_NAME = 'AcyMailing sending service';
@@ -108,7 +108,7 @@ class plgAcymAcymailer extends acymPlugin
 			</label>
 			<button type="button"
 					id="acym__configuration__activate__acymailer"
-					class="cell shrink button">
+					class="cell shrink button margin-bottom-0">
                 <?php echo acym_translation('ACYM_SEE_THE_SENDING_METHOD'); ?>
 			</button>
 		</div>
@@ -184,7 +184,7 @@ class plgAcymAcymailer extends acymPlugin
 					<div class="cell grid-x">
                         <?php if (!empty($domainsWaiting)) { ?>
 							<div class="cell <?php echo empty($data['step']) ? 'large-8' : '' ?> grid-x acym_vcenter acym__config__acymailer__warning">
-								<i class="cell small-2 margin-right-0 acymicon-access_time acym__color__orange"></i>
+								<i class="cell small-2 margin-right-0 acymicon-access-time acym__color__orange"></i>
 								<div class="cell small-10 grid-x">
 									<span class="cell"><?php echo acym_translation('ACYM_DOMAINS_WAITING_VALIDATION_ADD_CNAME'); ?></span>
 									<a href="<?php echo ACYM_DOCUMENTATION; ?>external-sending-method/acymailing-sending-service#how-to-add-the-dns-entries-on-my-server"
@@ -253,11 +253,11 @@ class plgAcymAcymailer extends acymPlugin
                                                 $tooltipText = acym_translation('ACYM_VALIDATED');
                                                 break;
                                             case 'FAILED':
-                                                $iconClass = 'acymicon-remove acym__color__red notValidated';
+                                                $iconClass = 'acymicon-close acym__color__red notValidated';
                                                 $tooltipText = acym_translation('ACYM_APPROVAL_FAILED');
                                                 break;
                                             default:
-                                                $iconClass = 'acymicon-access_time acym__color__orange notValidated';
+                                                $iconClass = 'acymicon-access-time acym__color__orange notValidated';
                                                 $tooltipText = acym_translation('ACYM_A_CNAME_MISSING');
                                         }
                                         echo acym_tooltip(
@@ -313,7 +313,7 @@ class plgAcymAcymailer extends acymPlugin
                                                         } else {
                                                             $cnameStatus = acym_tooltip(
                                                                 [
-                                                                    'hoveredText' => '<i class="acym__config__acymailer__status__icon acymicon-remove acym__color__red"></i>',
+                                                                    'hoveredText' => '<i class="acym__config__acymailer__status__icon acymicon-close acym__color__red"></i>',
                                                                     'textShownInTooltip' => implode('<br/>', $this->cnameErrors),
                                                                 ]
                                                             );
@@ -963,7 +963,7 @@ class plgAcymAcymailer extends acymPlugin
                 'color' => 'acym__color__red',
                 'icon' => acym_tooltip(
                     [
-                        'hoveredText' => '<i class="acym__config__acymailer__rate-status__icon acymicon-remove acym__color__red"></i>',
+                        'hoveredText' => '<i class="acym__config__acymailer__rate-status__icon acymicon-close acym__color__red"></i>',
                         'textShownInTooltip' => acym_translation('ACYM_RATE_BLOCKED'),
                     ]
                 ),

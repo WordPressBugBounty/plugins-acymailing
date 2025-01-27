@@ -1,6 +1,6 @@
 <?php
 
-use AcyMailing\Types\OperatorinType;
+use AcyMailing\Types\OperatorInType;
 use AcyMailing\Types\OperatorType;
 
 trait UserAutomationFilters
@@ -12,7 +12,7 @@ trait UserAutomationFilters
         foreach ($allGroups as $group) {
             $groups[$group->id] = $group->text;
         }
-        $operatorIn = new OperatorinType();
+        $operatorIn = new OperatorInType();
 
         $filters['acy_group'] = new stdClass();
         $filters['acy_group']->name = acym_translation('ACYM_GROUP');

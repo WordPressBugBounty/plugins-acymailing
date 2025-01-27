@@ -7,13 +7,10 @@ use AcyMailing\Helpers\ExportHelper;
 use AcyMailing\Classes\UserClass;
 use AcyMailing\Classes\FieldClass;
 use AcyMailing\Classes\AutomationClass;
+use AcyMailing\Helpers\ScenarioHelper;
 
 trait SubscriberFollowup
 {
-    private $followTriggerName = 'user_creation';
-
-    private $triggerMail = ['user_click', 'user_open'];
-
     public function onAcymAfterUserCreate(&$user)
     {
         $automationClass = new AutomationClass();
@@ -21,6 +18,9 @@ trait SubscriberFollowup
 
         $followupClass = new FollowupClass();
         $followupClass->addFollowupEmailsQueue($this->followTriggerName, $user->id);
+
+        $scenarioHelper = new ScenarioHelper();
+        $scenarioHelper->trigger('user_creation', ['userId' => $user->id]);
     }
 
     public function matchFollowupsConditions(&$followups, $userId, $params)
@@ -77,59 +77,6 @@ trait SubscriberFollowup
         $userMatchingOr = acym_loadResult($automationHelper->getQuery(['user.id']));
 
         return !empty($userMatchingOr);
-    }
-
-    public function onAcymAfterUserModify(&$user, &$oldUser)
-    {
-        if (empty($user)) return;
-
-        $automationClass = new AutomationClass();
-        $automationClass->trigger('user_modification', ['userId' => $user->id]);
-
-        if (empty($oldUser)) return;
-
-        $exportChanges = $this->config->get('export_data_changes', 0);
-        if (!$exportChanges) return;
-
-        $fieldsToExport = $this->config->get('export_data_changes_fields', []);
-        if (empty($fieldsToExport)) return;
-
-        $userClass = new UserClass();
-        $newUser = $userClass->getOneByIdWithCustomFields($user->id);
-        if (empty($newUser)) return;
-
-        if (empty($fieldsToExport)) return;
-
-        $fieldsToExport = explode(',', $fieldsToExport);
-        $fieldClass = new FieldClass();
-        $fields = $fieldClass->getByIds($fieldsToExport);
-
-        $fieldsName = [];
-        foreach ($fields as $field) {
-            if ($field->name == 'ACYM_NAME') {
-                $name = 'name';
-            } elseif ($field->name == 'ACYM_EMAIL') {
-                $name = 'email';
-            } elseif ($field->name == 'ACYM_LANGUAGE') {
-                $name = 'language';
-            } else {
-                $name = $field->name;
-            }
-            $fieldsName[] = $name;
-        }
-
-        if (empty($fieldsName)) return;
-
-        $exportHelper = new ExportHelper();
-
-        foreach ($newUser as $column => $value) {
-            if (!isset($oldUser[$column])) $oldUser[$column] = '';
-            if (!isset($newUser[$column])) $newUser[$column] = '';
-
-            if ($oldUser[$column] == $newUser[$column]) continue;
-
-            $exportHelper->exportChanges($newUser, $fieldsName, $column, $newUser[$column], $oldUser[$column]);
-        }
     }
 
     public function getFollowupTriggers(&$triggers)

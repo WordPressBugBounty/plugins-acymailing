@@ -1,22 +1,14 @@
 <?php
 
+use AcyMailing\Classes\ScenarioClass;
 use AcyMailing\Helpers\ExportHelper;
 use AcyMailing\Classes\UserClass;
 use AcyMailing\Classes\FieldClass;
 use AcyMailing\Classes\AutomationClass;
+use AcyMailing\Helpers\ScenarioHelper;
 
 trait SubscriberAutomationTriggers
 {
-    private $triggers = [
-        'user_creation' => 'ACYM_ON_USER_CREATION',
-        'user_modification' => 'ACYM_ON_USER_MODIFICATION',
-        'user_click' => 'ACYM_WHEN_USER_CLICKS_MAIL',
-        'user_open' => 'ACYM_WHEN_USER_OPEN_MAIL',
-        'user_confirmation' => 'ACYM_WHEN_USER_CONFIRMS_SUBSCRIPTION',
-    ];
-
-    private $triggerMail = ['user_click', 'user_open'];
-
     public function onAcymDeclareTriggers(&$triggers, &$defaultValues)
     {
         foreach ($this->triggers as $key => $name) {
@@ -43,6 +35,11 @@ trait SubscriberAutomationTriggers
         }
     }
 
+    public function onAcymDeclareTriggersScenario(&$triggers, &$defaultValues)
+    {
+        $this->onAcymDeclareTriggers($triggers, $defaultValues);
+    }
+
     public function onAcymExecuteTrigger(&$step, &$execute, &$data)
     {
         if (empty($data['userId'])) return;
@@ -50,10 +47,14 @@ trait SubscriberAutomationTriggers
         $triggers = $step->triggers;
 
         foreach ($this->triggers as $identifier => $name) {
-            if (empty($triggers[$identifier])) continue;
+            if (empty($triggers[$identifier])) {
+                continue;
+            }
 
             if (!empty($triggers['mail_'.$identifier]) && in_array($identifier, $this->triggerMail)) {
-                if (empty($data['mailId']) || $data['mailId'] != $triggers['mail_'.$identifier]) continue;
+                if (empty($data['mailId']) || $data['mailId'] != $triggers['mail_'.$identifier]) {
+                    continue;
+                }
             }
 
             $execute = true;
@@ -72,22 +73,39 @@ trait SubscriberAutomationTriggers
 
     public function onAcymAfterUserModify(&$user, &$oldUser)
     {
-        if (empty($user)) return;
+        if (empty($user)) {
+            return;
+        }
 
         $automationClass = new AutomationClass();
         $automationClass->trigger('user_modification', ['userId' => $user->id]);
 
-        if (empty($oldUser)) return;
+        $scenarioHelper = new ScenarioHelper();
+        $scenarioHelper->trigger('user_modification', ['userId' => $user->id]);
+
+        if (empty($oldUser)) {
+            return;
+        }
 
         $exportChanges = $this->config->get('export_data_changes', 0);
-        if (!$exportChanges) return;
+        if (!$exportChanges) {
+            return;
+        }
 
         $fieldsToExport = $this->config->get('export_data_changes_fields', []);
-        if (empty($fieldsToExport)) return;
+        if (empty($fieldsToExport)) {
+            return;
+        }
 
         $userClass = new UserClass();
         $newUser = $userClass->getOneByIdWithCustomFields($user->id);
-        if (empty($newUser)) return;
+        if (empty($newUser)) {
+            return;
+        }
+
+        if (empty($fieldsToExport)) {
+            return;
+        }
 
         $fieldsToExport = explode(',', $fieldsToExport);
         $fieldClass = new FieldClass();
@@ -107,15 +125,23 @@ trait SubscriberAutomationTriggers
             $fieldsName[] = $name;
         }
 
-        if (empty($fieldsName)) return;
+        if (empty($fieldsName)) {
+            return;
+        }
 
         $exportHelper = new ExportHelper();
 
         foreach ($newUser as $column => $value) {
-            if (!isset($oldUser[$column])) $oldUser[$column] = '';
-            if (!isset($newUser[$column])) $newUser[$column] = '';
+            if (!isset($oldUser[$column])) {
+                $oldUser[$column] = '';
+            }
+            if (!isset($newUser[$column])) {
+                $newUser[$column] = '';
+            }
 
-            if ($oldUser[$column] == $newUser[$column]) continue;
+            if ($oldUser[$column] == $newUser[$column]) {
+                continue;
+            }
 
             $exportHelper->exportChanges($newUser, $fieldsName, $column, $newUser[$column], $oldUser[$column]);
         }
@@ -125,5 +151,8 @@ trait SubscriberAutomationTriggers
     {
         $automationClass = new AutomationClass();
         $automationClass->trigger('user_confirmation', ['userId' => $user->id]);
+
+        $scenarioHelper = new ScenarioHelper();
+        $scenarioHelper->trigger('user_confirmation', ['userId' => $user->id]);
     }
 }

@@ -1,13 +1,13 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 use AcyMailing\Classes\FieldClass;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'BirthdayAutomationTriggers.php';
 require_once __DIR__.DIRECTORY_SEPARATOR.'BirthdayCampaignType.php';
 require_once __DIR__.DIRECTORY_SEPARATOR.'BirthdayFollowup.php';
 
-class plgAcymBirthday extends acymPlugin
+class plgAcymBirthday extends AcymPlugin
 {
     use BirthdayAutomationTriggers;
     use BirthdayCampaignType;

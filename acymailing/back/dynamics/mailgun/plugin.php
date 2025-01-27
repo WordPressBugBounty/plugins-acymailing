@@ -1,8 +1,8 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
-class plgAcymMailgun extends acymPlugin
+class plgAcymMailgun extends AcymPlugin
 {
     const SENDING_METHOD_ID = 'mailgun';
     const SENDING_METHOD_NAME = 'Mailgun';

@@ -1,6 +1,6 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'UserAutomationAction.php';
 require_once __DIR__.DIRECTORY_SEPARATOR.'UserAutomationConditions.php';
@@ -8,7 +8,7 @@ require_once __DIR__.DIRECTORY_SEPARATOR.'UserAutomationFilters.php';
 require_once __DIR__.DIRECTORY_SEPARATOR.'UserInsertion.php';
 require_once __DIR__.DIRECTORY_SEPARATOR.'UserBirthday.php';
 
-class plgAcymUser extends acymPlugin
+class plgAcymUser extends AcymPlugin
 {
     use UserAutomationActions;
     use UserAutomationConditions;
@@ -19,9 +19,6 @@ class plgAcymUser extends acymPlugin
     public function __construct()
     {
         parent::__construct();
-
-        global $acymCmsUserVars;
-        $this->cmsUserVars = $acymCmsUserVars;
 
         $this->pluginDescription->name = acym_translationSprintf('ACYM_CMS_USER', 'WordPress');
     }

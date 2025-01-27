@@ -418,19 +418,20 @@ trait SubscriptionInsertion
             return "";
         }
 
+        global $acymCmsUserVars;
         if (!isset($this->listsowner[$listid])) {
             $this->listsowner[$listid] = acym_loadObject(
-                'SELECT user.* FROM #__acym_list AS list JOIN '.$this->cmsUserVars->table.' AS user ON user.'.$this->cmsUserVars->id.' = list.cms_user_id WHERE list.id = '.intval(
+                'SELECT user.* FROM #__acym_list AS list JOIN '.$acymCmsUserVars->table.' AS user ON user.'.$acymCmsUserVars->id.' = list.cms_user_id WHERE list.id = '.intval(
                     $listid
                 )
             );
         }
 
-        if (!in_array($parameter->field, [$this->cmsUserVars->username, $this->cmsUserVars->name, $this->cmsUserVars->email])) {
+        if (!in_array($parameter->field, [$acymCmsUserVars->username, $acymCmsUserVars->name, $acymCmsUserVars->email])) {
             return 'Field not found : '.$parameter->field;
         }
 
-        return @$this->listsowner[$listid]->{$this->cmsUserVars->{$parameter->field}};
+        return @$this->listsowner[$listid]->{$acymCmsUserVars->{$parameter->field}};
     }
 
     private function listname(&$email, &$user, &$parameter)

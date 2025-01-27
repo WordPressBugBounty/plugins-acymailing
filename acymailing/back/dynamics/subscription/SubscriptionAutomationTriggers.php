@@ -2,6 +2,7 @@
 
 use AcyMailing\Classes\FollowupClass;
 use AcyMailing\Classes\AutomationClass;
+use AcyMailing\Helpers\ScenarioHelper;
 
 trait SubscriptionAutomationTriggers
 {
@@ -20,6 +21,11 @@ trait SubscriptionAutomationTriggers
             $triggers['user'][$key]->name = '<div class="cell shrink">'.acym_translation($name).'</div>';
             $triggers['user'][$key]->option = '<input type="hidden" name="[triggers][user]['.$key.'][]" value="">';
         }
+    }
+
+    public function onAcymDeclareTriggersScenario(&$triggers, &$defaultValues)
+    {
+        $this->onAcymDeclareTriggers($triggers, $defaultValues);
     }
 
     public function onAcymExecuteTrigger(&$step, &$execute, &$data)
@@ -50,6 +56,9 @@ trait SubscriptionAutomationTriggers
         $automationClass = new AutomationClass();
         $automationClass->trigger($this->subscribeTrigger, ['userId' => $user->id]);
 
+        $scenarioHelper = new ScenarioHelper();
+        $scenarioHelper->trigger($this->subscribeTrigger, ['userId' => $user->id]);
+
         $followupClass = new FollowupClass();
         $followupClass->addFollowupEmailsQueue($this->subscribeTrigger, $user->id, ['sub_lists' => $lists]);
     }
@@ -58,5 +67,8 @@ trait SubscriptionAutomationTriggers
     {
         $automationClass = new AutomationClass();
         $automationClass->trigger($this->unsubscribeTrigger, ['userId' => $user->id]);
+
+        $scenarioHelper = new ScenarioHelper();
+        $scenarioHelper->trigger($this->unsubscribeTrigger, ['userId' => $user->id]);
     }
 }

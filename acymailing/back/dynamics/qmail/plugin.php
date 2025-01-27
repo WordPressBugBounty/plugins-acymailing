@@ -1,8 +1,8 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
-class plgAcymQmail extends acymPlugin
+class plgAcymQmail extends AcymPlugin
 {
     const SENDING_METHOD_ID = 'qmail';
     const SENDING_METHOD_NAME = 'Qmail';

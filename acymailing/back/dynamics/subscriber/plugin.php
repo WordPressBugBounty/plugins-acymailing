@@ -1,7 +1,7 @@
 <?php
 
 use AcyMailing\Helpers\ExportHelper;
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 use AcyMailing\Classes\UserClass;
 use AcyMailing\Classes\FieldClass;
 use AcyMailing\Classes\AutomationClass;
@@ -13,7 +13,7 @@ require_once __DIR__.DIRECTORY_SEPARATOR.'SubscriberAutomationActions.php';
 require_once __DIR__.DIRECTORY_SEPARATOR.'SubscriberFollowup.php';
 require_once __DIR__.DIRECTORY_SEPARATOR.'SubscriberInsertion.php';
 
-class plgAcymSubscriber extends acymPlugin
+class plgAcymSubscriber extends AcymPlugin
 {
     use SubscriberAutomationTriggers;
     use SubscriberAutomationConditions;
@@ -22,63 +22,20 @@ class plgAcymSubscriber extends acymPlugin
     use SubscriberFollowup;
     use SubscriberInsertion;
 
+    private string $followTriggerName = 'user_creation';
+    private array $triggerMail = ['user_click', 'user_open'];
+    private array $triggers = [
+        'user_creation' => 'ACYM_ON_USER_CREATION',
+        'user_modification' => 'ACYM_ON_USER_MODIFICATION',
+        'user_click' => 'ACYM_WHEN_USER_CLICKS_MAIL',
+        'user_open' => 'ACYM_WHEN_USER_OPEN_MAIL',
+        'user_confirmation' => 'ACYM_WHEN_USER_CONFIRMS_SUBSCRIPTION',
+    ];
+
     public function __construct()
     {
         parent::__construct();
         $this->pluginDescription->name = acym_translation('ACYM_SUBSCRIBER');
-    }
-
-    public function onAcymAfterUserModify(&$user, &$oldUser)
-    {
-        if (empty($user)) return;
-
-        $automationClass = new AutomationClass();
-        $automationClass->trigger('user_modification', ['userId' => $user->id]);
-
-        if (empty($oldUser)) return;
-
-        $exportChanges = $this->config->get('export_data_changes', 0);
-        if (!$exportChanges) return;
-
-        $fieldsToExport = $this->config->get('export_data_changes_fields', []);
-        if (empty($fieldsToExport)) return;
-
-        $userClass = new UserClass();
-        $newUser = $userClass->getOneByIdWithCustomFields($user->id);
-        if (empty($newUser)) return;
-
-        if (empty($fieldsToExport)) return;
-
-        $fieldsToExport = explode(',', $fieldsToExport);
-        $fieldClass = new FieldClass();
-        $fields = $fieldClass->getByIds($fieldsToExport);
-
-        $fieldsName = [];
-        foreach ($fields as $field) {
-            if ($field->name == 'ACYM_NAME') {
-                $name = 'name';
-            } elseif ($field->name == 'ACYM_EMAIL') {
-                $name = 'email';
-            } elseif ($field->name == 'ACYM_LANGUAGE') {
-                $name = 'language';
-            } else {
-                $name = $field->name;
-            }
-            $fieldsName[] = $name;
-        }
-
-        if (empty($fieldsName)) return;
-
-        $exportHelper = new ExportHelper();
-
-        foreach ($newUser as $column => $value) {
-            if (!isset($oldUser[$column])) $oldUser[$column] = '';
-            if (!isset($newUser[$column])) $newUser[$column] = '';
-
-            if ($oldUser[$column] == $newUser[$column]) continue;
-
-            $exportHelper->exportChanges($newUser, $fieldsName, $column, $newUser[$column], $oldUser[$column]);
-        }
     }
 
     public function onAcymToggleUserConfirmed($userId, $newValue)

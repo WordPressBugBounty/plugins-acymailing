@@ -79,23 +79,13 @@ trait SubscriberAutomationConditions
 
         $conditions['user']['acy_field'] = new stdClass();
         $conditions['user']['acy_field']->name = acym_translation('ACYM_ACYMAILING_FIELD');
-        $conditions['user']['acy_field']->option = '<div class="intext_select_automation cell">';
-        $conditions['user']['acy_field']->option .= acym_select(
-            $fields,
-            'acym_condition[conditions][__numor__][__numand__][acy_field][field]',
-            null,
-            ['class' => 'acym__select acym__automation__conditions__fields__dropdown']
-        );
-        $conditions['user']['acy_field']->option .= '</div>';
-        $conditions['user']['acy_field']->option .= '<div class="intext_select_automation cell">';
-        $conditions['user']['acy_field']->option .= $operator->display(
-            'acym_condition[conditions][__numor__][__numand__][acy_field][operator]',
-            '',
-            'acym__automation__conditions__operator__dropdown'
-        );
-        $conditions['user']['acy_field']->option .= '</div>';
-        $conditions['user']['acy_field']->option .= '<input class="acym__automation__one-field intext_input_automation cell acym__automation__condition__regular-field" type="text" name="acym_condition[conditions][__numor__][__numand__][acy_field][value]">';
-        $conditions['user']['acy_field']->option .= implode(' ', $customFieldValues);
+        ob_start();
+        include acym_getPartial('conditions', 'acy_field');
+        $conditions['user']['acy_field']->option = ob_get_clean();
+    }
+
+    public function onAcymDeclareConditionsScenario(&$conditions){
+        $this->onAcymDeclareConditions($conditions);
     }
 
     public function onAcymProcessCondition_acy_field(&$query, &$options, $num, &$conditionNotValid)

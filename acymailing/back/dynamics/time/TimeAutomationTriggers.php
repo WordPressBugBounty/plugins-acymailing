@@ -150,6 +150,10 @@ trait TimeAutomationTriggers
 
     public function onAcymExecuteTrigger(&$step, &$execute, &$data)
     {
+        if (!empty($step->is_scenario)) {
+            return;
+        }
+
         $time = $data['time'];
         $triggers = $step->triggers;
 

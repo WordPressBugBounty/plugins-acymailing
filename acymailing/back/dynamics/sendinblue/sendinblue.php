@@ -1,8 +1,8 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
-class SendinblueClass extends acymPlugin
+class SendinblueClass extends AcymPlugin
 {
     protected $headers;
     public $plugin;

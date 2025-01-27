@@ -1,7 +1,7 @@
 <?php
 
 
-$vendorDir = dirname(dirname(__FILE__));
+$vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(

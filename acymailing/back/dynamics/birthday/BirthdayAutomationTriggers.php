@@ -43,7 +43,7 @@ trait BirthdayAutomationTriggers
             $i++;
         }
 
-        $option = '<div class="grid-x grid-margin-x margin-y">
+        $option = '<div class="grid-x grid-margin-x grid-margin-y">
                         <div class="cell grid-x">
                             <div class="cell medium-shrink" style="display: none">
                                 '.acym_translation('ACYM_SOURCE').' : ';
@@ -109,9 +109,16 @@ trait BirthdayAutomationTriggers
         $triggers['user']['on_birthday']->option = $option;
     }
 
+    public function onAcymDeclareTriggersScenario(&$triggers, &$defaultValues)
+    {
+        $this->onAcymDeclareTriggers($triggers, $defaultValues);
+    }
+
     public function onAcymExecuteTrigger(&$step, &$execute, &$data)
     {
-        if (!empty($step->next_execution) && $step->next_execution > $data['time']) return;
+        if (!empty($step->next_execution) && $step->next_execution > $data['time']) {
+            return;
+        }
 
         $triggers = $step->triggers;
 

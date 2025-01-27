@@ -1,8 +1,8 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
-class plgAcymPostmark extends acymPlugin
+class plgAcymPostmark extends AcymPlugin
 {
     const SENDING_METHOD_ID = 'postmark';
     const SENDING_METHOD_NAME = 'Postmark';

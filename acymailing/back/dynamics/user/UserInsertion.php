@@ -61,10 +61,11 @@ trait UserInsertion
             ['containerClass' => 'margin-bottom-1']
         );
 
+        global $acymCmsUserVars;
         $fields = [
-            $this->cmsUserVars->username => 'ACYM_LOGIN_NAME',
-            $this->cmsUserVars->name => 'ACYM_USER_NAME',
-            $this->cmsUserVars->registered => 'ACYM_REGISTRATION_DATE',
+            $acymCmsUserVars->username => 'ACYM_LOGIN_NAME',
+            $acymCmsUserVars->name => 'ACYM_USER_NAME',
+            $acymCmsUserVars->registered => 'ACYM_REGISTRATION_DATE',
             'groups' => 'ACYM_USER_GROUPS',
         ];
 
@@ -144,7 +145,8 @@ trait UserInsertion
             }
 
             if (!empty($idused) && empty($this->sendervalues[$idused]) && empty($receivervalues[$idused])) {
-                $receivervalues[$idused] = acym_loadObject('SELECT * FROM '.$this->cmsUserVars->table.' WHERE '.$this->cmsUserVars->id.' = '.intval($idused));
+                global $acymCmsUserVars;
+                $receivervalues[$idused] = acym_loadObject('SELECT * FROM '.$acymCmsUserVars->table.' WHERE '.$acymCmsUserVars->id.' = '.intval($idused));
 
                 if ($save) {
                     $this->sendervalues[$idused] = $receivervalues[$idused];

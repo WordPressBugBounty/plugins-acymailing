@@ -13,36 +13,14 @@ trait UserAutomationActions
 
         $actions['acy_group_action'] = new stdClass();
         $actions['acy_group_action']->name = acym_translation('ACYM_ACTION_ON_GROUPS');
-        $actions['acy_group_action']->option = '<div class="grid-x>';
+        ob_start();
+        include acym_getPartial('actions', 'acy_group_action');
+        $actions['acy_group_action']->option = ob_get_clean();
+    }
 
-        $actions['acy_group_action']->option .= '<div class="intext_select_automation cell">';
-        $actions['acy_group_action']->option .= '<label class="cell acym_vcenter">'.acym_translation('ACYM_ACTION_ON_GROUPS_FROM').'</label>';
-        $actions['acy_group_action']->option .= acym_select(
-            $groups,
-            'acym_action[actions][__and__][acy_group_action][remove]',
-            'none',
-            ['class' => 'acym__select']
-        );
-        $actions['acy_group_action']->option .= '</div>';
-
-        $actions['acy_group_action']->option .= '<div class="intext_select_automation cell">';
-        $actions['acy_group_action']->option .= '<label class="cell shrink margin-left-1 margin-right-1">'.acym_translation('ACYM_ACTION_ON_GROUPS_TO').'</label>';
-        $actions['acy_group_action']->option .= acym_select(
-            $groups,
-            'acym_action[actions][__and__][acy_group_action][add]',
-            'none',
-            [
-                'class' => 'acym__select',
-                'data-toggle-select' => '{"none":"#warning_delete_group"}',
-            ]
-        );
-        $actions['acy_group_action']->option .= '</div>';
-
-        $actions['acy_group_action']->option .= '<div id="warning_delete_group" class="cell">';
-        $actions['acy_group_action']->option .= '<label class="cell shrink acym__color__red">'.acym_translation('ACYM_ACTION_ON_GROUPS_FROM_WARNING').'</label>';
-        $actions['acy_group_action']->option .= '</div>';
-
-        $actions['acy_group_action']->option .= '</div>';
+    public function onAcymDeclareActionsScenario(&$actions)
+    {
+        $this->onAcymDeclareActions($actions);
     }
 
     public function onAcymProcessAction_acy_group_action(&$query, $action)

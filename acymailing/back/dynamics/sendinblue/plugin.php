@@ -1,9 +1,9 @@
 <?php
 
 use AcyMailing\Classes\MailClass;
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
-class plgAcymSendinblue extends acymPlugin
+class plgAcymSendinblue extends AcymPlugin
 {
     const SENDING_METHOD_ID = 'sendinblue';
     const SENDING_METHOD_NAME = 'Brevo';

@@ -3,6 +3,7 @@
 use AcyMailing\Classes\UserClass;
 use AcyMailing\Classes\MailClass;
 use AcyMailing\Classes\FieldClass;
+use AcyMailing\Helpers\MailerHelper;
 
 trait SubscriberAutomationActions
 {
@@ -57,13 +58,10 @@ trait SubscriberAutomationActions
 
         $actions['acy_user'] = new stdClass();
         $actions['acy_user']->name = acym_translation('ACYM_ACTION_ON_USERS');
-        $actions['acy_user']->option = '<div class="intext_select_automation cell">'.acym_select(
-                $userActions,
-                'acym_action[actions][__and__][acy_user][action]',
-                null,
-                ['class' => 'acym__select']
-            ).'</div>';
 
+        ob_start();
+        include acym_getPartial('actions', 'acy_user');
+        $actions['acy_user']->option = ob_get_clean();
 
         $userClass = new UserClass();
         $userFields = $userClass->getAllColumnsUserAndCustomField(true);
@@ -123,56 +121,33 @@ trait SubscriberAutomationActions
 
         $actions['acy_user_value'] = new stdClass();
         $actions['acy_user_value']->name = acym_translation('ACYM_SET_USER_VALUE');
-        $actions['acy_user_value']->option = '<div class="intext_select_automation">'.acym_select(
-                $userFields,
-                'acym_action[actions][__and__][acy_user_value][field]',
-                null,
-                ['class' => 'acym__select acym__automation__actions__fields__dropdown']
-            ).'</div><div class="intext_select_automation cell">'.acym_select(
-                $userOperator,
-                'acym_action[actions][__and__][acy_user_value][operator]',
-                null,
-                ['class' => 'acym__select acym__automation__actions__operator__dropdown']
-            ).'</div><input type="text" name="acym_action[actions][__and__][acy_user_value][value]" class="intext_input_automation cell acym__automation__one-field acym__automation__action__regular-field">';
-        $actions['acy_user_value']->option .= implode(' ', $customFieldValues);
+        ob_start();
+        include acym_getPartial('actions', 'acy_user_value');
+        $actions['acy_user_value']->option = ob_get_clean();
 
         $actions['acy_add_queue'] = new stdClass();
         $actions['acy_add_queue']->name = acym_translation('ACYM_ADD_EMAIL_QUEUE');
-        $actions['acy_add_queue']->option = '<button class="shrink grid-x cell acy_button_submit button " type="button" data-task="createMail" data-and="__and__">'.acym_translation(
-                'ACYM_CREATE_MAIL'
-            ).'</button>';
-        $actions['acy_add_queue']->option .= '<input type="hidden" name="acym_action[actions][__and__][acy_add_queue][mail_id]">';
-        $actions['acy_add_queue']->option .= '<div class="shrink acym__automation__action__mail__name"></div>';
-        $actions['acy_add_queue']->option .= '<div class="shrink margin-left-1 margin-right-1">'.acym_strtolower(acym_translation('ACYM_OR')).' </div>';
-        $actions['acy_add_queue']->option .= '<button type="button" data-modal-name="acym__template__choose__modal__and__" data-open="acym__template__choose__modal" aria-controls="acym__template__choose__modal" tabindex="0" aria-haspopup="true" class="cell medium-shrink button-secondary auto button ">'.acym_translation(
-                'ACYM_CHOOSE_EXISTING'
-            ).'</button>';
-        $actions['acy_add_queue']->option .= acym_info('ACYM_CHOOSE_EXISTING_DESC', '', 'margin-left-0');
-        $actions['acy_add_queue']->option .= '<div class="medium-4 grid-x cell">';
-        $actions['acy_add_queue']->option .= acym_dateField('acym_action[actions][__and__][acy_add_queue][time]', '[time]', '', '', '+');
-        $actions['acy_add_queue']->option .= '</div>';
+        ob_start();
+        include acym_getPartial('actions', 'acy_add_queue');
+        $actions['acy_add_queue']->option = ob_get_clean();
+
+        $actions['acy_send_email'] = new stdClass();
+        $actions['acy_send_email']->name = acym_translation('ACYM_SEND_EMAIL');
+        ob_start();
+        include acym_getPartial('actions', 'acy_send_email');
+        $actions['acy_send_email']->option = ob_get_clean();
 
         $actions['acy_remove_queue'] = new stdClass();
         $actions['acy_remove_queue']->name = acym_translation('ACYM_REMOVE_EMAIL_QUEUE');
-        $actions['acy_remove_queue']->option = '<div class="intext_select_automation">';
         $ajaxParams = json_encode(
             [
                 'plugin' => __CLASS__,
                 'trigger' => 'searchEmails',
             ]
         );
-        $actions['acy_remove_queue']->option .= acym_select(
-            [],
-            'acym_action[actions][__and__][acy_remove_queue][mail_id]',
-            null,
-            [
-                'class' => 'acym_select2_ajax',
-                'data-min' => 0,
-                'data-placeholder' => acym_translation('ACYM_SELECT_AN_EMAIL'),
-                'data-params' => $ajaxParams,
-            ]
-        );
-        $actions['acy_remove_queue']->option .= '</div>';
+        ob_start();
+        include acym_getPartial('actions', 'acy_remove_queue');
+        $actions['acy_remove_queue']->option = ob_get_clean();
 
         if ($this->config->get('require_confirmation', '1') === '1') {
             $actions['resend_confirmation'] = new stdClass();
@@ -180,6 +155,14 @@ trait SubscriberAutomationActions
             $actions['resend_confirmation']->option = '<input type="hidden" name="acym_action[actions][__and__][resend_confirmation][save]" />';
         }
     }
+
+    public function onAcymDeclareActionsScenario(&$actions)
+    {
+        $this->onAcymDeclareActions($actions);
+
+        unset($actions['acy_add_queue']);
+    }
+
 
     public function onAcymProcessAction_acy_user(&$query, $action)
     {
@@ -264,6 +247,37 @@ trait SubscriberAutomationActions
         return acym_translationSprintf('ACYM_UPDATED_USERS', $nbAffected);
     }
 
+    public function onAcymProcessAction_acy_send_email(&$query, &$action)
+    {
+        if (empty($action['mail_id'])) {
+            return acym_translation('ACYM_NO_MAIL_SET');
+        }
+
+        $mailerHelper = new MailerHelper();
+
+        $userIds = acym_loadResultArray($query->getQuery(['user.id']));
+        if (empty($userIds)) {
+            return acym_translation('ACYM_NO_USER_FOUND');
+        }
+
+        $errors = [];
+
+        foreach ($userIds as $userId) {
+            try {
+                $mailSent = $mailerHelper->sendOne($action['mail_id'], $userId);
+
+                if (!$mailSent) {
+                    $errors[] = acym_translationSprintf('ACYM_COULD_NOT_SEND_EMAIL_TO_USER_X', $userId);
+                    acym_logError('Error while sending email', 'action_acy_send_email');
+                }
+            } catch (Exception $e) {
+                $errors[] = acym_translationSprintf('ACYM_COULD_NOT_SEND_EMAIL_TO_USER_X_ERROR_X', $userId, $e->getMessage());
+            }
+        }
+
+        return empty($errors) ? acym_translation('ACYM_EMAILS_SENT') : implode('<br>', $errors);
+    }
+
     public function onAcymProcessAction_acy_add_queue(&$query, &$action, $automationAdmin)
     {
         if (empty($action['time']) || empty($action['mail_id'])) return '';
@@ -309,22 +323,22 @@ trait SubscriberAutomationActions
         return acym_translationSprintf('ACYM_EMAILS_REMOVED_QUEUE', $nbRows);
     }
 
-    public function onAcymProcessAction_resend_confirmation(&$query, &$action, $automationAdmin)
+    public function onAcymProcessAction_resend_confirmation(&$query, &$action)
     {
         $mailClass = new MailClass();
         $confirmationMail = $mailClass->getOneByName('acy_confirm');
         $sendDate = acym_date('now', 'Y-m-d H:i:s', false);
 
-        $queryInsert = 'INSERT IGNORE INTO #__acym_queue ';
-        $queryInsert .= $query->getQuery(
-            [
-                intval($confirmationMail->id),
-                'user.id',
-                acym_escapeDB($sendDate),
-                '1',
-                '0',
-            ]
-        );
+        $queryInsert = 'INSERT IGNORE INTO #__acym_queue (`mail_id`, `user_id`, `sending_date`, `priority`, `try`) ';
+        $queryInsert .= '('.$query->getQuery(
+                [
+                    intval($confirmationMail->id),
+                    'user.id',
+                    acym_escapeDB($sendDate),
+                    '1',
+                    '0',
+                ]
+            ).')';
         $nbInserted = acym_query($queryInsert);
 
         if (is_numeric($nbInserted)) {

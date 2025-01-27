@@ -1,8 +1,8 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
-class plgAcymSendmail extends acymPlugin
+class plgAcymSendmail extends AcymPlugin
 {
     const SENDING_METHOD_ID = 'sendmail';
     const SENDING_METHOD_NAME = 'SendMail';

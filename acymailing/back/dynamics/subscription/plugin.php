@@ -1,6 +1,6 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'SubscriptionAutomationTriggers.php';
 require_once __DIR__.DIRECTORY_SEPARATOR.'SubscriptionAutomationConditions.php';
@@ -10,7 +10,7 @@ require_once __DIR__.DIRECTORY_SEPARATOR.'SubscriptionFollowup.php';
 require_once __DIR__.DIRECTORY_SEPARATOR.'SubscriptionInsertion.php';
 require_once __DIR__.DIRECTORY_SEPARATOR.'SubscriptionMailboxAction.php';
 
-class plgAcymSubscription extends acymPlugin
+class plgAcymSubscription extends AcymPlugin
 {
     use SubscriptionAutomationTriggers;
     use SubscriptionAutomationConditions;
@@ -23,9 +23,6 @@ class plgAcymSubscription extends acymPlugin
     public function __construct()
     {
         parent::__construct();
-
-        global $acymCmsUserVars;
-        $this->cmsUserVars = $acymCmsUserVars;
 
         $this->pluginDescription->name = acym_translation('ACYM_SUBSCRIPTION');
     }

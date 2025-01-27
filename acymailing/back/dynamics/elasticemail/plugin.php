@@ -3,9 +3,9 @@
 use AcyMailing\Classes\CampaignClass;
 use AcyMailing\Classes\MailClass;
 use AcyMailing\Helpers\MailerHelper;
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
-class plgAcymElasticemail extends acymPlugin
+class plgAcymElasticemail extends AcymPlugin
 {
     const SENDING_METHOD_ID = 'elasticemail';
     const SENDING_METHOD_NAME = 'Elastic Email';

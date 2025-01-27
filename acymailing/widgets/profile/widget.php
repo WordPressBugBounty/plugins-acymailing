@@ -2,14 +2,13 @@
 
 use AcyMailing\Classes\ListClass;
 use AcyMailing\FrontControllers\FrontusersController;
-use AcyMailing\Libraries\acymParameter;
+use AcyMailing\Core\AcymParameter;
 
 class acym_profile_widget extends WP_Widget
 {
     public function __construct()
     {
-        $ds = DIRECTORY_SEPARATOR;
-        require_once rtrim(dirname(dirname(__DIR__)), $ds).$ds.'back'.$ds.'helpers'.$ds.'helper.php';
+        $this->loadAcyMailing();
 
         parent::__construct(
             'acym_profile_widget',
@@ -20,8 +19,7 @@ class acym_profile_widget extends WP_Widget
 
     public function form($instance)
     {
-        $ds = DIRECTORY_SEPARATOR;
-        require_once rtrim(dirname(dirname(__DIR__)), $ds).$ds.'back'.$ds.'helpers'.$ds.'helper.php';
+        $this->loadAcyMailing();
 
         acym_addStyle(false, ACYM_CSS.'widget.min.css?v='.filemtime(ACYM_MEDIA.'css'.DS.'widget.min.css'));
 
@@ -113,9 +111,11 @@ class acym_profile_widget extends WP_Widget
 
     public function widget($args, $instance)
     {
-        $ds = DIRECTORY_SEPARATOR;
-        require_once rtrim(dirname(dirname(__DIR__)), $ds).$ds.'back'.$ds.'helpers'.$ds.'helper.php';
-        if (!acym_isElementorEdition()) acym_loadAssets('frontusers', 'profile');
+        $this->loadAcyMailing();
+
+        if (!acym_isElementorEdition()) {
+            acym_loadAssets('frontusers', 'profile');
+        }
 
         echo $args['before_widget'];
 
@@ -126,7 +126,7 @@ class acym_profile_widget extends WP_Widget
         }
 
         acym_setVar('page', ACYM_COMPONENT.'_front');
-        $params = new acymParameter($instance);
+        $params = new AcymParameter($instance);
         acym_initModule($params);
 
         $userController = new FrontusersController();
@@ -141,5 +141,11 @@ class acym_profile_widget extends WP_Widget
         $userController->display($data);
 
         echo $args['after_widget'];
+    }
+
+    private function loadAcyMailing(): void
+    {
+        $ds = DIRECTORY_SEPARATOR;
+        require_once rtrim(dirname(dirname(__DIR__)), $ds).$ds.'back'.$ds.'Core'.$ds.'init.php';
     }
 }

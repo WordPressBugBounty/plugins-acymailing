@@ -1,10 +1,10 @@
 <?php
 
-use AcyMailing\Libraries\acymPlugin;
+use AcyMailing\Core\AcymPlugin;
 
 require_once __DIR__.DIRECTORY_SEPARATOR.'SegmentAutomationFilters.php';
 
-class plgAcymSegment extends acymPlugin
+class plgAcymSegment extends AcymPlugin
 {
     use SegmentAutomationFilters;
 
