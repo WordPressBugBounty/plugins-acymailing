@@ -21,7 +21,7 @@ class UpdateHelper extends AcymObject
     const BOUNCE_VERSION = 5;
 
     private $level = 'starter';
-    private $version = '10.0.0';
+    private $version = '10.0.1';
     private $previousVersion;
     private $isUpdating = false;
 

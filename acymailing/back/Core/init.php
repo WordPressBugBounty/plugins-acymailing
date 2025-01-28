@@ -64,7 +64,8 @@ include_once ACYM_CORE.'AcymController.php';
 include_once ACYM_CORE.'AcymView.php';
 include_once ACYM_CORE.'AcymPlugin.php';
 
-class_alias(AcymParameter::class, 'AcyMailing\\Libraries\\AcymParameter');
-class_alias(AcymPlugin::class, 'AcyMailing\\Libraries\\AcymPlugin');
+class_alias(AcymParameter::class, 'AcyMailing\\Libraries\\acymParameter');
+class_alias(AcymPlugin::class, 'AcyMailing\\Libraries\\acymPlugin');
+class_alias(AcymPlugin::class, 'acymPlugin');
 
 acym_loadLanguage();

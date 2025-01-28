@@ -52,23 +52,16 @@
 
 						<!-- BUTTON ACTION TELECHARGEMENT -->
 						<div class="cell grid-x acym__plugins__card__actions">
-							<div class="cell grid-x align-center" v-show="!rightLevel(plugin.level)">
-								<div class="cell grid-x">
-									<button :data-acym-tooltip="<?php echo acym_escapeDB(acym_translation('ACYM_YOU_DONT_HAVE_THE_RIGHT_LEVEL')); ?> + ucfirst(plugin.level)"
-											type="button"
-											class="acym__plugins__button acym__plugins__button-disabled button button-primary acym__plugins__button__purchase cell text-center cell small-5">
-                                        <?php echo acym_translation('ACYM_DOWNLOAD'); ?><i class="acymicon-download"></i>
-									</button>
-									<div class="cell auto"></div>
-									<a target="_blank"
-									   href="<?php echo ACYM_ACYMAILING_WEBSITE; ?>pricing"
-									   class="acym__plugins__button cell small-5 acym__plugins__button__purchase text-center button button-primary">
-                                        <?php echo acym_translation('ACYM_PURCHASE'); ?>
-										<i class="acymicon-cart-arrow-down"></i>
-									</a>
-								</div>
+							<div v-if="!installed[plugin.file_name]" v-show="!rightLevel(plugin.level)" class="cell grid-x align-center">
+								<a :data-acym-tooltip="<?php echo acym_escapeDB(acym_translation('ACYM_YOU_DONT_HAVE_THE_RIGHT_LEVEL')); ?> + ucfirst(plugin.level)"
+								   target="_blank"
+								   href="<?php echo ACYM_ACYMAILING_WEBSITE; ?>pricing"
+								   class="acym__plugins__button cell small-5 acym__plugins__button__purchase text-center button button-primary">
+                                    <?php echo acym_translation('ACYM_PURCHASE'); ?>
+									<i class="acymicon-cart-arrow-down"></i>
+								</a>
 							</div>
-							<div v-if="!installed[plugin.file_name]" v-show="rightLevel(plugin.level)" class="cell grid-x acym__plugins__card__actions">
+							<div v-if="!installed[plugin.file_name]" v-show="rightLevel(plugin.level)" class="cell grid-x acym__plugins__card__actions margin-top-1">
 								<button v-show="'<?php echo ACYM_CMS; ?>' == 'joomla'"
 										type="button"
 										class="acym__plugins__button cell text-center button button-primary"
@@ -87,8 +80,8 @@
 									<i class="acymicon-download"></i>
 								</a>
 							</div>
-							<div v-if="installed[plugin.file_name]" class="cell grid-x acym__plugins__card__actions">
-								<button type="button" class="acym__plugins__button cell text-center acym__plugins__button-disabled button button-primary">
+							<div v-if="installed[plugin.file_name]" class="cell grid-x acym__plugins__card__actions margin-top-1">
+								<button type="button" class="acym__plugins__button cell text-center acym__plugins__button-disabled button button-secondary">
                                     <?php echo acym_translation('ACYM_ADD_ON_SUCCESSFULLY_INSTALLED'); ?>
 									<i class="acymicon-check"></i>
 								</button>
