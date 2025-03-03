@@ -7,20 +7,11 @@ use AcyMailing\Classes\UserClass;
 
 trait Security
 {
-    private $messagesNoHtml = [];
+    private array $messagesNoHtml = [];
 
-    public function checkDB($returnMode = '', $fromConfiguration = true)
+    public function checkDBAjax(): void
     {
-        $correctTablesStructure = $this->getCorrectTablesStructure();
-        $currentTablesStructure = $this->getCurrentTablesStructure($correctTablesStructure);
-        $this->fixCurrentStructure($correctTablesStructure, $currentTablesStructure);
-
-        $this->cleanDuplicatedUrls($fromConfiguration);
-        $this->addMissingUserKeys();
-
-        if ($returnMode === 'report') {
-            return $this->messagesNoHtml;
-        }
+        $this->checkDB();
 
         if (empty($this->messagesNoHtml)) {
             echo '<i class="acymicon-check-circle acym__color__green"></i>';
@@ -36,6 +27,18 @@ trait Security
         }
 
         exit;
+    }
+
+    public function checkDB(bool $fromConfiguration = true): array
+    {
+        $correctTablesStructure = $this->getCorrectTablesStructure();
+        $currentTablesStructure = $this->getCurrentTablesStructure($correctTablesStructure);
+        $this->fixCurrentStructure($correctTablesStructure, $currentTablesStructure);
+
+        $this->cleanDuplicatedUrls($fromConfiguration);
+        $this->addMissingUserKeys();
+
+        return $this->messagesNoHtml;
     }
 
     private function getCorrectTablesStructure(): array
@@ -174,7 +177,7 @@ trait Security
         return $currentTablesStructure;
     }
 
-    private function fixCurrentStructure(array $correctTablesStructure, array $currentTablesStructure)
+    private function fixCurrentStructure(array $correctTablesStructure, array $currentTablesStructure): void
     {
         foreach ($correctTablesStructure['tableNames'] as $oneTableName) {
             if (empty($currentTablesStructure[$oneTableName])) {
@@ -189,7 +192,7 @@ trait Security
         }
     }
 
-    private function addMissingColumns(array $correctTableColumns, array $currentTableColumnNames, string $oneTableName)
+    private function addMissingColumns(array $correctTableColumns, array $currentTableColumnNames, string $oneTableName): void
     {
         $idealColumnNames = array_keys($correctTableColumns);
         $missingColumns = array_diff($idealColumnNames, $currentTableColumnNames);
@@ -228,7 +231,7 @@ trait Security
         }
     }
 
-    private function removeExtraColumns(array $correctTableColumns, array $currentTableColumnNames, string $oneTableName)
+    private function removeExtraColumns(array $correctTableColumns, array $currentTableColumnNames, string $oneTableName): void
     {
         $idealColumnNames = array_keys($correctTableColumns);
         $extraColumns = array_diff($currentTableColumnNames, $idealColumnNames);
@@ -267,7 +270,7 @@ trait Security
         }
     }
 
-    private function fixDefaultValues($correctTableColumns, $oneTableName)
+    private function fixDefaultValues(array $correctTableColumns, string $oneTableName): void
     {
         $oneTableName = str_replace('#__', acym_getPrefix(), $oneTableName);
         try {
@@ -364,7 +367,7 @@ trait Security
         }
     }
 
-    private function addMissingTableKeys(array $correctTableIndexes, string $oneTableName)
+    private function addMissingTableKeys(array $correctTableIndexes, string $oneTableName): void
     {
         $results = acym_loadObjectList('SHOW INDEX FROM '.$oneTableName, 'Key_name');
         if (empty($results)) {
@@ -409,7 +412,7 @@ trait Security
         }
     }
 
-    private function addMissingTableConstraints(array $correctTableConstraints, string $oneTableName)
+    private function addMissingTableConstraints(array $correctTableConstraints, string $oneTableName): void
     {
         if (empty($correctTableConstraints)) {
             return;
@@ -486,7 +489,7 @@ trait Security
         acym_query('SET foreign_key_checks = 1');
     }
 
-    private function cleanDuplicatedUrls(bool $fromConfiguration)
+    private function cleanDuplicatedUrls(bool $fromConfiguration): void
     {
         if (!$fromConfiguration) {
             return;
@@ -541,7 +544,7 @@ trait Security
         }
     }
 
-    private function addMissingUserKeys()
+    private function addMissingUserKeys(): void
     {
         $userClass = new UserClass();
         $nbAddedKeys = $userClass->addMissingKeys();
@@ -555,7 +558,7 @@ trait Security
         }
     }
 
-    public function redomigration()
+    public function redomigration(): void
     {
         $newConfig = new \stdClass();
         $newConfig->migration = 0;
@@ -564,7 +567,7 @@ trait Security
         acym_redirect(acym_completeLink('dashboard', false, true));
     }
 
-    public function scanSiteFiles()
+    public function scanSiteFiles(): void
     {
         $maliciousFiles = [];
         $siteFiles = acym_getFiles(ACYM_ROOT, '.', true, true);

@@ -3,19 +3,22 @@
 namespace AcyMailing\Helpers;
 
 use AcyMailing\Classes\MailClass;
-use AcyMailing\Controllers\SegmentsController;
 use AcyMailing\Core\AcymObject;
 
 class AutomationHelper extends AcymObject
 {
-    public $from = ' `#__acym_user` AS `user`';
-    public $leftjoin = [];
-    public $join = [];
-    public $where = [];
-    public $orderBy = '';
-    public $groupBy = '';
-    public $limit = '';
-    public $excludeSelected = false;
+    const TYPE_PHONE = 'phone';
+    const TYPE_DATETIME = 'datetime';
+    const TYPE_TIMESTAMP = 'timestamp';
+
+    public string $from = ' `#__acym_user` AS `user`';
+    public array $leftjoin = [];
+    public array $join = [];
+    public array $where = [];
+    public string $orderBy = '';
+    public string $groupBy = '';
+    public string $limit = '';
+    public bool $excludeSelected = false;
 
     public function getQuery(array $select = []): string
     {
@@ -38,18 +41,18 @@ class AutomationHelper extends AcymObject
         return $query;
     }
 
-    public function count()
+    public function count(): int
     {
-        if (empty($this->limit)) {
-            return acym_loadResult($this->getQuery(['COUNT(DISTINCT user.id)']));
-        } else {
-            $result = acym_loadResult($this->getQuery(['COUNT(DISTINCT user.id)']));
+        $result = intval(acym_loadResult($this->getQuery(['COUNT(DISTINCT user.id)'])));
 
+        if (empty($this->limit)) {
+            return $result;
+        } else {
             return min($result, $this->limit);
         }
     }
 
-    public function addFlag(int $id, bool $reset = false)
+    public function addFlag(int $id, bool $reset = false): void
     {
         if (!empty($this->orderBy) || !empty($this->limit)) {
             $flagQuery = 'UPDATE #__acym_user';
@@ -78,31 +81,39 @@ class AutomationHelper extends AcymObject
         $this->limit = '';
     }
 
-    public function removeFlag(int $id)
+    public function removeFlag(int $id): void
     {
-        acym_query('UPDATE #__acym_user SET automation = REPLACE(automation, "a'.intval($id).'a", "") WHERE automation LIKE "%a'.intval($id).'a%"');
+        acym_query(
+            'UPDATE #__acym_user 
+            SET `automation` = REPLACE(`automation`, "a'.$id.'a", "") 
+            WHERE `automation` LIKE "%a'.$id.'a%"'
+        );
     }
 
-    public function convertQuery($table, $column, $operator, $value, $type = '')
+    public function convertQuery(string $table, string $column, string $operator, $value, string $type = ''): string
     {
         $operator = str_replace(['&lt;', '&gt;'], ['<', '>'], $operator);
 
-        if ($operator == 'CONTAINS' || ($type == 'phone' && $operator == '=')) {
+        if ($operator === 'CONTAINS' || ($type === self::TYPE_PHONE && $operator === '=')) {
             $operator = 'LIKE';
             $value = '%'.$value.'%';
-        } elseif ($operator == 'BEGINS') {
+        } elseif ($operator === 'BEGINS') {
             $operator = 'LIKE';
             $value = $value.'%';
-        } elseif ($operator == 'END') {
+        } elseif ($operator === 'END') {
             $operator = 'LIKE';
             $value = '%'.$value;
-        } elseif ($operator == 'NOTCONTAINS' || ($type == 'phone' && $operator == '!=')) {
+        } elseif ($operator === 'NOTCONTAINS' || ($type === self::TYPE_PHONE && $operator === '!=')) {
             $operator = 'NOT LIKE';
             $value = '%'.$value.'%';
-        } elseif ($operator == 'REGEXP') {
-            if ($value === '') return '1 = 1';
-        } elseif ($operator == 'NOT REGEXP') {
-            if ($value === '') return '0 = 1';
+        } elseif ($operator === 'REGEXP') {
+            if ($value === '') {
+                return '1 = 1';
+            }
+        } elseif ($operator === 'NOT REGEXP') {
+            if ($value === '') {
+                return '0 = 1';
+            }
         } elseif (!in_array($operator, ['IS NULL', 'IS NOT NULL', 'NOT LIKE', 'LIKE', '=', '!=', '>', '<', '>=', '<='])) {
             die(acym_translationSprintf('ACYM_UNKNOWN_OPERATOR', $operator));
         }
@@ -122,18 +133,20 @@ class AutomationHelper extends AcymObject
             $value = '';
         }
 
-        if (!empty($table)) $table = acym_secureDBColumn($table).'.';
-        if ($type == 'datetime' && in_array($operator, ['=', '!='])) {
+        if (!empty($table)) {
+            $table = acym_secureDBColumn($table).'.';
+        }
+        if ($type === self::TYPE_DATETIME && in_array($operator, ['=', '!='])) {
             return 'DATE_FORMAT('.$table.'`'.acym_secureDBColumn($column).'`, "%Y-%m-%d") '.$operator.' '.'DATE_FORMAT('.$value.', "%Y-%m-%d")';
         }
-        if ($type == 'timestamp' && in_array($operator, ['=', '!='])) {
+        if ($type === self::TYPE_TIMESTAMP && in_array($operator, ['=', '!='])) {
             return 'FROM_UNIXTIME('.$table.'`'.acym_secureDBColumn($column).'`, "%Y-%m-%d") '.$operator.' '.'FROM_UNIXTIME('.$value.', "%Y-%m-%d")';
         }
 
         return $table.'`'.acym_secureDBColumn($column).'` '.$operator.' '.$value;
     }
 
-    public function deleteUnusedEmails()
+    public function deleteUnusedEmails(): void
     {
         $automationEmails = acym_loadResultArray('SELECT id FROM #__acym_mail WHERE type = "automation"');
 

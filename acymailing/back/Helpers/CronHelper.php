@@ -127,7 +127,7 @@ class CronHelper extends AcymObject
         $this->handleCronReport();
     }
 
-    public function saveReport(array $messages = [], array $detailMessages = [])
+    public function saveReport(array $messages = [], array $detailMessages = []): void
     {
         $saveReport = $this->config->get('cron_savereport');
         $reportPath = $this->config->get('cron_savepath');
@@ -179,22 +179,22 @@ class CronHelper extends AcymObject
         $this->emailTypes = $emailTypes;
     }
 
-    public function addMessage(string $message)
+    public function addMessage(string $message): void
     {
         $this->messages[] = $message;
     }
 
-    public function handleCronReport()
+    public function handleCronReport(): void
     {
         $sendReport = $this->config->get('cron_sendreport');
 
         if (($sendReport == 2 && $this->processed) || $sendReport == 1 || ($sendReport == 3 && $this->errorDetected)) {
-            $mailer = new MailerHelper();
-            $mailer->report = false;
-            $mailer->autoAddUser = true;
-            $mailer->addParam('report', implode('<br />', $this->messages));
-            $mailer->addParam('mainreport', $this->mainMessage);
-            $mailer->addParam('detailreport', implode('<br />', $this->detailMessages));
+            $mailerHelper = new MailerHelper();
+            $mailerHelper->report = false;
+            $mailerHelper->autoAddUser = true;
+            $mailerHelper->addParam('report', implode('<br />', $this->messages));
+            $mailerHelper->addParam('mainreport', $this->mainMessage);
+            $mailerHelper->addParam('detailreport', implode('<br />', $this->detailMessages));
 
             $receiverString = $this->config->get('cron_sendto');
             $receivers = [];
@@ -214,7 +214,7 @@ class CronHelper extends AcymObject
                     try {
                         $reportEmail = $mailClass->getOneByName('acy_report');
                         if (!empty($reportEmail)) {
-                            $mailer->sendOne($reportEmail->id, $oneReceiver);
+                            $mailerHelper->sendOne($reportEmail->id, $oneReceiver);
                         }
                     } catch (\Exception $e) {
                         acym_logError('Error while sending the cron report to '.$oneReceiver.' : '.$e->getMessage());
@@ -371,7 +371,7 @@ class CronHelper extends AcymObject
         $queueHelper = new QueueHelper();
         $queueHelper->send_limit = (int)$this->config->get('queue_nbmail_auto');
         $queueHelper->report = false;
-        $queueHelper->emailtypes = $this->emailTypes;
+        $queueHelper->emailTypes = $this->emailTypes;
         $queueHelper->process();
 
         if (!empty($queueHelper->messages)) {
@@ -437,7 +437,7 @@ class CronHelper extends AcymObject
     private function handleBounceMessages(): void
     {
         $time = time();
-        $autoBounceHandlingActive = $this->config->get('auto_bounce', 0) != 0;
+        $autoBounceHandlingActive = (int)$this->config->get('auto_bounce', 0) === 1;
         $autoBounceHandlingNextTime = (int)$this->config->get('auto_bounce_next', 0);
         $autoBounceHandlingFrequency = (int)$this->config->get('auto_bounce_frequency', 0);
         $isEnterprise = acym_level(ACYM_ENTERPRISE);

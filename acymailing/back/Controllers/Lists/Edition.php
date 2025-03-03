@@ -14,7 +14,7 @@ use AcyMailing\Helpers\WorkflowHelper;
 
 trait Edition
 {
-    public function settings()
+    public function settings(): void
     {
         acym_setVar('layout', 'settings');
 
@@ -54,7 +54,7 @@ trait Edition
         parent::display($data);
     }
 
-    private function prepareListSettings(&$data, $listId)
+    private function prepareListSettings(array &$data, int $listId): bool
     {
         if (empty($listId)) {
             $listInformation = new \stdClass();
@@ -134,18 +134,18 @@ trait Edition
         return true;
     }
 
-    private function prepareTagsSettings(&$data, $listId)
+    private function prepareTagsSettings(array &$data, int $listId): void
     {
         $tagClass = new TagClass();
         $data['allTags'] = $tagClass->getAllTagsByType(TagClass::TYPE_LIST);
         $data['listTagsName'] = [];
-        $listsTags = $tagClass->getAllTagsByElementId(TagClass::TYPE_LIST, intval($listId));
+        $listsTags = $tagClass->getAllTagsByElementId(TagClass::TYPE_LIST, $listId);
         foreach ($listsTags as $oneTag) {
             $data['listTagsName'][] = $oneTag;
         }
     }
 
-    private function prepareSubscribersSettings(&$data, $listId)
+    private function prepareSubscribersSettings(array &$data, int $listId): void
     {
         $data['ordering'] = acym_getVar('string', 'users_ordering', 'id');
         $data['orderingSortOrder'] = acym_getVar('string', 'users_ordering_sort_order', 'desc');
@@ -167,7 +167,7 @@ trait Edition
         }
     }
 
-    private function prepareSubscribersEntitySelect(&$data, $listId)
+    private function prepareSubscribersEntitySelect(array &$data, int $listId): void
     {
         if (empty($listId)) {
             $data['subscribersEntitySelect'] = '';
@@ -194,7 +194,7 @@ trait Edition
         );
     }
 
-    private function prepareListStat(&$data, $listId)
+    private function prepareListStat(array &$data, int $listId): void
     {
         $data['listStats'] = ['deliveryRate' => 0, 'openRate' => 0, 'clickRate' => 0, 'failRate' => 0, 'bounceRate' => 0];
         if (empty($listId)) return;
@@ -222,7 +222,7 @@ trait Edition
         $data['listStats']['clickRate'] = number_format($nbClicks / $totalSent * 100, 2);
     }
 
-    private function prepareListStatEvolution(&$data, $listId)
+    private function prepareListStatEvolution(array &$data, int $listId): void
     {
         $data['evol'] = [];
         $listClass = new ListClass();
@@ -255,7 +255,7 @@ trait Edition
         }
     }
 
-    protected function prepareWelcomeUnsubData(&$data)
+    protected function prepareWelcomeUnsubData(array &$data): void
     {
         $data['tmpls'] = [];
         if (empty($data['listInformation']->id)) return;
@@ -293,7 +293,7 @@ trait Edition
         }
     }
 
-    public function unsetMail(string $type)
+    public function unsetMail(string $type): void
     {
         $listClass = new ListClass();
         $id = acym_getVar('int', 'listId', 0);
@@ -321,22 +321,22 @@ trait Edition
         }
     }
 
-    public function unsetWelcome()
+    public function unsetWelcome(): void
     {
         $this->unsetMail('welcome_id');
     }
 
-    public function unsetUnsubscribe()
+    public function unsetUnsubscribe(): void
     {
         $this->unsetMail('unsubscribe_id');
     }
 
-    public function apply()
+    public function apply(): void
     {
         $this->save(false);
     }
 
-    public function save($goToListing = true)
+    public function save(bool $goToListing = true): void
     {
         acym_checkToken();
 
@@ -418,7 +418,7 @@ trait Edition
         return true;
     }
 
-    public function saveSubscribers()
+    public function saveSubscribers(): void
     {
         acym_checkToken();
 
@@ -429,7 +429,7 @@ trait Edition
         $this->settings();
     }
 
-    private function sortDataByList($data)
+    private function sortDataByList(array $data): array
     {
         $sortedData = [];
 
@@ -449,7 +449,7 @@ trait Edition
         return $sortedData;
     }
 
-    private function prepareUnsubReasons(&$data)
+    private function prepareUnsubReasons(array &$data): void
     {
         $historyClass = new HistoryClass();
         $allReasonsData = $historyClass->getAllUnsubReasons();

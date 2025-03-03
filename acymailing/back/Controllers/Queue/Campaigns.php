@@ -11,7 +11,7 @@ use AcyMailing\Helpers\WorkflowHelper;
 
 trait Campaigns
 {
-    public function campaigns()
+    public function campaigns(): void
     {
         acym_setVar('layout', 'campaigns');
 
@@ -43,7 +43,7 @@ trait Campaigns
             ]
         );
 
-        $pagination->setStatus($matchingElements['total'], $page, $campaignsPerPage);
+        $pagination->setStatus((int)$matchingElements['total']->total, $page, $campaignsPerPage);
         $tagClass = new TagClass();
 
         $viewData = [
@@ -65,7 +65,7 @@ trait Campaigns
         parent::display($viewData);
     }
 
-    public function prepareToolbar(&$data)
+    public function prepareToolbar(array &$data): void
     {
         $toolbarHelper = new ToolbarHelper();
         $toolbarHelper->addSearchBar($data['search'], 'cqueue_search', 'ACYM_SEARCH');
@@ -95,7 +95,7 @@ trait Campaigns
         }
     }
 
-    public function cancelSending()
+    public function cancelSending(): void
     {
         $mailId = acym_getVar('int', 'acym__queue__cancel__mail_id');
 
@@ -114,13 +114,13 @@ trait Campaigns
         }
     }
 
-    public function cancelCampaignSending()
+    public function cancelCampaignSending(): void
     {
         $this->cancelSending();
         $this->campaigns();
     }
 
-    public function playPauseSending()
+    public function playPauseSending(): void
     {
         $active = acym_getVar('int', 'acym__queue__play_pause__active__new_value');
         $campaignId = acym_getVar('int', 'acym__queue__play_pause__campaign_id');
@@ -139,7 +139,7 @@ trait Campaigns
         $this->campaigns();
     }
 
-    public function emptyQueue()
+    public function emptyQueue(): void
     {
         acym_checkToken();
 

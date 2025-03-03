@@ -25,7 +25,7 @@ class ArchiveController extends AcymController
         ];
     }
 
-    public function view()
+    public function view(): void
     {
         if ($this->config->get('archive_index', 0) == 0) {
             acym_addMetadata('robots', 'noindex,nofollow');
@@ -108,7 +108,7 @@ class ArchiveController extends AcymController
         if ($isPopup || 'wordpress' === ACYM_CMS) exit;
     }
 
-    public function listing()
+    public function listing(): void
     {
         acym_setVar('layout', 'listing');
 
@@ -157,7 +157,7 @@ class ArchiveController extends AcymController
         $this->showArchive($viewParams);
     }
 
-    public function showArchive($viewParams)
+    public function showArchive(array $viewParams): void
     {
         acym_setVar('layout', 'listing');
 
@@ -166,7 +166,7 @@ class ArchiveController extends AcymController
         parent::display($data);
     }
 
-    private function getDataForArchive($viewParams)
+    private function getDataForArchive(array $viewParams): array
     {
         $params = [];
 
@@ -197,7 +197,7 @@ class ArchiveController extends AcymController
         $params['page'] = $this->getVarFiltersListing('int', 'archive_pagination_page', 1);
         $campaignClass = new CampaignClass();
         $pagination = new PaginationHelper();
-        $params['numberPerPage'] = $viewParams['nbNewslettersPerPage'];
+        $params['numberPerPage'] = (int)$viewParams['nbNewslettersPerPage'];
 
         $returnLastNewsletters = $campaignClass->getLastNewsletters($params);
         $pagination->setStatus($returnLastNewsletters['count'], $params['page'], $params['numberPerPage']);

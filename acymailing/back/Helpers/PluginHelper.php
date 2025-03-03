@@ -7,13 +7,12 @@ use AcyMailing\Core\AcymObject;
 
 class PluginHelper extends AcymObject
 {
-    public $wraped = false;
-    public $name = 'content';
-    public $mailerHelper;
-    public $wrappedText = '';
+    private MailerHelper $mailerHelper;
+    public string $name = 'content';
+    public string $wrappedText = '';
     public string $contextLanguage;
 
-    public function getFormattedResult($elements, $parameter)
+    public function getFormattedResult(array $elements, object $parameter): string
     {
         if (count($elements) < 2) {
             return implode('', $elements);
@@ -108,12 +107,10 @@ class PluginHelper extends AcymObject
 
         $equalwidth = intval(100 / $cols).'%';
 
-        $string = str_replace(['{equalwidth}'], [$equalwidth], $string);
-
-        return $string;
+        return str_replace(['{equalwidth}'], [$equalwidth], $string);
     }
 
-    public function formatString(&$replaceme, $mytag)
+    public function formatString(&$replaceme, object $mytag): void
     {
         if (!empty($mytag->part)) {
             $parts = explode(' ', $replaceme);
@@ -188,7 +185,7 @@ class PluginHelper extends AcymObject
         }
     }
 
-    public function replaceVideos(&$text)
+    public function replaceVideos(string &$text): void
     {
         $text = preg_replace(
             '#\[embed=videolink][^}]*youtube[^=]*=([^"/}]*)[^}]*}\[/embed]#i',
@@ -248,7 +245,7 @@ class PluginHelper extends AcymObject
         $text = preg_replace('#<video[^>]*src="([^"]*)"[^>]*>[^>]*</video>#i', '<a target="_blank" href="$1"><img src="'.ACYM_IMAGES.'/video.png"/></a>', $text);
     }
 
-    private function _convertbase64pictures(&$html)
+    private function convertbase64pictures(string &$html): void
     {
         if (!preg_match_all('#<img[^>]*src=("data:image/([^;]{1,5});base64[^"]*")([^>]*)>#Uis', $html, $resultspictures)) {
             return;
@@ -320,9 +317,9 @@ class PluginHelper extends AcymObject
         }
     }
 
-    public function cleanHtml(&$html)
+    public function cleanHtml(string &$html): void
     {
-        $this->_convertbase64pictures($html);
+        $this->convertbase64pictures($html);
 
         $pregreplace = [];
         $pregreplace['#<tr([^>"]*>([^<]*<td[^>]*>[ \n\s]*<img[^>]*>[ \n\s]*</ *td[^>]*>[ \n\s]*)*</ *tr)#Uis'] = '<tr style="line-height: 0px;" $1';
@@ -344,18 +341,18 @@ class PluginHelper extends AcymObject
             $html = $newbody;
         }
 
-        $body = preg_replace_callback('/src="([^"]* [^"]*)"/Ui', [$this, '_convertSpaces'], $html);
+        $body = preg_replace_callback('/src="([^"]* [^"]*)"/Ui', [$this, 'convertSpaces'], $html);
         if (!empty($body)) $html = $body;
 
         $html = acym_cmsCleanHtml($html);
     }
 
-    public function _convertSpaces($matches)
+    public function convertSpaces(array $matches): string
     {
         return "src='".str_replace(' ', '%20', $matches[1])."'";
     }
 
-    public function replaceTags(&$email, $tags, $html = false)
+    public function replaceTags(object &$email, array $tags, bool $html = false): void
     {
         if (empty($tags)) return;
 
@@ -387,7 +384,7 @@ class PluginHelper extends AcymObject
             $textreplace = [];
             foreach ($tags as $i => $replacement) {
                 if (isset($textreplace[$i])) continue;
-                $textreplace[$i] = $this->mailerHelper->textVersion($replacement, true);
+                $textreplace[$i] = $this->mailerHelper->textVersion($replacement);
             }
         } else {
             $textreplace = $tags;
@@ -402,7 +399,7 @@ class PluginHelper extends AcymObject
     public function replaceDText($text, $replacement)
     {
         if (is_array($text)) {
-            foreach ($text as $i => &$oneCell) {
+            foreach ($text as &$oneCell) {
                 if (empty($oneCell)) continue;
                 $oneCell = $this->replaceDText($oneCell, $replacement);
             }
@@ -435,7 +432,7 @@ class PluginHelper extends AcymObject
         return $text;
     }
 
-    public function extractTags($email, $tagfamily)
+    public function extractTags(object $email, string $tagfamily): array
     {
         $results = [];
 
@@ -498,7 +495,7 @@ class PluginHelper extends AcymObject
         return $tags;
     }
 
-    public function extractTag($oneTag)
+    public function extractTag(string $oneTag): \stdClass
     {
         $oneTag = str_replace(['[time]+', '[time]-'], [urlencode('[time]+'), urlencode('[time]-')], $oneTag);
         $arguments = explode('|', strip_tags(urldecode($oneTag)));
@@ -523,12 +520,13 @@ class PluginHelper extends AcymObject
         return $tag;
     }
 
-    public function wrapText($text, $tag)
+    public function wrapText(string $text, object $tag): string
     {
-        $this->wraped = false;
+        if (empty($tag->wrap)) {
+            return $text;
+        }
 
-        if (!empty($tag->wrap)) $tag->wrap = intval($tag->wrap);
-        if (empty($tag->wrap)) return $text;
+        $tag->wrap = intval($tag->wrap);
 
         $allowedTags = [
             'b',
@@ -564,8 +562,6 @@ class PluginHelper extends AcymObject
         if ($numCharStrip <= $tag->wrap) {
             return $newText;
         }
-
-        $this->wraped = true;
 
         $open = [];
 
@@ -625,9 +621,11 @@ class PluginHelper extends AcymObject
         return $newText;
     }
 
-    public function getStandardDisplay($format)
+    public function getStandardDisplay(object $format): string
     {
-        if (empty($format->tag->format)) $format->tag->format = 'TOP_LEFT';
+        if (empty($format->tag->format)) {
+            $format->tag->format = 'TOP_LEFT';
+        }
         if (!in_array($format->tag->format, ['TOP_LEFT', 'TOP_RIGHT', 'TITLE_IMG', 'TITLE_IMG_RIGHT', 'CENTER_IMG', 'TOP_IMG', 'COL_LEFT', 'COL_RIGHT'])) {
             $format->tag->format = 'TOP_LEFT';
         }
@@ -796,7 +794,7 @@ class PluginHelper extends AcymObject
         return $result;
     }
 
-    public function managePicts($tag, $result)
+    public function managePicts(object $tag, string $result): string
     {
         if (!isset($tag->pict)) {
             return $result;
@@ -1329,7 +1327,7 @@ class PluginHelper extends AcymObject
         }
     }
 
-    public function createDummyEmailObject(int $mailId, string $code, string $previewBody)
+    public function createDummyEmailObject(int $mailId, string $code, string $previewBody): object
     {
         if (!empty($mailId)) {
             $mailClass = new MailClass();

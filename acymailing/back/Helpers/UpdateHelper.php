@@ -20,14 +20,14 @@ class UpdateHelper extends AcymObject
     const FIRST_EMAIL_NAME_KEY = 'ACYM_FIRST_EMAIL_NAME';
     const BOUNCE_VERSION = 5;
 
-    private $level = 'starter';
-    private $version = '10.0.1';
-    private $previousVersion;
-    private $isUpdating = false;
+    private string $level = 'starter';
+    private string $version = '10.1.0';
+    private string $previousVersion;
+    private bool $isUpdating = false;
 
-    public $firstInstallation = true;
+    public bool $firstInstallation = true;
 
-    public function deleteNewSplashScreenInstall()
+    public function deleteNewSplashScreenInstall(): void
     {
         if (!$this->isUpdating || (!empty($this->previousVersion) && version_compare($this->previousVersion, $this->version, '='))) {
             $splashscreenJson = ACYM_PARTIAL.'update'.DS.'changelogs_splashscreen.json';
@@ -38,7 +38,7 @@ class UpdateHelper extends AcymObject
         }
     }
 
-    public function updateAddons()
+    public function updateAddons(): void
     {
         acym_checkPluginsVersion();
 

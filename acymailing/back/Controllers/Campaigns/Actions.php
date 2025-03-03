@@ -11,7 +11,7 @@ use stdClass;
 
 trait Actions
 {
-    public function duplicate()
+    public function duplicate(): void
     {
         $campaignsSelected = acym_getVar('int', 'elements_checked');
 
@@ -82,7 +82,7 @@ trait Actions
         }
     }
 
-    public function duplicateFollowup()
+    public function duplicateFollowup(): void
     {
         $followupsSelected = acym_getVar('int', 'elements_checked');
 
@@ -125,7 +125,7 @@ trait Actions
         $this->listing();
     }
 
-    public function unpause_campaign()
+    public function unpause_campaign(): void
     {
         $id = acym_getVar('int', 'campaignId', 0);
         if (empty($id)) {
@@ -138,17 +138,17 @@ trait Actions
         acym_redirect(acym_completeLink('queue', false, true).'&task=playPauseSending&acym__queue__play_pause__active__new_value=1&acym__queue__play_pause__campaign_id='.$id);
     }
 
-    public function stopSending()
+    public function stopSending(): void
     {
-        $this->_stopAction('stopSendingCampaignId');
+        $this->stopAction('stopSendingCampaignId');
     }
 
-    public function stopScheduled()
+    public function stopScheduled(): void
     {
-        $this->_stopAction('stopScheduledCampaignId');
+        $this->stopAction('stopScheduledCampaignId');
     }
 
-    private function _stopAction($action)
+    private function stopAction(string $action): void
     {
         acym_checkToken();
 
@@ -178,7 +178,7 @@ trait Actions
         $this->listing();
     }
 
-    public function confirmCampaign()
+    public function confirmCampaign(): void
     {
         $this->updateOpenAcymailerPopup();
         $campaignId = acym_getVar('int', 'campaignId');
@@ -214,7 +214,7 @@ trait Actions
         $this->listing();
     }
 
-    public function activeAutoCampaign()
+    public function activeAutoCampaign(): void
     {
         $this->updateOpenAcymailerPopup();
         $campaignId = acym_getVar('int', 'campaignId');
@@ -237,7 +237,7 @@ trait Actions
         $this->listing();
     }
 
-    public function saveAsDraftCampaign()
+    public function saveAsDraftCampaign(): void
     {
         $campaignId = acym_getVar('int', 'campaignId');
         $campaignClass = new CampaignClass();
@@ -262,7 +262,7 @@ trait Actions
         $this->listing();
     }
 
-    public function toggleActivateColumnCampaign()
+    public function toggleActivateColumnCampaign(): void
     {
 
         $campaignId = acym_getVar('int', 'campaignId');
@@ -293,7 +293,7 @@ trait Actions
         $this->listing();
     }
 
-    public function addQueue()
+    public function addQueue(): void
     {
         acym_checkToken();
         $this->updateOpenAcymailerPopup();
@@ -304,7 +304,6 @@ trait Actions
         if (empty($campaignID)) {
             acym_enqueueMessage(acym_translation('ACYM_CAMPAIGN_NOT_FOUND'), 'error');
         } else {
-
             if (!$campaignClass->hasUserAccess($campaignID)) {
                 die('Access denied to add campaign to the queue');
             }
@@ -334,7 +333,7 @@ trait Actions
         $this->_redirectAfterQueued();
     }
 
-    private function _redirectAfterQueued()
+    private function _redirectAfterQueued(): void
     {
         if (acym_isAdmin() && (!acym_level(ACYM_ESSENTIAL) || $this->config->get('cron_last', 0) < (time() - 43200))) {
             acym_redirect(acym_completeLink('queue&task=campaigns', false, true));
@@ -343,14 +342,14 @@ trait Actions
         }
     }
 
-    private function updateOpenAcymailerPopup()
+    private function updateOpenAcymailerPopup(): void
     {
         if (acym_isAdmin() && $this->config->get('mailer_method') === 'acymailer' && intval($this->config->get('acymailer_popup', 0)) === 0) {
             $this->config->save(['acymailer_popup' => '1']);
         }
     }
 
-    public function updateArchive()
+    public function updateArchive(): void
     {
         $campaignId = acym_getVar('int', 'campaignId', 0);
         if (empty($campaignId)) {

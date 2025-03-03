@@ -11,7 +11,7 @@ use AcyMailing\Helpers\WorkflowHelper;
 
 trait Scheduled
 {
-    public function scheduled()
+    public function scheduled(): void
     {
         acym_setVar('layout', 'scheduled');
 
@@ -32,7 +32,7 @@ trait Scheduled
             ]
         );
 
-        $pagination->setStatus($matchingElements['total'], $page, $campaignsPerPage);
+        $pagination->setStatus((int)$matchingElements['total']->total, $page, $campaignsPerPage);
         $tagClass = new TagClass();
 
         $viewData = [
@@ -52,7 +52,7 @@ trait Scheduled
         parent::display($viewData);
     }
 
-    public function prepareScheduledToolbar(&$data)
+    public function prepareScheduledToolbar(array &$data): void
     {
         $toolbarHelper = new ToolbarHelper();
         $toolbarHelper->addSearchBar($data['search'], 'squeue_search');
@@ -66,7 +66,7 @@ trait Scheduled
         }
     }
 
-    public function cancelScheduledSending()
+    public function cancelScheduledSending(): void
     {
         $this->cancelSending();
         $this->scheduled();

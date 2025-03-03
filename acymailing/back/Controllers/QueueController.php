@@ -18,17 +18,18 @@ class QueueController extends AcymController
     public function __construct()
     {
         parent::__construct();
+
         $this->breadcrumb[acym_translation('ACYM_QUEUE')] = acym_completeLink('queue');
         $this->setDefaultTask('campaigns');
     }
 
-    public function scheduleReady()
+    public function scheduleReady(): void
     {
         $queueClass = new QueueClass();
         $queueClass->scheduleReady();
     }
 
-    public function continuesend()
+    public function continuesend(): void
     {
         if ($this->config->get('queue_type') == 'onlyauto') {
             acym_setNoTemplate();
@@ -59,14 +60,14 @@ class QueueController extends AcymController
 
         $alreadySent = acym_getVar('int', 'alreadysent', 0);
 
-        $helperQueue = new QueueHelper();
-        $helperQueue->id = $mailid;
-        $helperQueue->report = true;
-        $helperQueue->total = $totalSend;
-        $helperQueue->start = $alreadySent;
-        $helperQueue->pause = $this->config->get('queue_pause');
-        $helperQueue->fromManual = true;
-        $helperQueue->process();
+        $queueHelper = new QueueHelper();
+        $queueHelper->id = $mailid;
+        $queueHelper->report = true;
+        $queueHelper->total = (int)$totalSend;
+        $queueHelper->start = $alreadySent;
+        $queueHelper->pause = (int)$this->config->get('queue_pause', 0);
+        $queueHelper->fromManual = true;
+        $queueHelper->process();
 
         acym_setNoTemplate();
         exit;

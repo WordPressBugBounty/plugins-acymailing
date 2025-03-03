@@ -6,20 +6,19 @@ use AcyMailing\Core\AcymObject;
 
 class ImageHelper extends AcymObject
 {
-    var $error;
-    var $maxHeight;
-    var $maxWidth;
-    var $destination;
+    public string $error = '';
+    public int $maxHeight;
+    public int $maxWidth;
+    public string $destination;
 
-    public function removePictures($text)
+    public function removePictures(string $text): string
     {
         $return = preg_replace('#< *img((?!content_main_image)[^>])*>#Ui', '', $text);
-        $return = preg_replace('#< *div[^>]*class="jce_caption"[^>]*>[^<]*(< *div[^>]*>[^<]*<\/div>)*[^<]*<\/div>#Ui', '', $return);
 
-        return $return;
+        return preg_replace('#< *div[^>]*class="jce_caption"[^>]*>[^<]*(< *div[^>]*>[^<]*<\/div>)*[^<]*<\/div>#Ui', '', $return);
     }
 
-    public function available()
+    public function available(): bool
     {
         if (!function_exists('gd_info')) {
             $this->error = 'The GD library is not installed.';
@@ -40,7 +39,7 @@ class ImageHelper extends AcymObject
         return true;
     }
 
-    public function resizePictures($input)
+    public function resizePictures(string $input): string
     {
         $this->destination = ACYM_MEDIA.'resized'.DS;
         acym_createDir($this->destination);
@@ -71,7 +70,7 @@ class ImageHelper extends AcymObject
 
             $newDimension = 'max-width:'.$this->maxWidth.'px;max-height:'.$this->maxHeight.'px;';
 
-            if (!$newPicture) {
+            if (empty($newPicture)) {
                 if (strpos($onepicture, 'style="') !== false) {
                     $replace[$onepicture] = preg_replace('#style="([^"]*)"#Uis', 'style="'.$newDimension.'$1"', $onepicture);
                 } else {
@@ -112,18 +111,20 @@ class ImageHelper extends AcymObject
         return $input;
     }
 
-    public function generateThumbnail($picturePath)
+    public function generateThumbnail(string $picturePath): array
     {
         $paramsPos = strpos($picturePath, '?');
-        if ($paramsPos !== false) $picturePath = substr($picturePath, 0, $paramsPos);
+        if ($paramsPos !== false) {
+            $picturePath = substr($picturePath, 0, $paramsPos);
+        }
 
         [$currentwidth, $currentheight] = @getimagesize($picturePath);
         if (empty($currentwidth) || empty($currentheight)) {
-            return false;
+            return [];
         }
         $factor = min($this->maxWidth / $currentwidth, $this->maxHeight / $currentheight);
         if ($factor >= 1) {
-            return false;
+            return [];
         }
         $newWidth = round($currentwidth * $factor);
         $newHeight = round($currentheight * $factor);
@@ -137,7 +138,7 @@ class ImageHelper extends AcymObject
         if (substr($picturePath, 0, 10) == 'data:image') {
             preg_match('#data:image/([^;]{1,5});#', $picturePath, $resultextension);
             if (empty($resultextension[1])) {
-                return false;
+                return [];
             }
             $extension = $resultextension[1];
             $name = md5($picturePath);
@@ -174,7 +175,7 @@ class ImageHelper extends AcymObject
             } elseif ($extension === 'webp') {
                 $imageRealType = IMAGETYPE_WEBP;
             } else {
-                return false;
+                return [];
             }
         }
 
@@ -194,11 +195,11 @@ class ImageHelper extends AcymObject
                 }
                 break;
             default:
-                return false;
+                return [];
         }
 
         if (empty($img)) {
-            return false;
+            return [];
         }
 
         $thumb = imagecreatetruecolor($newWidth, $newHeight);

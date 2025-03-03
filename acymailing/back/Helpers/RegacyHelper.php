@@ -8,14 +8,17 @@ use AcyMailing\Core\AcymObject;
 
 class RegacyHelper extends AcymObject
 {
-    var $options = [];
+    private array $options = [];
 
-    var $label = '';
-    var $lists = null;
+    public string $label = '';
+    public array $lists = [];
+    public string $listsHtml = '';
 
-    public function prepareLists($options)
+    public function prepareLists(array $options): bool
     {
-        if (empty($options['baseOption'])) $options['baseOption'] = 'regacy';
+        if (empty($options['baseOption'])) {
+            $options['baseOption'] = 'regacy';
+        }
         $this->options = $options;
 
         $visibleLists = $this->config->get($options['baseOption'].'_lists');
@@ -82,12 +85,14 @@ class RegacyHelper extends AcymObject
             ];
         }
 
-        if ('joomla' === ACYM_CMS || !empty($options['formatted'])) $this->_formatResults();
+        if ('joomla' === ACYM_CMS || !empty($options['formatted'])) {
+            $this->formatResults();
+        }
 
         return true;
     }
 
-    private function _formatResults()
+    private function formatResults(): void
     {
         $base = $this->options['baseOption'];
         $checkedListsOnAjaxUpdate = acym_getVar('array', $base.'_visible_lists_checked', []);
@@ -109,6 +114,6 @@ class RegacyHelper extends AcymObject
         $result .= '<input type="hidden" value="'.implode(',', array_keys($this->lists)).'" name="'.$base.'_visible_lists" />';
         $source = !empty($base) && $base != 'regacy' ? $base : ACYM_CMS;
         $result .= '<input type="hidden" value="'.$source.' registration form" name="acy_source" />';
-        $this->lists = $result;
+        $this->listsHtml = $result;
     }
 }

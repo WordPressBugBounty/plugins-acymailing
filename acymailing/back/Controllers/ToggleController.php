@@ -7,10 +7,10 @@ use AcyMailing\Core\AcymController;
 
 class ToggleController extends AcymController
 {
-    var $toggleableColumns = [];
-    var $icons = [];
-    var $tooltips = [];
-    var $deletableRows = [];
+    protected array $toggleableColumns = [];
+    protected array $icons = [];
+    protected array $tooltips = [];
+    private array $deletableRows = [];
 
     public function __construct()
     {
@@ -23,7 +23,7 @@ class ToggleController extends AcymController
         acym_noCache();
     }
 
-    protected function defineToggles()
+    protected function defineToggles(): void
     {
         $this->toggleableColumns['automation'] = ['active' => 'id'];
         $this->toggleableColumns['field'] = [
@@ -101,7 +101,7 @@ class ToggleController extends AcymController
         $this->deletableRows[] = 'queue';
     }
 
-    public function toggle()
+    public function toggle(): void
     {
         acym_checkToken();
 
@@ -109,9 +109,13 @@ class ToggleController extends AcymController
         $field = acym_getVar('cmd', 'field', '');
         $id = acym_getVar('int', 'id', 0);
         $newValue = acym_getVar('int', 'value', 0);
-        if (!empty($newValue)) $newValue = 1;
+        if (!empty($newValue)) {
+            $newValue = 1;
+        }
 
-        if (empty($table) || empty($field) || empty($id) || empty($this->toggleableColumns[$table][$field])) exit;
+        if (empty($table) || empty($field) || empty($id) || empty($this->toggleableColumns[$table][$field])) {
+            exit;
+        }
 
         $preciseMethod = $table.ucfirst($field);
         $globalMethod = $table.'Global';
@@ -140,16 +144,16 @@ class ToggleController extends AcymController
         acym_sendAjaxResponse('', $data);
     }
 
-    protected function doToggle($id, $table, $field, $newValue)
+    protected function doToggle(int $id, string $table, string $field, int $newValue): void
     {
         $updateQuery = 'UPDATE '.acym_secureDBColumn(ACYM_DBPREFIX.$table);
-        $updateQuery .= ' SET `'.acym_secureDBColumn($field).'` = '.intval($newValue);
-        $updateQuery .= ' WHERE `'.acym_secureDBColumn($this->toggleableColumns[$table][$field]).'` = '.intval($id);
+        $updateQuery .= ' SET `'.acym_secureDBColumn($field).'` = '.$newValue;
+        $updateQuery .= ' WHERE `'.acym_secureDBColumn($this->toggleableColumns[$table][$field]).'` = '.$id;
         $updateQuery .= ' LIMIT 1';
         acym_query($updateQuery);
     }
 
-    public function delete()
+    public function delete(): void
     {
         if (!acym_isAdmin()) exit;
         acym_checkToken();
@@ -169,7 +173,7 @@ class ToggleController extends AcymController
         exit;
     }
 
-    public function setDoNotRemindMe()
+    public function setDoNotRemindMe(): void
     {
         $newValue = acym_getVar('string', 'value');
 
@@ -189,7 +193,7 @@ class ToggleController extends AcymController
         }
     }
 
-    public function subscribeOnClick()
+    public function subscribeOnClick(): void
     {
         $userId = acym_getVar('int', 'userid');
         $listId = acym_getVar('int', 'listid');
@@ -204,7 +208,7 @@ class ToggleController extends AcymController
         }
     }
 
-    public function unsubscribeOnClick()
+    public function unsubscribeOnClick(): void
     {
         $userId = acym_getVar('int', 'userid');
         $listId = acym_getVar('int', 'listid');
@@ -218,5 +222,4 @@ class ToggleController extends AcymController
             acym_sendAjaxResponse('', [], false);
         }
     }
-
 }

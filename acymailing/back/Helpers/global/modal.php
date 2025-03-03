@@ -1,6 +1,6 @@
 <?php
 
-function acym_modal($button, $data, $id = null, $attributesModal = '', $attributesButton = '', $isButton = true, $isLarge = true, $classesModal = '')
+function acym_modal($button, $data, $id = null, $attributesModal = '', $attributesButton = '', $isButton = true, $isLarge = true, $classesModal = ''): string
 {
     if (empty($id)) {
         $id = 'acymodal_'.rand(1000, 9000);

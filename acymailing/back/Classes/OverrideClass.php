@@ -18,7 +18,7 @@ class OverrideClass extends AcymClass
     public function getMatchingElements(array $settings = []): array
     {
         $query = 'SELECT override.*, mail.name, mail.subject FROM #__acym_mail_override AS override JOIN #__acym_mail AS mail ON override.mail_id = mail.id';
-        $queryCount = 'SELECT COUNT(override.mail_id) as total, SUM(override.active) as totalActive FROM #__acym_mail_override AS override INNER JOIN #__acym_mail AS mail ON override.mail_id = mail.id';
+        $queryCount = 'SELECT COUNT(override.mail_id) AS total, SUM(override.active) AS totalActive FROM #__acym_mail_override AS override INNER JOIN #__acym_mail AS mail ON override.mail_id = mail.id';
 
         $filters = [];
 
@@ -57,12 +57,12 @@ class OverrideClass extends AcymClass
         }
 
         $mailClass = new MailClass();
-        $results['elements'] = $mailClass->decode(acym_loadObjectList($query, '', $settings['offset'], $settings['elementsPerPage']));
-        $results['total'] = acym_loadObject($queryCount);
 
-        $results['status'] = [];
-
-        return $results;
+        return [
+            'elements' => $mailClass->decode(acym_loadObjectList($query, '', $settings['offset'], $settings['elementsPerPage'])),
+            'total' => acym_loadObject($queryCount),
+            'status' => [],
+        ];
     }
 
     public function cleanEmailsOverride()

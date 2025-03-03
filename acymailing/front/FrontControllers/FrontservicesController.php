@@ -19,12 +19,12 @@ class FrontservicesController extends AcymController
         ];
     }
 
-    public function listing()
+    public function listing(): void
     {
         exit;
     }
 
-    public function sendinblue()
+    public function sendinblue(): void
     {
         $securityKey = acym_getVar('string', 'seckey');
         if (empty($securityKey) || $securityKey !== $this->config->get('sendinblue_webhooks_seckey')) exit;

@@ -112,7 +112,7 @@ class plgAcymMailgun extends AcymPlugin
 
     public function onAcymSendEmail(&$response, $mailerHelper, $to, $from, $replyTo, $bcc = [], $attachments = [], $sendingMethodListParams = [])
     {
-        if ($mailerHelper->externalMailer != self::SENDING_METHOD_ID) return;
+        if ($mailerHelper->externalMailer !== self::SENDING_METHOD_ID) return;
 
         $this->setSendingMethodApiUrl();
         $headers = $this->getHeadersSendingMethod(self::SENDING_METHOD_ID);

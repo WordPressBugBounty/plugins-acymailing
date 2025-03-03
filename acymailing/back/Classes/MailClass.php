@@ -90,7 +90,7 @@ class MailClass extends AcymClass
     public function getMatchingElements(array $settings = []): array
     {
         $query = 'SELECT mail.* FROM #__acym_mail AS mail';
-        $queryCount = 'SELECT COUNT(mail.id) FROM #__acym_mail AS mail';
+        $queryCount = 'SELECT COUNT(mail.id) AS total FROM #__acym_mail AS mail';
 
         $filters = [];
         $tagJoin = '';
@@ -183,7 +183,7 @@ class MailClass extends AcymClass
         }
 
         $results['elements'] = $this->decode(acym_loadObjectList($query, '', $settings['offset'], $settings['elementsPerPage']));
-        $results['total'] = acym_loadResult($queryCount);
+        $results['total'] = acym_loadObject($queryCount);
 
         if (!empty($settings['element_tab'])) {
             $this->getAllListIdsForWelcomeUnsub($results['elements'], $settings['element_tab']);
@@ -219,7 +219,7 @@ class MailClass extends AcymClass
         return true;
     }
 
-    public function getAll($key = null)
+    public function getAll(?string $key = null): array
     {
         $allMails = parent::getAll($key);
 

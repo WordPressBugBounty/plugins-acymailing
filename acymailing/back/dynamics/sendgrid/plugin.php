@@ -73,7 +73,7 @@ class plgAcymSendgrid extends AcymPlugin
 
     public function onAcymSendEmail(&$response, $mailerHelper, $to, $from, $reply_to, $bcc = [], $attachments = [], $sendingMethodListParams = [])
     {
-        if ($mailerHelper->externalMailer != self::SENDING_METHOD_ID) return;
+        if ($mailerHelper->externalMailer !== self::SENDING_METHOD_ID) return;
         $headers = $this->getHeadersSendingMethod(self::SENDING_METHOD_ID, [], $sendingMethodListParams);
         $headers[] = 'Content-Type: application/json';
 

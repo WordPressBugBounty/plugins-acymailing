@@ -11,7 +11,7 @@ use AcyMailing\Helpers\UpdateHelper;
 
 trait Listing
 {
-    public function listing()
+    public function listing(): void
     {
         acym_setVar('layout', 'listing');
 
@@ -48,7 +48,7 @@ trait Listing
             return;
         }
 
-        $pagination->setStatus($matchingMails['total'], $page, $mailsPerPage);
+        $pagination->setStatus($matchingMails['total']->total, $page, $mailsPerPage);
 
         ob_start();
         require acym_getView('mails', 'listing_import', true);
@@ -80,7 +80,7 @@ trait Listing
         parent::display($mailsData);
     }
 
-    public function prepareToolbar(&$data)
+    public function prepareToolbar(array &$data): void
     {
         $toolbarHelper = new ToolbarHelper();
         $toolbarHelper->addSearchBar($data['search'], 'mails_search', 'ACYM_SEARCH');
@@ -115,7 +115,7 @@ trait Listing
         $data['toolbar'] = $toolbarHelper;
     }
 
-    public function doUploadTemplate()
+    public function doUploadTemplate(): void
     {
         acym_checkToken();
 
@@ -129,13 +129,15 @@ trait Listing
         $this->listing();
     }
 
-    public function export()
+    public function export(): void
     {
         acym_checkToken();
 
         $templateId = acym_getVar('int', 'templateId', 0);
 
-        if (empty($templateId)) exit;
+        if (empty($templateId)) {
+            exit;
+        }
 
         $mailClass = new MailClass();
         $template = $mailClass->getOneById($templateId);
@@ -146,7 +148,7 @@ trait Listing
         exit;
     }
 
-    public function installDefaultTmpl()
+    public function installDefaultTmpl(): void
     {
         $updateHelper = new UpdateHelper();
         $updateHelper->installTemplates();
@@ -154,7 +156,7 @@ trait Listing
         $this->listing();
     }
 
-    public function favorite()
+    public function favorite(): void
     {
         $templateId = acym_getVar('int', 'templateId', 0);
 
@@ -171,14 +173,16 @@ trait Listing
         $this->listing();
     }
 
-    public function massDuplicate()
+    public function massDuplicate(): void
     {
         $ids = acym_getVar('array', 'elements_checked', []);
-        if (!empty($ids)) $this->duplicate($ids);
+        if (!empty($ids)) {
+            $this->duplicate($ids);
+        }
         $this->listing();
     }
 
-    public function oneDuplicate()
+    public function oneDuplicate(): void
     {
         $templateId = acym_getVar('int', 'templateId', 0);
 
@@ -193,7 +197,7 @@ trait Listing
         $this->listing();
     }
 
-    public function duplicate($templates = [])
+    public function duplicate(array $templates = []): void
     {
         $mailClass = new MailClass();
         $tmplError = [];
@@ -217,7 +221,7 @@ trait Listing
         }
     }
 
-    public function delete()
+    public function delete(): void
     {
         parent::delete();
 
@@ -234,7 +238,7 @@ trait Listing
         }
     }
 
-    public function getMailByIdAjax()
+    public function getMailByIdAjax(): void
     {
         acym_checkToken();
         $mailId = acym_getVar('int', 'id', 0);

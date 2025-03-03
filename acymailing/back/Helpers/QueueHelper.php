@@ -10,27 +10,31 @@ use AcyMailing\Core\AcymObject;
 
 class QueueHelper extends AcymObject
 {
-    var $id = 0;
-    var $report = true;
-    var $send_limit = 0;
-    var $finish = false;
-    var $error = false;
-    var $nbprocess = 0;
-    var $start = 0;
-    public int $stoptime = 0;
-    var $successSend = 0;
-    var $errorSend = 0;
-    var $consecutiveError = 0;
-    var $messages = [];
-    var $pause = 0;
-    var $userClass;
-    var $mod_security2 = false;
-    var $obend = 0;
-    var $emailtypes = [];
-    var $fromManual = false;
+    const MESSAGE_TYPE_SUCCESS = 1;
+    const MESSAGE_TYPE_WARNING = 2;
+    const MESSAGE_TYPE_ERROR = 3;
 
-    public $queueClass;
-    public $total;
+    public bool $report = true;
+    public bool $finish = false;
+    public bool $fromManual = false;
+    public int $id = 0;
+    public int $send_limit = 0;
+    public int $nbprocess = 0;
+    public int $start = 0;
+    public int $stoptime = 0;
+    public int $successSend = 0;
+    public int $errorSend = 0;
+    public int $pause = 0;
+    public int $total;
+    public array $messages = [];
+    public array $emailTypes = [];
+
+    private int $consecutiveError = 0;
+    private bool $mod_security2 = false;
+    private int $obend = 0;
+
+    private UserClass $userClass;
+    private QueueClass $queueClass;
 
     public function __construct()
     {
@@ -57,7 +61,7 @@ class QueueHelper extends AcymObject
         }
     }
 
-    public function process()
+    public function process(): bool
     {
         $creditsLeft = 10000;
         acym_trigger('onAcymCreditsLeft', [&$creditsLeft]);
@@ -75,7 +79,7 @@ class QueueHelper extends AcymObject
         }
 
         $queueClass = new QueueClass();
-        $queueClass->emailtypes = $this->emailtypes;
+        $queueClass->emailtypes = $this->emailTypes;
         $queueElements = $queueClass->getReady($this->send_limit, $this->id);
 
         if (empty($queueElements)) {
@@ -122,7 +126,7 @@ class QueueHelper extends AcymObject
 					function setInfo(message){ divinfo.style.display = \'block\';divinfo.innerHTML=message; }
 					function setPauseInfo(nbpause){ divpauseinfo.style.display = \'\';divpauseinfo.innerHTML=nbpause;}
 					function setCounter(val){ mycounter.innerHTML=val;}
-					var scriptpause = '.intval($this->pause).';
+					var scriptpause = '.$this->pause.';
 					function handlePause(){
 						setPauseInfo(scriptpause);
 						if(scriptpause > 0){
@@ -142,10 +146,10 @@ class QueueHelper extends AcymObject
             }
         }
 
-        $mailHelper = new MailerHelper();
-        $mailHelper->report = false;
+        $mailerHelper = new MailerHelper();
+        $mailerHelper->report = false;
         if ($this->config->get('smtp_keepalive', 1) || in_array($this->config->get('mailer_method'), ['elasticemail'])) {
-            $mailHelper->SMTPKeepAlive = true;
+            $mailerHelper->SMTPKeepAlive = true;
         }
 
         $queueDelete = [];
@@ -189,7 +193,7 @@ class QueueHelper extends AcymObject
         $userClass = new UserClass();
         $isSendingMethodByListActive = false;
         acym_trigger('sendingMethodByListActive', [&$isSendingMethodByListActive]);
-        $mailHelper->isSendingMethodByListActive = $isSendingMethodByListActive;
+        $mailerHelper->isSendingMethodByListActive = $isSendingMethodByListActive;
 
         foreach ($queueElements as $oneQueue) {
             if ($isSendingMethodByListActive && empty($userLists[$oneQueue->user_id])) {
@@ -220,19 +224,19 @@ class QueueHelper extends AcymObject
                 $isAbTesting = isset($sendingParams['abtest']);
             }
 
-            $this->triggerSentHook($oneQueue->mail_id);
+            $this->triggerSentHook((int)$oneQueue->mail_id);
             try {
-                $mailHelper->isAbTest = $isAbTesting;
-                $mailHelper->listsIds = empty($userLists[$oneQueue->user_id]) ? [] : $userLists[$oneQueue->user_id];
-                $mailHelper->setSendingMethodSetting();
-                $result = $mailHelper->sendOne($oneQueue->mail_id, $oneQueue->user_id);
+                $mailerHelper->isAbTest = $isAbTesting;
+                $mailerHelper->listsIds = empty($userLists[$oneQueue->user_id]) ? [] : $userLists[$oneQueue->user_id];
+                $mailerHelper->setSendingMethodSetting();
+                $result = $mailerHelper->sendOne($oneQueue->mail_id, $oneQueue->user_id);
             } catch (\Exception $e) {
                 $result = false;
-                $this->_display($e->getMessage(), 'error', $e->getCode());
+                $this->displayMessage([$e->getMessage()], self::MESSAGE_TYPE_ERROR, $e->getCode());
             }
 
             if (empty($sentEmails[$oneQueue->mail_id])) {
-                $sentEmails[$oneQueue->mail_id] = $mailHelper->Body;
+                $sentEmails[$oneQueue->mail_id] = $mailerHelper->Body;
             }
 
             $queueDeleteOk = true;
@@ -244,39 +248,39 @@ class QueueHelper extends AcymObject
                 $queueDelete[$oneQueue->mail_id][] = $oneQueue->user_id;
                 $statsAdd[$oneQueue->mail_id][1][] = $oneQueue->user_id;
 
-                $queueDeleteOk = $this->_deleteQueue($queueDelete);
-                $mailHelper->triggerFollowUpAgain($oneQueue->mail_id, $oneQueue->user_id);
+                $queueDeleteOk = $this->deleteQueue($queueDelete);
+                $mailerHelper->triggerFollowUpAgain($oneQueue->mail_id, $oneQueue->user_id);
                 $queueDelete = [];
 
                 if ($this->nbprocess % 10 == 0) {
                     $this->statsAdd($statsAdd);
-                    $this->_queueUpdate($queueUpdate);
+                    $this->queueUpdate($queueUpdate);
                     $statsAdd = [];
                     $queueUpdate = [];
                 }
-            } elseif ($mailHelper->dtextsFailed) {
+            } elseif ($mailerHelper->dtextsFailed) {
                 $this->consecutiveError = 0;
                 $queueDelete[$oneQueue->mail_id][] = $oneQueue->user_id;
-                $queueDeleteOk = $this->_deleteQueue($queueDelete);
+                $queueDeleteOk = $this->deleteQueue($queueDelete);
                 $queueDelete = [];
             } else {
-                acym_trigger('onAcymFailedSendingEmail', [$oneQueue->mail_id, $oneQueue->user_id, $mailHelper->errorNumber]);
+                acym_trigger('onAcymFailedSendingEmail', [$oneQueue->mail_id, $oneQueue->user_id, $mailerHelper->errorNumber]);
                 $this->errorSend++;
 
                 $shouldTrySendingLater = false;
-                if (in_array($mailHelper->errorNumber, $mailHelper->errorNewTry)) {
+                if (in_array($mailerHelper->errorNumber, MailerHelper::NEW_TRY_ERRORS)) {
                     if (empty($maxTry) || $oneQueue->try < $maxTry - 1) {
                         $shouldTrySendingLater = true;
-                        if ($mailHelper->failedCounting) {
+                        if ($mailerHelper->failedCounting) {
                             $otherMessage = acym_translationSprintf('ACYM_QUEUE_NEXT_TRY', 60);
                         }
                     }
 
-                    if ($mailHelper->errorNumber == 1) {
+                    if ($mailerHelper->errorNumber === 1) {
                         $this->consecutiveError++;
                     }
 
-                    if ($this->consecutiveError == 2) {
+                    if ($this->consecutiveError === 2) {
                         sleep(1);
                     }
                 }
@@ -284,23 +288,23 @@ class QueueHelper extends AcymObject
                 if (!$shouldTrySendingLater) {
                     $queueDelete[$oneQueue->mail_id][] = $oneQueue->user_id;
                     $statsAdd[$oneQueue->mail_id][0][] = $oneQueue->user_id;
-                    if ($mailHelper->errorNumber == 1 && $this->config->get('bounce_action_maxtry')) {
-                        $queueDeleteOk = $this->_deleteQueue($queueDelete);
+                    if ($mailerHelper->errorNumber === 1 && $this->config->get('bounce_action_maxtry')) {
+                        $queueDeleteOk = $this->deleteQueue($queueDelete);
                         $queueDelete = [];
-                        $otherMessage .= $this->_failedActions($oneQueue->user_id);
+                        $otherMessage .= $this->failedActions((int)$oneQueue->user_id);
                     }
-                } elseif ($mailHelper->failedCounting) {
+                } elseif ($mailerHelper->failedCounting) {
                     $queueUpdate[$oneQueue->mail_id][] = $oneQueue->user_id;
                 }
 
-                $mailHelper->failedCounting = true;
+                $mailerHelper->failedCounting = true;
             }
 
-            $messageOnScreen = '[ID '.$oneQueue->mail_id.'] '.$mailHelper->reportMessage;
+            $messageOnScreen = '[ID '.$oneQueue->mail_id.'] '.$mailerHelper->reportMessage;
             if (!empty($otherMessage)) {
                 $messageOnScreen .= ' => '.$otherMessage;
             }
-            $this->_display($messageOnScreen, $result, $currentMail);
+            $this->displayMessage([$messageOnScreen], $result ? self::MESSAGE_TYPE_SUCCESS : self::MESSAGE_TYPE_ERROR, $currentMail);
 
             if (!$queueDeleteOk) {
                 $this->finish = true;
@@ -308,7 +312,7 @@ class QueueHelper extends AcymObject
             }
 
             if (!empty($this->stoptime) && $this->stoptime < time()) {
-                $this->_display(acym_translation('ACYM_SEND_REFRESH_TIMEOUT'));
+                $this->displayMessage([acym_translation('ACYM_SEND_REFRESH_TIMEOUT')], self::MESSAGE_TYPE_WARNING);
                 if ($this->nbprocess < count($queueElements)) {
                     $this->finish = false;
                 }
@@ -316,11 +320,11 @@ class QueueHelper extends AcymObject
             }
 
             if ($this->consecutiveError > 3 && $this->successSend > 3) {
-                $this->_display(acym_translation('ACYM_SEND_REFRESH_CONNECTION'));
+                $this->displayMessage([acym_translation('ACYM_SEND_REFRESH_CONNECTION')], self::MESSAGE_TYPE_WARNING);
                 break;
             }
 
-            if ($this->consecutiveError > 5 || connection_aborted()) {
+            if ($this->consecutiveError > 5 || ($this->report && connection_aborted())) {
                 $this->finish = true;
                 break;
             }
@@ -334,12 +338,12 @@ class QueueHelper extends AcymObject
             }
         }
 
-        $this->_deleteQueue($queueDelete);
+        $this->deleteQueue($queueDelete);
         $this->statsAdd($statsAdd);
-        $this->_queueUpdate($queueUpdate);
+        $this->queueUpdate($queueUpdate);
 
-        if ($mailHelper->SMTPKeepAlive) {
-            $mailHelper->smtpClose();
+        if ($mailerHelper->SMTPKeepAlive) {
+            $mailerHelper->smtpClose();
         }
 
         if (!empty($this->total) && $currentMail >= $this->total) {
@@ -347,7 +351,7 @@ class QueueHelper extends AcymObject
         }
 
         if ($this->consecutiveError > 5) {
-            $this->_handleError();
+            $this->handleError();
 
             return false;
         }
@@ -367,43 +371,7 @@ class QueueHelper extends AcymObject
         return true;
     }
 
-    private function triggerSentHook($mailId)
-    {
-        static $triggered = [];
-        if (!empty($triggered[$mailId])) return;
-
-        $triggered[$mailId] = true;
-        acym_triggerCmsHook('onAcymSendMail', [$mailId]);
-    }
-
-    private function _deleteQueue($queueDelete)
-    {
-        if (empty($queueDelete)) {
-            return true;
-        }
-        $status = true;
-
-        foreach ($queueDelete as $mailid => $subscribers) {
-            $nbsub = count($subscribers);
-            $res = $this->queueClass->deleteOne($subscribers, $mailid);
-            if ($res === false || !empty($this->queueClass->errors)) {
-                $status = false;
-                $this->_display($this->queueClass->errors);
-            } else {
-                $nbdeleted = $res;
-                if ($nbdeleted != $nbsub) {
-                    $status = false;
-                    $this->_display(
-                        $nbdeleted < $nbsub ? acym_translation('ACYM_QUEUE_DOUBLE') : $nbdeleted.' emails deleted from the queue whereas we only have '.$nbsub.' subscribers'
-                    );
-                }
-            }
-        }
-
-        return $status;
-    }
-
-    public function statsAdd(array $statsAdd)
+    public function statsAdd(array $statsAdd): void
     {
         if (empty($statsAdd)) {
             return;
@@ -456,10 +424,50 @@ class QueueHelper extends AcymObject
         }
     }
 
-    private function _queueUpdate($queueUpdate)
+    private function triggerSentHook(int $mailId): void
+    {
+        static $triggered = [];
+        if (!empty($triggered[$mailId])) {
+            return;
+        }
+
+        $triggered[$mailId] = true;
+        acym_triggerCmsHook('onAcymSendMail', [$mailId]);
+    }
+
+    private function deleteQueue(array $queueDelete): bool
+    {
+        if (empty($queueDelete)) {
+            return true;
+        }
+
+        $status = true;
+
+        foreach ($queueDelete as $mailid => $subscribers) {
+            $nbsub = count($subscribers);
+            $res = $this->queueClass->deleteOne($subscribers, $mailid);
+            if ($res === false || !empty($this->queueClass->errors)) {
+                $status = false;
+                $this->displayMessage($this->queueClass->errors, self::MESSAGE_TYPE_ERROR);
+            } else {
+                $nbdeleted = $res;
+                if ($nbdeleted != $nbsub) {
+                    $status = false;
+                    $this->displayMessage(
+                        [$nbdeleted < $nbsub ? acym_translation('ACYM_QUEUE_DOUBLE') : $nbdeleted.' emails deleted from the queue whereas we only have '.$nbsub.' subscribers'],
+                        self::MESSAGE_TYPE_ERROR
+                    );
+                }
+            }
+        }
+
+        return $status;
+    }
+
+    private function queueUpdate(array $queueUpdate): void
     {
         if (empty($queueUpdate)) {
-            return true;
+            return;
         }
 
         foreach ($queueUpdate as $mailid => $subscribers) {
@@ -467,7 +475,7 @@ class QueueHelper extends AcymObject
         }
     }
 
-    private function _handleError()
+    private function handleError(): void
     {
         $this->finish = true;
         $message = acym_translation('ACYM_SEND_STOPED');
@@ -490,15 +498,11 @@ class QueueHelper extends AcymObject
             }
         }
 
-        $this->_display($message);
+        $this->displayMessage([$message], self::MESSAGE_TYPE_WARNING);
     }
 
-    private function _display($messages, $status = '', $num = '')
+    private function displayMessage(array $messages, int $status, int $num = 0): void
     {
-        if (!is_array($messages)) {
-            $messages = [$messages];
-        }
-
         foreach ($messages as $message) {
             $this->messages[] = strip_tags($message);
         }
@@ -507,7 +511,7 @@ class QueueHelper extends AcymObject
             return;
         }
 
-        $color = $status === true ? 'green' : ($status === -1 ? 'orange' : 'red');
+        $color = $status === self::MESSAGE_TYPE_SUCCESS ? 'green' : ($status === self::MESSAGE_TYPE_WARNING ? 'orange' : 'red');
         foreach ($messages as $message) {
             if (!empty($num)) {
                 echo '<br />'.$num.' : <span style="color:'.$color.';">'.$message.'</span>';
@@ -524,7 +528,7 @@ class QueueHelper extends AcymObject
         }
     }
 
-    private function _failedActions($userId)
+    private function failedActions(int $userId): string
     {
         $listId = 0;
         if (in_array($this->config->get('bounce_action_maxtry'), ['sub', 'remove', 'unsub'])) {

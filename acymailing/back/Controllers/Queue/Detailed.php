@@ -10,7 +10,7 @@ use AcyMailing\Helpers\WorkflowHelper;
 
 trait Detailed
 {
-    public function detailed()
+    public function detailed(): void
     {
         acym_setVar('layout', 'detailed');
         $pagination = new PaginationHelper();
@@ -31,7 +31,7 @@ trait Detailed
             ]
         );
 
-        $pagination->setStatus($matchingElements['total'], $page, $elementsPerPage);
+        $pagination->setStatus((int)$matchingElements['total']->total, $page, $elementsPerPage);
 
         $tagClass = new TagClass();
         $viewData = [
@@ -49,7 +49,7 @@ trait Detailed
         parent::display($viewData);
     }
 
-    public function prepareToolbarDetailed(&$data)
+    public function prepareToolbarDetailed(array &$data): void
     {
         $toolbarHelper = new ToolbarHelper();
         $toolbarHelper->addSearchBar($data['search'], 'dqueue_search', 'ACYM_SEARCH');

@@ -202,7 +202,7 @@ return array(
     'AcyMailing\\Helpers\\UpdatemeHelper' => $baseDir . '/back/Helpers/UpdatemeHelper.php',
     'AcyMailing\\Helpers\\UserHelper' => $baseDir . '/back/Helpers/UserHelper.php',
     'AcyMailing\\Helpers\\WorkflowHelper' => $baseDir . '/back/Helpers/WorkflowHelper.php',
-    'AcyMailing\\Libraries\\Browser\\Browser' => $baseDir . '/back/Libraries/Browser/Browser.php',
+    'AcyMailing\\Libraries\\Browser\\BrowserDetection' => $baseDir . '/back/Libraries/Browser/BrowserDetection.php',
     'AcyMailing\\Libraries\\Pear\\Error' => $baseDir . '/back/Libraries/Pear/Error.php',
     'AcyMailing\\Libraries\\Pear\\Pear' => $baseDir . '/back/Libraries/Pear/Pear.php',
     'AcyMailing\\Libraries\\Pear\\Pop3' => $baseDir . '/back/Libraries/Pear/Pop3.php',

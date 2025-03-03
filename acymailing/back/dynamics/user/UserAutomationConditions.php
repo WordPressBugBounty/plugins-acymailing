@@ -1,5 +1,6 @@
 <?php
 
+use AcyMailing\Helpers\AutomationHelper;
 use AcyMailing\Types\OperatorInType;
 use AcyMailing\Types\OperatorType;
 
@@ -72,7 +73,8 @@ trait UserAutomationConditions
             ).'</div>';
     }
 
-    public function onAcymDeclareConditionsScenario(&$conditions){
+    public function onAcymDeclareConditionsScenario(&$conditions)
+    {
         $this->onAcymDeclareConditions($conditions);
     }
 
@@ -167,13 +169,13 @@ trait UserAutomationConditions
             $query->leftjoin['cmsuserfields'.$num] = '#__fields_values AS cmsuserfields'.$num.' ON cmsuserfields'.$num.'.item_id = user.cms_id AND cmsuserfields'.$num.'.field_id = '.intval(
                     $cfId
                 );
-            $query->where[] = $query->convertQuery('cmsuserfields'.$num, 'value', $options['operator'], $options['value'], '');
+            $query->where[] = $query->convertQuery('cmsuserfields'.$num, 'value', $options['operator'], $options['value']);
         } else {
             $type = '';
             $query->leftjoin['cmsuser'.$num] = '#__users AS cmsuser'.$num.' ON cmsuser'.$num.'.id = user.cms_id';
 
             if (in_array($options['field'], ['registerDate', 'lastvisitDate', 'user_registered'])) {
-                $type = 'datetime';
+                $type = AutomationHelper::TYPE_DATETIME;
                 $options['value'] = acym_replaceDate($options['value']);
 
                 if (!is_numeric($options['value']) && strtotime($options['value']) !== false) {
@@ -184,7 +186,13 @@ trait UserAutomationConditions
                 }
             }
 
-            $query->where[] = $query->convertQuery('cmsuser'.$num, $options['field'], $options['operator'], $options['value'], $type);
+            $query->where[] = $query->convertQuery(
+                'cmsuser'.$num,
+                $options['field'],
+                $options['operator'],
+                $options['value'],
+                $type
+            );
         }
 
         return $query->count();

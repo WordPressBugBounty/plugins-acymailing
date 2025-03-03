@@ -35,7 +35,7 @@ class ListClass extends AcymClass
         }
 
         $query = 'SELECT '.$columns.' FROM #__acym_list AS list';
-        $queryCount = 'SELECT COUNT(list.id) FROM #__acym_list AS list';
+        $queryCount = 'SELECT COUNT(list.id) AS total FROM #__acym_list AS list';
         if (!empty($settings['join'])) $query .= $this->getJoinForQuery($settings['join']);
         $queryStatus = 'SELECT COUNT(id) AS number, active + (visible*2) AS score FROM #__acym_list AS list';
         $filters = [];
@@ -138,7 +138,7 @@ class ListClass extends AcymClass
             if (isset($countEvolByList[$list->id]->newUnsub)) $results['elements'][$i]->newUnsub = $countEvolByList[$list->id]->newUnsub;
         }
 
-        $results['total'] = acym_loadResult($queryCount);
+        $results['total'] = acym_loadObject($queryCount);
 
         $listsPerStatus = acym_loadObjectList($queryStatus.' GROUP BY score', 'score');
         for ($i = 0 ; $i < 4 ; $i++) {
@@ -195,7 +195,7 @@ class ListClass extends AcymClass
         return '';
     }
 
-    public function getListsWithIdNameCount($settings)
+    public function getListsWithIdNameCount(array $settings): array
     {
         $filters = [];
 
@@ -255,10 +255,10 @@ class ListClass extends AcymClass
 
         $query .= ' GROUP BY list.id ';
 
-        $results['lists'] = acym_loadObjectList($query, '', $settings['offset'], $settings['listsPerPage']);
-        $results['total'] = acym_loadResult($queryCount);
-
-        return $results;
+        return [
+            'lists' => acym_loadObjectList($query, '', $settings['offset'], $settings['listsPerPage']),
+            'total' => (int)acym_loadResult($queryCount),
+        ];
     }
 
     public function getOneByName($name)
@@ -572,7 +572,7 @@ class ListClass extends AcymClass
 
         $alreadySent = [];
         $mailerHelper = new MailerHelper();
-        $mailerHelper->report = $this->config->get('welcome_message', 1);
+        $mailerHelper->report = (bool)$this->config->get('welcome_message', 1);
         foreach ($messages as $oneMessage) {
             $mailid = $oneMessage->welcome_id;
             if (empty($mailid)) continue;
@@ -606,7 +606,7 @@ class ListClass extends AcymClass
 
         $alreadySent = [];
         $mailerHelper = new MailerHelper();
-        $mailerHelper->report = $this->config->get('unsub_message', 1);
+        $mailerHelper->report = (bool)$this->config->get('unsub_message', 1);
         foreach ($messages as $oneMessage) {
             if (!empty($oneMessage->unsubscribe_id)) {
                 $mailid = $oneMessage->unsubscribe_id;
@@ -897,17 +897,6 @@ class ListClass extends AcymClass
         $return = acym_loadResultArray('SELECT id FROM #__acym_list WHERE '.$type.' = '.intval($mailId));
 
         return empty($return) ? [] : $return;
-    }
-
-    public function getAll($key = null, $needTranslation = false)
-    {
-        $lists = parent::getAll($key);
-
-        if ($needTranslation && acym_isMultilingual()) {
-            $lists = $this->getTranslatedNameDescription($lists);
-        }
-
-        return $lists;
     }
 
     public function getUsersForSummaryModal($id, $offset, $limit, $search)

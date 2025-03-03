@@ -17,7 +17,7 @@ use AcyMailing\Types\FailActionType;
 
 trait Listing
 {
-    public function listing()
+    public function listing(): void
     {
         acym_setVar('layout', 'listing');
 
@@ -32,7 +32,7 @@ trait Listing
         $this->prepareClass($data);
         $this->prepareDataTab($data);
         $this->prepareSecurity($data);
-        $this->checkConfigMail($data);
+        $this->checkConfigMail();
         $this->prepareToolbar($data);
         $this->prepareHoursMinutes($data);
         $this->resetQueueProcess();
@@ -50,7 +50,7 @@ trait Listing
         parent::display($data);
     }
 
-    private function checkConfigMail(&$data)
+    private function checkConfigMail(): void
     {
         $queueType = $this->config->get('queue_type');
         $batchesNumber = $this->config->get('queue_batch_auto', 1);
@@ -69,7 +69,7 @@ trait Listing
         }
     }
 
-    private function prepareMailSettings(&$data)
+    private function prepareMailSettings(array &$data): void
     {
         $data['sendingMethodsType'] = [
             'server' => acym_translation('ACYM_USING_YOUR_SERVER'),
@@ -88,7 +88,7 @@ trait Listing
         acym_trigger('onAcymSendingMethodOptions', [&$data]);
     }
 
-    public function prepareToolbar(&$data)
+    public function prepareToolbar(array &$data): void
     {
         $toolbarHelper = new ToolbarHelper();
         $toolbarHelper->addButton(
@@ -111,20 +111,20 @@ trait Listing
         $data['toolbar'] = $toolbarHelper;
     }
 
-    private function prepareClass(&$data)
+    private function prepareClass(array &$data): void
     {
         $data['typeDelay'] = new DelayType();
         $data['failaction'] = new FailActionType();
         $data['encodingHelper'] = new EncodingHelper();
     }
 
-    private function prepareLanguages(&$data)
+    private function prepareLanguages(array &$data): void
     {
         $langs = acym_getLanguages();
         $data['languages'] = [];
 
         foreach ($langs as $lang => $obj) {
-            if ($lang == "xx-XX") continue;
+            if ($lang === 'xx-XX') continue;
 
             $oneLanguage = new \stdClass();
             $oneLanguage->language = $lang;
@@ -163,7 +163,7 @@ trait Listing
         );
     }
 
-    private function prepareLists(&$data)
+    private function prepareLists(array &$data): void
     {
         $listClass = new ListClass();
         try {
@@ -179,7 +179,7 @@ trait Listing
         $data['lists'] = $lists;
     }
 
-    private function prepareNotifications(&$data)
+    private function prepareNotifications(array &$data): void
     {
         $data['notifications'] = [
             'acy_notification_create' => [
@@ -209,14 +209,14 @@ trait Listing
         ];
     }
 
-    private function prepareAcl(&$data)
+    private function prepareAcl(array &$data): void
     {
         $data['acl'] = acym_cmsPermission();
         $data['acl_advanced'] = acym_getPagesForAcl();
         $data['aclType'] = new AclType();
     }
 
-    private function prepareSecurity(&$data)
+    private function prepareSecurity(array &$data): void
     {
         $data['acychecker_installed'] = acym_isAcyCheckerInstalled();
         $data['acychecker_get_link'] = ACYM_ACYCHECKER_WEBSITE.'?utm_source=acymailing_plugin&utm_campaign=get_acychecker&utm_medium=button_configuration_security';
@@ -242,7 +242,7 @@ trait Listing
         }
     }
 
-    private function prepareDataTab(&$data)
+    private function prepareDataTab(array &$data): void
     {
         $fieldClass = new FieldClass();
         $data['fields'] = $fieldClass->getAll();
@@ -253,7 +253,7 @@ trait Listing
         }
     }
 
-    private function prepareHoursMinutes(&$data)
+    private function prepareHoursMinutes(array &$data): void
     {
         $listHours = [];
         for ($i = 0 ; $i < 24 ; $i++) {
@@ -275,20 +275,20 @@ trait Listing
         $data['listAllMinutes'] = $listAllMinutes;
     }
 
-    private function handleEmails(&$formData)
+    private function handleEmails(array &$formData): void
     {
         $formData['from_email'] = acym_strtolower($formData['from_email']);
         $formData['replyto_email'] = acym_strtolower($formData['replyto_email']);
         $formData['bounce_email'] = acym_strtolower($formData['bounce_email']);
     }
 
-    public function store()
+    public function store(): void
     {
         acym_checkToken();
 
         $formData = acym_getVar('array', 'config', []);
         if (empty($formData)) {
-            return false;
+            return;
         }
 
         $this->handleReplyTo($formData);
@@ -316,19 +316,19 @@ trait Listing
         $this->handleMultilingual($formData);
 
         $this->config->load();
-
-        return true;
     }
 
-    private function handleReplyTo(&$formData)
+    private function handleReplyTo(array &$formData): void
     {
         if ($formData['from_as_replyto'] == 1) {
-            $formData['replyto_name'] = $formData['from_name'];
+            if (isset($formData['from_name'])) {
+                $formData['replyto_name'] = $formData['from_name'];
+            }
             $formData['replyto_email'] = $formData['from_email'];
         }
     }
 
-    private function handleWordWrap(&$formData)
+    private function handleWordWrap(array &$formData): void
     {
         if (empty($formData['mailer_wordwrap']) || $formData['mailer_wordwrap'] < 0) {
             $formData['mailer_wordwrap'] = 0;
@@ -339,11 +339,11 @@ trait Listing
         }
     }
 
-    private function handleDemoSite(&$formData)
+    private function handleDemoSite(array &$formData): void
     {
     }
 
-    private function handleAcl(&$formData)
+    private function handleAcl(array &$formData): void
     {
         if (ACYM_PRODUCTION) {
             $aclPages = array_keys(acym_getPagesForAcl());
@@ -355,7 +355,7 @@ trait Listing
         }
     }
 
-    private function handleSelect2Fields(&$formData)
+    private function handleSelect2Fields(array &$formData): void
     {
         $select2Fields = [
             'regacy_lists',
@@ -383,7 +383,7 @@ trait Listing
         }
     }
 
-    private function handleAcyChecker(&$formData)
+    private function handleAcyChecker(array &$formData): void
     {
         if (empty($formData['email_verification'])) {
             return;
@@ -410,7 +410,7 @@ trait Listing
         }
     }
 
-    private function handleNewDkim(&$formData)
+    private function handleNewDkim(array &$formData): void
     {
         if (empty($formData['dkim'])) {
             return;
@@ -436,7 +436,7 @@ trait Listing
         $formData['dkim_public'] = $newDkimKeys['public_key'];
     }
 
-    private function handleWebsiteLinking($formData, $licenseKeyBeforeSave)
+    private function handleWebsiteLinking(array $formData, string $licenseKeyBeforeSave): void
     {
         $isLicenseKeyUpdated = isset($formData['license_key']) && $licenseKeyBeforeSave !== $formData['license_key'];
 
@@ -457,7 +457,7 @@ trait Listing
         }
     }
 
-    private function handleMultilingual($formData)
+    private function handleMultilingual(array $formData): void
     {
         $removed = array_diff(
             explode(',', acym_getVar('string', 'previous_multilingual_languages', '')),
@@ -470,7 +470,7 @@ trait Listing
         }
     }
 
-    public function test()
+    public function test(): void
     {
         $this->store();
 
@@ -522,7 +522,7 @@ trait Listing
         $this->listing();
     }
 
-    public function handleUnsubSurvey(&$formData)
+    public function handleUnsubSurvey(array &$formData): void
     {
         if (isset($formData['unsub_survey'])) {
             $unsubSurvey = json_decode($formData['unsub_survey'], true);
@@ -553,7 +553,7 @@ trait Listing
         }
     }
 
-    private function resetQueueProcess()
+    private function resetQueueProcess(): void
     {
         if (!acym_level(ACYM_ESSENTIAL) && $this->config->get('queue_type', 'manual') !== 'manual') {
             $this->config->save(['queue_type' => 'manual']);
@@ -561,13 +561,13 @@ trait Listing
     }
 
 
-    public function addNewSml()
+    public function addNewSml(): void
     {
         acym_trigger('onConfigurationAddSml');
         $this->listing();
     }
 
-    public function deleteSml()
+    public function deleteSml(): void
     {
         acym_trigger('onConfigurationDeleteSml');
         $this->listing();

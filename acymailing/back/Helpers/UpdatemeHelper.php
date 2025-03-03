@@ -59,7 +59,7 @@ class UpdatemeHelper extends AcymObject
         $url = 'public/getLicenseInfo';
         $url .= '?level='.urlencode(strtolower($config->get('level', 'starter')));
         if (acym_level(ACYM_ESSENTIAL)) {
-            if ($config->get('different_admin_url_value', 0) === 1) {
+            if ($config->get('different_admin_url_toggle', 0) === 1) {
                 $url .= '&domain='.$config->get('different_admin_url_value', 0);
             } else {
                 $url .= '&domain='.urlencode(rtrim(ACYM_LIVE, '/'));

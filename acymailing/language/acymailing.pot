@@ -1,13 +1,22 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.0.1\n"
+"Project-Id-Version: AcyMailing 10.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-01-28\n"
+"POT-Creation-Date: 2025-03-03\n"
 "X-Domain: acymailing\n"
 
+
+msgid "Care to share your reasons for unsubscribing?"
+msgstr ""
+
+msgid "Mobile"
+msgstr ""
+
+msgid "Desktop"
+msgstr ""
 
 msgid "Finished"
 msgstr ""
@@ -2320,9 +2329,6 @@ msgid "The send frequency cannot be set to 0 minute when the Automated tasks opt
 msgstr ""
 
 msgid "%s missing keys added to subscribers"
-msgstr ""
-
-msgid "Why are you unsubscribing?"
 msgstr ""
 
 msgid "The PHP extension zlib is needed for this feature, activate it on your server."
@@ -5209,9 +5215,6 @@ msgid "Purchase"
 msgstr ""
 
 msgid "Domain missing"
-msgstr ""
-
-msgid "You're not allowed to download, please attach your website to a valid license first"
 msgstr ""
 
 msgid "Download"

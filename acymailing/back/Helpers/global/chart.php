@@ -1,6 +1,6 @@
 <?php
 
-function acym_lineChart($id, $dataMonth, $dataDay, $dataHour, $ajax = false)
+function acym_lineChart(array $dataMonth, array $dataDay, array $dataHour, bool $ajax = false): string
 {
     acym_initializeChart();
 
@@ -34,8 +34,9 @@ function acym_lineChart($id, $dataMonth, $dataDay, $dataHour, $ajax = false)
         $clickHour[] = '"'.$data['click'].'"';
     }
 
-    $idCanvas = 'acy_canvas_rand_id'.rand(1000, 9000);
-    $idLegend = 'acy_legend_rand_id'.rand(1000, 9000);
+    $randNumber = rand(1000, 9000);
+    $idCanvas = 'acy_canvas_rand_id'.$randNumber;
+    $idLegend = 'acy_legend_rand_id'.$randNumber;
     $return = '';
 
     $nbDataDay = count($dataDay);
@@ -62,7 +63,7 @@ function acym_lineChart($id, $dataMonth, $dataDay, $dataHour, $ajax = false)
     }
 
 
-    $return .= '<div class="acym__chart__line__container" id="'.$id.'">
+    $return .= '<div class="acym__chart__line__container">
                     <div class="acym__chart__line__choose__by">
                         <p class="acym__chart__line__choose__by__one '.$selectedChartMonth.'" onclick="acymChartLineUpdate(this, \'month\')">'.acym_translation('ACYM_BY_MONTH').'</p>
                         <p class="acym__chart__line__choose__by__one '.$selectedChartDay.'" onclick="acymChartLineUpdate(this, \'day\')">'.acym_translation('ACYM_BY_DAY').'</p>
@@ -230,7 +231,7 @@ function acym_lineChart($id, $dataMonth, $dataDay, $dataHour, $ajax = false)
     return $return;
 }
 
-function acym_initializeChart()
+function acym_initializeChart(): void
 {
     static $loaded = false;
 
@@ -240,17 +241,17 @@ function acym_initializeChart()
     }
 }
 
-function acym_roundChart($id, $percentage, $type = '', $class = '', $topLabel = '', $bottomLabel = '', $colorChart = '')
+function acym_roundChart($percentage, string $type = '', string $class = '', string $topLabel = ''): string
 {
-    if ($percentage !== 0 && empty($percentage)) {
+    if (empty($percentage) && $percentage !== 0) {
         return '';
     }
 
     acym_initializeChart();
 
-    if (empty($id)) {
-        $id = 'acy_round_chart_rand_id'.rand(1000, 9000);
-    }
+    $randNumber = rand(1000, 9000);
+    $id = 'acy_round_chart_rand_id'.$randNumber;
+    $idCanvas = 'acy_canvas_rand_id'.$randNumber;
 
     $green = '#3dea91';
     $red = '#ff5259';
@@ -287,28 +288,22 @@ function acym_roundChart($id, $percentage, $type = '', $class = '', $topLabel = 
             $isFixColor = true;
     }
 
-    if ($isFixColor) {
-        $color = !empty($colorChart) ? $colorChart : $defaultColor;
-    } else {
+    $color = $defaultColor;
+    if (!$isFixColor) {
         if ($percentage >= $valueHigh) {
             $color = $isInverted ? $red : $green;
         } elseif ($percentage < $valueHigh && $percentage >= $valueLow) {
             $color = $orange;
         } elseif ($percentage < $valueLow) {
             $color = $isInverted ? $green : $red;
-        } else {
-            $color = $defaultColor;
         }
     }
-
-    $idCanvas = 'acy_canvas_rand_id'.rand(1000, 9000);
 
     $return = '<div class="'.$class.' acym__chart__doughnut text-center">
                         <p class="text-center acym__chart__doughnut__container__top-label">'.$topLabel.'</p>
                         <div class="acym__chart__doughnut__container" id="'.$id.'">
                             <canvas id="'.$idCanvas.'" width="200" height="200"></canvas>
                         </div>
-                        <p class="acym__chart__doughnut__container__bottom-label text-center">'.$bottomLabel.'</p>
                 </div>';
     $return .= '<script>
             document.addEventListener("DOMContentLoaded", function () {
@@ -366,34 +361,40 @@ function acym_roundChart($id, $percentage, $type = '', $class = '', $topLabel = 
     return $return;
 }
 
-
-function acym_pieChart($id, $data = [], $class = '', $topLabel = '', $cap = true, $perList = false)
+function acym_pieChart(array $data = [], string $class = '', string $topLabel = '', bool $cap = true, bool $perList = false): string
 {
-    if (empty($data)) return '';
+    if (empty($data)) {
+        return '';
+    }
 
     acym_initializeChart();
 
-    if (empty($id)) {
-        $id = 'acy_pie_chart_rand_id'.rand(1000, 9000);
-    }
-
-    $idCanvas = 'acy_canvas_rand_id'.rand(1000, 9000);
-    $idLegend = 'acy_legend_rand_id'.rand(1000, 9000);
+    $randNumber = rand(1000, 9000);
+    $id = 'acy_pie_chart_rand_id'.$randNumber;
+    $idCanvas = 'acy_canvas_rand_id'.$randNumber;
+    $idLegend = 'acy_legend_rand_id'.$randNumber;
 
     $allLabelsArray = [];
     $colors = [];
 
     asort($data);
     $data = array_reverse($data, true);
+
+    if (isset($data['ACYM_OTHER'])) {
+        $otherValue = $data['ACYM_OTHER'];
+        unset($data['ACYM_OTHER']);
+        $data['ACYM_OTHER'] = $otherValue;
+    }
+
     $position = 0;
-    $cappedValue = 0;
-    $nbOther = 0;
+    $othersValue = 0;
+    $nbOthers = 0;
     if ($perList) {
         foreach ($data as $itemId => $item) {
             if ($position > 9 && $cap) {
-                $cappedValue += (float)$item['value'];
+                $othersValue += (float)$item['value'];
                 unset($data[$itemId]);
-                $nbOther++;
+                $nbOthers++;
                 continue;
             }
             $data[$itemId] = (float)$item['value'];
@@ -401,24 +402,26 @@ function acym_pieChart($id, $data = [], $class = '', $topLabel = '', $cap = true
             $colors[] = $item['color'];
             $position++;
         }
+
+        if ($othersValue > 0) {
+            $othersValue = $othersValue / $nbOthers;
+        }
     } else {
         foreach ($data as $label => $number) {
             if ($position > 9 && $cap) {
-                $cappedValue += (float)$number;
+                $othersValue += (float)$number;
                 unset($data[$label]);
-                $nbOther++;
                 continue;
             }
             $data[$label] = (float)$number;
-            $allLabelsArray[] = $label;
+            $allLabelsArray[] = acym_translation($label);
             $colors[] = acym_getChartColor($position);
             $position++;
         }
     }
 
-    if ($cappedValue > 0) {
-        $cappedValue = $cappedValue / $nbOther;
-        $data[acym_translation('ACYM_OTHER')] = $cappedValue;
+    if ($othersValue > 0) {
+        $data['ACYM_OTHER'] = $othersValue;
         $allLabelsArray[] = acym_translation('ACYM_OTHER');
         $colors[] = acym_getChartColor($position);
     }
@@ -439,12 +442,12 @@ function acym_pieChart($id, $data = [], $class = '', $topLabel = '', $cap = true
 
     $return .= '<script>
         document.addEventListener("DOMContentLoaded", function () {
-            var ctx = document.getElementById("'.$idCanvas.'").getContext("2d");
-            var config = {
+            const ctx = document.getElementById("'.$idCanvas.'").getContext("2d");
+            const config = {
                 type: "pie",
                  data: {
                     datasets: [{
-                        data: ['.$allNumbers.'], //Data of chart
+                        data: ['.$allNumbers.'],
                         backgroundColor: ['.$allColors.'],
                     }],
                     labels: ['.$allLabels.']
@@ -463,11 +466,11 @@ function acym_pieChart($id, $data = [], $class = '', $topLabel = '', $cap = true
                         bodyFontSize: 14,
                     },
                     legendCallback: function(chart) {
-                        let dataSets = chart.data.datasets;
-                        let colors = dataSets[0].backgroundColor;
-                        let numbers = dataSets[0].data;
-                        let labels = chart.data.labels;
-                        let text = [];
+                        const dataSets = chart.data.datasets;
+                        const colors = dataSets[0].backgroundColor;
+                        const numbers = dataSets[0].data;
+                        const labels = chart.data.labels;
+                        const text = [];
                         
                         if (colors.length !== labels.length) {
                             return "";
@@ -481,7 +484,7 @@ function acym_pieChart($id, $data = [], $class = '', $topLabel = '', $cap = true
                     },
                 }
             };
-            var chart = new Chart(ctx, config);
+            const chart = new Chart(ctx, config);
             document.getElementById("'.$idLegend.'").innerHTML = (chart.generateLegend());
         });
 </script>';
@@ -489,18 +492,18 @@ function acym_pieChart($id, $data = [], $class = '', $topLabel = '', $cap = true
     return $return;
 }
 
-function acym_barChart($id, $data = [], $class = '', $topLabel = '', $cap = true)
+function acym_barChart(array $data = [], string $topLabel = ''): string
 {
-    if (empty($data)) return '';
+    if (empty($data)) {
+        return '';
+    }
 
     acym_initializeChart();
 
-    if (empty($id)) {
-        $id = 'acy_pie_chart_rand_id'.rand(1000, 9000);
-    }
-
-    $idCanvas = 'acy_canvas_rand_id'.rand(1000, 9000);
-    $idLegend = 'acy_legend_rand_id'.rand(1000, 9000);
+    $randNumber = rand(1000, 9000);
+    $id = 'acy_pie_chart_rand_id'.$randNumber;
+    $idCanvas = 'acy_canvas_rand_id'.$randNumber;
+    $idLegend = 'acy_legend_rand_id'.$randNumber;
 
     $allLabelsArray = [];
     $colors = [];
@@ -511,7 +514,7 @@ function acym_barChart($id, $data = [], $class = '', $topLabel = '', $cap = true
     $cappedValue = 0;
     $nbOther = 0;
     foreach ($data as $itemId => $item) {
-        if ($position > 9 && $cap) {
+        if ($position > 9) {
             $cappedValue += (float)$item['value'];
             unset($data[$itemId]);
             $nbOther++;
@@ -534,7 +537,7 @@ function acym_barChart($id, $data = [], $class = '', $topLabel = '', $cap = true
     $allLabels = "'".implode("', '", $allLabelsArray)."'";
     $allColors = "'".implode("', '", $colors)."'";
 
-    $return = '<div class="'.$class.' acym__chart__pie grid-x">
+    $return = '<div class="acym__chart__pie grid-x">
                         <p class="text-center acym__chart__pie__container__top-label cell medium-6">'.$topLabel.'</p>
                         <div class="acym__chart__pie__container grid-x cell" id="'.$id.'">
                             <div class="acym__chart__pie__canvas_container cell medium-6">                            
@@ -622,13 +625,21 @@ function acym_barChart($id, $data = [], $class = '', $topLabel = '', $cap = true
     return $return;
 }
 
-function acym_getChartColor($position = null)
+function acym_getChartColor(int $position): string
 {
-    if ($position === null) {
-        return 'rgba('.round(rand(0, 100) * 2.55).','.round(rand(0, 100) * 2.55).','.round(rand(0, 100) * 2.55).',.8)';
-    }
-
-    $colors = ['#845EC2', '#D65DB1', '#FF6F91', '#FF9671', '#FFC75F', '#F9F871', '#8BE884', '#00CFA9', '#00AFC6', '#008AC9', '#2261AC'];
+    $colors = [
+        '#845EC2',
+        '#D65DB1',
+        '#FF6F91',
+        '#FF9671',
+        '#FFC75F',
+        '#F9F871',
+        '#8BE884',
+        '#00CFA9',
+        '#00AFC6',
+        '#008AC9',
+        '#2261AC',
+    ];
 
     return $colors[$position % 11];
 }

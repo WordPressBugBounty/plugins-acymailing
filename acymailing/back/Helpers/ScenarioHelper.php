@@ -28,7 +28,7 @@ class ScenarioHelper extends AcymObject
         $this->scenarioProcessClass = new ScenarioProcessClass();
     }
 
-    public function trigger(string $trigger, array $options)
+    public function trigger(string $trigger, array $options): void
     {
         if (!acym_level(ACYM_ENTERPRISE) || empty($trigger)) {
             acym_logError('ScenarioHelper::trigger - Missing trigger or not allowed, trigger: '.$trigger);
@@ -91,7 +91,7 @@ class ScenarioHelper extends AcymObject
         }
     }
 
-    private function handleStep(object $step, int $userId, int $scenarioProcessId)
+    private function handleStep(object $step, int $userId, int $scenarioProcessId): void
     {
         switch ($step->type) {
             case ScenarioClass::TYPE_DELAY:
@@ -106,12 +106,12 @@ class ScenarioHelper extends AcymObject
         }
     }
 
-    private function handleDelay(object $step, int $userId, int $scenarioProcessId)
+    private function handleDelay(object $step, int $userId, int $scenarioProcessId): void
     {
         $nextStep = $this->scenarioStepClass->getStepByPreviousStepId($step->id);
 
         if (empty($nextStep)) {
-            $this->ending($step->scenario_id, $userId, $scenarioProcessId);
+            $this->ending($scenarioProcessId);
 
             return;
         }
@@ -128,7 +128,7 @@ class ScenarioHelper extends AcymObject
         $this->createHistory($scenarioProcessId, ScenarioClass::TYPE_DELAY, 'success', $step->id, $step->params);
     }
 
-    private function calculateDelaySecondsToAdd(array $stepDelayParams)
+    private function calculateDelaySecondsToAdd(array $stepDelayParams): int
     {
         if (empty($stepDelayParams['delay']) || empty($stepDelayParams['unit'])) {
             return 0;
@@ -137,7 +137,7 @@ class ScenarioHelper extends AcymObject
         return $stepDelayParams['delay'] * $stepDelayParams['unit'];
     }
 
-    private function handleCondition(object $step, int $userId, int $scenarioProcessId)
+    private function handleCondition(object $step, int $userId, int $scenarioProcessId): void
     {
         $conditionNotValidCount = 0;
 
@@ -157,7 +157,7 @@ class ScenarioHelper extends AcymObject
         $nextStep = $this->scenarioStepClass->getStepByPreviousConditionId($step->id, $conditionValid);
 
         if (empty($nextStep)) {
-            $this->ending($step->scenario_id, $userId, $scenarioProcessId);
+            $this->ending($scenarioProcessId);
 
             return;
         }
@@ -198,7 +198,7 @@ class ScenarioHelper extends AcymObject
         return $formattedOptions;
     }
 
-    private function handleAction(object $step, int $userId, int $scenarioProcessId)
+    private function handleAction(object $step, int $userId, int $scenarioProcessId): void
     {
         $query = new AutomationHelper();
         $query->where = ['user.id = '.$userId];
@@ -221,7 +221,7 @@ class ScenarioHelper extends AcymObject
         $nextStep = $this->scenarioStepClass->getStepByPreviousStepId($step->id);
 
         if (empty($nextStep)) {
-            $this->ending($step->scenario_id, $userId, $scenarioProcessId);
+            $this->ending($scenarioProcessId);
 
             return;
         }
@@ -229,14 +229,14 @@ class ScenarioHelper extends AcymObject
         $this->handleStep($nextStep, $userId, $scenarioProcessId);
     }
 
-    private function ending(int $scenarioId, int $userId, int $scenarioProcessId)
+    private function ending(int $scenarioProcessId): void
     {
         $this->createHistory($scenarioProcessId, 'ending', acym_translation('ACYM_SCENARIO_ENDED'));
 
         $this->scenarioProcessClass->endProcess($scenarioProcessId);
     }
 
-    public function executeAvailableSteps()
+    public function executeAvailableSteps(): void
     {
         $dateNowUtc = acym_date('now', 'Y-m-d H:i:s', false);
 
@@ -317,7 +317,7 @@ class ScenarioHelper extends AcymObject
         }
     }
 
-    private function createHistory(int $scenarioProcessId, string $type, string $result, string $scenarioStepId = '', array $params = [], string $log = '')
+    private function createHistory(int $scenarioProcessId, string $type, string $result, string $scenarioStepId = '', array $params = [], string $log = ''): void
     {
         $scenarioHistoryLine = new \stdClass();
         $scenarioHistoryLine->scenario_process_id = $scenarioProcessId;
@@ -340,12 +340,12 @@ class ScenarioHelper extends AcymObject
         $this->scenarioHistoryLineClass->save($scenarioHistoryLine);
     }
 
-    public function getConditionValue(\stdClass $step): string
+    public function getConditionValue(object $step): string
     {
         return $step->params['condition'];
     }
 
-    public function getActionValue(\stdClass $step): string
+    public function getActionValue(object $step): string
     {
         return $step->params['action'];
     }

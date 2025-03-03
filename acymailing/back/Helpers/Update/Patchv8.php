@@ -2,13 +2,14 @@
 
 namespace AcyMailing\Helpers\Update;
 
+use AcyMailing\Classes\ConfigurationClass;
 use AcyMailing\Classes\FormClass;
 use AcyMailing\Classes\MailClass;
 use AcyMailing\Classes\RuleClass;
 
 trait Patchv8
 {
-    private function updateFor800($config)
+    private function updateFor800(ConfigurationClass $config): void
     {
         if ($this->isPreviousVersionAtLeast('8.0.0')) {
             return;
@@ -45,7 +46,7 @@ trait Patchv8
         );
     }
 
-    private function updateFor810()
+    private function updateFor810(): void
     {
         if ($this->isPreviousVersionAtLeast('8.1.0')) {
             return;
@@ -90,7 +91,7 @@ trait Patchv8
         $this->updateQuery('ALTER TABLE `#__acym_user` CHANGE `key` `key` VARCHAR(40) NULL');
     }
 
-    private function updateFor811()
+    private function updateFor811(): void
     {
         if ($this->isPreviousVersionAtLeast('8.1.1')) {
             return;
@@ -108,7 +109,7 @@ trait Patchv8
         }
     }
 
-    private function updateFor850()
+    private function updateFor850(): void
     {
         if ($this->isPreviousVersionAtLeast('8.5.0')) {
             return;
@@ -222,7 +223,7 @@ trait Patchv8
         }
     }
 
-    private function updateFor860()
+    private function updateFor860(): void
     {
         if ($this->isPreviousVersionAtLeast('8.6.0')) {
             return;
@@ -279,7 +280,7 @@ trait Patchv8
         );
     }
 
-    private function updateFor862()
+    private function updateFor862(): void
     {
         if ($this->isPreviousVersionAtLeast('8.6.2')) {
             return;
@@ -304,7 +305,7 @@ trait Patchv8
         }
     }
 
-    private function updateFor870()
+    private function updateFor870(): void
     {
         if ($this->isPreviousVersionAtLeast('8.7.0')) {
             return;
@@ -313,7 +314,7 @@ trait Patchv8
         $this->updateQuery('ALTER TABLE #__acym_plugin DROP `features`');
     }
 
-    private function updateFor872($config)
+    private function updateFor872(ConfigurationClass $config): void
     {
         if ($this->isPreviousVersionAtLeast('8.7.2')) {
             return;
@@ -329,7 +330,7 @@ trait Patchv8
         }
     }
 
-    private function updateFor873($config)
+    private function updateFor873(ConfigurationClass $config): void
     {
         if ($this->isPreviousVersionAtLeast('8.7.3')) {
             return;
@@ -354,7 +355,7 @@ trait Patchv8
         }
     }
 
-    private function updateFor874($config)
+    private function updateFor874(ConfigurationClass $config): void
     {
         if ($this->isPreviousVersionAtLeast('8.7.4') || ACYM_CMS !== 'joomla') {
             return;
@@ -363,7 +364,7 @@ trait Patchv8
         $config->save(['malicious_scan' => 1]);
     }
 
-    private function updateFor881($config)
+    private function updateFor881(ConfigurationClass $config): void
     {
         if ($this->isPreviousVersionAtLeast('8.7.0')) {
             return;

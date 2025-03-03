@@ -114,7 +114,7 @@ function acym_boolean($name, $selected = null, $id = null, $attributes = [], $ye
     );
 }
 
-function acym_select($data, $name, $selected = null, $attribs = null, $optKey = 'value', $optText = 'text', $idtag = false, $translate = false)
+function acym_select($data, $name, $selected = null, $attribs = null, $optKey = 'value', $optText = 'text', $idtag = false, $translate = false): string
 {
     $idtag = str_replace(['[', ']', ' '], '', empty($idtag) ? $name : $idtag);
 

@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 6.7.1
-Stable tag: 10.0.1
+Stable tag: 10.1.0
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,11 +113,21 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.0.1 - January 28, 2025 =
-* Improve the display of the creation date in the template listing that could be misinterpreted with the name
-* Add the possibility to sort the subscribers by their user account ID.
+= 10.1.0 - March 3, 2025 =
+* Added the possibility to sort campaigns by the visible option
+* You can now duplicate segments in the segment listing.
+* You can now send a test for the version B in an A/B campaign.
+* When importing users by file, columns containing custom fields are now detected better.
+* Improved the way the confirmation messages look when an email is sent to a user or when they click the confirmation link.
 
-* We fixed an error message happening for users with old versions of some add-ons like the ones for Community Builder and Event Booking.
-* Fixed issue when displaying prices with discounts in WooCommerce dynamic content when sending campaigns.
+* Birthday campaigns could still be sent to the receivers when the birthday field was deleted after activating the campaign.
+* The automatic sending process could send only a few emails on some servers, this has been fixed.
+* Fixed the cron email report which was sent when nothing happened
+* The verification of ElasticEmail API key now works correctly.
+* The website main content could be shown above the unsubscribe page in some cases, it has been fixed now.
+* Fixed an issue that could happen on bounce handling if the IMAP extension isn't active on the server
+* Saving a list when the multilingual is active no longer changes the list name to the currently viewed language.
+* System messages could be shown on the front-end when overriding website emails. This has been disabled.
+* The insertion of list owner information in the emails has been fixed.
 
 [See the whole changelog here.](https://www.acymailing.com/change-log)

@@ -14,7 +14,7 @@ use AcyMailing\Helpers\ExportHelper;
 
 trait Export
 {
-    public function export()
+    public function export(): void
     {
         acym_setVar('layout', 'export');
         $this->breadcrumb[acym_translation('ACYM_EXPORT_SUBSCRIBERS')] = acym_completeLink('users&task=export');
@@ -78,7 +78,7 @@ trait Export
         parent::display($data);
     }
 
-    public function doexport()
+    public function doexport(): void
     {
         acym_checkToken();
         acym_increasePerf();
@@ -88,7 +88,7 @@ trait Export
         if ($usersToExport == 'list' && empty($listsToExport)) {
             acym_enqueueMessage(acym_translation('ACYM_EXPORT_SELECT_LIST'), 'error');
 
-            return $this->exportError(acym_translation('ACYM_EXPORT_SELECT_LIST'));
+            $this->exportError(acym_translation('ACYM_EXPORT_SELECT_LIST'));
         }
         acym_arrayToInteger($listsToExport);
 
@@ -108,7 +108,7 @@ trait Export
         if (empty($fieldsToExport)) {
             acym_setVar('elements_checked', empty($selectedUsersArray) ? [] : $selectedUsersArray);
 
-            return $this->exportError(acym_translation('ACYM_EXPORT_SELECT_FIELD'));
+            $this->exportError(acym_translation('ACYM_EXPORT_SELECT_FIELD'));
         }
 
         $tableFields = acym_getColumns('user');
@@ -132,7 +132,7 @@ trait Export
             $notAllowedFields[] = 'id';
         }
         if (!empty($notAllowedFields)) {
-            return $this->exportError(acym_translationSprintf('ACYM_NOT_ALLOWED_FIELDS', implode(', ', $notAllowedFields), implode(', ', $tableFields)));
+            $this->exportError(acym_translationSprintf('ACYM_NOT_ALLOWED_FIELDS', implode(', ', $notAllowedFields), implode(', ', $tableFields)));
         }
 
         $charset = acym_getVar('string', 'export_charset', 'UTF-8');
@@ -142,7 +142,6 @@ trait Export
         if (!in_array($separator, array_keys($realSeparators))) {
             $separator = 'comma';
         }
-
 
         $newConfig = new \stdClass();
         $newConfig->export_separator = $separator;
@@ -232,16 +231,16 @@ trait Export
         }
 
         $exportHelper = new ExportHelper();
-        $exportHelper->exportCSV($query, $fieldsToExport, $customFieldsToExport, $specialFieldsToExport, $realSeparators[$separator], $charset, null, $flagSegment);
+        $exportHelper->exportCSV($query, $fieldsToExport, $customFieldsToExport, $specialFieldsToExport, $realSeparators[$separator], $charset, '', $flagSegment);
 
         exit;
     }
 
-    private function exportError($message)
+    private function exportError(string $message): void
     {
         acym_enqueueMessage($message, 'error', 0);
         acym_setNoTemplate(false);
 
-        return acym_redirect(acym_completeLink('users&task=export', false, true));
+        acym_redirect(acym_completeLink('users&task=export', false, true));
     }
 }

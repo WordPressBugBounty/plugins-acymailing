@@ -321,7 +321,7 @@ class ComposerStaticInit8e5345a60fb58de98e3331c310fb5215
         'AcyMailing\\Helpers\\UpdatemeHelper' => __DIR__ . '/../..' . '/back/Helpers/UpdatemeHelper.php',
         'AcyMailing\\Helpers\\UserHelper' => __DIR__ . '/../..' . '/back/Helpers/UserHelper.php',
         'AcyMailing\\Helpers\\WorkflowHelper' => __DIR__ . '/../..' . '/back/Helpers/WorkflowHelper.php',
-        'AcyMailing\\Libraries\\Browser\\Browser' => __DIR__ . '/../..' . '/back/Libraries/Browser/Browser.php',
+        'AcyMailing\\Libraries\\Browser\\BrowserDetection' => __DIR__ . '/../..' . '/back/Libraries/Browser/BrowserDetection.php',
         'AcyMailing\\Libraries\\Pear\\Error' => __DIR__ . '/../..' . '/back/Libraries/Pear/Error.php',
         'AcyMailing\\Libraries\\Pear\\Pear' => __DIR__ . '/../..' . '/back/Libraries/Pear/Pear.php',
         'AcyMailing\\Libraries\\Pear\\Pop3' => __DIR__ . '/../..' . '/back/Libraries/Pear/Pop3.php',

@@ -1,5 +1,8 @@
 <?php
 
+__('Care to share your reasons for unsubscribing?', 'acymailing');
+__('Mobile', 'acymailing');
+__('Desktop', 'acymailing');
 __('Finished', 'acymailing');
 __('Started', 'acymailing');
 __('Coming soon', 'acymailing');
@@ -773,7 +776,6 @@ __('Preview (Custom view)', 'acymailing');
 __('You are using a custom view, all the &quot;Display&quot; settings in the right menu won\'t be taken into account', 'acymailing');
 __('The send frequency cannot be set to 0 minute when the Automated tasks option is active in the License tab. The frequency used will be 15 minutes with one batch.', 'acymailing');
 __('%s missing keys added to subscribers', 'acymailing');
-__('Why are you unsubscribing?', 'acymailing');
 __('The PHP extension zlib is needed for this feature, activate it on your server.', 'acymailing');
 __('Only the elements created/published since the specified date will be inserted in your email.', 'acymailing');
 __('Min. publishing date', 'acymailing');
@@ -1741,7 +1743,6 @@ __('Add-on not found', 'acymailing');
 __('You need the latest version of AcyMailing to download add-ons', 'acymailing');
 __('Purchase', 'acymailing');
 __('Domain missing', 'acymailing');
-__('You\'re not allowed to download, please attach your website to a valid license first', 'acymailing');
 __('Download', 'acymailing');
 __('Could not load all information', 'acymailing');
 __('You don\'t have the right AcyMailing edition to download this add-on, you need at least AcyMailing ', 'acymailing');

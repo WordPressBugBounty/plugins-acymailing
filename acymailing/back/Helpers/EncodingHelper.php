@@ -7,7 +7,7 @@ use AcyMailing\Types\CharsetType;
 
 class EncodingHelper extends AcymObject
 {
-    public function change($data, $inputCharset, $outputCharset)
+    public function change(string $data, string $inputCharset, string $outputCharset): string
     {
         $inputCharset = strtoupper(trim($inputCharset));
         $outputCharset = strtoupper(trim($outputCharset));
@@ -52,10 +52,10 @@ class EncodingHelper extends AcymObject
         }
 
         if (function_exists('iconv')) {
-            set_error_handler('AcyMailing\Helpers\acym_error_handler_encoding');
+            set_error_handler('AcyMailing\Helpers\acym_errorHandlerEncoding');
             $encodedData = iconv($inputCharset, $outputCharset.'//IGNORE', $data);
             restore_error_handler();
-            if (!empty($encodedData) && !acym_errorHandlerEncoding('result')) {
+            if (!empty($encodedData) && !acym_errorHandlerEncoding(-1)) {
                 return $encodedData;
             }
         }
@@ -75,7 +75,7 @@ class EncodingHelper extends AcymObject
         return $data;
     }
 
-    public function detectEncoding(&$content)
+    public function detectEncoding(string &$content): string
     {
         if (!function_exists('mb_check_encoding')) {
             return '';
@@ -101,16 +101,8 @@ class EncodingHelper extends AcymObject
         return '';
     }
 
-    public function encodingField($name, $selected, $attribs = null)
+    public function encodingField(string $name, string $selected): void
     {
-        if ($attribs === null) {
-            $attribs = [
-                'class' => 'acym__select',
-                'acym-data-infinite' => '',
-            ];
-        }
-        $attribs['style'] = empty($attribs['style']) ? 'max-width:200px;' : 'max-width:200px;'.$attribs['style'];
-
         echo acym_select(
             [
                 'binary' => 'Binary',
@@ -121,14 +113,18 @@ class EncodingHelper extends AcymObject
             ],
             $name,
             $selected,
-            $attribs,
+            [
+                'class' => 'acym__select',
+                'acym-data-infinite' => '',
+                'style' => 'max-width: 200px;',
+            ],
             '',
             '',
             'config_encoding'
         );
     }
 
-    public function charsetField($name, $selected, $attribs = null)
+    public function charsetField(string $name, string $selected, array $attribs = []): string
     {
         $charsetType = new CharsetType();
 
@@ -136,10 +132,10 @@ class EncodingHelper extends AcymObject
     }
 }
 
-function acym_errorHandlerEncoding($errno, $errstr = '')
+function acym_errorHandlerEncoding(int $errno, string $errstr = ''): bool
 {
     static $error = false;
-    if (is_string($errno) && $errno == 'result') {
+    if ($errno === -1) {
         $currentError = $error;
         $error = false;
 
@@ -148,9 +144,4 @@ function acym_errorHandlerEncoding($errno, $errstr = '')
     $error = true;
 
     return true;
-}
-
-function acym_error_handler_encoding($errno, $errstr = '')
-{
-    return acym_errorHandlerEncoding($errno, $errstr = '');
 }

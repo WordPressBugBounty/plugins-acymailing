@@ -79,7 +79,10 @@ function acym_makeCurlCall(string $url, array $options = []): array
 
         curl_close($ch);
 
-        return ['error' => $error, 'status_code' => $httpCode];
+        return [
+            'error' => $error,
+            'status_code' => $httpCode,
+        ];
     }
 
     curl_close($ch);
@@ -90,11 +93,11 @@ function acym_makeCurlCall(string $url, array $options = []): array
     return $result;
 }
 
-function acym_asyncCurlCall($urls)
+function acym_asyncCurlCall(array $urls): void
 {
-    if (!function_exists('curl_multi_exec')) return;
-
-    if (!is_array($urls)) $urls = [$urls];
+    if (!function_exists('curl_multi_exec')) {
+        return;
+    }
 
     try {
         $mh = curl_multi_init();

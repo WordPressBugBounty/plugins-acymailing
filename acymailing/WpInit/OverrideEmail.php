@@ -81,6 +81,8 @@ class OverrideEmail
         }
 
         $mailerHelper = new MailerHelper();
+        $mailerHelper->report = false;
+
         $success = $mailerHelper->overrideEmail(
             [
                 'subject' => $args['subject'],

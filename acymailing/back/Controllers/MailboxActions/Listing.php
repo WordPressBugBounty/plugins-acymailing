@@ -8,7 +8,63 @@ use AcyMailing\Helpers\WorkflowHelper;
 
 trait Listing
 {
-    private function prepareMailboxesActions(&$data)
+    public function prepareMailboxesListing(array &$data): void
+    {
+        $mailboxesPerPage = $data['pagination']->getListLimit();
+        $page = $this->getVarFiltersListing('int', 'mailboxes_pagination_page', 1);
+        $status = $data['status'];
+
+        $matchingMailboxes = $this->getMatchingElementsFromData(
+            [
+                'ordering' => $data['ordering'],
+                'search' => $data['search'],
+                'elementsPerPage' => $mailboxesPerPage,
+                'offset' => ($page - 1) * $mailboxesPerPage,
+                'ordering_sort_order' => $data['orderingSortOrder'],
+                'status' => $status,
+            ],
+            $status,
+            $page,
+            'mailbox'
+        );
+
+        $data['allStatusFilters'] = [
+            'all' => $matchingMailboxes['total']->total,
+            'active' => $matchingMailboxes['total']->totalActive,
+            'inactive' => $matchingMailboxes['total']->total - $matchingMailboxes['total']->totalActive,
+        ];
+        $data['pagination']->setStatus($matchingMailboxes['total']->total, $page, $mailboxesPerPage);
+        $data['allMailboxes'] = $matchingMailboxes['elements'];
+    }
+
+    public function mailboxes(): void
+    {
+        acym_setVar('layout', 'mailboxes');
+        acym_setVar('task', 'mailboxes');
+
+        $data = [
+            'pagination' => new PaginationHelper(),
+            'workflowHelper' => new WorkflowHelper(),
+        ];
+        $this->getAllParamsRequest($data);
+        $this->prepareMailboxesListing($data);
+        $this->prepareMailboxesActions($data);
+        $this->prepareToolbar($data, 'mailboxes');
+
+        parent::display($data);
+    }
+
+    public function duplicateMailboxAction(): void
+    {
+        $this->mailboxDoListingAction('duplicate');
+    }
+
+    public function deleteMailboxAction(): void
+    {
+        $this->mailboxDoListingAction('delete');
+    }
+
+    private function prepareMailboxesActions(array &$data): void
     {
         if (empty($data['allMailboxes'])) {
             return;
@@ -31,54 +87,7 @@ trait Listing
         }
     }
 
-    public function prepareMailboxesListing(&$data)
-    {
-        $mailboxesPerPage = $data['pagination']->getListLimit();
-        $page = $this->getVarFiltersListing('int', 'mailboxes_pagination_page', 1);
-        $status = $data['status'];
-
-        $matchingMailboxes = $this->getMatchingElementsFromData(
-            [
-                'ordering' => $data['ordering'],
-                'search' => $data['search'],
-                'elementsPerPage' => $mailboxesPerPage,
-                'offset' => ($page - 1) * $mailboxesPerPage,
-                'ordering_sort_order' => $data['orderingSortOrder'],
-                'status' => $status,
-            ],
-            $status,
-            $page,
-            'mailbox'
-        );
-
-        $totalElement = $matchingMailboxes['total'];
-        $data['allStatusFilters'] = [
-            'all' => $matchingMailboxes['total']->total,
-            'active' => $matchingMailboxes['total']->totalActive,
-            'inactive' => $matchingMailboxes['total']->total - $matchingMailboxes['total']->totalActive,
-        ];
-        $data['pagination']->setStatus($totalElement->total, $page, $mailboxesPerPage);
-        $data['allMailboxes'] = $matchingMailboxes['elements'];
-    }
-
-    public function mailboxes()
-    {
-        acym_setVar('layout', 'mailboxes');
-        acym_setVar('task', 'mailboxes');
-
-        $data = [
-            'pagination' => new PaginationHelper(),
-            'workflowHelper' => new WorkflowHelper(),
-        ];
-        $this->getAllParamsRequest($data);
-        $this->prepareMailboxesListing($data);
-        $this->prepareMailboxesActions($data);
-        $this->prepareToolbar($data, 'mailboxes');
-
-        parent::display($data);
-    }
-
-    private function mailboxDoListingAction($action)
+    private function mailboxDoListingAction(string $action): void
     {
         $mailboxClass = new MailboxClass();
         if (!method_exists($mailboxClass, $action)) {
@@ -94,15 +103,5 @@ trait Listing
         $mailboxClass->$action($mailboxActionSelected);
 
         $this->mailboxes();
-    }
-
-    public function duplicateMailboxAction()
-    {
-        $this->mailboxDoListingAction('duplicate');
-    }
-
-    public function deleteMailboxAction()
-    {
-        $this->mailboxDoListingAction('delete');
     }
 }

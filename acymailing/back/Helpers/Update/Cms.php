@@ -6,7 +6,7 @@ use AcyMailing\Helpers\UpdatemeHelper;
 
 trait Cms
 {
-    public function installTables()
+    public function installTables(): void
     {
         $queries = file_get_contents(ACYM_BACK.'tables.sql');
         $tables = explode('CREATE TABLE IF NOT EXISTS', $queries);
@@ -20,7 +20,7 @@ trait Cms
         }
     }
 
-    public function installLanguages()
+    public function installLanguages(): void
     {
         $siteLanguages = acym_getLanguages();
         if (!empty($siteLanguages[ACYM_DEFAULT_LANGUAGE])) {
@@ -28,7 +28,9 @@ trait Cms
         }
 
         $installedLanguages = array_keys($siteLanguages);
-        if (empty($installedLanguages) || !class_exists('\AcyMailing\Helpers\UpdatemeHelper')) return;
+        if (empty($installedLanguages) || !class_exists(UpdatemeHelper::class)) {
+            return;
+        }
 
         ob_start();
         $languagesContent = UpdatemeHelper::call('public/download/translations?version=latest&codes='.implode(',', $installedLanguages));
@@ -69,9 +71,11 @@ trait Cms
         if (!empty($errorLoad)) acym_enqueueMessage(acym_translationSprintf('ACYM_ERROR_LOAD_LANGUAGE', implode(', ', $errorLoad)), 'warning');
     }
 
-    public function installBackLanguages($onlyCode = '')
+    public function installBackLanguages(string $onlyCode = ''): void
     {
-        if (ACYM_CMS !== 'joomla') return;
+        if (ACYM_CMS !== 'joomla') {
+            return;
+        }
 
         $menuStrings = [
             'ACYM_DASHBOARD',
