@@ -2342,7 +2342,6 @@ __('Create', 'acymailing');
 __('Saturday', 'acymailing');
 __('Sunday', 'acymailing');
 __('Wednesday', 'acymailing');
-__('Create empty template', 'acymailing');
 __('Start from', 'acymailing');
 __('Sending date', 'acymailing');
 __('The campaign couldn\'t be saved', 'acymailing');

@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.1.0\n"
+"Project-Id-Version: AcyMailing 10.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-03-03\n"
+"POT-Creation-Date: 2025-03-04\n"
 "X-Domain: acymailing\n"
 
 
@@ -6976,9 +6976,6 @@ msgid "Sunday"
 msgstr ""
 
 msgid "Wednesday"
-msgstr ""
-
-msgid "Create empty template"
 msgstr ""
 
 msgid "Start from"
