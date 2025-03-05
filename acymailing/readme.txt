@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 6.7.1
-Stable tag: 10.1.2
+Stable tag: 10.1.3
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,8 +113,8 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.1.2 - March 4, 2025 =
-* Fixed an issue when trying to send emails to users with no name.
+= 10.1.3 - March 5, 2025 =
+* An error could occur on the configuration page and the campaign creation page on some servers due to type verifications.
 
 
 [See the whole changelog here.](https://www.acymailing.com/change-log)
