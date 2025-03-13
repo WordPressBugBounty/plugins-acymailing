@@ -900,7 +900,6 @@ __('Latitude, Longitude', 'acymailing');
 __('This feature may not work on all mail clients', 'acymailing');
 __('Always', 'acymailing');
 __('If the connected user is subscribed', 'acymailing');
-__('Add unsubscribe header in emails', 'acymailing');
 __('It seems the related add-on is not installed or disabled', 'acymailing');
 __('If this option is disabled, the open and click statistics won\'t be tracked for this subscriber', 'acymailing');
 __('Allow users to manage their own subscribers on the front-end of your site, BIND THIS MENU TO A SPECIFIC USER GROUP', 'acymailing');

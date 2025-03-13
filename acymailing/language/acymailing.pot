@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.1.3\n"
+"Project-Id-Version: AcyMailing 10.1.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-03-05\n"
+"POT-Creation-Date: 2025-03-13\n"
 "X-Domain: acymailing\n"
 
 
@@ -2701,9 +2701,6 @@ msgid "Always"
 msgstr ""
 
 msgid "If the connected user is subscribed"
-msgstr ""
-
-msgid "Add unsubscribe header in emails"
 msgstr ""
 
 msgid "It seems the related add-on is not installed or disabled"

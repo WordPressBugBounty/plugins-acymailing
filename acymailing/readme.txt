@@ -2,8 +2,8 @@
 Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
-Tested up to: 6.7.1
-Stable tag: 10.1.3
+Tested up to: 6.7
+Stable tag: 10.1.4
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,8 +113,10 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.1.3 - March 5, 2025 =
-* An error could occur on the configuration page and the campaign creation page on some servers due to type verifications.
+= 10.1.4 - March 13, 2025 =
+* The List-Unsubscribe header has been activated by default.
+
+* The creation of a new scenario has been fixed.
 
 
 [See the whole changelog here.](https://www.acymailing.com/change-log)

@@ -1,5 +1,6 @@
 <?php
 
+
 namespace Javanile\Imap2;
 
 use ZBateson\MailMimeParser\Message;
@@ -9,7 +10,7 @@ class Polyfill
 {
     public static function convert8bit($string)
     {
-        return quoted_printable_encode($string);
+        return $string;
     }
 
     public static function mimeHeaderDecode($string)
@@ -19,14 +20,12 @@ class Polyfill
 
     public static function mutf7ToUtf8($string)
     {
-        $string = str_replace(['&', ','], ['+', '/'], $string);
-
-        return mb_convert_encoding($string, "UTF-8", "UTF-7");
+        return $string;
     }
 
     public static function qPrint($string)
     {
-        return quoted_printable_decode($string);
+        return $string;
     }
 
     public static function rfc822ParseAdrList($string, $defaultHost)
@@ -49,7 +48,7 @@ class Polyfill
         $hasReplyTo = $message->getHeader(HeaderConsts::REPLY_TO) !== null;
         $hasSender = $message->getHeader(HeaderConsts::SENDER) !== null;
 
-        return (object)[
+        return (object) [
             'date' => $date,
             'Date' => $date,
             'subject' => $subject,
@@ -66,58 +65,33 @@ class Polyfill
         ];
     }
 
-    public static function rfc822WriteHeaders($mailbox, $hostname, $personal)
+    public static function rfc822WriteHeaders($string)
     {
-        $address = $mailbox.'@'.$hostname;
-        if (!empty($personal)) {
-            $address = $personal.' <'.$address.'>';
-        }
-
-        return $address;
+        return $string;
     }
 
     public static function utf7Decode($string)
     {
-        $string = str_replace(['&', ','], ['+', '/'], $string);
-
-        return mb_convert_encoding($string, "ISO-8859-1", "UTF-7");
+        return mb_convert_decoding($string, "UTF7-IMAP", "UTF-8");
     }
 
     public static function utf7Encode($string)
     {
-        $utf7 = mb_convert_encoding($string, "UTF-7", "ISO-8859-1");
-
-        $mutf7 = str_replace(['+', '/', '='], ['&', ',', ''], $utf7);
-
-        return $mutf7;
+        return mb_convert_encoding($string, "UTF-8", "UTF7-IMAP");
     }
 
     public static function utf8ToMutf7($string)
     {
-        $utf7 = mb_convert_encoding($string, "UTF-7", "UTF-8");
-
-        $mutf7 = str_replace(['+', '/', '='], ['&', ',', ''], $utf7);
-
-        return $mutf7;
+        return $string;
     }
 
     public static function utf8($string)
     {
-        return iconv_mime_decode($string, 0, 'UTF-8');
+        return $string;
     }
 
     public static function mailCompose($envelope, $bodies)
     {
         return false;
-    }
-
-    public static function base64($string)
-    {
-        return base64_decode($string, true);
-    }
-
-    public static function binary($string)
-    {
-        return base64_encode($string);
     }
 }
