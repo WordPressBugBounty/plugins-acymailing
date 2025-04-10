@@ -1,13 +1,157 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.1.4\n"
+"Project-Id-Version: AcyMailing 10.2.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-03-13\n"
+"POT-Creation-Date: 2025-04-10\n"
 "X-Domain: acymailing\n"
 
+
+msgid "Add \"Built with AcyMailing\" image in the emails footer and at the bottom of the unsubscribe page"
+msgstr ""
+
+msgid "There are no recent campaigns"
+msgstr ""
+
+msgid "New subscribers in the last 30 days"
+msgstr ""
+
+msgid "Main lists"
+msgstr ""
+
+msgid "average compare"
+msgstr ""
+
+msgid "Recent campaigns"
+msgstr ""
+
+msgid "Engage your community"
+msgstr ""
+
+msgid "Beginner's steps"
+msgstr ""
+
+msgid "Important notice"
+msgstr ""
+
+msgid "There is nothing in the queue"
+msgstr ""
+
+msgid "Based on the last 30 days"
+msgstr ""
+
+msgid "Override website emails"
+msgstr ""
+
+msgid "In order to keep an homogenous communication from your website, override your website emails (account creation, password reset) to use the same design as your campaigns."
+msgstr ""
+
+msgid "Add more users"
+msgstr ""
+
+msgid "Import users from your website or add new ones when they purchase from your site thanks to our integrations."
+msgstr ""
+
+msgid "Trigger actions from external sources"
+msgstr ""
+
+msgid "You can link AcyMailing to external services thanks to Zapier and Make, allowing you to add subscribers, change subscriptions or trigger actions from your CRM or external services."
+msgstr ""
+
+msgid "Create advanced scenarios"
+msgstr ""
+
+msgid "Now that you are sending emails to your subscribers, create scenarios of emails and actions to communicate with your audience based on their actions."
+msgstr ""
+
+msgid "Build meaningful user profiles"
+msgstr ""
+
+msgid "Create custom fields to get useful information on your subscribers and then insert precise data in your emails or target your audience more specifically."
+msgstr ""
+
+msgid "Target your audience"
+msgstr ""
+
+msgid "Create different lists depending on your communication needs and use the segmentation to precisely target your recipients. Only send emails to relevant users."
+msgstr ""
+
+msgid "Choose the communication you want"
+msgstr ""
+
+msgid "Depending on your way to communicate with your users, choose among our different types of email campaigns (one time, periodic automated newsletters, email sequence after user action, birthday email, after purchase email...)"
+msgstr ""
+
+msgid "Send website or user related information"
+msgstr ""
+
+msgid "Thanks to our integrations with other extensions, insert specific content in your emails (articles, posts, events, products...)"
+msgstr ""
+
+msgid "In progress"
+msgstr ""
+
+msgid "Progress"
+msgstr ""
+
+msgid "Create a list"
+msgstr ""
+
+msgid "Add my first subscriber"
+msgstr ""
+
+msgid "Create my first campaign"
+msgstr ""
+
+msgid "Send my first campaign"
+msgstr ""
+
+msgid "Check the statistics of my first campaign"
+msgstr ""
+
+msgid "Start sending automatically"
+msgstr ""
+
+msgid "Once your website is linked to a license, you can enable automatic sending so your emails will be sent without you!"
+msgstr ""
+
+msgid "Create a subscription form"
+msgstr ""
+
+msgid "You want to raise your number of subscribers? Allow your website users to subscribe to your emails by creating subscription forms."
+msgstr ""
+
+msgid "Set a welcome email"
+msgstr ""
+
+msgid "Welcome your new subscribers with a nice welcoming email."
+msgstr ""
+
+msgid "Invalid name"
+msgstr ""
+
+msgid "Please enter your client ID and client secret."
+msgstr ""
+
+msgid "Outlook"
+msgstr ""
+
+msgid "The authentication will expire on %s. Your app needs to be published to avoid this."
+msgstr ""
+
+msgid "Revoke permissions"
+msgstr ""
+
+msgid "Authenticate"
+msgstr ""
+
+msgid "Google / Gmail"
+msgstr ""
+
+msgid "The authentication was successful, but is temporary. You will need to authenticate again after %s"
+msgstr ""
 
 msgid "Care to share your reasons for unsubscribing?"
 msgstr ""
@@ -361,24 +505,6 @@ msgid "Use custom fields"
 msgstr ""
 
 msgid "Follow-up not found"
-msgstr ""
-
-msgid "Bounce login method"
-msgstr ""
-
-msgid "Bounce redirect url"
-msgstr ""
-
-msgid "Bounce client secret"
-msgstr ""
-
-msgid "Bounce client ID"
-msgstr ""
-
-msgid "Classic authentication"
-msgstr ""
-
-msgid "Oauth2"
 msgstr ""
 
 msgid "Message %1$s successfully sent to %2$s with sending method %3$s"
@@ -1548,18 +1674,6 @@ msgstr ""
 msgid "Mailbox actions"
 msgstr ""
 
-msgid "Using OAuth is considered safer and will require you to authorise AcyMailing to send emails instead of using the password"
-msgstr ""
-
-msgid "With password"
-msgstr ""
-
-msgid "With OAuth"
-msgstr ""
-
-msgid "Connection type"
-msgstr ""
-
 msgid "Opened with"
 msgstr ""
 
@@ -1854,9 +1968,6 @@ msgstr ""
 msgid "Microsoft accounts"
 msgstr ""
 
-msgid "Tenant field is missing"
-msgstr ""
-
 msgid "Tenant"
 msgstr ""
 
@@ -1879,9 +1990,6 @@ msgid "Authentication successful!"
 msgstr ""
 
 msgid "An error occurred while retrieving a new token to your SMTP server: %s"
-msgstr ""
-
-msgid "You use Google or Outlook to send your emails. These services have changed the way to identify yourself, you must connect your account %s, so that AcyMailing can send your emails"
 msgstr ""
 
 msgid "Remove VAT"
@@ -2926,9 +3034,6 @@ msgid "Create on subscriber modification"
 msgstr ""
 
 msgid "Create from subscription on"
-msgstr ""
-
-msgid "Add \"Built with AcyMailing\" image in the emails footer"
 msgstr ""
 
 msgid "That have a subscription for %1$s in %2$s"
@@ -4605,9 +4710,6 @@ msgstr ""
 msgid "Allowed groups"
 msgstr ""
 
-msgid "View all emails"
-msgstr ""
-
 msgid "Select one or more lists"
 msgstr ""
 
@@ -6177,9 +6279,6 @@ msgstr ""
 msgid "Create new mail"
 msgstr ""
 
-msgid "View all automations"
-msgstr ""
-
 msgid "Please format the date like 21/12/2010 your format is %s"
 msgstr ""
 
@@ -6744,9 +6843,6 @@ msgstr ""
 msgid "Create new list"
 msgstr ""
 
-msgid "Create segment"
-msgstr ""
-
 msgid "Create new template"
 msgstr ""
 
@@ -7254,7 +7350,7 @@ msgstr ""
 msgid "l, j F Y"
 msgstr ""
 
-msgid "l, j F Y h:i a"
+msgid "l, j F Y g:i a"
 msgstr ""
 
 msgid "Could not upload the file %1$s to %2$s"
@@ -7708,18 +7804,6 @@ msgid "One or more address(es) are invalid and couldn't be imported"
 msgstr ""
 
 msgid "Invalid address"
-msgstr ""
-
-msgid "Audience"
-msgstr ""
-
-msgid "View all lists"
-msgstr ""
-
-msgid "Create list"
-msgstr ""
-
-msgid "Campaigns scheduled"
 msgstr ""
 
 msgid "None of your campaigns are scheduled. Go schedule one!"

@@ -9,7 +9,6 @@ class ComposerStaticInitaa27ffae5a54d18e2ceb750f48a9aaac
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         'def43f6c87e4f8dfd0c9e1b1bab14fe8' => __DIR__ . '/..' . '/symfony/polyfill-iconv/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
-        '9b59d1b0dc9f17a96044da689a464ead' => __DIR__ . '/..' . '/javanile/php-imap2/bootstrap.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -31,10 +30,6 @@ class ComposerStaticInitaa27ffae5a54d18e2ceb750f48a9aaac
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Container\\' => 14,
             'Pelago\\Emogrifier\\' => 18,
-        ),
-        'J' => 
-        array (
-            'Javanile\\Imap2\\' => 15,
         ),
         'G' => 
         array (
@@ -89,10 +84,6 @@ class ComposerStaticInitaa27ffae5a54d18e2ceb750f48a9aaac
         'Pelago\\Emogrifier\\' => 
         array (
             0 => __DIR__ . '/../..' . '/back/Libraries/Pelago/Emogrifier/src',
-        ),
-        'Javanile\\Imap2\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/javanile/php-imap2/src',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (
@@ -322,6 +313,26 @@ class ComposerStaticInitaa27ffae5a54d18e2ceb750f48a9aaac
         'AcyMailing\\Helpers\\UserHelper' => __DIR__ . '/../..' . '/back/Helpers/UserHelper.php',
         'AcyMailing\\Helpers\\WorkflowHelper' => __DIR__ . '/../..' . '/back/Helpers/WorkflowHelper.php',
         'AcyMailing\\Libraries\\Browser\\BrowserDetection' => __DIR__ . '/../..' . '/back/Libraries/Browser/BrowserDetection.php',
+        'AcyMailing\\Libraries\\Imap2\\BodyStructure' => __DIR__ . '/../..' . '/back/Libraries/Imap2/BodyStructure.php',
+        'AcyMailing\\Libraries\\Imap2\\Connection' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Connection.php',
+        'AcyMailing\\Libraries\\Imap2\\Errors' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Errors.php',
+        'AcyMailing\\Libraries\\Imap2\\Functions' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Functions.php',
+        'AcyMailing\\Libraries\\Imap2\\HeaderInfo' => __DIR__ . '/../..' . '/back/Libraries/Imap2/HeaderInfo.php',
+        'AcyMailing\\Libraries\\Imap2\\ImapHelpers' => __DIR__ . '/../..' . '/back/Libraries/Imap2/ImapHelpers.php',
+        'AcyMailing\\Libraries\\Imap2\\Mail' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Mail.php',
+        'AcyMailing\\Libraries\\Imap2\\Mailbox' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Mailbox.php',
+        'AcyMailing\\Libraries\\Imap2\\Message' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Message.php',
+        'AcyMailing\\Libraries\\Imap2\\Polyfill' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Polyfill.php',
+        'AcyMailing\\Libraries\\Imap2\\Roundcube\\Charset' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Roundcube/Charset.php',
+        'AcyMailing\\Libraries\\Imap2\\Roundcube\\ImapClient' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Roundcube/ImapClient.php',
+        'AcyMailing\\Libraries\\Imap2\\Roundcube\\MessageHeader' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Roundcube/MessageHeader.php',
+        'AcyMailing\\Libraries\\Imap2\\Roundcube\\MessageHeaderSorter' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Roundcube/MessageHeaderSorter.php',
+        'AcyMailing\\Libraries\\Imap2\\Roundcube\\Mime' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Roundcube/Mime.php',
+        'AcyMailing\\Libraries\\Imap2\\Roundcube\\ResultIndex' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Roundcube/ResultIndex.php',
+        'AcyMailing\\Libraries\\Imap2\\Roundcube\\ResultThread' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Roundcube/ResultThread.php',
+        'AcyMailing\\Libraries\\Imap2\\Roundcube\\Utils' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Roundcube/Utils.php',
+        'AcyMailing\\Libraries\\Imap2\\Thread' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Thread.php',
+        'AcyMailing\\Libraries\\Imap2\\Timeout' => __DIR__ . '/../..' . '/back/Libraries/Imap2/Timeout.php',
         'AcyMailing\\Libraries\\Pear\\Error' => __DIR__ . '/../..' . '/back/Libraries/Pear/Error.php',
         'AcyMailing\\Libraries\\Pear\\Pear' => __DIR__ . '/../..' . '/back/Libraries/Pear/Pear.php',
         'AcyMailing\\Libraries\\Pear\\Pop3' => __DIR__ . '/../..' . '/back/Libraries/Pear/Pop3.php',
@@ -408,27 +419,6 @@ class ComposerStaticInitaa27ffae5a54d18e2ceb750f48a9aaac
         'GuzzleHttp\\Psr7\\UriNormalizer' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/UriNormalizer.php',
         'GuzzleHttp\\Psr7\\UriResolver' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/UriResolver.php',
         'GuzzleHttp\\Psr7\\Utils' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/Utils.php',
-        'Javanile\\Imap2\\Acl' => __DIR__ . '/..' . '/javanile/php-imap2/src/Acl.php',
-        'Javanile\\Imap2\\BodyStructure' => __DIR__ . '/..' . '/javanile/php-imap2/src/BodyStructure.php',
-        'Javanile\\Imap2\\Connection' => __DIR__ . '/..' . '/javanile/php-imap2/src/Connection.php',
-        'Javanile\\Imap2\\Errors' => __DIR__ . '/..' . '/javanile/php-imap2/src/Errors.php',
-        'Javanile\\Imap2\\Functions' => __DIR__ . '/..' . '/javanile/php-imap2/src/Functions.php',
-        'Javanile\\Imap2\\HeaderInfo' => __DIR__ . '/..' . '/javanile/php-imap2/src/HeaderInfo.php',
-        'Javanile\\Imap2\\ImapHelpers' => __DIR__ . '/..' . '/javanile/php-imap2/src/ImapHelpers.php',
-        'Javanile\\Imap2\\Mail' => __DIR__ . '/..' . '/javanile/php-imap2/src/Mail.php',
-        'Javanile\\Imap2\\Mailbox' => __DIR__ . '/..' . '/javanile/php-imap2/src/Mailbox.php',
-        'Javanile\\Imap2\\Message' => __DIR__ . '/..' . '/javanile/php-imap2/src/Message.php',
-        'Javanile\\Imap2\\Polyfill' => __DIR__ . '/..' . '/javanile/php-imap2/src/Polyfill.php',
-        'Javanile\\Imap2\\Roundcube\\Charset' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/Charset.php',
-        'Javanile\\Imap2\\Roundcube\\ImapClient' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/ImapClient.php',
-        'Javanile\\Imap2\\Roundcube\\MessageHeader' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/MessageHeader.php',
-        'Javanile\\Imap2\\Roundcube\\MessageHeaderSorter' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/MessageHeaderSorter.php',
-        'Javanile\\Imap2\\Roundcube\\Mime' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/Mime.php',
-        'Javanile\\Imap2\\Roundcube\\ResultIndex' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/ResultIndex.php',
-        'Javanile\\Imap2\\Roundcube\\ResultThread' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/ResultThread.php',
-        'Javanile\\Imap2\\Roundcube\\Utils' => __DIR__ . '/..' . '/javanile/php-imap2/src/Roundcube/Utils.php',
-        'Javanile\\Imap2\\Thread' => __DIR__ . '/..' . '/javanile/php-imap2/src/Thread.php',
-        'Javanile\\Imap2\\Timeout' => __DIR__ . '/..' . '/javanile/php-imap2/src/Timeout.php',
         'Pelago\\Emogrifier\\CssInliner' => __DIR__ . '/../..' . '/back/Libraries/Pelago/Emogrifier/src/CssInliner.php',
         'Pelago\\Emogrifier\\Css\\CssDocument' => __DIR__ . '/../..' . '/back/Libraries/Pelago/Emogrifier/src/Css/CssDocument.php',
         'Pelago\\Emogrifier\\Css\\StyleRule' => __DIR__ . '/../..' . '/back/Libraries/Pelago/Emogrifier/src/Css/StyleRule.php',

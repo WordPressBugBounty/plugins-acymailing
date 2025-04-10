@@ -2,6 +2,7 @@
 
 namespace AcyMailing\Helpers;
 
+use AcyMailerPhp\OAuth;
 use AcyMailing\Classes\HistoryClass;
 use AcyMailing\Classes\ListClass;
 use AcyMailing\Classes\MailClass;
@@ -13,6 +14,11 @@ use AcyMailing\Types\CharsetType;
 
 class BounceHelper extends AcymObject
 {
+    const HOSTS_NEEDING_OAUTH = [
+        'imap.gmail.com',
+        'outlook.office365.com',
+    ];
+
     private string $server;
     private string $username;
     private string $password;
@@ -22,7 +28,6 @@ class BounceHelper extends AcymObject
     private bool $selfSigned;
     private int $timeout;
     private string $oAuthToken;
-    private string $imapConnectionMethod;
 
     private array $allowed_extensions = [];
     protected int $nbMessages = 0;
@@ -87,8 +92,7 @@ class BounceHelper extends AcymObject
                 'secure_method' => $this->config->get('bounce_secured'),
                 'self_signed' => $this->config->get('bounce_certif', false),
                 'timeout' => $this->config->get('bounce_timeout', 10),
-                'bounce_token' => $this->config->get('bounce_token'),
-                'imap_connection_method' => $this->config->get('imap_connection_method', 'classic'),
+                'bounce_access_token' => $this->config->get('bounce_access_token'),
             ];
         }
 
@@ -100,8 +104,7 @@ class BounceHelper extends AcymObject
         $this->secureMethod = $config['secure_method'];
         $this->selfSigned = $config['self_signed'];
         $this->timeout = intval($config['timeout']);
-        $this->oAuthToken = str_replace('Bearer ', '', $config['bounce_token']);
-        $this->imapConnectionMethod = $config['imap_connection_method'];
+        $this->oAuthToken = $config['bounce_access_token'];
 
         if ($this->connectMethod === 'pear') {
             $this->usePear = true;
@@ -110,34 +113,20 @@ class BounceHelper extends AcymObject
             return true;
         }
 
+        require_once ACYM_LIBRARIES.'Imap2'.DS.'bootstrap.php';
+
         if (extension_loaded('imap') || function_exists('imap_open')) {
             return true;
         }
 
-        $prefix = PHP_SHLIB_SUFFIX === 'dll' ? 'php_' : '';
-        $EXTENSION = $prefix.'imap.'.PHP_SHLIB_SUFFIX;
-
-        if (function_exists('dl')) {
-            $fatalMessage = 'The system tried to load dynamically the '.$EXTENSION.' extension';
-            $fatalMessage .= '<br />If you see this message, that means the system could not load this PHP extension';
-            $fatalMessage .= '<br />Please enable the PHP Extension '.$EXTENSION;
-            ob_start();
-            echo $fatalMessage;
-            dl($EXTENSION);
-            $warnings = str_replace($fatalMessage, '', ob_get_clean());
-            if (extension_loaded('imap') || function_exists('imap_open')) {
-                return true;
-            }
-        }
-
         if ($this->report) {
+            $prefix = PHP_SHLIB_SUFFIX === 'dll' ? 'php_' : '';
+            $extension = $prefix.'imap.'.PHP_SHLIB_SUFFIX;
+
             acym_display(
-                'The extension "'.$EXTENSION.'" could not be loaded, please change your PHP configuration to enable it or use the pop3 method without imap extension',
+                'The extension "'.$extension.'" could not be loaded, please change your PHP configuration to enable it or use the pop3 method without imap extension',
                 'error'
             );
-            if (!empty($warnings)) {
-                acym_display($warnings, 'warning');
-            }
         }
 
         return false;
@@ -166,7 +155,7 @@ class BounceHelper extends AcymObject
         $port = intval($this->port);
         $secure = $this->secureMethod;
         if (empty($port)) {
-            if ($secure == 'ssl') {
+            if ($secure === 'ssl') {
                 $port = '995';
             } else {
                 $port = '110/pop3/notls';
@@ -182,7 +171,11 @@ class BounceHelper extends AcymObject
         if (!$this->mailbox->connect($serverName, $port)) {
             $warnings = ob_get_clean();
             if ($this->report) {
-                acym_enqueueMessage(acym_translationSprintf('ACYM_ERROR_CONNECTING', $this->server.' : '.$port), 'error');
+                $notification = [
+                    'name' => 'error_connecting',
+                    'removable' => 1,
+                ];
+                acym_enqueueMessage(acym_translationSprintf('ACYM_ERROR_CONNECTING', $this->server.' : '.$port), 'error', true, [$notification]);
             }
             if (!empty($warnings) && $this->report) {
                 acym_display($warnings, 'warning');
@@ -242,7 +235,7 @@ class BounceHelper extends AcymObject
             $serverName .= ':'.$port;
         }
 
-        if ($serverName === '{outlook.office365.com:993') {
+        if ($this->server === 'outlook.office365.com') {
             $serverName .= '/imap';
         }
 
@@ -261,12 +254,15 @@ class BounceHelper extends AcymObject
             $serverName .= '/novalidate-cert';
         }
 
-        if (!empty($protocol)) {
+        if (!empty($protocol) && $this->server !== 'outlook.office365.com') {
             $serverName .= '/service='.$protocol;
         }
         $serverName .= '}';
-        if ($this->imapConnectionMethod === 'oauth') {
+        if (in_array($this->server, self::HOSTS_NEEDING_OAUTH)) {
             $this->refreshToken();
+            if (empty($this->oAuthToken)) {
+                return false;
+            }
             $this->mailbox = imap2_open($serverName, trim($this->username), $this->oAuthToken, OP_XOAUTH2);
         } else {
             $this->mailbox = imap_open($serverName, trim($this->username), trim($this->password), OP_SILENT);
@@ -275,7 +271,11 @@ class BounceHelper extends AcymObject
 
         if ($this->report) {
             if (!$this->mailbox) {
-                acym_enqueueMessage(acym_translationSprintf('ACYM_ERROR_CONNECTING', $serverName), 'error');
+                $notification = [
+                    'name' => 'error_connecting',
+                    'removable' => 1,
+                ];
+                acym_enqueueMessage(acym_translationSprintf('ACYM_ERROR_CONNECTING', $serverName), 'error', true, [$notification]);
             }
             if (!empty($warnings)) {
                 acym_enqueueMessage($warnings, 'warning');
@@ -482,7 +482,6 @@ class BounceHelper extends AcymObject
 
     private function decodeMessageImap(bool $attachments): bool
     {
-
         $this->_message->structure = $this->callImapFunction('imap_fetchstructure', [$this->mailbox, $this->_message->messageNB]);
 
         if (empty($this->_message->structure)) {
@@ -496,7 +495,7 @@ class BounceHelper extends AcymObject
 
         if ($this->_message->structure->type == 1) {
             $this->_message->contentType = 2;
-            if ($this->_message->structure->subtype == "MIXED") {
+            if ($this->_message->structure->subtype === 'MIXED') {
                 $allParts = $this->explodeBodyMixed($this->_message->structure);
             } else {
                 $allParts = $this->explodeBody($this->_message->structure);
@@ -532,7 +531,7 @@ class BounceHelper extends AcymObject
                 $this->_message->html = str_replace(array_keys($this->inlineImages), $this->inlineImages, $this->_message->html);
             }
         } else {
-            if ($this->_message->structure->subtype == 'HTML') {
+            if ($this->_message->structure->subtype === 'HTML') {
                 $this->_message->contentType = 1;
                 $this->_message->html = $this->decodeContent($this->callImapFunction('imap_body', [$this->mailbox, $this->_message->messageNB]), $this->_message->structure);
             } else {
@@ -563,7 +562,7 @@ class BounceHelper extends AcymObject
 
         if ($extensionPos === false) {
             foreach ($attachment->parameters as $key => $oneParam) {
-                if (strtolower($oneParam->attribute) == 'name') {
+                if (strtolower($oneParam->attribute) === 'name') {
                     $filename = $this->decodeHeader($attachment->parameters[$key]->value);
                     $extensionPos = strrpos($filename, '.');
                     break;
@@ -774,9 +773,7 @@ class BounceHelper extends AcymObject
             }
         }
 
-
         $this->userActions();
-
         $this->close();
     }
 
@@ -1295,14 +1292,14 @@ class BounceHelper extends AcymObject
             return $allParts;
         }
 
-        $c = 0; //counts real content
+        $c = 0;
         foreach ($struct->parts as $part) {
             if ($part->type == 1) {
-                if ($part->subtype === 'MIXED') { //Mixed:
-                    $path = $this->incPath($path); //refreshing current path
-                    $newpath = $path.'.0'; //create a new path-id (ex.:2.0)
-                    $allParts = array_merge($this->explodeBody($part, $newpath), $allParts); //fetch new parts
-                } else { //Alternativ / rfc / signed
+                if ($part->subtype === 'MIXED') {
+                    $path = $this->incPath($path);
+                    $newpath = $path.'.0';
+                    $allParts = array_merge($this->explodeBody($part, $newpath), $allParts);
+                } else {
                     $newpath = $this->incPath($path);
                     $path = $this->incPath($path);
                     $allParts = array_merge($this->explodeBody($part, $newpath, true), $allParts);
@@ -1326,10 +1323,10 @@ class BounceHelper extends AcymObject
         $path_elements = explode('.', $path);
         $limit = count($path_elements);
         for ($i = 0 ; $i < $limit ; $i++) {
-            if ($i == $limit - 1) { //last element
-                $newPath .= $path_elements[$i] + 1; // new Part-Number
+            if ($i == $limit - 1) {
+                $newPath .= $path_elements[$i] + 1;
             } else {
-                $newPath .= $path_elements[$i]."."; //rebuild "1.2.2"-Chronology
+                $newPath .= $path_elements[$i].'.';
             }
         }
 
@@ -1408,50 +1405,32 @@ class BounceHelper extends AcymObject
 
     private function refreshToken(): void
     {
-        if ((int)$this->config->get('bounce_token_expireIn') > time()) {
-            return;
-        }
-
         if ($this->config->get('bounce_server') === 'imap.gmail.com') {
             $url = 'https://oauth2.googleapis.com/token';
         } else {
-            $tenant = $this->config->get('bounce_tenant');
-            if (empty($tenant)) {
-                acym_enqueueMessage(acym_translation('ACYM_TENANT_FIELD_IS_MISSING'), 'error');
-            }
+            $tenant = $this->config->get('bounce_tenant', 'consumers');
             $url = 'https://login.microsoftonline.com/'.$tenant.'/oauth2/v2.0/token';
         }
 
-        $requestOptions = [
-            'method' => 'POST',
-            'data' => [
-                'client_id' => $this->config->get('bounce_client_id'),
-                'grant_type' => 'refresh_token',
-                'refresh_token' => $this->config->get('bounce_refresh_token'),
-                'client_secret' => $this->config->get('bounce_client_secret'),
-            ],
-        ];
-        $response = acym_makeCurlCall(
-            $url,
-            $requestOptions
+        $oauth = new OAuth(
+            [
+                'sendingMethod' => 'bounce',
+                'tokenGenerationUrl' => $url,
+                'userName' => trim($this->config->get('bounce_username')),
+                'clientId' => trim($this->config->get('bounce_client_id')),
+                'clientSecret' => trim($this->config->get('bounce_client_secret')),
+                'oauthToken' => trim($this->config->get('bounce_access_token')),
+                'oauthTokenExpiration' => trim($this->config->get('bounce_access_token_expiration')),
+                'refreshToken' => trim($this->config->get('bounce_refresh_token')),
+            ]
         );
 
-        acym_logError('Response from OAuth refresh token call: '.json_encode($response), 'imap_oauth', 100);
-
-        if (empty($response['error'])) {
-            $token = $response['token_type'].' '.$response['access_token'];
-            $expireIn = time() + (int)$response['expires_in'];
-            $this->config->save(['bounce_token' => $token, 'bounce_token_expireIn' => $expireIn]);
-
-            $this->oAuthToken = $token;
-        } else {
-            acym_enqueueMessage(acym_translationSprintf('ACYM_OAUTH_REFRESH_TOKEN_ERROR', $response['error']), 'error');
-        }
+        $this->oAuthToken = $oauth->getToken();
     }
 
     private function callImapFunction(string $functionName, array $params = [])
     {
-        if ($this->imapConnectionMethod === 'oauth') {
+        if (in_array($this->server, self::HOSTS_NEEDING_OAUTH)) {
             $functionName = str_replace('imap_', 'imap2_', $functionName);
         }
 

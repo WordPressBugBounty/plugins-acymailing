@@ -15,7 +15,6 @@ return array(
     'Psr\\Http\\Message\\' => array($vendorDir . '/psr/http-factory/src', $vendorDir . '/psr/http-message/src'),
     'Psr\\Container\\' => array($vendorDir . '/psr/container/src'),
     'Pelago\\Emogrifier\\' => array($baseDir . '/back/Libraries/Pelago/Emogrifier/src'),
-    'Javanile\\Imap2\\' => array($vendorDir . '/javanile/php-imap2/src'),
     'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
     'AcyMailing\\WpInit\\' => array($baseDir . '/WpInit'),
     'AcyMailing\\' => array($baseDir . '/back', $baseDir . '/front'),

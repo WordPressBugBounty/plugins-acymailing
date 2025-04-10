@@ -13,7 +13,7 @@ class Activation
         $queries = fread($handle, filesize($file_name));
         fclose($handle);
 
-        if (is_multisite()) {
+        if (is_multisite() && is_network_admin()) {
             $currentBlog = get_current_blog_id();
             $sites = function_exists('get_sites') ? get_sites() : wp_get_sites();
 
@@ -56,6 +56,11 @@ class Activation
 
     public function updateAcym()
     {
+        if (!in_array(acym_getPrefix().'acym_configuration', acym_getTables())) {
+
+            return;
+        }
+
         $config = acym_config();
         if (!file_exists(ACYM_FOLDER.'update.php') && $config->get('installcomplete', 0) != 0) {
             return;

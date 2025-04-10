@@ -103,9 +103,9 @@ class plgAcymElasticemail extends AcymPlugin
             'content' => new stdClass(),
         ];
 
-        $this->handleAddresses($data, $from, $reply_to, $to, $bcc);
+        $this->handleAddresses($data, $mailerHelper, $from, $reply_to, $to, $bcc);
         $this->handleEmailContent($data, $mailerHelper);
-        $this->handleAttachments($data, $mailerHelper, $attachments);
+        $this->handleAttachments($data, $attachments);
         $this->handleHeaders($data, $mailerHelper);
         $this->handleGA($data, $mailerHelper);
 
@@ -129,7 +129,7 @@ class plgAcymElasticemail extends AcymPlugin
         $data['embedImage'][self::SENDING_METHOD_ID] = false;
     }
 
-    private function handleAddresses(array &$data, array $from, array $reply_to, array $to, array $bcc): void
+    private function handleAddresses(array &$data, MailerHelper $mailerHelper, array $from, array $reply_to, array $to, array $bcc): void
     {
         $data['recipients']->to = [$to['email']];
 
@@ -140,7 +140,7 @@ class plgAcymElasticemail extends AcymPlugin
         $data['content']->From = empty($from['name']) ? $from['email'] : $from['name'].' <'.$from['email'].'>';
         $data['content']->ReplyTo = empty($reply_to['name']) ? $reply_to['email'] : $reply_to['name'].' <'.$reply_to['email'].'>';
 
-        $bounceAddress = $this->config->get('bounce_email');
+        $bounceAddress = $this->getBounceAddress($mailerHelper);
         if (!empty($bounceAddress)) {
             $data['content']->EnvelopeFrom = $bounceAddress;
         }
@@ -166,7 +166,7 @@ class plgAcymElasticemail extends AcymPlugin
         }
     }
 
-    private function handleAttachments(array &$data, MailerHelper $mailerHelper, array $attachments): void
+    private function handleAttachments(array &$data, array $attachments): void
     {
         if (empty($attachments)) {
             return;
@@ -237,10 +237,6 @@ class plgAcymElasticemail extends AcymPlugin
         $data['content']->Utm->Source = 'newsletter';
         $data['content']->Utm->Medium = 'email';
         $data['content']->Utm->Campaign = acym_getAlias($data['content']->Subject);
-
-        if (empty($mailerHelper->mailId)) {
-            return;
-        }
 
         if (empty($this->mailClass)) {
             $this->mailClass = new MailClass();

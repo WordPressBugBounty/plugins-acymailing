@@ -41,7 +41,6 @@ trait Configuration
 
         $smtpinfos = explode(':', acym_getCMSConfig('smtphost', ''));
         $allPref['smtp_host'] = $smtpinfos[0];
-        $allPref['smtp_type'] = 'oauth';
         if (isset($smtpinfos[1])) {
             $allPref['smtp_port'] = $smtpinfos[1];
         }
@@ -136,7 +135,7 @@ trait Configuration
         $allPref['Starter'] = ACYM_STARTER;
         $allPref['Essential'] = ACYM_ESSENTIAL;
         $allPref['Enterprise'] = ACYM_ENTERPRISE;
-        $allPref['previous_version'] = '10.1.4';
+        $allPref['previous_version'] = '10.2.0';
 
         $allPref['display_built_by'] = acym_level(ACYM_ESSENTIAL) ? 0 : 1;
         $allPref['php_overrides'] = 0;

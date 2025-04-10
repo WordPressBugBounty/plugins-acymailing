@@ -10,6 +10,8 @@ class InstalledVersions
 {
     private static $installed;
 
+    private static $installedIsLocalDir;
+
     private static $canGetVendors;
 
     private static $installedByVendor = array();
@@ -184,6 +186,8 @@ class InstalledVersions
     {
         self::$installed = $data;
         self::$installedByVendor = array();
+
+        self::$installedIsLocalDir = false;
     }
 
     private static function getInstalled()
@@ -196,17 +200,22 @@ class InstalledVersions
         $copiedLocalDir = false;
 
         if (self::$canGetVendors) {
+            $selfDir = strtr(__DIR__, '\\', '/');
             foreach (ClassLoader::getRegisteredLoaders() as $vendorDir => $loader) {
+                $vendorDir = strtr($vendorDir, '\\', '/');
                 if (isset(self::$installedByVendor[$vendorDir])) {
                     $installed[] = self::$installedByVendor[$vendorDir];
                 } elseif (is_file($vendorDir.'/composer/installed.php')) {
                     $required = require $vendorDir.'/composer/installed.php';
                     self::$installedByVendor[$vendorDir] = $required;
                     $installed[] = $required;
-                    if (strtr($vendorDir.'/composer', '\\', '/') === strtr(__DIR__, '\\', '/')) {
+                    if (self::$installed === null && $vendorDir.'/composer' === $selfDir) {
                         self::$installed = $required;
-                        $copiedLocalDir = true;
+                        self::$installedIsLocalDir = true;
                     }
+                }
+                if (self::$installedIsLocalDir && $vendorDir.'/composer' === $selfDir) {
+                    $copiedLocalDir = true;
                 }
             }
         }

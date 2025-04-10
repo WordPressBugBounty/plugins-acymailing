@@ -104,7 +104,7 @@ class MailerHelper extends Mailer
         $this->config = acym_config();
 
         $this->setFrom($this->getSendSettings('from_email'), $this->getSendSettings('from_name'));
-        $this->Sender = $this->cleanText($this->config->get('bounce_email'));
+        $this->Sender = $this->cleanText($this->getSendSettings('bounce_email'));
         if (empty($this->Sender)) {
             $this->Sender = '';
         }
@@ -153,7 +153,61 @@ class MailerHelper extends Mailer
         $mailerMethodConfig = $this->getSendingMethod();
         $this->currentSendingMethod = $mailerMethodConfig;
 
-        if ($mailerMethodConfig === 'smtp') {
+        if ($mailerMethodConfig === 'google') {
+            $this->isSMTP();
+            $this->Host = 'smtp.gmail.com:465';
+            $this->SMTPAuth = true;
+            $this->Username = trim($this->getSendingMethodSettings('google_username'));
+            $this->AuthType = 'XOAUTH2';
+            $this->SMTPSecure = 'ssl';
+
+            $this->setOAuth(
+                new OAuth(
+                    [
+                        'sendingMethod' => 'google',
+                        'tokenGenerationUrl' => 'https://oauth2.googleapis.com/token',
+                        'userName' => $this->Username,
+                        'clientId' => trim($this->getSendingMethodSettings('google_client_id')),
+                        'clientSecret' => trim($this->getSendingMethodSettings('google_client_secret')),
+                        'oauthToken' => trim($this->getSendingMethodSettings('google_access_token')),
+                        'oauthTokenExpiration' => trim($this->getSendingMethodSettings('google_access_token_expiration')),
+                        'refreshToken' => trim($this->getSendingMethodSettings('google_refresh_token')),
+                    ]
+                )
+            );
+
+            if (empty($this->Sender)) {
+                $this->Sender = strpos($this->Username, '@') ? $this->Username : $this->getSendingMethodSettings('from_email');
+            }
+        } elseif ($mailerMethodConfig === 'outlook') {
+            $this->isSMTP();
+            $tenant = trim($this->getSendingMethodSettings('outlook_tenant', 'consumers'));
+            $host = $tenant === 'consumers' ? 'smtp-mail.outlook.com' : 'smtp.office365.com';
+            $this->Host = $host.':587';
+            $this->SMTPAuth = true;
+            $this->Username = trim($this->getSendingMethodSettings('outlook_username'));
+            $this->AuthType = 'XOAUTH2';
+            $this->SMTPSecure = 'tls';
+
+            $this->setOAuth(
+                new OAuth(
+                    [
+                        'sendingMethod' => 'outlook',
+                        'tokenGenerationUrl' => 'https://login.microsoftonline.com/'.$tenant.'/oauth2/v2.0/token',
+                        'userName' => $this->Username,
+                        'clientId' => trim($this->getSendingMethodSettings('outlook_client_id')),
+                        'clientSecret' => trim($this->getSendingMethodSettings('outlook_client_secret')),
+                        'oauthToken' => trim($this->getSendingMethodSettings('outlook_access_token')),
+                        'oauthTokenExpiration' => trim($this->getSendingMethodSettings('outlook_access_token_expiration')),
+                        'refreshToken' => trim($this->getSendingMethodSettings('outlook_refresh_token')),
+                    ]
+                )
+            );
+
+            if (empty($this->Sender)) {
+                $this->Sender = strpos($this->Username, '@') ? $this->Username : $this->getSendingMethodSettings('from_email');
+            }
+        } elseif ($mailerMethodConfig === 'smtp') {
             $this->isSMTP();
             $this->Host = trim($this->getSendingMethodSettings('smtp_host'));
             $port = $this->getSendingMethodSettings('smtp_port');
@@ -165,41 +219,16 @@ class MailerHelper extends Mailer
             }
             $this->SMTPAuth = (bool)$this->getSendingMethodSettings('smtp_auth', '1');
             $this->Username = trim($this->getSendingMethodSettings('smtp_username'));
-            $connectionType = $this->getSendingMethodSettings('smtp_type');
-            $hostName = explode(':', $this->Host)[0];
 
-            if (OAuth::hostRequireOauth($hostName, $connectionType)) {
-                $this->AuthType = 'XOAUTH2';
-
-                $clientSecret = trim($this->getSendingMethodSettings('smtp_secret'));
-                $clientId = trim($this->getSendingMethodSettings('smtp_clientId'));
-                $refreshToken = trim($this->getSendingMethodSettings('smtp_refresh_token'));
-                $oauthToken = trim($this->getSendingMethodSettings('smtp_token'));
-                $expiredIn = trim($this->getSendingMethodSettings('smtp_token_expireIn'));
-
-                $oauth = new OAuth(
-                    [
-                        'userName' => $this->Username,
-                        'clientSecret' => $clientSecret,
-                        'oauthToken' => $oauthToken,
-                        'clientId' => $clientId,
-                        'refreshToken' => $refreshToken,
-                        'expiredIn' => $expiredIn,
-                        'host' => $hostName,
-                    ]
-                );
-                $this->setOAuth($oauth);
-            } else {
-                $authMethod = $this->getSendingMethodSettings('smtp_method');
-                if (in_array($authMethod, ['CRAM-MD5', 'LOGIN', 'PLAIN', 'XOAUTH2'])) {
-                    $this->AuthType = $authMethod;
-                }
-                if ($this->SMTPAuth) {
-                    $this->Password = trim($this->getSendingMethodSettings('smtp_password'));
-                }
+            $authMethod = $this->getSendingMethodSettings('smtp_method');
+            if (in_array($authMethod, ['CRAM-MD5', 'LOGIN', 'PLAIN'])) {
+                $this->AuthType = $authMethod;
+            }
+            if ($this->SMTPAuth) {
+                $this->Password = trim($this->getSendingMethodSettings('smtp_password'));
             }
 
-            $this->SMTPSecure = trim((string)$this->getSendingMethodSettings('smtp_secured'));
+            $this->SMTPSecure = trim($this->getSendingMethodSettings('smtp_secured'));
 
             if (empty($this->Sender)) {
                 $this->Sender = strpos($this->Username, '@') ? $this->Username : $this->getSendingMethodSettings('from_email');
@@ -1463,15 +1492,14 @@ class MailerHelper extends Mailer
         return $statusSend;
     }
 
-    private function getSendSettings(string $type, int $mailId = 0): string
+    public function getSendSettings(string $type, int $mailId = 0): string
     {
-        if (!in_array($type, ['from_name', 'from_email', 'replyto_name', 'replyto_email'])) {
+        if (!in_array($type, ['from_name', 'from_email', 'replyto_name', 'replyto_email', 'bounce_email'])) {
             return '';
         }
 
         $mailType = strpos($type, 'replyto') !== false ? str_replace('replyto', 'reply_to', $type) : $type;
-
-        if (!empty($mailId) && !empty($this->defaultMail[$mailId]) && !empty($this->defaultMail[$mailId]->$mailType)) {
+        if (!empty($mailId) && !empty($this->defaultMail[$mailId]->$mailType)) {
             return $this->defaultMail[$mailId]->$mailType;
         }
 

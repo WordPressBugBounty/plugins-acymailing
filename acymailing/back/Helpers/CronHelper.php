@@ -103,7 +103,6 @@ class CronHelper extends AcymObject
             return;
         }
 
-        $this->freeUpCall();
         $this->queueScheduledCampaigns();
         $this->cleanQueue();
         $this->sendQueuedEmails();
@@ -294,13 +293,6 @@ class CronHelper extends AcymObject
         $this->config->save($newConfig);
 
         return true;
-    }
-
-    private function freeUpCall(): void
-    {
-        if (function_exists('fastcgi_finish_request')) {
-            fastcgi_finish_request();
-        }
     }
 
     private function queueScheduledCampaigns(): void
