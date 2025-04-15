@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 6.7
-Stable tag: 10.2.0
+Stable tag: 10.2.1
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,20 +113,9 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.2.0 - April 10, 2025 =
-* The dashboard page has been reworked to include tips for new users and to better monitor your campaigns.
-* You can remove the built with AcyMailing in the unsubscribe page
-* The integration with AcyChecker has been updated for compatibility with the version 1.5.0.
-* It is now possible to dynamically insert the week number and the year in an email.
-* The sending of emails with Google and Microsoft accounts has been reworked to better match their new protocols. The same has also been done for the connection to the bounce address.
-* It is now possible to use our ACF integration with their pro version.
+= 10.2.1 - April 15, 2025 =
 
-* Patched a vulnerability on welcome emails creation. More details will be added after enough time for the users to update. Found by offscript (https://github.com/offscriptian)
-* Inactive lists won't appear in the recipients section anymore.
-* We fixed an issue with the GDPR options (user data export and deletion) regarding custom fields.
-* Bounce email address in the mail settings will be used before the bounce email address in the configuration
-* Installation on a single site of a WordPress multisite will no longer install on all network websites.
-* [add-ons] The last purchased products for WooCommerce are now correctly found and inserted in emails.
+* Fixed the error when you try to save a followup condition
 
 
 [See the whole changelog here.](https://www.acymailing.com/change-log)

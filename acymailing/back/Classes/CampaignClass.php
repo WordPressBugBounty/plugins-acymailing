@@ -5,6 +5,7 @@ namespace AcyMailing\Classes;
 use AcyMailing\Controllers\CampaignsController;
 use AcyMailing\Controllers\SegmentsController;
 use AcyMailing\Helpers\AutomationHelper;
+use AcyMailing\Helpers\MailerHelper;
 use AcyMailing\Helpers\PaginationHelper;
 use AcyMailing\Core\AcymClass;
 
@@ -936,13 +937,20 @@ class CampaignClass extends AcymClass
         );
         $activeAutoCampaigns = $this->decode($activeAutoCampaigns);
 
-        if (empty($activeAutoCampaigns)) return;
+        if (empty($activeAutoCampaigns)) {
+            return;
+        }
 
         $mailClass = new MailClass();
+        $mailerHelper = new MailerHelper();
+        $mailerHelper->autoAddUser = true;
+        $adminNotificationEmail = $mailClass->getOneByName('acy_notification_auto_campaign_admin');
         $time = time();
 
         foreach ($activeAutoCampaigns as $campaign) {
-            if (!empty($campaign->sending_params['start_date']) && (int)acym_getTime(acym_date($campaign->sending_params['start_date'], 'Y-m-d H:i')) > $time) continue;
+            if (!empty($campaign->sending_params['start_date']) && (int)acym_getTime(acym_date($campaign->sending_params['start_date'], 'Y-m-d H:i')) > $time) {
+                continue;
+            }
 
             $step = new \stdClass();
             $step->triggers = $campaign->sending_params;
@@ -964,12 +972,22 @@ class CampaignClass extends AcymClass
             $shouldGenerate = $this->updateAutoCampaign($campaign, $campaignMail, $time);
             $this->save($campaign);
 
-            if (!$shouldGenerate) continue;
+            if (!$shouldGenerate) {
+                continue;
+            }
 
             $generatedCampaign = $this->generateCampaign($campaign, $campaignMail, $lastGenerated, $mailClass);
 
             if (empty($campaign->sending_params['need_confirm_to_send'])) {
                 $this->send($generatedCampaign->id);
+            } elseif (!empty($campaign->sending_params['admin_notification_emails']) && !empty($adminNotificationEmail)) {
+                $mailerHelper->addParam('campaign_name', $campaign->name);
+                $campaignLink = '<a href="'.acym_backendLink('campaigns&task=summaryGenerated&campaignId='.$generatedCampaign->id).'">'.$campaign->name.'</a>';
+                $mailerHelper->addParam('campaign_link', $campaignLink);
+
+                foreach ($campaign->sending_params['admin_notification_emails'] as $email) {
+                    $mailerHelper->sendOne($adminNotificationEmail->id, $email);
+                }
             }
         }
     }

@@ -1,13 +1,19 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.2.0\n"
+"Project-Id-Version: AcyMailing 10.2.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-04-10\n"
+"POT-Creation-Date: 2025-04-15\n"
 "X-Domain: acymailing\n"
 
+
+msgid "The automatic campaign \"{campaign_name}\" has been generated and is pending approval to be sent. You can review and send it here: {campaign_link}"
+msgstr ""
+
+msgid "Automatic campaign \"{campaign_name}\" is pending confirmation"
+msgstr ""
 
 msgid "Add \"Built with AcyMailing\" image in the emails footer and at the bottom of the unsubscribe page"
 msgstr ""
