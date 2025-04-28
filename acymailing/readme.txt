@@ -2,8 +2,8 @@
 Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
-Tested up to: 6.7
-Stable tag: 10.2.1
+Tested up to: 6.8
+Stable tag: 10.2.2
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,9 +113,11 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.2.1 - April 15, 2025 =
+= 10.2.2 - April 28, 2025 =
+* Urls/links in the editor can't have space in them anymore
 
-* Fixed the error when you try to save a followup condition
+* The centering of images in Apple Mail has been fixed.
+* Fixed a sending error with missing bounce email address on some multilingual configuration
 
 
 [See the whole changelog here.](https://www.acymailing.com/change-log)
