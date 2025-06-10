@@ -1,13 +1,19 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.2.2\n"
+"Project-Id-Version: AcyMailing 10.3.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-04-28\n"
+"POT-Creation-Date: 2025-06-10\n"
 "X-Domain: acymailing\n"
 
+
+msgid "The port 465 is closed on your server. Please open it to use this sending method."
+msgstr ""
+
+msgid "Get the Enterprise version"
+msgstr ""
 
 msgid "The automatic campaign \"{campaign_name}\" has been generated and is pending approval to be sent. You can review and send it here: {campaign_link}"
 msgstr ""

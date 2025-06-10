@@ -88,6 +88,7 @@ class MailerHelper extends Mailer
     public bool $isTransactional = false;
     public bool $isOneTimeMail = false;
     public bool $isSendingMethodByListActive = false;
+    public string $portError;
 
     public function __construct()
     {
@@ -1014,6 +1015,29 @@ class MailerHelper extends Mailer
             $this->trackEmail = true;
 
             return $this->sendOverride($override, $options);
+        }
+    }
+
+    public function isPortOpen(int $port, string $targetServer): bool
+    {
+        if (!function_exists('fsockopen')) {
+            $this->portError = acym_translation('ACYM_FSOCKOPEN');
+
+            return false;
+        }
+
+        $errorCode = 0;
+        $errorMessage = 0;
+        $fp = @fsockopen($targetServer, $port, $errorCode, $errorMessage, 5);
+
+        if (is_resource($fp)) {
+            fclose($fp);
+
+            return true;
+        } else {
+            $this->portError = $errorCode.' - '.acym_utf8Encode($errorMessage);
+
+            return false;
         }
     }
 

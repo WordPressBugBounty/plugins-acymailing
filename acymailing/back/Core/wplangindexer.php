@@ -1,5 +1,7 @@
 <?php
 
+__('The port 465 is closed on your server. Please open it to use this sending method.', 'acymailing');
+__('Get the Enterprise version', 'acymailing');
 __('The automatic campaign &quot;{campaign_name}&quot; has been generated and is pending approval to be sent. You can review and send it here: {campaign_link}', 'acymailing');
 __('Automatic campaign &quot;{campaign_name}&quot; is pending confirmation', 'acymailing');
 __('Add &quot;Built with AcyMailing&quot; image in the emails footer and at the bottom of the unsubscribe page', 'acymailing');

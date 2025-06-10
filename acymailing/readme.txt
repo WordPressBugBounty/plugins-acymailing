@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 6.8
-Stable tag: 10.2.2
+Stable tag: 10.3.0
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,11 +113,19 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.2.2 - April 28, 2025 =
-* Urls/links in the editor can't have space in them anymore
+= 10.3.0 - June 10, 2025 =
+* The compatibility with Microsoft mailboxes has been added for the bounce handling feature.
 
-* The centering of images in Apple Mail has been fixed.
-* Fixed a sending error with missing bounce email address on some multilingual configuration
+* The anchors in sent emails don't open in a new tab anymore when clicked on the online version.
+
+* It is now possible to send emails to CC and BCC addresses using the AcyMailing sending service.
+* Fixed the error when exporting the links details in the detailed statistics
+* Fixed the error when displaying some form in the user edit profile page in the front-end
+* Fixed the wrong display of long links in the detailed statistics page
+* Fixed the bug affecting the sorting of subscribers by subscription date when editing a list.
+* We have fixed the problem that when you save a list in the edition page while being on the Subscribers or Unsubscribers tab, the list's description, tags and accesses were deleted.
+* We have fixed an error that could occur in rare cases that was causing lists not to appear on the unsubscribe page.
+* Fixed the error that could occur when running the bounce rules
 
 
-[See the whole changelog here.](https://www.acymailing.com/change-log)
+[See the whole changelog here.](https://www.acymailing.com/changelog)

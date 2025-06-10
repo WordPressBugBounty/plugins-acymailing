@@ -436,6 +436,8 @@ trait GlobalStats
         }
 
         foreach ($data['listsStats'] as $listId => $item) {
+            $nbSent = empty($item->nbSent) ? 1 : $item->nbSent;
+
             $data['emailsSent'][$listId] = [
                 'label' => $data['lists'][$listId]->name,
                 'value' => $item->nbSent,
@@ -443,17 +445,17 @@ trait GlobalStats
             ];
             $data['emailsOpen'][$listId] = [
                 'label' => $data['lists'][$listId]->name,
-                'value' => round(($item->nbOpen * 100) / $item->nbSent),
+                'value' => round(($item->nbOpen * 100) / $nbSent),
                 'color' => $data['lists'][$listId]->color,
             ];
             $data['bounces'][$listId] = [
                 'label' => $data['lists'][$listId]->name,
-                'value' => round(($item->nbBounce * 100) / $item->nbSent),
+                'value' => round(($item->nbBounce * 100) / $nbSent),
                 'color' => $data['lists'][$listId]->color,
             ];
             $data['unsubscribed'][$listId] = [
                 'label' => $data['lists'][$listId]->name,
-                'value' => round(($item->nbUnsub * 100) / $item->nbSent),
+                'value' => round(($item->nbUnsub * 100) / $nbSent),
                 'color' => $data['lists'][$listId]->color,
             ];
         }

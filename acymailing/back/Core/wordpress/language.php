@@ -183,9 +183,15 @@ function acym_loadLanguageFile($extension, $basePath = null, $lang = null, $relo
 {
     global $acymLanguages;
     $currentLanguage = acym_getLanguageTag();
-    if (isset($acymLanguages[$currentLanguage][$extension]) && !$reload) return;
+    if (isset($acymLanguages[$currentLanguage][$extension]) && !$reload) {
+        return;
+    }
 
-    $base = ACYM_LANGUAGE;
+    if (ACYM_PRODUCTION) {
+        $base = ACYM_LANGUAGE;
+    }
+
+
     $language = $currentLanguage;
 
     if (!file_exists($base.$language.'.'.$extension.'.ini')) {
