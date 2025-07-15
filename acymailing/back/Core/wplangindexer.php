@@ -1,5 +1,6 @@
 <?php
 
+__('When a campaign is generated, send an e-mail to', 'acymailing');
 __('The port 465 is closed on your server. Please open it to use this sending method.', 'acymailing');
 __('Get the Enterprise version', 'acymailing');
 __('The automatic campaign &quot;{campaign_name}&quot; has been generated and is pending approval to be sent. You can review and send it here: {campaign_link}', 'acymailing');

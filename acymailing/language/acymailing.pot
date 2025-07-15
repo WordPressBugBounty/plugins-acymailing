@@ -1,13 +1,16 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.3.0\n"
+"Project-Id-Version: AcyMailing 10.4.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-06-10\n"
+"POT-Creation-Date: 2025-07-15\n"
 "X-Domain: acymailing\n"
 
+
+msgid "When a campaign is generated, send an e-mail to"
+msgstr ""
 
 msgid "The port 465 is closed on your server. Please open it to use this sending method."
 msgstr ""

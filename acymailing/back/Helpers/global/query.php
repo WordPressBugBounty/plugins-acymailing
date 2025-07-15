@@ -1,9 +1,9 @@
 <?php
 
-function acym_getTables()
+function acym_getTables(bool $reload = false): array
 {
     static $tables = null;
-    if (empty($tables)) {
+    if (empty($tables) || $reload) {
         $tables = acym_loadResultArray('SHOW TABLES');
     }
 

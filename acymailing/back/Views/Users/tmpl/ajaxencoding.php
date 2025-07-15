@@ -147,7 +147,7 @@ $nbLines = count($this->lines);
         $fieldAssignment[] = $separator;
 
 
-        $fields = $userClass->getAllColumnsUserAndCustomField();
+        $fields = $userClass->getAllColumnsUserAndCustomField(false, true);
         if (acym_isAdmin()) {
             $fields['listids'] = 'listids';
             $fields['listname'] = 'listname';

@@ -130,11 +130,12 @@ class FrontusersController extends UsersController
         }
 
         $msgtype = 'success';
-        $extraMsg = '';
         if (empty($myuser->confirmed) && $this->config->get('require_confirmation', 1) == 1) {
-            $extraMsg = strip_tags(acym_getVar('string', 'confirmation_message'));
             if ($userClass->confirmationSentSuccess || empty($userClass->confirmationSentError)) {
-                $msg = !empty($extraMsg) ? $extraMsg : 'ACYM_CONFIRMATION_SENT';
+                $msg = strip_tags(acym_getVar('string', 'confirmation_message', ''));
+                if (empty($msg)) {
+                    $msg = 'ACYM_CONFIRMATION_SENT';
+                }
                 $code = 2;
             } else {
                 $msg = $userClass->confirmationSentError;
@@ -143,8 +144,10 @@ class FrontusersController extends UsersController
             }
         } else {
             if ($userClass->subscribed) {
-                $msg = strip_tags(acym_getVar('string', 'confirmation_message'));
-                if (empty($msg)) $msg = 'ACYM_SUBSCRIPTION_OK';
+                $msg = strip_tags(acym_getVar('string', 'confirmation_message', ''));
+                if (empty($msg)) {
+                    $msg = 'ACYM_SUBSCRIPTION_OK';
+                }
                 $code = 3;
             } else {
                 $msg = 'ACYM_ALREADY_SUBSCRIBED';
@@ -159,9 +162,6 @@ class FrontusersController extends UsersController
         }
 
         $msg = str_replace(array_keys($replace), $replace, acym_translation($msg));
-        if (!empty($extraMsg)) {
-            $msg = str_replace(array_keys($replace), $replace, acym_translation($extraMsg)).'<br />'.$msg;
-        }
 
         if ($ajax) {
             $msg = str_replace(["\n", "\r", '"', '\\'], [' ', ' ', "'", '\\\\'], $msg);
