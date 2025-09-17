@@ -6,9 +6,9 @@ use AcyMailing\Core\AcymObject;
 
 class DelayType extends AcymObject
 {
-    var $values = [];
-    var $num = 0;
-    var $onChange = '';
+    private array $values = [];
+    private string $num = '0';
+    private string $onChange = '';
 
     public function display($map, $value, $type = 1, $num = '', $inputClass = '', $hiddenInputClass = '')
     {

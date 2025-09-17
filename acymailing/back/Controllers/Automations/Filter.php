@@ -19,7 +19,7 @@ trait Filter
         }
     }
 
-    private function _saveFilters(bool $isMassAction = false): array
+    private function setSaveFilters(bool $isMassAction = false): array
     {
         $automationID = acym_getVar('int', 'id');
         $actionId = acym_getVar('int', 'actionId');
@@ -71,7 +71,7 @@ trait Filter
 
     public function saveExitFilters(): void
     {
-        $this->_saveFilters();
+        $this->setSaveFilters();
 
         acym_enqueueMessage(acym_translation('ACYM_SUCCESSFULLY_SAVED'), 'success');
 
@@ -80,7 +80,7 @@ trait Filter
 
     public function saveFilters(): void
     {
-        $ids = $this->_saveFilters();
+        $ids = $this->setSaveFilters();
 
         acym_setVar('id', $ids['automationId']);
         acym_setVar('stepId', $ids['stepId']);

@@ -1,5 +1,9 @@
 <?php
 
+__('Show field labels', 'acymailing');
+__('Display featured events first', 'acymailing');
+__('Featured', 'acymailing');
+__('This follow-up campaign will be triggered when a subscriber clicks on the confirmation link.', 'acymailing');
 __('When a campaign is generated, send an e-mail to', 'acymailing');
 __('The port 465 is closed on your server. Please open it to use this sending method.', 'acymailing');
 __('Get the Enterprise version', 'acymailing');

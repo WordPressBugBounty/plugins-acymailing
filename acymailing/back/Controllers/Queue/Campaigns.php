@@ -25,7 +25,6 @@ trait Campaigns
                     'removable' => 1,
                 ];
                 acym_enqueueMessage($message, 'warning', true, [$notification]);
-
             }
         }
 

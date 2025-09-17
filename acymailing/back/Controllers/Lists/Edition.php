@@ -233,7 +233,7 @@ trait Edition
         $zeroReached = false;
         $evolSub = [];
         $evolUnsub = [];
-        for ($i = 0 ; $i < 12 ; $i++) {
+        for ($i = 0; $i < 12; $i++) {
             $month = ($firstMonth + $i) % 13;
             if ($month == 0) $zeroReached = true;
             if ($zeroReached) $month += 1;
@@ -342,7 +342,6 @@ trait Edition
 
         $step = acym_getVar('string', 'step');
         if ($step === self::LIST_EDITION_TABS_GENERAL) {
-
             $listClass = new ListClass();
             $formData = (object)acym_getVar('array', 'list', []);
 
@@ -375,7 +374,7 @@ trait Edition
             if (!empty($listId)) {
                 acym_setVar('listId', $listId);
                 acym_enqueueMessage(acym_translationSprintf('ACYM_LIST_IS_SAVED', $listInformation->name), 'success');
-                $this->_saveSubscribersTolist();
+                $this->saveSubscribersTolist();
             } else {
                 acym_enqueueMessage(acym_translation('ACYM_ERROR_SAVING'), 'error');
                 if (!empty($listClass->errors)) {
@@ -391,7 +390,7 @@ trait Edition
         }
     }
 
-    private function _saveSubscribersTolist(): bool
+    private function saveSubscribersTolist(): bool
     {
         $usersIds = json_decode(acym_getVar('string', 'acym__entity_select__selected', '[]'));
         $usersIdsUnselected = json_decode(acym_getVar('string', 'acym__entity_select__unselected', '[]'));
@@ -426,7 +425,7 @@ trait Edition
     {
         acym_checkToken();
 
-        $this->_saveSubscribersTolist();
+        $this->saveSubscribersTolist();
         $listId = acym_getVar('int', 'listId', 0);
         acym_setVar('listId', $listId);
 

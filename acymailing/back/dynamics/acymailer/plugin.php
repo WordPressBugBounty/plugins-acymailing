@@ -133,7 +133,7 @@ class plgAcymAcymailer extends AcymPlugin
         ob_start();
         ?>
 		<div class="send_settings cell grid-x acym_vcenter" id="<?php echo self::SENDING_METHOD_ID; ?>_settings">
-			<div class="cell grid-x acym__sending__methods__one__settings <?php echo empty($data['step']) ? 'xlarge-10 xxlarge-8' : '' ?>">
+			<div class="cell grid-x acym__sending__methods__one__settings <?php echo empty($data['step']) ? 'xlarge-10 xxlarge-8' : ''; ?>">
                 <?php if (!acym_level(ACYM_ESSENTIAL) && empty($data['step'])) { ?>
 					<div class="acym_vcenter acym__config__acymailer__warning margin-top-1 cell grid-x large-8 xlarge-6 xxlarge-5">
 						<label for="acym__configuration__license-key" class="cell">
@@ -183,7 +183,7 @@ class plgAcymAcymailer extends AcymPlugin
                 <?php } else { ?>
 					<div class="cell grid-x">
                         <?php if (!empty($domainsWaiting)) { ?>
-							<div class="cell <?php echo empty($data['step']) ? 'large-8' : '' ?> grid-x acym_vcenter acym__config__acymailer__warning">
+							<div class="cell <?php echo empty($data['step']) ? 'large-8' : ''; ?> grid-x acym_vcenter acym__config__acymailer__warning">
 								<i class="cell small-2 margin-right-0 acymicon-access-time acym__color__orange"></i>
 								<div class="cell small-10 grid-x">
 									<span class="cell"><?php echo acym_translation('ACYM_DOMAINS_WAITING_VALIDATION_ADD_CNAME'); ?></span>
@@ -194,7 +194,7 @@ class plgAcymAcymailer extends AcymPlugin
 									</a>
 								</div>
 							</div>
-							<div class="cell <?php echo empty($data['step']) ? 'large-4' : '' ?> margin-top-1 margin-bottom-1">
+							<div class="cell <?php echo empty($data['step']) ? 'large-4' : ''; ?> margin-top-1 margin-bottom-1">
 								<button id="acym__config__acymailer__update-domain-status"
 										type="button"
 										class="button button-secondary float-right"
@@ -241,7 +241,7 @@ class plgAcymAcymailer extends AcymPlugin
                                     empty($domain['warning_complaint_rate']) ? 0 : $domain['warning_complaint_rate']
                                 );
                                 ?>
-								<div acym-data-domain="<?php echo $domain['domain'] ?>" class="grid-x cell align-middle acym__listing__row">
+								<div acym-data-domain="<?php echo $domain['domain']; ?>" class="grid-x cell align-middle acym__listing__row">
 									<div class="cell small-6 medium-auto grid-x acym__listing__title__container">
                                         <?php echo acym_escape($domain['domain']); ?>
 									</div>

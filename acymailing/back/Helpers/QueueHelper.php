@@ -388,7 +388,6 @@ class QueueHelper extends AcymObject
 
             foreach ($infos as $status => $subscribers) {
                 foreach ($subscribers as $oneSubscriber) {
-
                     $oneSubscriber = intval($oneSubscriber);
 
                     $userStat = [];
@@ -537,13 +536,13 @@ class QueueHelper extends AcymObject
 
         $message = '';
         switch ($this->config->get('bounce_action_maxtry')) {
-            case 'sub' :
+            case 'sub':
                 $listId = $this->config->get('bounce_action_lists_maxtry');
                 if (!empty($listId)) {
                     $message .= ' user '.$userId.' subscribed to list n°'.$listId;
                     $this->userClass->subscribe($userId, [$listId]);
                 }
-            case 'remove' :
+            case 'remove':
                 $unsubLists = array_diff(array_keys($subscriptions), [$listId]);
                 if (!empty($unsubLists)) {
                     $message .= ' user '.$userId.' removed from lists '.implode(',', $unsubLists);
@@ -552,7 +551,7 @@ class QueueHelper extends AcymObject
                     $message .= ' user '.$userId.' not subscribed';
                 }
                 break;
-            case 'unsub' :
+            case 'unsub':
                 $unsubLists = array_diff(array_keys($subscriptions), [$listId]);
                 if (!empty($unsubLists)) {
                     $message .= ' user '.$userId.' unsubscribed from lists '.implode(',', $unsubLists);
@@ -561,11 +560,11 @@ class QueueHelper extends AcymObject
                     $message .= ' user '.$userId.' not unsubscribed';
                 }
                 break;
-            case 'delete' :
+            case 'delete':
                 $message .= ' user '.$userId.' deleted';
                 $this->userClass->delete($userId);
                 break;
-            case 'block' :
+            case 'block':
                 $message .= ' user '.$userId.' blocked';
                 $this->userClass->deactivate($userId);
                 $this->queueClass->deleteOne($userId);

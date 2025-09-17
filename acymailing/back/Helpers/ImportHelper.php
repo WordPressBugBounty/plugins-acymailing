@@ -560,18 +560,18 @@ class ImportHelper extends AcymObject
                 $position = -1;
 
                 while ($j < ($i + 30)) {
-
                     $quoteOpened = substr($importLines[$i], $position + 1, 1) == '"';
 
                     if ($quoteOpened) {
                         $nextQuotePosition = strpos($importLines[$i], '"', $position + 2);
-                        while ($nextQuotePosition !== false && $nextQuotePosition + 1 != strlen($importLines[$i]) && substr(
-                                $importLines[$i],
-                                $nextQuotePosition + 1,
-                                1
-                            ) != $this->separator) {
+                        while (
+                            $nextQuotePosition !== false
+                            && $nextQuotePosition + 1 != strlen($importLines[$i])
+                            && substr($importLines[$i], $nextQuotePosition + 1, 1) != $this->separator
+                        ) {
                             $nextQuotePosition = strpos($importLines[$i], '"', $nextQuotePosition + 1);
                         }
+
                         if ($nextQuotePosition === false) {
                             if (!isset($importLines[$j])) {
                                 break;
@@ -608,7 +608,7 @@ class ImportHelper extends AcymObject
             }
 
             if (!empty($this->separatorsToRemove)) {
-                for ($b = $numberColumns + $this->separatorsToRemove - 1 ; $b >= $numberColumns ; $b--) {
+                for ($b = $numberColumns + $this->separatorsToRemove - 1; $b >= $numberColumns; $b--) {
                     if (isset($data[$b]) && (strlen($data[$b]) == 0 || $data[$b] == ' ')) {
                         unset($data[$b]);
                     }
@@ -624,18 +624,23 @@ class ImportHelper extends AcymObject
             if (count($data) > $numberColumns) {
                 $copy = $data;
                 foreach ($copy as $oneelem => $oneval) {
-                    if (!empty($oneval[0]) && $oneval[0] == '"' && $oneval[strlen($oneval) - 1] != '"' && isset($copy[$oneelem + 1]) && $copy[$oneelem + 1][strlen(
-                            $copy[$oneelem + 1]
-                        ) - 1] == '"') {
+                    if (
+                        !empty($oneval[0])
+                        && $oneval[0] === '"'
+                        && $oneval[strlen($oneval) - 1] !== '"'
+                        && isset($copy[$oneelem + 1])
+                        && $copy[$oneelem + 1][strlen($copy[$oneelem + 1]) - 1] == '"'
+                    ) {
                         $data[$oneelem] = $copy[$oneelem].$this->separator.$copy[$oneelem + 1];
                         unset($data[$oneelem + 1]);
                     }
                 }
+
                 $data = array_values($data);
             }
 
             if (count($data) < $numberColumns) {
-                for ($a = count($data) ; $a < $numberColumns ; $a++) {
+                for ($a = count($data); $a < $numberColumns; $a++) {
                     $data[$a] = '';
                 }
             }
@@ -974,7 +979,7 @@ class ImportHelper extends AcymObject
 
         $this->columns = explode($this->separator, $this->header);
 
-        for ($i = count($this->columns) - 1 ; $i >= 0 ; $i--) {
+        for ($i = count($this->columns) - 1; $i >= 0; $i--) {
             if (strlen($this->columns[$i]) == 0) {
                 unset($this->columns[$i]);
                 $this->separatorsToRemove++;
@@ -1074,7 +1079,6 @@ class ImportHelper extends AcymObject
         }
 
         if (!empty($lists)) {
-
             foreach ($lists as $listid => $val) {
                 if (empty($val)) {
                     continue;
@@ -1183,7 +1187,7 @@ class ImportHelper extends AcymObject
                             $fieldsToUpdate[] = 'unsubscribe_date ='.$unsubscribeDate;
                         }
 
-                        $fieldsToUpdate[] = 'subscription_date ='. $subscriptionDate;
+                        $fieldsToUpdate[] = 'subscription_date ='.$subscriptionDate;
                     } else {
                         if ($unsubscribeDate != 'NULL' && ($existing->subscription_date != 'NULL' && $unsubscribeDate > $existing->subscription_date)) {
                             $fieldsToUpdate[] = 'status ='. 0;
@@ -1210,5 +1214,4 @@ class ImportHelper extends AcymObject
             }
         }
     }
-
 }

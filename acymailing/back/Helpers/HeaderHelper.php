@@ -246,6 +246,9 @@ class HeaderHelper extends AcymObject
     public function getNotificationCenter(): string
     {
         $notifications = json_decode($this->config->get('notifications', '{}'), true);
+        if (!is_array($notifications) || empty($notifications)) {
+            $notifications = [];
+        }
         $message = '';
         $notificationLevel = 0;
         if (!empty($_SESSION['acym_success'])) {

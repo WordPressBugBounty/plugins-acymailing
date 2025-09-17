@@ -29,7 +29,7 @@
 
     <?php if (!empty($data['labelDropdownCaptcha']) && isset($data['level']) && isset($data['captchaOptions'])) { ?>
 		<div class="margin-bottom-2 cell margin-y acym__configuration__security__captcha">
-			<div class="acym__title acym__title__secondary"><?php echo $data['labelDropdownCaptcha'] ?></div>
+			<div class="acym__title acym__title__secondary"><?php echo $data['labelDropdownCaptcha']; ?></div>
 			<div class="grid-x grid-margin-x margin-y">
 				<div class="cell medium-6 grid-x">
 					<label class="cell large-3" for="security_key">

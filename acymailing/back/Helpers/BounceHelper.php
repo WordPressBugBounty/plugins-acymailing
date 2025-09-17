@@ -606,10 +606,11 @@ class BounceHelper extends AcymObject
 
         try {
             if (acym_writeFile($pathToUpload.$filename.'.'.$extension, $data)) {
-                if (strtolower($attachment->disposition) !== 'attachment' && !empty($attachment->id) && in_array(
-                        strtolower($attachment->subtype),
-                        acym_getImageFileExtensions()
-                    )) {
+                if (
+                    strtolower($attachment->disposition) !== 'attachment'
+                    && !empty($attachment->id)
+                    && in_array(strtolower($attachment->subtype), acym_getImageFileExtensions())
+                ) {
                     $this->inlineImages['cid:'.trim($attachment->id, '<>')] = acym_rootURI().$uploadFolder.'/'.$filename.'.'.$extension;
                 } else {
                     $attachment = new \stdClass();
@@ -733,7 +734,7 @@ class BounceHelper extends AcymObject
 
                 if (empty($results[0])) {
                     preg_match_all($this->detectEmail2, $this->_message->analyseText, $results2);
-                    for ($i = 0 ; $i < count($results2[0]) ; $i++) {
+                    for ($i = 0; $i < count($results2[0]); $i++) {
                         $results[0][] = $results2[3][$i].'@'.$results2[1][$i];
                     }
                 }
@@ -928,10 +929,11 @@ class BounceHelper extends AcymObject
             return $message;
         }
 
-        if (in_array('delete_user_subscription', $oneRule->action_user) || in_array('unsubscribe_user', $oneRule->action_user) || in_array(
-                'subscribe_user',
-                $oneRule->action_user
-            )) {
+        if (
+            in_array('delete_user_subscription', $oneRule->action_user)
+            || in_array('unsubscribe_user', $oneRule->action_user)
+            || in_array('subscribe_user', $oneRule->action_user)
+        ) {
             if (empty($this->_message->subemail)) {
                 $currentUser = $this->userClass->getOneById($this->_message->userid);
                 if (!empty($currentUser->email)) {
@@ -972,7 +974,6 @@ class BounceHelper extends AcymObject
 
         $mail = $this->mailClass->getOneById($this->_message->mailid);
         if ($oneRule->increment_stats && !empty($this->_message->mailid) && !empty($mail)) {
-
             if (empty($this->bounceMessages[$this->_message->mailid])) {
                 $this->bounceMessages[$this->_message->mailid] = [];
                 $this->bounceMessages[$this->_message->mailid]['nbbounces'] = 0;
@@ -1105,9 +1106,10 @@ class BounceHelper extends AcymObject
         $message = '';
 
         if (!empty($oneRule->action_message['forward_to'])) {
-            if (strtolower($oneRule->action_message['forward_to']) == strtolower($this->config->get('bounce_username')) || strtolower(
-                    $oneRule->action_message['forward_to']
-                ) == strtolower($this->config->get('bounce_email'))) {
+            if (
+                strtolower($oneRule->action_message['forward_to']) === strtolower($this->config->get('bounce_username'))
+                || strtolower($oneRule->action_message['forward_to']) === strtolower($this->config->get('bounce_email'))
+            ) {
                 $oneRule->action_message['forward_to'] = '';
                 unset($oneRule->action_message['delete_message']);
                 $message .= ' | '.acym_translation('ACYM_BOUNCE_NOT_FORWARD');
@@ -1262,7 +1264,6 @@ class BounceHelper extends AcymObject
         $currentCharset = false;
 
         while (preg_match('/(=\?([^?]+)\?(q|b)\?([^?]*)\?=)/i', $input, $matches)) {
-
             $encoded = $matches[1];
             $charset = $matches[2];
             $encoding = $matches[3];
@@ -1351,7 +1352,7 @@ class BounceHelper extends AcymObject
         $newPath = '';
         $path_elements = explode('.', $path);
         $limit = count($path_elements);
-        for ($i = 0 ; $i < $limit ; $i++) {
+        for ($i = 0; $i < $limit; $i++) {
             if ($i == $limit - 1) {
                 $newPath .= $path_elements[$i] + 1;
             } else {

@@ -167,7 +167,7 @@ class ToggleController extends AcymController
         }
 
         $namespaceClass = 'AcyMailing\\Classes\\'.ucfirst($table).'Class';
-        $elementClass = new $namespaceClass;
+        $elementClass = new $namespaceClass();
         $elementClass->$method($id);
 
         exit;

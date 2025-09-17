@@ -23,17 +23,17 @@ abstract class AcymView extends AcymObject
         }
     }
 
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function getLayout()
+    public function getLayout(): string
     {
         return acym_getVar('cmd', 'layout', acym_getVar('cmd', 'task', 'listing'));
     }
 
-    public function setLayout($value)
+    public function setLayout($value): void
     {
         acym_setVar('layout', $value);
     }
@@ -54,9 +54,13 @@ abstract class AcymView extends AcymObject
             echo ob_get_clean();
         }
 
-        if (ACYM_CMS !== 'wordpress' || ($name === 'frontusers' && ($view === 'unsubscribe' || $view === 'unsubscribepage')) || !defined(
-                'DOING_AJAX'
-            ) || !DOING_AJAX || ($name === 'archive' && $view === 'view')) {
+        if (
+            ACYM_CMS !== 'wordpress'
+            || ($name === 'frontusers' && ($view === 'unsubscribe' || $view === 'unsubscribepage'))
+            || !defined('DOING_AJAX')
+            || !DOING_AJAX
+            || ($name === 'archive' && $view === 'view')
+        ) {
             acym_loadAssets($name, $view);
             $controller->loadScripts($view);
         }

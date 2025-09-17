@@ -387,9 +387,11 @@ class FrontusersController extends UsersController
 
         $listsToUnsub = [];
         foreach ($userSubscriptions as $subscription) {
-            if (!in_array($subscription->id, $listsChecked)
+            if (
+                !in_array($subscription->id, $listsChecked)
                 && in_array($subscription->id, $displayedCheckedLists)
-                && intval($subscription->status) === 1) {
+                && intval($subscription->status) === 1
+            ) {
                 $listsToUnsub[] = $subscription->id;
             }
         }

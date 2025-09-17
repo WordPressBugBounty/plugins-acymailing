@@ -1,13 +1,25 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.4.0\n"
+"Project-Id-Version: AcyMailing 10.5.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-07-15\n"
+"POT-Creation-Date: 2025-09-17\n"
 "X-Domain: acymailing\n"
 
+
+msgid "Show field labels"
+msgstr ""
+
+msgid "Display featured events first"
+msgstr ""
+
+msgid "Featured"
+msgstr ""
+
+msgid "This follow-up campaign will be triggered when a subscriber clicks on the confirmation link."
+msgstr ""
 
 msgid "When a campaign is generated, send an e-mail to"
 msgstr ""

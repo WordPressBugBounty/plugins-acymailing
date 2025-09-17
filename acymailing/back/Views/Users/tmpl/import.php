@@ -33,7 +33,6 @@
         ?>
 	</div>
     <?php
-
     $modalData = $data['entitySelect']->entitySelect(
         'list',
         ['join' => ''],
@@ -49,7 +48,6 @@
         '',
         'style="display: none"'
     );
-
     ?>
 	<input type="hidden" name="import_from" />
     <?php acym_formOptions(true, "doImport"); ?>

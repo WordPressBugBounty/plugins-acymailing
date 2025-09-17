@@ -415,6 +415,7 @@ function acym_getJSMessages()
         'ACYM_SCENARIO_ARE_YOU_SURE_DELETE_X_WITH_CHILDREN_NODES',
         'ACYM_SCENARIO',
         'ACYM_SCENARIOS',
+        'ACYM_EXTRA_INFORMATION',
     ];
 
     foreach ($keysToLoad as $oneKey) {

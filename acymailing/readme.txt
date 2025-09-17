@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 6.8
-Stable tag: 10.4.0
+Stable tag: 10.5.0
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,16 +113,19 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.4.0 - July 15, 2025 =
-* The display of fields labels on header and footer subscription forms has been improved. When displayed outside their field, they are now more widely spaced.
-* [add-ons] All the integration plugins have been updated to better follow WordPress guidelines.
+= 10.5.0 - September 17, 2025 =
+* The follow-up campaigns can now be triggered when a user confirms their email address.
 
-* The confirmation message when submitting a subscription form could be displayed twice, this has been fixed.
-* The lists and tables in inserted content are not removed anymore when the content is truncated after X characters.
-* We have corrected the error that was displayed in a form when a list that has been deleted was still selected in the form settings.
-* The custom field type "File" is now correctly displayed in the notification emails.
-* The temporary images are now stored in the upload(wordpress)/media(joomla) directory as they should be.
-* The database tables and default values are now correctly installed when a new sub-site is created on a WordPress multisite network.
-* The installation of the EventOn integration is fixed and does not crash anymore.
+* We improved security and reliability of our code by adding new automated tests.
+* Default templates are now stored differently to better match WordPress standards.
+
+* The subscription form in popup mode could be shown twice in some cases, this has been fixed.
+* We added a security when loading base64 encoded images in the editor.
+* We have fixed the error that could occur when sending a campaign to users without an email address.
+* We fixed an issue when loading videos in the editor video block.
+* In some cases the auto-update of AcyMailing could install the free version instead of the current edition. The update process has been reworked to avoid this.
+* We fixed an issue that could occur on some new WordPress installations where the AcyMailing header caused a fatal error in the plugin.
+* Fixed an issue with Contact Form 7 integration, preventing the subscriber creation
+
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)

@@ -6,8 +6,6 @@ use AcyMailing\Classes\PluginClass;
 
 class Router
 {
-    var $activation;
-
     public function __construct()
     {
         add_action('wp_ajax_acymailing_router', [$this, 'router']);

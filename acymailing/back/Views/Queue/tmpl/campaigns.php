@@ -170,7 +170,6 @@
 							<div class="cell medium-2 small-3">
 								<div class="acym_vcenter">
                                     <?php
-
                                     echo '<div class="acym_action_buttons">';
 
                                     $cancelText = 'ACYM_CANCEL_SCHEDULING';

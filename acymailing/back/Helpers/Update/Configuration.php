@@ -48,7 +48,8 @@ trait Configuration
             $allPref['smtp_secured'] = '';
         }
 
-        $allPref['social_icons'] = json_encode([
+        $allPref['social_icons'] = json_encode(
+            [
                 'facebook' => ACYM_IMAGES.'logo/facebook.png',
                 'twitter' => ACYM_IMAGES.'logo/twitter.png',
                 'x' => ACYM_IMAGES.'logo/x.png',
@@ -135,7 +136,7 @@ trait Configuration
         $allPref['Starter'] = ACYM_STARTER;
         $allPref['Essential'] = ACYM_ESSENTIAL;
         $allPref['Enterprise'] = ACYM_ENTERPRISE;
-        $allPref['previous_version'] = '10.4.0';
+        $allPref['previous_version'] = '10.5.0';
 
         $allPref['display_built_by'] = acym_level(ACYM_ESSENTIAL) ? 0 : 1;
         $allPref['php_overrides'] = 0;

@@ -78,7 +78,6 @@ trait SubscriptionInsertion
             }
 		</script>
         <?php
-
         $text = '<div class="acym__popup__listing text-center grid-x">
                     <h1 class="acym__title acym__title__secondary text-center cell">'.acym_translation('ACYM_SUBSCRIPTION').'</h1>
                     <div class="grid-x medium-12 cell acym__row__no-listing text-left acym_vcenter">
@@ -167,7 +166,7 @@ trait SubscriptionInsertion
 
     public function replaceUserInformation(&$email, &$user, $send = true)
     {
-        $this->_replacelisttags($email, $user, $send);
+        $this->replacelisttags($email, $user, $send);
 
         if (empty($user->id) || !empty($this->addedListUnsubscribe[$email->id][$user->id])) return;
         if (empty($this->unsubscribeLink[$email->id]) || !method_exists($email, 'addCustomHeader')) return;
@@ -218,12 +217,12 @@ trait SubscriptionInsertion
 
     public function replaceContent(&$email, $send = true)
     {
-        $this->_replaceSubscriptionTags($email);
-        $this->_replacemailtags($email);
+        $this->replaceSubscriptionTags($email);
+        $this->replacemailtags($email);
         $this->replaceAutomailTags($email);
     }
 
-    private function _replacemailtags(&$email)
+    private function replacemailtags(&$email)
     {
         $result = $this->pluginHelper->extractTags($email, 'mail');
         $tags = [];
@@ -289,7 +288,7 @@ trait SubscriptionInsertion
         $this->pluginHelper->replaceTags($email, $tags);
     }
 
-    private function _replacelisttags(&$email, &$user, $send)
+    private function replacelisttags(&$email, &$user, $send)
     {
         $tags = $this->pluginHelper->extractTags($email, 'list');
         if (empty($tags)) {
@@ -310,7 +309,7 @@ trait SubscriptionInsertion
         $this->pluginHelper->replaceTags($email, $replaceTags, true);
     }
 
-    private function _getAttachedListid($email, $subid)
+    private function getAttachedListid($email, $subid)
     {
         $mailid = $email->id;
 
@@ -417,7 +416,7 @@ trait SubscriptionInsertion
             return 'Field not found : '.$parameter->field;
         }
 
-        $listid = $this->_getAttachedListid($email, $user->id);
+        $listid = $this->getAttachedListid($email, $user->id);
         if (empty($listid)) {
             return '';
         }
@@ -440,12 +439,12 @@ trait SubscriptionInsertion
         if (empty($user->id)) {
             return '';
         }
-        $listid = $this->_getAttachedListid($email, $user->id);
+        $listid = $this->getAttachedListid($email, $user->id);
         if (empty($listid)) {
             return '';
         }
 
-        $this->_loadlist($listid);
+        $this->loadlist($listid);
 
         return !empty($this->listsinfo[$listid]->display_name) ? $this->listsinfo[$listid]->display_name : @$this->listsinfo[$listid]->name;
     }
@@ -456,17 +455,17 @@ trait SubscriptionInsertion
             return '';
         }
         if (!empty($parameter->listid)) $listid = $parameter->listid;
-        if (empty($listid)) $listid = $this->_getAttachedListid($email, $user->id);
+        if (empty($listid)) $listid = $this->getAttachedListid($email, $user->id);
         if (empty($listid)) {
             return '';
         }
 
-        $this->_loadlist($listid);
+        $this->loadlist($listid);
 
         return @$this->listsinfo[$listid]->description;
     }
 
-    private function _loadlist($listid)
+    private function loadlist($listid)
     {
         if (isset($this->listsinfo[$listid])) {
             return;
@@ -502,7 +501,7 @@ trait SubscriptionInsertion
         if (empty($user->id)) {
             return '';
         }
-        $listid = $this->_getAttachedListid($email, $user->id);
+        $listid = $this->getAttachedListid($email, $user->id);
         if (empty($listid)) {
             return '';
         }
@@ -510,7 +509,7 @@ trait SubscriptionInsertion
         return $listid;
     }
 
-    private function _replaceSubscriptionTags(&$email)
+    private function replaceSubscriptionTags(&$email)
     {
         $match = '#(?:{|%7B)(confirm|unsubscribe(?:\|[^}]+)*|unsubscribeall|subscribe(?:\|[^}]+)*)(?:}|%7D)(.*)(?:{|%7B)/(confirm|unsubscribe|unsubscribeall|subscribe)(?:}|%7D)#Uis';
         $variables = ['subject', 'body'];
@@ -531,14 +530,14 @@ trait SubscriptionInsertion
             foreach ($allresults[0] as $i => $oneTag) {
                 if (isset($tags[$oneTag])) continue;
 
-                $tags[$oneTag] = $this->_replaceSubscriptionTag($allresults, $i, $email);
+                $tags[$oneTag] = $this->replaceSubscriptionTag($allresults, $i, $email);
             }
         }
 
         $this->pluginHelper->replaceTags($email, $tags);
     }
 
-    private function _replaceSubscriptionTag(&$allresults, $i, &$email)
+    private function replaceSubscriptionTag(&$allresults, $i, &$email)
     {
         $parameters = $this->pluginHelper->extractTag($allresults[1][$i]);
 

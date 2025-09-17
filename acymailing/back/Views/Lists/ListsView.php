@@ -7,7 +7,6 @@ use AcyMailing\Core\AcymView;
 
 class ListsView extends AcymView
 {
-
     public $disableTabs = [];
 
     public function __construct()

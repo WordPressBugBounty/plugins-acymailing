@@ -18,11 +18,14 @@ function acydump($arg, $ajax = false, array $options = [])
     $result = ob_get_clean();
 
     if ($ajax) {
+        $logsPath = ACYM_ROOT.ACYM_LOGS_FOLDER.'debug.log';
+        acym_createDir(dirname($logsPath), true, true);
+
         if (($options['clear_file'] ?? false) === true) {
-            file_put_contents(ACYM_BACK.'debug.log', '');
+            file_put_contents($logsPath, '');
         }
 
-        file_put_contents(ACYM_BACK.'debug.log', $result, FILE_APPEND);
+        file_put_contents($logsPath, $result, FILE_APPEND);
     } else {
         $style = $indent ? 'margin-left: 220px;' : '';
         echo '<pre style="'.$style.'">';

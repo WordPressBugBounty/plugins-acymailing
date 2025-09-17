@@ -125,7 +125,7 @@ class EditorHelper extends AcymObject
 
                 if (!ACYM_J40) {
                     $access = [];
-                    for ($i = 1 ; $i < 20 ; $i++) {
+                    for ($i = 1; $i < 20; $i++) {
                         $access[] = $i;
                     }
 

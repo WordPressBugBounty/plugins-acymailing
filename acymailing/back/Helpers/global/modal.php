@@ -117,6 +117,5 @@ function acym_frontModal($iframeSrc, $buttonText, $isButton, $identifier = null,
 		</div>
 	</div>
     <?php
-
     return ob_get_clean();
 }

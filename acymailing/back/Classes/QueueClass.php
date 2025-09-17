@@ -582,7 +582,11 @@ class QueueClass extends AcymClass
     {
         $priority = $this->config->get('priority_newsletter', 3);
 
-        return acym_query('INSERT IGNORE INTO #__acym_queue (`mail_id`, `user_id`, `sending_date`, `priority`, `try`) VALUES ('.intval($mailId).', '.intval($userId).', '.acym_escapeDB($sendingDate).', '.intval($priority).', 0)');
+        return acym_query(
+            'INSERT IGNORE INTO #__acym_queue (`mail_id`, `user_id`, `sending_date`, `priority`, `try`) VALUES ('.intval($mailId).', '.intval($userId).', '.acym_escapeDB(
+                $sendingDate
+            ).', '.intval($priority).', 0)'
+        );
     }
 
     public function unpauseCampaign($campaignId, $active)

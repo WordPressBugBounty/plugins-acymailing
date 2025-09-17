@@ -224,7 +224,7 @@ $nbLines = count($this->lines);
             echo '<tr class="acym__users__import__generic__column_name"><td><b>'.implode('</b></td><td><b>', $columnNames).'</b></td></tr>';
         }
 
-        for ($i = 1 - $noHeader ; $i < 11 - $noHeader && $i < $nbLines ; $i++) {
+        for ($i = 1 - $noHeader; $i < 11 - $noHeader && $i < $nbLines; $i++) {
             $values = $this->lines[$i];
 
             echo '<tr>';

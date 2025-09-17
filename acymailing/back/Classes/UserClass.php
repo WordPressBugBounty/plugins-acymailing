@@ -9,23 +9,32 @@ use AcyMailing\Core\AcymClass;
 
 class UserClass extends AcymClass
 {
-    var $checkVisitor = true;
-    var $restrictedFields = ['id', 'key', 'confirmed', 'active', 'cms_id', 'creation_date'];
-    var $allowModif = false;
-    var $requireId = false;
-    var $sendConf = true;
-    var $forceConf = false;
+    const RESTRICTED_FIELDS = [
+        'id',
+        'key',
+        'confirmed',
+        'active',
+        'cms_id',
+        'creation_date',
+    ];
+
+    public bool $checkVisitor = true;
+    public bool $requireId = false;
+    public bool $sendConf = true;
     public bool $confirmationSentSuccess = false;
-    var $newUser = false;
-    var $blockNotifications = false;
-    var $subscribed = false;
-    var $confirmationSentError;
-    var $triggers = true;
+    public bool $newUser = false;
+    public bool $blockNotifications = false;
+    public bool $subscribed = false;
+    public string $confirmationSentError;
+    public bool $triggers = true;
 
-    var $forceConfAdmin = false;
+    public bool $forceConfAdmin = false;
 
-    public $sendWelcomeEmail = true;
-    public $sendUnsubscribeEmail = true;
+    public bool $sendWelcomeEmail = true;
+    public bool $sendUnsubscribeEmail = true;
+
+    private bool $allowModif = false;
+    private bool $forceConf = false;
 
     public function __construct()
     {
@@ -201,7 +210,7 @@ class UserClass extends AcymClass
         $usersPerStatusObject = acym_loadObjectList($queryStatus.' GROUP BY score', 'score');
 
         $usersPerStatus = [];
-        for ($i = 0 ; $i < 4 ; $i++) {
+        for ($i = 0; $i < 4; $i++) {
             $usersPerStatus[$i] = empty($usersPerStatusObject[$i]) ? 0 : $usersPerStatusObject[$i]->number;
         }
 
@@ -881,7 +890,7 @@ class UserClass extends AcymClass
             if (empty($value)) continue;
 
             $oneAttribute = trim(strtolower($oneAttribute));
-            if (!in_array($oneAttribute, $this->restrictedFields)) {
+            if (!in_array($oneAttribute, self::RESTRICTED_FIELDS)) {
                 $user->$oneAttribute = strip_tags($value);
             }
 
@@ -891,10 +900,12 @@ class UserClass extends AcymClass
                 if (mb_detect_encoding($user->$oneAttribute, 'UTF-8', true) !== 'UTF-8') {
                     $user->$oneAttribute = acym_utf8Encode($user->$oneAttribute);
                 }
-            } elseif (!preg_match(
-                '%^(?:[\x09\x0A\x0D\x20-\x7E]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})*$%xs',
-                $user->$oneAttribute
-            )) {
+            } elseif (
+                !preg_match(
+                    '%^(?:[\x09\x0A\x0D\x20-\x7E]|[\xC2-\xDF][\x80-\xBF]|\xE0[\xA0-\xBF][\x80-\xBF]|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}|\xED[\x80-\x9F][\x80-\xBF]|\xF0[\x90-\xBF][\x80-\xBF]{2}|[\xF1-\xF3][\x80-\xBF]{3}|\xF4[\x80-\x8F][\x80-\xBF]{2})*$%xs',
+                    $user->$oneAttribute
+                )
+            ) {
                 $user->$oneAttribute = acym_utf8Encode($user->$oneAttribute);
             }
         }
@@ -1446,10 +1457,13 @@ class UserClass extends AcymClass
             if (!$oneList->active) continue;
             if (!empty($currentSubscription[$oneList->id]) && $currentSubscription[$oneList->id]->status == 1) continue;
 
-            if (in_array($oneList->id, $visibleListsChecked) || (in_array($oneList->id, $autoLists) && !in_array(
-                        $oneList->id,
-                        $visibleLists
-                    ) && empty($currentSubscription[$oneList->id]))) {
+            if (
+                in_array($oneList->id, $visibleListsChecked)
+                || (
+                    in_array($oneList->id, $autoLists)
+                    && !in_array($oneList->id, $visibleLists) && empty($currentSubscription[$oneList->id])
+                )
+            ) {
                 $listsToSubscribe[] = $oneList->id;
             }
         }

@@ -730,6 +730,6 @@
             "install-path": "../zbateson/stream-decorators"
         }
     ],
-    "dev": true,
+    "dev": false,
     "dev-package-names": []
 }
