@@ -117,6 +117,9 @@ trait DefaultData
         $notifications = $mailClass->getMailsByType(MailClass::TYPE_NOTIFICATION, $searchSettings);
         $notifications = $notifications['mails'];
         $user = $this->getCurrentUser();
+        if (empty($user)) {
+            return false;
+        }
 
         $addNotif = [];
 

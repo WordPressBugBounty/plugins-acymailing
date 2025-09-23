@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 6.8
-Stable tag: 10.5.0
+Stable tag: 10.5.1
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,19 +113,14 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.5.0 - September 17, 2025 =
-* The follow-up campaigns can now be triggered when a user confirms their email address.
+= 10.5.1 - September 23, 2025 =
+* The option to prevents hyphens in sent emails now works for newer versions of Outlook.
+* Improve the import of website users on WordPress multi-sites.
 
-* We improved security and reliability of our code by adding new automated tests.
-* Default templates are now stored differently to better match WordPress standards.
-
-* The subscription form in popup mode could be shown twice in some cases, this has been fixed.
-* We added a security when loading base64 encoded images in the editor.
-* We have fixed the error that could occur when sending a campaign to users without an email address.
-* We fixed an issue when loading videos in the editor video block.
-* In some cases the auto-update of AcyMailing could install the free version instead of the current edition. The update process has been reworked to avoid this.
-* We fixed an issue that could occur on some new WordPress installations where the AcyMailing header caused a fatal error in the plugin.
-* Fixed an issue with Contact Form 7 integration, preventing the subscriber creation
+* We fixed a warning that could appear when updating the plugin.
+* It was not possible to customize some themes for servers with PHP 8.2 or higher, this has been fixed.
+* The DateTime picker is now properly displayed in dark mode.
+* [add-on] The RSEventsPro insertion by category now correctly filters the events.
 
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)

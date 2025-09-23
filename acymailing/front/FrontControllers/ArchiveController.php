@@ -86,7 +86,7 @@ class ArchiveController extends AcymController
             acym_addStyle(true, $oneMail->stylesheet);
         }
         $editorHelper = new EditorHelper();
-        $settings = json_decode($oneMail->settings, true);
+        $settings = json_decode($oneMail->settings ?? '[]', true);
         if (!empty($settings)) {
             $settings = $editorHelper->getSettingsStyle($settings);
 

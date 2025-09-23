@@ -139,19 +139,35 @@ class ImportHelper extends AcymObject
         $formattedTime = acym_date($time, 'Y-m-d H:i:s');
         $sourceImport = 'Import on '.$formattedTime;
         $query = 'INSERT IGNORE INTO #__acym_user (`name`,`email`,`creation_date`,`active`,`cms_id`, `source`) SELECT `user`.`'.$acymCmsUserVars->name.'`,`user`.`'.$acymCmsUserVars->email.'`,`user`.`'.$acymCmsUserVars->registered.'`,1 - `user`.'.$acymCmsUserVars->blocked.',`user`.`'.$acymCmsUserVars->id.'`,\''.$sourceImport.'\' FROM '.$acymCmsUserVars->table.' AS `user` ';
+
+        $queryJoin = [];
+        $queryWhere = [];
+        if (ACYM_CMS === 'wordpress' && is_multisite()) {
+            $queryJoin[] = 'JOIN #__usermeta  AS `meta` ON `user`.'.$acymCmsUserVars->id.'=`meta`.`user_id`';
+            $queryWhere[] = '`meta`.`meta_key`=\'#__capabilities\'';
+        }
         $groups = acym_getVar('array', 'groups', []);
         $this->config->save(['import_groups' => implode(',', $groups)]);
         if (!empty($groups)) {
             if (ACYM_CMS === 'joomla') {
                 acym_arrayToInteger($groups);
-                $query .= ' JOIN #__user_usergroup_map AS `map` ON map.user_id = `user`.`'.$acymCmsUserVars->id.'` WHERE `map`.`group_id` IN ('.implode(', ', $groups).')';
+                $queryJoin[] = ' JOIN #__user_usergroup_map AS `map` ON map.user_id = `user`.`'.$acymCmsUserVars->id.'`';
+                $queryWhere[] = '`map`.`group_id` IN ('.implode(', ', $groups).')';
             } else {
-                $query .= ' JOIN #__usermeta AS `meta` ON meta.user_id = `user`.`'.$acymCmsUserVars->id.'` AND `meta`.`meta_key` = "#__capabilities"';
+                if (!is_multisite()) {
+                    $queryJoin[] = 'JOIN #__usermeta AS `meta` ON meta.user_id = `user`.`'.$acymCmsUserVars->id.'` AND `meta`.`meta_key` = "#__capabilities"';
+                }
+
                 foreach ($groups as $i => $oneGroup) {
                     $groups[$i] = acym_escapeDB('%'.strlen($oneGroup).':"'.$oneGroup.'"%');
                 }
-                $query .= ' WHERE `meta`.`meta_value` LIKE '.implode(' OR `meta`.`meta_value` LIKE ', $groups);
+                $queryWhere[] = '`meta`.`meta_value` LIKE '.implode(' OR `meta`.`meta_value` LIKE ', $groups);
             }
+        }
+
+        $query .= implode(' ', $queryJoin);
+        if (!empty($queryWhere)) {
+            $query .= ' WHERE ('.implode(') AND (', $queryWhere).')';
         }
 
         $insertedUsers = acym_query($query);
