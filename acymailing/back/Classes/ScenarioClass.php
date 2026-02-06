@@ -7,13 +7,13 @@ use AcyMailing\Core\AcymClass;
 
 class ScenarioClass extends AcymClass
 {
-    private ScenarioStepClass $scenarioStepClass;
-    private ScenarioHistoryLineClass $scenarioHistoryLineClass;
     const TYPE_DELAY = 'delay';
     const TYPE_CONDITION = 'condition';
     const TYPE_ACTION = 'action';
 
-    private $stepIdsToKeep = [];
+    private ScenarioStepClass $scenarioStepClass;
+
+    private array $stepIdsToKeep = [];
 
     public function __construct()
     {
@@ -22,7 +22,6 @@ class ScenarioClass extends AcymClass
         $this->table = 'scenario';
         $this->pkey = 'id';
         $this->scenarioStepClass = new ScenarioStepClass();
-        $this->scenarioHistoryLineClass = new ScenarioHistoryLineClass();
     }
 
     public function getMatchingElements(array $settings = []): array
@@ -77,9 +76,9 @@ class ScenarioClass extends AcymClass
         ];
     }
 
-    public function save($element): int
+    public function save(object $element): ?int
     {
-        $flow = '';
+        $flow = [];
         if (!empty($element->flow)) {
             $flow = json_decode($element->flow, true);
 
@@ -105,14 +104,14 @@ class ScenarioClass extends AcymClass
 
         $element->id = parent::save($element);
 
-        if (!empty($flow)) {
+        if (!empty($flow) && !empty($element->id)) {
             $this->saveFlow($flow, $element->id);
         }
 
         return $element->id;
     }
 
-    public function getOneById($id)
+    public function getOneById(int $id): ?object
     {
         $scenario = parent::getOneById($id);
 
@@ -125,7 +124,7 @@ class ScenarioClass extends AcymClass
         return $scenario;
     }
 
-    private function saveFlow($flow, $scenarioId)
+    private function saveFlow(array $flow, int $scenarioId): void
     {
         if (!empty($flow[0]['children'][0])) {
             $this->saveStep($flow[0]['children'][0], $scenarioId);
@@ -133,7 +132,7 @@ class ScenarioClass extends AcymClass
         $this->cleanSteps($scenarioId);
     }
 
-    private function saveStep($currentStep, $scenarioId, $previousStepId = null, $conditionValid = null)
+    private function saveStep(array $currentStep, int $scenarioId, ?string $previousStepId = null, ?int $conditionValid = null): void
     {
         if (isset($currentStep['conditionEnd'])) {
             if ($currentStep['conditionEnd'] && !empty($currentStep['children'])) {
@@ -192,7 +191,7 @@ class ScenarioClass extends AcymClass
         $this->scenarioStepClass->delete($stepIdsToDelete);
     }
 
-    private function formatScenario($scenario)
+    private function formatScenario(object $scenario): ?object
     {
         if (empty($scenario)) {
             return null;
@@ -210,25 +209,18 @@ class ScenarioClass extends AcymClass
         }
 
         $triggerTypes = array_map('acym_escapeDB', $triggerTypes);
-        $query = 'SELECT * FROM #__acym_scenario WHERE active = 1 AND `trigger` IN ('.implode(', ', $triggerTypes).')';
+        $query = 'SELECT * FROM #__acym_scenario WHERE active = 1 AND `trigger` IN ('.implode(', ', $triggerTypes).') ORDER BY `ordering` ASC';
 
         return array_map([$this, 'formatScenario'], acym_loadObjectList($query));
     }
 
-    public function delete($elements)
+    public function delete(array $elements): int
     {
         if (empty($elements)) {
             return 0;
         }
 
-        if (!is_array($elements)) {
-            $elements = [$elements];
-        }
-
-        $escapedElements = [];
-        foreach ($elements as $key => $val) {
-            $escapedElements[$key] = acym_escapeDB($val);
-        }
+        $escapedElements = array_map('acym_escapeDB', $elements);
 
         $scenarioHistoryLineQuery = 'DELETE FROM #__acym_scenario_history_line WHERE scenario_process_id IN (SELECT id FROM #__acym_scenario_process WHERE scenario_id IN ('.implode(
                 ',',
@@ -248,7 +240,7 @@ class ScenarioClass extends AcymClass
         return parent::delete($elements);
     }
 
-    public function duplicate(int $scenarioId)
+    public function duplicate(int $scenarioId): void
     {
         $scenarioStepClass = new ScenarioStepClass();
 
@@ -284,5 +276,45 @@ class ScenarioClass extends AcymClass
             $scenarioStep->scenario_id = $scenario->id;
             $scenarioStepClass->save($scenarioStep);
         }
+    }
+
+    public function markUserUnsubscribeFromScenario(int $userId, int $scenarioId): void
+    {
+        $query = 'UPDATE #__acym_scenario_process SET unsubscribed = 1 WHERE scenario_id = '.intval($scenarioId).' AND user_id = '.intval($userId);
+
+
+        acym_query($query);
+    }
+
+    public function getScenarioIdByMailId(int $mailId): ?int
+    {
+        $query = 'SELECT scenario_id 
+              FROM #__acym_scenario_step 
+              WHERE type = '.acym_escapeDB(self::TYPE_ACTION).' 
+              AND params LIKE '.acym_escapeDB('%[mail_id]":"'.$mailId.'"%').' 
+              LIMIT 1';
+
+        return acym_loadResult($query);
+    }
+
+    public function checkUserMarkedUnsubscribed(int $userId, int $scenarioProcessId): bool
+    {
+        $queryScenId = 'SELECT scenario_id 
+              FROM #__acym_scenario_process 
+              WHERE id = '.intval($scenarioProcessId).' 
+              AND user_id = '.intval($userId).' 
+              LIMIT 1';
+
+        $scenarioId = acym_loadResult($queryScenId);
+
+        $queryUnsubscribed = 'SELECT unsubscribed 
+              FROM #__acym_scenario_process 
+              WHERE scenario_id = '.intval($scenarioId).' 
+              AND user_id = '.intval($userId).' 
+              LIMIT 1';
+
+        $result = acym_loadResult($queryUnsubscribed);
+
+        return !empty($result);
     }
 }

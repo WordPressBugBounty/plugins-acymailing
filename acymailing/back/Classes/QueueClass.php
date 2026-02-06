@@ -8,26 +8,67 @@ use AcyMailing\Core\AcymClass;
 
 class QueueClass extends AcymClass
 {
-    public $emailtypes;
+    public array $emailtypes = [];
 
     public function getMatchingCampaigns(array $settings): array
     {
+        $queuedMails = acym_loadResultArray('SELECT DISTINCT mail_id FROM #__acym_queue');
+        if (empty($queuedMails)) {
+            return [
+                'elements' => [],
+                'total' => (object)['total' => 0],
+                'status' => [
+                    'all' => 0,
+                    'sending' => 0,
+                    'paused' => 0,
+                    'automation' => 0,
+                    'followup' => 0,
+                ],
+            ];
+        }
+
         $campaignClass = new CampaignClass();
         $mailStatClass = new MailStatClass();
         $mailClass = new MailClass();
-        $query = 'FROM #__acym_mail AS mail
-                  JOIN #__acym_queue AS queue ON mail.id = queue.mail_id 
-                  LEFT JOIN #__acym_campaign AS campaign ON mail.id = campaign.mail_id OR mail.parent_id = campaign.mail_id';
+
+        $queryCount = 'SELECT COUNT(DISTINCT mail.id) AS total 
+                        FROM #__acym_mail AS mail
+                        LEFT JOIN #__acym_campaign AS campaign ON campaign.mail_id = mail.id OR campaign.mail_id = mail.parent_id';
+
+        $query = 'SELECT 
+                    mail.name, 
+                    mail.subject, 
+                    mail.type, 
+                    mail.id, 
+                    campaign.id AS campaign, 
+                    COALESCE(campaign.sending_date, queue.min_sending_date) AS sending_date, 
+                    campaign.sending_type, 
+                    campaign.active, 
+                    campaign.sending_params AS sending_params, 
+                    queue.nbqueued, 
+                    mail.language, 
+                    mail.parent_id 
+                FROM #__acym_mail AS mail
+                JOIN (
+                    SELECT mail_id, COUNT(*) AS nbqueued, MIN(sending_date) AS min_sending_date
+                    FROM #__acym_queue
+                    GROUP BY mail_id
+                ) AS queue ON mail.id = queue.mail_id
+                LEFT JOIN #__acym_campaign AS campaign 
+                    ON mail.id = campaign.mail_id 
+                    OR mail.parent_id = campaign.mail_id';
 
         $queryStatus = 'SELECT COUNT(DISTINCT mail.id) AS number, campaign.active
                         FROM #__acym_mail AS mail
-                        JOIN #__acym_queue AS queue ON queue.mail_id = mail.id 
                         LEFT JOIN #__acym_campaign AS campaign ON mail.id = campaign.mail_id';
 
         if (!empty($settings['tag'])) {
-            $query .= ' JOIN #__acym_tag AS tag ON (mail.id = tag.id_element OR mail.parent_id = tag.id_element) AND tag.type = "mail" AND tag.name = '.acym_escapeDB(
-                    $settings['tag']
-                );
+            $tagJoin = ' JOIN #__acym_tag AS tag 
+                            ON (mail.id = tag.id_element OR mail.parent_id = tag.id_element) 
+                            AND tag.type = "mail" 
+                            AND tag.name = '.acym_escapeDB($settings['tag']);
+            $query .= $tagJoin;
+            $queryCount .= $tagJoin;
             $queryStatus .= ' JOIN #__acym_tag AS tag ON mail.id = tag.id_element AND tag.type = "mail" AND tag.name = '.acym_escapeDB($settings['tag']);
         }
 
@@ -38,9 +79,7 @@ class QueueClass extends AcymClass
             $filters[] = 'mail.subject LIKE '.acym_escapeDB('%'.$settings['search'].'%').' OR mail.name LIKE '.acym_escapeDB('%'.$settings['search'].'%');
         }
 
-        if (!empty($filters)) {
-            $queryStatus .= ' WHERE ('.implode(') AND (', $filters).')';
-        }
+        $queryStatus .= ' WHERE ('.implode(') AND (', $filters).') AND mail.id IN ('.implode(',', $queuedMails).')';
 
         if (!empty($settings['status'])) {
             $allowedStatus = [
@@ -57,18 +96,15 @@ class QueueClass extends AcymClass
             $filters[] = $allowedStatus[$settings['status']];
         }
 
-        if (!empty($filters)) {
-            $query .= ' WHERE ('.implode(') AND (', $filters).')';
-        }
-
-        $queryCount = 'SELECT COUNT(DISTINCT mail.id) AS total '.$query;
-        $query .= ' GROUP BY mail.id';
-
-        $query = 'SELECT mail.name, mail.subject, mail.type, mail.id, campaign.id AS campaign, IF(campaign.sending_date IS NULL, queue.sending_date, campaign.sending_date) AS sending_date, campaign.sending_type, campaign.active, campaign.sending_params AS sending_params, COUNT(queue.mail_id) AS nbqueued, mail.language, mail.parent_id '.$query.' ORDER BY queue.sending_date ASC';
+        $queryCount .= ' WHERE ('.implode(') AND (', $filters).') AND mail.id IN ('.implode(',', $queuedMails).')';
+        $query .= ' WHERE ('.implode(') AND (', $filters).')';
+        $query .= ' ORDER BY queue.min_sending_date ASC';
 
         acym_query('SET SQL_BIG_SELECTS=1;');
-        $results['elements'] = $mailClass->decode(acym_loadObjectList($query, '', $settings['offset'], $settings['campaignsPerPage']));
-        $results['total'] = acym_loadObject($queryCount);
+        $results = [
+            'elements' => $mailClass->decode(acym_loadObjectList($query, '', $settings['offset'], $settings['campaignsPerPage'])),
+            'total' => acym_loadObject($queryCount),
+        ];
 
         $isMultilingual = acym_isMultilingual();
         $campaignRecipientsMultilingual = [];
@@ -173,14 +209,13 @@ class QueueClass extends AcymClass
         );
 
         $elementsPerStatus = acym_loadObjectList($queryStatus.' GROUP BY active', 'active');
-        foreach ($elementsPerStatus as $i => $element) {
-            $elementsPerStatus[$i] = empty($element->number) ? 0 : $element->number;
-        }
+        $queuedActiveCampaigns = empty($elementsPerStatus[1]->number) ? 0 : $elementsPerStatus[1]->number;
+        $queuedPausedCampaigns = empty($elementsPerStatus[0]->number) ? 0 : $elementsPerStatus[0]->number;
 
         $results['status'] = [
-            'all' => array_sum($elementsPerStatus) + $automationNumber + $followupNumber,
-            'sending' => $elementsPerStatus[1] ?? 0,
-            'paused' => $elementsPerStatus[0] ?? 0,
+            'all' => $queuedActiveCampaigns + $queuedPausedCampaigns + $automationNumber + $followupNumber,
+            'sending' => $queuedActiveCampaigns,
+            'paused' => $queuedPausedCampaigns,
             'automation' => $automationNumber,
             'followup' => $followupNumber,
         ];
@@ -190,7 +225,6 @@ class QueueClass extends AcymClass
 
     public function getMatchingScheduledCampaigns(array $settings): array
     {
-        $campaignClass = new CampaignClass();
         $mailClass = new MailClass();
         $query = 'FROM #__acym_mail AS mail 
                   JOIN #__acym_campaign AS campaign ON mail.id = campaign.mail_id OR mail.parent_id = campaign.mail_id ';
@@ -209,9 +243,7 @@ class QueueClass extends AcymClass
             $filters[] = 'mail.subject LIKE '.acym_escapeDB('%'.$settings['search'].'%').' OR mail.name LIKE '.acym_escapeDB('%'.$settings['search'].'%');
         }
 
-        if (!empty($filters)) {
-            $query .= ' WHERE ('.implode(') AND (', $filters).')';
-        }
+        $query .= ' WHERE ('.implode(') AND (', $filters).')';
 
         $queryCount = 'SELECT COUNT(DISTINCT mail.id) AS total '.$query;
         $query = 'SELECT mail.name, mail.subject, mail.id, campaign.sending_date, campaign.sending_params, mail.language, mail.parent_id '.$query.' GROUP BY mail.id ORDER BY campaign.sending_date ASC';
@@ -277,11 +309,10 @@ class QueueClass extends AcymClass
         ];
     }
 
-    public function scheduleReady()
+    public function scheduleReady(): ?int
     {
         $this->messages = [];
 
-        $campaignClass = new CampaignClass();
         $mailClass = new MailClass();
 
         $multilingualQuery = acym_isMultilingual() ? ' OR mail.parent_id = campaign.mail_id ' : '';
@@ -301,7 +332,7 @@ class QueueClass extends AcymClass
         );
 
         if (empty($mailReady)) {
-            return false;
+            return null;
         }
 
         $nbQueue = [];
@@ -317,12 +348,18 @@ class QueueClass extends AcymClass
         $campaignClass = new CampaignClass();
         foreach ($campaigns as $campaign) {
             $result = $campaignClass->send($campaign->id, $nbQueue[$campaign->mail_id]);
-            if (empty($result) && acym_isMultilingual()) {
-                $translatedMails = acym_loadResultArray('SELECT id FROM #__acym_mail WHERE id != '.intval($campaign->mail_id).' AND parent_id = '.intval($campaign->mail_id));
-                if (!empty($translatedMails)) {
-                    foreach ($translatedMails as $translatedMailId) {
-                        if (!empty($nbQueue[$translatedMailId])) $campaignClass->send($campaign->id, $nbQueue[$translatedMailId]);
-                    }
+            if (!empty($result) || !acym_isMultilingual()) {
+                continue;
+            }
+
+            $translatedMails = acym_loadResultArray('SELECT id FROM #__acym_mail WHERE id != '.intval($campaign->mail_id).' AND parent_id = '.intval($campaign->mail_id));
+            if (empty($translatedMails)) {
+                continue;
+            }
+
+            foreach ($translatedMails as $translatedMailId) {
+                if (!empty($nbQueue[$translatedMailId])) {
+                    $campaignClass->send($campaign->id, $nbQueue[$translatedMailId]);
                 }
             }
         }
@@ -330,10 +367,9 @@ class QueueClass extends AcymClass
         return count($mailReady);
     }
 
-    public function delete($elements)
+    public function delete(array $elements): int
     {
         if (empty($elements)) return 0;
-        if (!is_array($elements)) $elements = [$elements];
         acym_arrayToInteger($elements);
 
         $query = 'DELETE FROM #__acym_queue WHERE mail_id IN ('.implode(',', $elements).')';
@@ -342,58 +378,46 @@ class QueueClass extends AcymClass
         acym_query('UPDATE #__acym_campaign SET draft = 1, active = 1 WHERE mail_id IN ('.implode(',', $elements).')');
 
         if (!$result) {
-            return false;
+            return 0;
         }
 
         return $result;
     }
 
-    public function deleteOne($elements, $mailId = null)
+    public function deleteQueuedByUserIds(array $userIds, ?int $mailId = null): int
     {
-        if (!is_array($elements)) {
-            $elements = [$elements];
-        }
-
-        if (empty($elements)) {
+        acym_arrayToInteger($userIds);
+        if (empty($userIds)) {
             return 0;
         }
 
-        $nbDeleted = 0;
-        foreach ($elements as $one) {
-            if (strpos($one, '_')) {
-                [$mailId, $userId] = explode('_', $one);
-            } else {
-                $userId = $one;
-            }
-
-            $query = 'DELETE FROM #__acym_queue WHERE user_id = '.intval($userId);
-            if (!empty($mailId)) {
-                $query .= ' AND mail_id = '.intval($mailId);
-            }
-
-            try {
-                $res = acym_query($query);
-            } catch (\Exception $e) {
-                $res = false;
-            }
-            if ($res === false) {
-                if (isset($e)) {
-                    $this->errors[] = $e->getMessage();
-                    unset($e);
-                } else {
-                    $this->errors[] = acym_getDBError();
-                }
-            } else {
-                $nbDeleted += $res;
-            }
+        $query = 'DELETE FROM #__acym_queue WHERE user_id IN ('.implode(',', $userIds).')';
+        if (!empty($mailId)) {
+            $query .= ' AND mail_id = '.intval($mailId);
         }
 
-        return $res;
+        try {
+            $nbDeleted = acym_query($query);
+
+            if ($nbDeleted === false) {
+                $this->errors[] = acym_getDBError();
+
+                return 0;
+            }
+
+            return (int)$nbDeleted;
+        } catch (\Exception $e) {
+            $this->errors[] = $e->getMessage();
+
+            return 0;
+        }
     }
 
-    public function getReady($limit, $mailId = 0): array
+    public function getReady(int $startFrom, int $limit, int $mailId = 0): array
     {
-        if (empty($limit)) return [];
+        if (empty($limit)) {
+            return [];
+        }
 
         $query = 'SELECT queue.*, campaign.sending_params AS sending_params FROM #__acym_queue AS queue';
         $query .= ' JOIN #__acym_user AS user ON queue.`user_id` = user.`id` ';
@@ -434,8 +458,7 @@ class QueueClass extends AcymClass
         }
 
         $query .= ' ORDER BY queue.`priority` ASC, queue.`sending_date` ASC, '.$order;
-        $startqueue = acym_getVar('int', 'startqueue', 0);
-        $query .= ' LIMIT '.intval($startqueue).','.intval($limit);
+        $query .= ' LIMIT '.intval($startFrom).','.intval($limit);
 
         try {
             $results = acym_loadObjectList($query);
@@ -462,14 +485,14 @@ class QueueClass extends AcymClass
         return $results;
     }
 
-    public function delayFailed($mailId, $userIds)
+    public function delayFailed(int $mailId, array $userIds): void
     {
         acym_arrayToInteger($userIds);
         if (empty($mailId) || empty($userIds)) {
-            return false;
+            return;
         }
 
-        return acym_query(
+        acym_query(
             'UPDATE #__acym_queue 
             SET sending_date = DATE_ADD(sending_date, INTERVAL 1 HOUR), try = try +1 
             WHERE mail_id = '.intval($mailId).' 
@@ -477,20 +500,20 @@ class QueueClass extends AcymClass
         );
     }
 
-    public function delayAll(int $hours)
+    public function delayAll(int $hours): void
     {
         if ($hours < 1) {
-            return false;
+            return;
         }
 
-        return acym_query(
+        acym_query(
             'UPDATE #__acym_queue 
             SET sending_date = DATE_ADD(sending_date, INTERVAL '.$hours.' HOUR) 
             WHERE sending_date < DATE_ADD(NOW(), INTERVAL '.intval($hours).' HOUR)'
         );
     }
 
-    public function getMailReceivers($mail, $onlyNew = false)
+    public function getMailReceivers(object $mail, bool $onlyNew = false): AutomationHelper
     {
         if (empty($mail->sending_params)) {
             $sendingParams = [];
@@ -564,7 +587,7 @@ class QueueClass extends AcymClass
         return $automationHelper;
     }
 
-    public function queue($mail)
+    public function queue(object $mail): int
     {
         $automationHelper = $this->getMailReceivers($mail);
         $automationHelper->where[] = '`user`.`active` = 1';
@@ -575,21 +598,21 @@ class QueueClass extends AcymClass
 
         $automationHelper->removeFlag(SegmentsController::FLAG_COUNT);
 
-        return $inserted;
+        return (int)$inserted;
     }
 
-    public function addQueue($userId, $mailId, $sendingDate)
+    public function addQueue(int $userId, int $mailId, string $sendingDate): int
     {
         $priority = $this->config->get('priority_newsletter', 3);
 
-        return acym_query(
+        return (int)acym_query(
             'INSERT IGNORE INTO #__acym_queue (`mail_id`, `user_id`, `sending_date`, `priority`, `try`) VALUES ('.intval($mailId).', '.intval($userId).', '.acym_escapeDB(
                 $sendingDate
             ).', '.intval($priority).', 0)'
         );
     }
 
-    public function unpauseCampaign($campaignId, $active)
+    public function unpauseCampaign(int $campaignId, int $active): void
     {
         if (acym_query('UPDATE #__acym_campaign SET active = '.intval($active).' WHERE id = '.intval($campaignId))) {
             acym_enqueueMessage(acym_translation($active ? 'ACYM_UNPAUSE_CAMPAIGN_SUCCESSFUL' : 'ACYM_PAUSE_CAMPAIGN_SUCCESSFUL'), "success");
@@ -598,17 +621,19 @@ class QueueClass extends AcymClass
         }
     }
 
-    public function emptyQueue()
+    public function emptyQueue(): int
     {
-        return acym_query('DELETE FROM `#__acym_queue`');
+        return (int)acym_query('DELETE FROM `#__acym_queue`');
     }
 
-    public function cleanQueue()
+    public function cleanQueue(): int
     {
         $twoDaysEarlier = acym_date(time() - 172800, 'Y-m-d H:i:s', false);
 
         $conditionUser = '`user`.`active` = 0';
-        if ($this->config->get('require_confirmation', 1) == 1) $conditionUser .= ' OR `user`.`confirmed` = 0';
+        if ($this->config->get('require_confirmation', 1) == 1) {
+            $conditionUser .= ' OR `user`.`confirmed` = 0';
+        }
 
         $numberOfDaysToWait = $this->config->get('queue_delete_days', 0);
         $conditionDateDelete = '';
@@ -617,7 +642,7 @@ class QueueClass extends AcymClass
             $conditionDateDelete = ' OR (`queue`.`sending_date` < '.acym_escapeDB($dateTimeConditionDelete).')';
         }
 
-        return acym_query(
+        return (int)acym_query(
             'DELETE `queue`.* 
             FROM `#__acym_queue` AS `queue` 
             JOIN `#__acym_user` AS `user` ON `queue`.`user_id` = `user`.`id` 
@@ -625,7 +650,7 @@ class QueueClass extends AcymClass
         );
     }
 
-    public function isSendingFinished($mailId): bool
+    public function isSendingFinished(int $mailId): bool
     {
         $mailClass = new MailClass();
         $mail = $mailClass->getOneById($mailId);

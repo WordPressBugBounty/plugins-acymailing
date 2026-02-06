@@ -2,6 +2,7 @@
 
 namespace AcyMailing\Controllers;
 
+use AcyMailing\Classes\ListClass;
 use AcyMailing\Classes\UserClass;
 use AcyMailing\Core\AcymController;
 
@@ -159,16 +160,17 @@ class ToggleController extends AcymController
         acym_checkToken();
 
         $table = acym_getVar('word', 'table', '');
-        $id = acym_getVar('cmd', 'id', 0);
-        $method = acym_getVar('word', 'method', 'delete');
+        $id = acym_getVar('int', 'id', 0);
 
         if (empty($table) || !in_array($table, $this->deletableRows) || empty($id)) {
             exit;
         }
 
+        $method = $table === 'queue' ? 'deleteQueuedByUserIds' : 'delete';
+
         $namespaceClass = 'AcyMailing\\Classes\\'.ucfirst($table).'Class';
         $elementClass = new $namespaceClass();
-        $elementClass->$method($id);
+        $elementClass->$method([$id]);
 
         exit;
     }
@@ -181,12 +183,12 @@ class ToggleController extends AcymController
             acym_sendAjaxResponse(acym_translation('ACYM_ERROR_SAVING'), [], false);
         }
 
-        $newConfig = new \stdClass();
-        $newConfig->remindme = json_decode($this->config->get('remindme', '[]'));
-        if (!in_array($newValue, $newConfig->remindme)) array_push($newConfig->remindme, $newValue);
-        $newConfig->remindme = json_encode($newConfig->remindme);
+        $remindMe = json_decode($this->config->get('remindme', '[]'));
+        if (!in_array($newValue, $remindMe)) {
+            $remindMe[] = $newValue;
+        }
 
-        if ($this->config->save($newConfig)) {
+        if ($this->config->saveConfig(['remindme' => json_encode($remindMe)])) {
             acym_sendAjaxResponse(acym_translation('ACYM_THANKS'));
         } else {
             acym_sendAjaxResponse(acym_translation('ACYM_ERROR_SAVING'), [], false);
@@ -195,11 +197,17 @@ class ToggleController extends AcymController
 
     public function subscribeOnClick(): void
     {
-        $userId = acym_getVar('int', 'userid');
-        $listId = acym_getVar('int', 'listid');
+        $userIds = acym_getVar('array', 'userid', []);
+        $listIds = acym_getVar('array', 'listid', []);
 
         $userClass = new UserClass();
-        $result = $userClass->subscribe($userId, [$listId]);
+        $userClass->onlyManageableUsers($userIds);
+
+        $listClass = new ListClass();
+        $listClass->onlyManageableLists($listIds);
+
+        $userClass = new UserClass();
+        $result = $userClass->subscribe($userIds, $listIds);
 
         if ($result) {
             acym_sendAjaxResponse();
@@ -210,11 +218,17 @@ class ToggleController extends AcymController
 
     public function unsubscribeOnClick(): void
     {
-        $userId = acym_getVar('int', 'userid');
-        $listId = acym_getVar('int', 'listid');
+        $userIds = acym_getVar('array', 'userid', []);
+        $listIds = acym_getVar('array', 'listid', []);
 
         $userClass = new UserClass();
-        $result = $userClass->unsubscribe($userId, [$listId]);
+        $userClass->onlyManageableUsers($userIds);
+
+        $listClass = new ListClass();
+        $listClass->onlyManageableLists($listIds);
+
+        $userClass = new UserClass();
+        $result = $userClass->unsubscribe($userIds, $listIds);
 
         if ($result) {
             acym_sendAjaxResponse();

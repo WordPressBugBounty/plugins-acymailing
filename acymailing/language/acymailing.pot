@@ -1,13 +1,109 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.5.1\n"
+"Project-Id-Version: AcyMailing 10.7.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-09-23\n"
+"POT-Creation-Date: 2026-01-22\n"
 "X-Domain: acymailing\n"
 
+
+msgid "Get my API key"
+msgstr ""
+
+msgid "You need to enter your Giphy API key in the configuration to use this feature."
+msgstr ""
+
+msgid "Giphy API key"
+msgstr ""
+
+msgid "Giphy allows you to search and insert GIFs directly into your emails. You need to create an account on Giphy and create a new API key on their developer portal to use this feature."
+msgstr ""
+
+msgid "Please format the date like this: YYYY-MM-DD"
+msgstr ""
+
+msgid "Your account is currently under review. You will be able to send your emails as soon as it gets approved."
+msgstr ""
+
+msgid "Please specify a sending date"
+msgstr ""
+
+msgid "Only use a dedicated sending process when experiencing issues on automated tasks. This might not work for all servers!"
+msgstr ""
+
+msgid "Executing automated tasks may take a lot of time. If you're experiencing issues you may try using a dedicated process to send queued emails."
+msgstr ""
+
+msgid "Use dedicated sending process"
+msgstr ""
+
+msgid "An error occurred while retrieving the triggers of automatic campaigns. Please reconfigure the sending settings, save and reactivate them. Campaign ids: %s"
+msgstr ""
+
+msgid "Go to automatic campaigns"
+msgstr ""
+
+msgid "You have been unsubscribed from an automatic process."
+msgstr ""
+
+msgid "The user has unsubscribed from the scenario emails."
+msgstr ""
+
+msgid "It appears that there is no subscription list associated to the email you wish to unsubscribe from. You can either simply leave this page or unsubscribe from all lists using the button below."
+msgstr ""
+
+msgid "Record statistics by batch"
+msgstr ""
+
+msgid "When enabled, send statistics will be recorded every 10 emails sent, saving on resources. If too many emails are sent per batch causing the send process to stop midway (time/memory limits reached), some subscribers that received your email won't be taken into account in the statistics."
+msgstr ""
+
+msgid "Hide time for dates"
+msgstr ""
+
+msgid "You can select the CSV separator to use on the data collection configuration page."
+msgstr ""
+
+msgid "Data export management"
+msgstr ""
+
+msgid "Choose a separator for CSV exports"
+msgstr ""
+
+msgid "Determines the character used to separate columns in exported CSV files."
+msgstr ""
+
+msgid "Select a page"
+msgstr ""
+
+msgid "Choose whether to use an article or a URL for the Terms and Conditions. The article will be used if both are set."
+msgstr ""
+
+msgid "Choose whether to use an article or a URL for the Privacy Policy. The article will be used if both are set."
+msgstr ""
+
+msgid "Terms content type"
+msgstr ""
+
+msgid "Privacy policy content type"
+msgstr ""
+
+msgid "Terms and Conditions URL"
+msgstr ""
+
+msgid "Enter the URL leading to your terms and conditions"
+msgstr ""
+
+msgid "Enter the URL leading to your privacy policy"
+msgstr ""
+
+msgid "Insert a <b>direct unsubscribe</b> link in your email"
+msgstr ""
+
+msgid "This domain is blocked."
+msgstr ""
 
 msgid "Show field labels"
 msgstr ""
@@ -544,15 +640,6 @@ msgid "Pause campaign"
 msgstr ""
 
 msgid "Could not load GIFs, please try again in a few minutes."
-msgstr ""
-
-msgid "You need to enter your Tenor access key in the configuration to use this feature."
-msgstr ""
-
-msgid "Tenor access key"
-msgstr ""
-
-msgid "Tenor allows you to search and insert GIFs directly into your emails. You need to create an account on Tenor, create a project and get its access key to use this feature."
 msgstr ""
 
 msgid "Administrator email"
@@ -6304,9 +6391,6 @@ msgid "When the user subscribes"
 msgstr ""
 
 msgid "Create new mail"
-msgstr ""
-
-msgid "Please format the date like 21/12/2010 your format is %s"
 msgstr ""
 
 msgid "%s users subscribed"

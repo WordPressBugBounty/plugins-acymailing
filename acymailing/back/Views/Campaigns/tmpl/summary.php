@@ -22,7 +22,7 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
 
 			<div id="acym__campaign__summary" class="grid-x grid-margin-y">
 				<div class="cell grid-x acym__campaign__summary__section margin-right-2">
-					<h5 class="cell shrink margin-right-2 acym__title acym__title__secondary">
+					<h5 class="cell shrink margin-next-1 acym__title acym__title__secondary">
 						<b><?php echo acym_translation('ACYM_EMAIL'); ?></b>
 					</h5>
 					<div class="cell auto acym__campaign__summary__modify">
@@ -64,7 +64,7 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
 										class="button-secondary button margin-top-0 margin-bottom-2 margin-right-0 cell medium-shrink">
                                     <?php echo acym_translation('ACYM_REFRESH_ARCHIVE'); ?>
 								</button>
-                                <?php echo acym_info('ACYM_REFRESH_ARCHIVE_DESC'); ?>
+                                <?php echo acym_info(['textShownInTooltip' => 'ACYM_REFRESH_ARCHIVE_DESC']); ?>
 								<div id="acym__campaigns__summary__refresh__archive__message"></div>
 							</div>
                         <?php } ?>
@@ -79,14 +79,14 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
                     }
                     ?>
 					<input type="hidden" class="acym__hidden__mail__content" value="<?php echo acym_escape(acym_absoluteURL($data['mailInformation']->body)); ?>">
-					<div style="display: none" class="acym__hidden__mail__stylesheet"><?php echo $data['mailInformation']->stylesheet; ?></div>
+					<input type="hidden" class="acym__hidden__mail__stylesheet" value="<?php echo acym_escape($data['mailInformation']->stylesheet); ?>">
 					<div class="cell grid-x">
 						<div id="acym__wysid__email__preview" class="acym__email__preview grid-x cell"></div>
 					</div>
 				</div>
                 <?php if (!empty($data['mailInformation']->attachments)) { ?>
 					<div class="cell grid-x acym__campaign__summary__section">
-						<h5 class="cell shrink margin-right-2 acym__title acym__title__secondary">
+						<h5 class="cell shrink margin-next-1 acym__title acym__title__secondary">
 							<b><?php echo acym_translation('ACYM_ATTACHMENTS'); ?></b>
 						</h5>
 						<div class="cell auto acym__campaign__summary__modify">
@@ -95,27 +95,30 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
                             ); ?>"><i
 										class="acymicon-pencil"></i><span> <?php echo acym_translation('ACYM_EDIT'); ?></span></a>
 						</div>
-                        <?php foreach (json_decode($data['mailInformation']->attachments) as $key => $oneAttachment) {
-                            $onlyFilename = explode("/", $oneAttachment->filename);
+                        <?php
+                        $attachments = json_decode($data['mailInformation']->attachments, true);
+                        foreach ($attachments as $key => $oneAttachment) {
+                            $onlyFilename = explode('/', $oneAttachment['filename']);
 
                             $onlyFilename = end($onlyFilename);
 
                             echo acym_tooltip(
                                 [
                                     'hoveredText' => '<div class="cell" data-toggle="path_attachment_'.$key.'">'.$onlyFilename.'</div>',
-                                    'textShownInTooltip' => $oneAttachment->filename,
+                                    'textShownInTooltip' => $oneAttachment['filename'],
                                     'classContainer' => 'cell',
                                 ]
                             );
-                        } ?>
+                        }
+                        ?>
 					</div>
                 <?php } ?>
 				<div class="cell grid-x acym__campaign__summary__section">
-					<h5 class="cell shrink margin-right-2 acym__title acym__title__secondary">
+					<h5 class="cell shrink margin-next-1 acym__title acym__title__secondary">
 						<b>
                             <?php
                             echo acym_translation('ACYM_RECIPIENTS');
-                            echo ' ('.$data['nbSubscribers'].' '.acym_translation('ACYM_SUBSCRIBERS').acym_info('ACYM_SUMMARY_NUMBER_RECEIVERS_DESC').')';
+                            echo ' ('.$data['nbSubscribers'].' '.acym_translation('ACYM_SUBSCRIBERS').acym_info(['textShownInTooltip' => 'ACYM_SUMMARY_NUMBER_RECEIVERS_DESC']).')';
                             ?>
 						</b>
 					</h5>
@@ -138,7 +141,6 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
                                     'task' => 'usersSummary',
                                     'list_id' => $oneList->list_id,
                                 ],
-                                '',
                                 'acym__modal__users__summary__container'
                             );
                             echo '<div class="cell grid-x acym__listing__row">
@@ -154,7 +156,7 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
 					</div>
                     <?php if (!empty($data['segment'])) { ?>
 						<div class="cell grid-x acym__campaign__summary__section margin-top-1">
-							<h5 class="cell shrink margin-right-2 acym__title acym__title__secondary"><?php
+							<h5 class="cell shrink margin-next-1 acym__title acym__title__secondary"><?php
                                 if (!empty($data['campaignInformation']->sending_params['segment']['invert'])) {
                                     $segmentInformation = $data['campaignInformation']->sending_params['segment']['invert'] === 'exclude'
                                         ? ' ('.acym_translation('ACYM_EXCLUDE').')'
@@ -180,7 +182,7 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
                     $numberOfUsersToSend = round($data['campaignInformation']->sending_params['abtest']['repartition'] * $data['nbSubscribersAbTest'] / 100);
                     ?>
 					<div class="cell grid-x acym__campaign__summary__section">
-						<h5 class="cell shrink margin-right-2 acym__title acym__title__secondary">
+						<h5 class="cell shrink margin-next-1 acym__title acym__title__secondary">
 							<b><?php
                                 echo acym_translation('ACYM_AB_TEST'); ?></b>
 						</h5>
@@ -207,7 +209,7 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
 						</div>
                         <?php if (!empty($data['segment'])) { ?>
 							<div class="cell grid-x acym__campaign__summary__section margin-top-1">
-								<h5 class="cell shrink margin-right-2 acym__title acym__title__secondary"><?php
+								<h5 class="cell shrink margin-next-1 acym__title acym__title__secondary"><?php
                                     if (!empty($data['campaignInformation']->sending_params['segment']['invert'])) {
                                         $segmentInformation = $data['campaignInformation']->sending_params['segment']['invert'] === 'exclude'
                                             ? ' ('.acym_translation('ACYM_EXCLUDE').')'
@@ -231,7 +233,7 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
 					</div>
                 <?php } ?>
 				<div class="cell grid-x acym__campaign__summary__section">
-					<h5 class="cell shrink margin-right-2 acym__title acym__title__secondary">
+					<h5 class="cell shrink margin-next-1 acym__title acym__title__secondary">
 						<b><?php echo acym_translation('ACYM_SEND_SETTINGS'); ?></b>
 					</h5>
 					<div class="cell auto acym__campaign__summary__modify">
@@ -248,17 +250,27 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
 
                             if ($data['automatic']['isAuto']) {
                                 $sendingTimeText = $data['automatic']['text'];
-                            } elseif (!$isSent && $data['campaignClass']::SENDING_TYPE_SCHEDULED !== $data['campaignInformation']->sending_type) {
+                            } elseif ($data['campaignClass']::SENDING_TYPE_SCHEDULED === $data['campaignInformation']->sending_type) {
+                                if (empty($data['campaignInformation']->sending_date)) {
+                                    $sendingTimeText = acym_translation('ACYM_PLEASE_SET_SEND_DATE');
+                                } else {
+                                    if ($isSent) {
+                                        $text = 'ACYM_THIS_CAMPAIGN_HAS_BEEN_SENT_ON_AT';
+                                    } else {
+                                        $text = 'ACYM_THIS_CAMPAIGN_WILL_BE_SENT_ON_AT';
+                                    }
+
+                                    $sendingTimeText .= acym_translationSprintf(
+                                        $text,
+                                        acym_date($data['campaignInformation']->sending_date, 'F j, Y'),
+                                        acym_date($data['campaignInformation']->sending_date, 'H:i')
+                                    );
+                                }
+                            } elseif (!$isSent) {
                                 $sendingTimeText .= acym_translation('ACYM_THIS_CAMPAIGN_WILL_BE_SENT').' '.acym_strtolower(acym_translation('ACYM_NOW'));
                             } else {
-                                if ($isSent) {
-                                    $text = 'ACYM_THIS_CAMPAIGN_HAS_BEEN_SENT_ON_AT';
-                                } else {
-                                    $text = 'ACYM_THIS_CAMPAIGN_WILL_BE_SENT_ON_AT';
-                                }
-
                                 $sendingTimeText .= acym_translationSprintf(
-                                    $text,
+                                    'ACYM_THIS_CAMPAIGN_HAS_BEEN_SENT_ON_AT',
                                     acym_date($data['campaignInformation']->sending_date, 'F j, Y'),
                                     acym_date($data['campaignInformation']->sending_date, 'H:i')
                                 );
@@ -344,7 +356,7 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
                                 ?>
 
 								<button type="submit"
-										class="cell button button-secondary margin-bottom-1 margin-right-1 acy_button_submit medium-shrink"
+										class="cell button button-secondary margin-bottom-1 margin-next-1 acy_button_submit medium-shrink"
 										data-task="saveAsDraftCampaign">
                                     <?php echo acym_translation('ACYM_SAVE_AS_DRAFT'); ?>
 								</button>
@@ -391,7 +403,7 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
                                     acym_translation($buttonText),
                                     $popupData,
                                     'acym__acymailer__popup',
-                                    '',
+                                    [],
                                     ['class' => 'cell button medium-shrink'.$buttonClass]
                                 );
                             } else {

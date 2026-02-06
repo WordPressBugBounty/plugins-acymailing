@@ -8,7 +8,7 @@
 		</div>
 
 		<div class="cell grid-x acym__followup__summary__section margin-right-2">
-			<h5 class="cell shrink margin-right-2 acym__title acym__title__secondary">
+			<h5 class="cell shrink margin-next-1 acym__title acym__title__secondary">
 				<b><?php echo acym_translation('ACYM_TRIGGER'); ?></b>
 			</h5>
             <?php
@@ -41,7 +41,7 @@
 		</div>
 
 		<div class="cell grid-x acym__followup__summary__section margin-right-2">
-			<h5 class="cell shrink margin-right-2 acym__title acym__title__secondary">
+			<h5 class="cell shrink margin-next-1 acym__title acym__title__secondary">
 				<b><?php echo acym_translation('ACYM_CONDITIONS'); ?></b>
 			</h5>
 			<div class="cell auto acym__followup__summary__modify">
@@ -65,7 +65,7 @@
 		</div>
 
 		<div class="cell grid-x acym__followup__summary__section margin-right-2 margin-bottom-2">
-			<h5 class="cell shrink margin-right-2 acym__title acym__title__secondary">
+			<h5 class="cell shrink margin-next-1 acym__title acym__title__secondary">
 				<b><?php echo acym_translation('ACYM_EMAILS'); ?></b>
 			</h5>
 			<div class="cell auto acym__followup__summary__modify">
@@ -101,7 +101,7 @@
 								<div class="auto cell grid-x align-center">
                                     <?php
                                     echo $mail->delay_display;
-                                    echo acym_info('ACYM_DELAY_SUMMARY');
+                                    echo acym_info(['textShownInTooltip' => 'ACYM_DELAY_SUMMARY']);
                                     ?>
 								</div>
 								<div class="auto cell grid-x align-center acym__followup__summary__listing__action">

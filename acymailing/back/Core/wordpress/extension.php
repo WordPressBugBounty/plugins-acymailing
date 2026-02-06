@@ -2,7 +2,7 @@
 
 use AcyMailing\Classes\PluginClass;
 
-function acym_isExtensionActive($extension)
+function acym_isExtensionActive(string $extension): bool
 {
     if (acym_isMuPlugin($extension)) return true;
 
@@ -11,12 +11,12 @@ function acym_isExtensionActive($extension)
     return file_exists(WP_PLUGIN_DIR.DS.$extension);
 }
 
-function acym_isMuPlugin($extension)
+function acym_isMuPlugin(string $extension): bool
 {
     return file_exists(WPMU_PLUGIN_DIR.DS.$extension);
 }
 
-function acym_getPluginPath($plugin)
+function acym_getPluginPath(string $plugin): string
 {
     $corePath = ACYM_BACK.'dynamics'.DS.$plugin.DS.'plugin.php';
     if (file_exists($corePath)) return $corePath;
@@ -24,49 +24,49 @@ function acym_getPluginPath($plugin)
     return ACYM_ADDONS_FOLDER_PATH.$plugin.DS.'plugin.php';
 }
 
-function acym_coreAddons()
+function acym_coreAddons(): array
 {
     return [
         (object)[
             'title' => acym_translation('ACYM_ARTICLE'),
             'folder_name' => 'post',
-            'version' => '10.5.1',
+            'version' => '10.7.1',
             'active' => '1',
             'category' => 'Content management',
             'level' => 'starter',
             'uptodate' => '1',
             'description' => '- Insert WordPress posts in your emails<br/>- Insert the latest posts of a category in an automatic email',
-            'latest_version' => '10.5.1',
+            'latest_version' => '10.7.1',
             'type' => 'CORE',
         ],
         (object)[
             'title' => acym_translation('ACYM_PAGE'),
             'folder_name' => 'page',
-            'version' => '10.5.1',
+            'version' => '10.7.1',
             'active' => '1',
             'category' => 'Content management',
             'level' => 'starter',
             'uptodate' => '1',
             'description' => '- Insert pages in your emails',
-            'latest_version' => '10.5.1',
+            'latest_version' => '10.7.1',
             'type' => 'CORE',
         ],
         (object)[
             'title' => acym_translation('ACYM_CREATE_USER'),
             'folder_name' => 'createuser',
-            'version' => '10.5.1',
+            'version' => '10.7.1',
             'active' => '1',
             'category' => 'User management',
             'level' => 'starter',
             'uptodate' => '1',
             'description' => '- Automatically creates a site user when an AcyMailing subscriber is created',
-            'latest_version' => '10.5.1',
+            'latest_version' => '10.7.1',
             'type' => 'CORE',
         ],
     ];
 }
 
-function acym_isTrackingSalesActive()
+function acym_isTrackingSalesActive(): bool
 {
     $trackingWoocommerce = false;
     acym_trigger('onAcymIsTrackingWoocommerce', [&$trackingWoocommerce], 'plgAcymWoocommerce');
@@ -74,7 +74,7 @@ function acym_isTrackingSalesActive()
     return $trackingWoocommerce;
 }
 
-function acym_loadPlugins()
+function acym_loadPlugins(): void
 {
     $dynamicsLoadedLast = ['managetext'];
     $dynamics = acym_getFolders(ACYM_BACK.'dynamics');

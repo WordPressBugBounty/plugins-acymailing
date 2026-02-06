@@ -251,7 +251,7 @@ trait Edition
             $data['mailInformation']->settings = $mail->settings;
             $data['mailInformation']->stylesheet = $mail->stylesheet;
             $data['mailInformation']->headers = $mail->headers;
-            $data['mailInformation']->attachments = empty($mail->attachments) ? [] : json_decode($mail->attachments);
+            $data['mailInformation']->attachments = empty($mail->attachments) ? [] : json_decode($mail->attachments, true);
             $data['mailInformation']->links_language = $mail->links_language;
 
             $data['mailInformation']->from_email = $mail->from_email;
@@ -611,7 +611,7 @@ trait Edition
             $mailArchiveClass = new MailArchiveClass();
             $archive = $mailArchiveClass->getOneByMailId($mail->id);
             if (!empty($archive)) {
-                $mailArchiveClass->delete($archive->id);
+                $mailArchiveClass->delete([$archive->id]);
             }
         }
         $campaign->visible = acym_getVar('int', 'visible', 1);
@@ -656,8 +656,8 @@ trait Edition
             if (!empty($versions['main']['subject'])) $mail->subject = $versions['main']['subject'];
             if (!empty($versions['main']['preview'])) $mail->preheader = $versions['main']['preview'];
             if (!empty($versions['main']['content'])) $mail->body = $versions['main']['content'];
-            if (!empty($versions['main']['content'])) $mail->settings = $versions['main']['settings'];
-            if (!empty($versions['main']['content'])) $mail->stylesheet = $versions['main']['stylesheet'];
+            if (!empty($versions['main']['settings'])) $mail->settings = $versions['main']['settings'];
+            if (!empty($versions['main']['stylesheet'])) $mail->stylesheet = $versions['main']['stylesheet'];
 
             if ($versionType === 'multilingual') {
                 $mail->links_language = $this->config->get('multilingual_default');
@@ -666,7 +666,8 @@ trait Edition
             unset($versions['main']);
         }
 
-        if ($mailID = $mailClass->save($mail)) {
+        $mailID = $mailClass->save($mail);
+        if (!empty($mailID)) {
             if (acym_getVar('string', 'nextstep', '') === 'listing') {
                 acym_enqueueMessage(acym_translation('ACYM_SUCCESSFULLY_SAVED'));
             }
@@ -688,9 +689,9 @@ trait Edition
             foreach ($versions as $code => $version) {
                 if (empty($version['subject'])) {
                     if ($versionType === 'multilingual') {
-                        $mailClass->delete($mailClass->getTranslationId($mailID, $code));
+                        $mailClass->delete([$mailClass->getTranslationId($mailID, $code)]);
                     } elseif (!empty($abTestSendingParams[$code])) {
-                        $mailClass->delete($abTestSendingParams[$code]);
+                        $mailClass->delete([$abTestSendingParams[$code]]);
                     }
                     continue;
                 }
@@ -742,6 +743,12 @@ trait Edition
     {
         $allLists = json_decode(acym_getVar('string', 'acym__entity_select__selected'));
         $allListsUnselected = json_decode(acym_getVar('string', 'acym__entity_select__unselected'));
+        if (empty($allLists)) {
+            $allLists = [];
+        }
+        if (empty($allListsUnselected)) {
+            $allListsUnselected = [];
+        }
         $campaignId = acym_getVar('int', 'campaignId');
         $addSegmentStep = acym_getVar('int', 'add_segment_step');
 
@@ -938,7 +945,8 @@ trait Edition
             if ($currentCampaign->sending_date < acym_date('now', 'Y-m-d H:i:s', false)) acym_enqueueMessage(acym_translation('ACYM_BE_CAREFUL_SENDING_DATE_IN_PAST'), 'warning');
         }
 
-        if ($campaignClass->save($currentCampaign)) {
+        $savedCampaignId = $campaignClass->save($currentCampaign);
+        if (!empty($savedCampaignId)) {
             if (acym_getVar('string', 'nextstep', '') === 'listing') {
                 acym_enqueueMessage(acym_translation('ACYM_SUCCESSFULLY_SAVED'));
             }
@@ -1031,7 +1039,9 @@ trait Edition
             $receiver = new stdClass();
             $receiver->email = $currentUserEmail;
             $newID = $userClass->save($receiver);
-            $data['receiver'] = $userClass->getOneById($newID);
+            if (!empty($newID)) {
+                $data['receiver'] = $userClass->getOneById($newID);
+            }
         }
     }
 

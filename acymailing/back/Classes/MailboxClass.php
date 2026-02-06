@@ -57,14 +57,10 @@ class MailboxClass extends AcymClass
         ];
     }
 
-    public function duplicate($mailboxIds)
+    public function duplicate(array $mailboxIds): void
     {
         if (empty($mailboxIds)) {
             return;
-        }
-
-        if (!is_array($mailboxIds)) {
-            $mailboxIds = [$mailboxIds];
         }
 
         $duplicateErrors = [];
@@ -79,6 +75,8 @@ class MailboxClass extends AcymClass
             unset($mailbox->id);
             $mailbox->active = 0;
             $mailbox->name .= '_copy';
+            $mailbox->conditions = json_encode($mailbox->conditions);
+            $mailbox->actions = json_encode($mailbox->actions);
 
             if (empty($this->save($mailbox))) {
                 $duplicateErrors[] = acym_translationSprintf('ACYM_ERROR_DUPLICATING_MAILBOX_ACTION', $originalName);
@@ -90,14 +88,16 @@ class MailboxClass extends AcymClass
         }
     }
 
-    public function getOneById($id)
+    public function getOneById(int $id): ?object
     {
         $mailbox = acym_loadObject('SELECT * FROM #__acym_mailbox_action WHERE `id` = '.intval($id));
 
-        if (!empty($mailbox)) {
-            $mailbox->conditions = json_decode($mailbox->conditions, true);
-            $mailbox->actions = json_decode($mailbox->actions, true);
+        if (empty($mailbox)) {
+            return null;
         }
+
+        $mailbox->conditions = json_decode($mailbox->conditions, true);
+        $mailbox->actions = json_decode($mailbox->actions, true);
 
         return $mailbox;
     }
@@ -113,7 +113,7 @@ class MailboxClass extends AcymClass
         return array_map([$this, 'decodeMailbox'], $mailboxes);
     }
 
-    public function decodeMailbox($mailbox)
+    private function decodeMailbox(object $mailbox): object
     {
         $mailbox->conditions = json_decode($mailbox->conditions, true);
         $mailbox->actions = json_decode($mailbox->actions, true);

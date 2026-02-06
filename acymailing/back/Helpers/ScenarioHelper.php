@@ -2,6 +2,7 @@
 
 namespace AcyMailing\Helpers;
 
+use AcyMailing\Classes\HistoryClass;
 use AcyMailing\Classes\ScenarioClass;
 use AcyMailing\Classes\ScenarioHistoryLineClass;
 use AcyMailing\Classes\ScenarioProcessClass;
@@ -30,8 +31,12 @@ class ScenarioHelper extends AcymObject
 
     public function trigger(string $trigger, array $options): void
     {
-        if (!acym_level(ACYM_ENTERPRISE) || empty($trigger)) {
-            acym_logError('ScenarioHelper::trigger - Missing trigger or not allowed, trigger: '.$trigger);
+        if (!acym_level(ACYM_ENTERPRISE)) {
+            return;
+        }
+
+        if (empty($trigger)) {
+            acym_logError('ScenarioHelper::trigger - Missing trigger for options: '.json_encode($options));
 
             return;
         }
@@ -55,7 +60,7 @@ class ScenarioHelper extends AcymObject
 
         foreach ($scenarios as $scenario) {
             if ($scenario->trigger_once) {
-                if (!empty($this->scenarioProcessClass->getOneByScenarioIdUserId($scenario->id, $userId))) {
+                if ($this->scenarioProcessClass->hasUserProcess($scenario->id, $userId)) {
                     continue;
                 }
             }
@@ -200,6 +205,15 @@ class ScenarioHelper extends AcymObject
 
     private function handleAction(object $step, int $userId, int $scenarioProcessId): void
     {
+        $scenarioClass = new ScenarioClass();
+        $markUnsubscribed = $scenarioClass->checkUserMarkedUnsubscribed($userId, $scenarioProcessId);
+        if ($markUnsubscribed && $step->params['action'] === 'acy_send_email') {
+            $historyClass = new HistoryClass();
+            $historyClass->insert($userId, 'unsubscribed', [acym_translation('ACYM_SCENARIO_USER_UNSUBSCRIBED')]);
+
+            return;
+        }
+
         $query = new AutomationHelper();
         $query->where = ['user.id = '.$userId];
 
@@ -300,7 +314,7 @@ class ScenarioHelper extends AcymObject
             }
 
             foreach ($options['userIds'] as $userId) {
-                if ($scenario->trigger_once && !empty($this->scenarioProcessClass->getOneByScenarioIdUserId($scenario->id, $userId))) {
+                if ($scenario->trigger_once && $this->scenarioProcessClass->hasUserProcess($scenario->id, $userId)) {
                     continue;
                 }
 

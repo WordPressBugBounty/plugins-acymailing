@@ -10,7 +10,7 @@
 	<div style="min-width:80%" id="archive_view__preview"><?php echo $data['mail']->body; ?></div>
 
     <?php
-    $attachments = json_decode(!empty($data['mail']->attachments) ? $data['mail']->attachments : '[]');
+    $attachments = json_decode(!empty($data['mail']->attachments) ? $data['mail']->attachments : '[]', true);
 
     if (!empty($attachments)) {
         ?>
@@ -19,11 +19,10 @@
 			<table>
                 <?php
                 foreach ($attachments as $attachment) {
-                    $onlyFilename = explode("/", $attachment->filename);
-
+                    $onlyFilename = explode('/', $attachment['filename']);
                     $onlyFilename = end($onlyFilename);
 
-                    echo '<tr><td><a href="'.acym_rootURI().$attachment->filename.'" target="_blank">'.$onlyFilename.'</a></td></tr>';
+                    echo '<tr><td><a href="'.acym_rootURI().$attachment['filename'].'" target="_blank">'.$onlyFilename.'</a></td></tr>';
                 }
                 ?>
 			</table>

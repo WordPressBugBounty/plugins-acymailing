@@ -1,6 +1,6 @@
 <?php
 
-function acym_escapeDB($value)
+function acym_escapeDB(?string $value): string
 {
     if (is_null($value)) {
         $value = '';
@@ -9,7 +9,7 @@ function acym_escapeDB($value)
     return "'".esc_sql($value)."'";
 }
 
-function acym_query($query)
+function acym_query(string $query)
 {
     global $wpdb;
     $query = acym_prepareQuery($query);
@@ -19,7 +19,7 @@ function acym_query($query)
     return $result === false ? null : $result;
 }
 
-function acym_loadObjectList($query, $key = '', $offset = null, $limit = null): array
+function acym_loadObjectList(string $query, string $key = '', ?int $offset = null, ?int $limit = null): array
 {
     global $wpdb;
     $query = acym_prepareQuery($query);
@@ -41,7 +41,7 @@ function acym_loadObjectList($query, $key = '', $offset = null, $limit = null): 
     return $sorted;
 }
 
-function acym_prepareQuery($query)
+function acym_prepareQuery(string $query): string
 {
     global $wpdb;
     $query = str_replace('#__', $wpdb->prefix, $query);
@@ -53,17 +53,19 @@ function acym_prepareQuery($query)
     return $query;
 }
 
-function acym_loadObject($query)
+function acym_loadObject(string $query): ?object
 {
     acym_addLimit($query);
 
     global $wpdb;
     $query = acym_prepareQuery($query);
 
-    return $wpdb->get_row($query);
+    $object = $wpdb->get_row($query);
+
+    return empty($object) ? null : $object;
 }
 
-function acym_loadResult($query)
+function acym_loadResult(string $query)
 {
     global $wpdb;
     $query = acym_prepareQuery($query);
@@ -71,7 +73,7 @@ function acym_loadResult($query)
     return $wpdb->get_var($query);
 }
 
-function acym_loadResultArray($query)
+function acym_loadResultArray(string $query): array
 {
     global $wpdb;
     $query = acym_prepareQuery($query);
@@ -79,7 +81,7 @@ function acym_loadResultArray($query)
     return $wpdb->get_col($query);
 }
 
-function acym_getEscaped($text, $extra = false)
+function acym_getEscaped(string $text, bool $extra = false)
 {
     $result = esc_sql($text);
     if ($extra) {
@@ -89,32 +91,30 @@ function acym_getEscaped($text, $extra = false)
     return $result;
 }
 
-function acym_getDBError()
+function acym_getDBError(): string
 {
     global $wpdb;
 
-    return $wpdb->last_error;
+    return empty($wpdb->last_error) ? '' : $wpdb->last_error;
 }
 
-function acym_insertObject($table, $element)
+function acym_insertObject(string $table, object $element): ?int
 {
     global $wpdb;
     $element = get_object_vars($element);
     $table = acym_prepareQuery($table);
     $wpdb->insert($table, $element);
 
-    return $wpdb->insert_id;
+    $id = $wpdb->insert_id;
+
+    return empty($id) ? null : (int)$id;
 }
 
-function acym_updateObject($table, $element, $pkey)
+function acym_updateObject(string $table, object $element, array $pkey): bool
 {
     global $wpdb;
     $element = get_object_vars($element);
     $table = acym_prepareQuery($table);
-
-    if (!is_array($pkey)) {
-        $pkey = [$pkey];
-    }
 
     $where = [];
     foreach ($pkey as $onePkey) {
@@ -126,14 +126,14 @@ function acym_updateObject($table, $element, $pkey)
     return $nbUpdated !== false;
 }
 
-function acym_getPrefix()
+function acym_getPrefix(): string
 {
     global $wpdb;
 
     return $wpdb->prefix;
 }
 
-function acym_getTableList()
+function acym_getTableList(): array
 {
     global $wpdb;
 
@@ -142,7 +142,7 @@ function acym_getTableList()
     );
 }
 
-function acym_getCMSConfig($varname, $default = null)
+function acym_getCMSConfig(string $varname, $default = null)
 {
     $map = [
         'offset' => 'timezone_string',
@@ -169,7 +169,7 @@ function acym_getCMSConfig($varname, $default = null)
         }
     }
 
-    if ($varname == 'posts_per_page') {
+    if ($varname === 'posts_per_page') {
         $possibilities = [5, 10, 15, 20, 25, 30, 50, 100];
         $closest = 5;
         foreach ($possibilities as $possibility) {

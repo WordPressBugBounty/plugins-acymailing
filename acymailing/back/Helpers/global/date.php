@@ -97,8 +97,8 @@ function acym_dateField(string $name, $value = '', string $class = '', string $a
             '<input data-open="'.acym_escape($id).'" class="rs_date_field '.$class.'" '.$attributes.' type="text" value="'.acym_escape($shownValue).'" readonly>',
             $result,
             $id,
-            '',
-            '',
+            [],
+            [],
             false,
             false
         );
@@ -127,7 +127,7 @@ function acym_getDate($time = 0, string $format = '%d %B %Y %H:%M')
     }
 }
 
-function acym_replaceDate($mydate, $display = false)
+function acym_replaceDate(string $mydate, bool $display = false): string
 {
     if (strpos($mydate, '[time]') === false) {
         if (is_numeric($mydate) && $display) {
@@ -137,7 +137,9 @@ function acym_replaceDate($mydate, $display = false)
         return $mydate;
     }
 
-    if ($mydate == '[time]' && $display) return acym_translation('ACYM_NOW');
+    if ($mydate === '[time]' && $display) {
+        return acym_translation('ACYM_NOW');
+    }
 
     $mydate = str_replace('[time]', time(), $mydate);
     $operators = ['+', '-'];
@@ -210,7 +212,8 @@ function acym_displayDateFormat(string $format, string $name = 'date', string $d
     $year = [
         '' => acym_translation('ACYM_YEAR'),
     ];
-    for ($i = 1900; $i <= (acym_date('now', 'Y') + 10); $i++) {
+    $currentYear = (int)acym_date('now', 'Y');
+    for ($i = 1900; $i <= $currentYear + 10; $i++) {
         $year[$i] = $i;
     }
 
@@ -221,7 +224,7 @@ function acym_displayDateFormat(string $format, string $name = 'date', string $d
     foreach ($formatToDisplay as $one) {
         if ($one === 'd') {
             if ($returnHtml) {
-                $return[] = '<div class="medium-3 margin-left-0 cell">'.acym_select(
+                $return[] = '<div class="medium-3 margin-left-0 margin-right-0 cell">'.acym_select(
                         $days,
                         $name,
                         empty($defaultDate[2]) || $defaultDate[2] === '00' ? '' : $defaultDate[2],
@@ -277,9 +280,18 @@ function acym_displayDateFormat(string $format, string $name = 'date', string $d
     }
 }
 
-function acym_getTimeFromUTCDate($date)
+function acym_getTimeFromUTCDate(?string $date): int
 {
-    return strtotime($date) + date('Z');
+    if (empty($date)) {
+        return 0;
+    }
+
+    $timestamp = strtotime($date);
+    if ($timestamp === false) {
+        return 0;
+    }
+
+    return $timestamp + date('Z');
 }
 
 function acym_getTimeFromCMSDate($date)
@@ -299,7 +311,7 @@ function acym_date($time = 'now', $format = null, bool $useTz = true, bool $tran
     }
 
     if (is_numeric($time)) {
-        $time = acym_dateTimeCMS((int)$time);
+        $time = acym_dateTimeCMS($time);
     }
 
     if (!$format || (strpos($format, 'ACYM_DATE_FORMAT') !== false && acym_translation($format) == $format)) {

@@ -13,6 +13,7 @@ use AcyMailing\Classes\UserClass;
 use AcyMailerPhp\Exception;
 use AcyMailerPhp\OAuth;
 use AcyMailerPhp\Mailer;
+use Pelago\Emogrifier\CssInliner;
 use Pelago\Emogrifier\HtmlProcessor\HtmlPruner;
 
 class MailerHelper extends Mailer
@@ -565,12 +566,12 @@ class MailerHelper extends Mailer
         if (!empty($this->defaultMail[$mailId]->attachments)) {
             $this->defaultMail[$mailId]->attach = [];
 
-            $attachments = json_decode($this->defaultMail[$mailId]->attachments);
+            $attachments = json_decode($this->defaultMail[$mailId]->attachments, true);
             foreach ($attachments as $oneAttach) {
                 $attach = new \stdClass();
-                $attach->name = basename($oneAttach->filename);
-                $attach->filename = str_replace(['/', '\\'], DS, ACYM_ROOT).$oneAttach->filename;
-                $attach->url = ACYM_LIVE.$oneAttach->filename;
+                $attach->name = basename($oneAttach['filename']);
+                $attach->filename = str_replace(['/', '\\'], DS, ACYM_ROOT).$oneAttach['filename'];
+                $attach->url = ACYM_LIVE.$oneAttach['filename'];
                 $this->defaultMail[$mailId]->attach[] = $attach;
             }
         }
@@ -1139,27 +1140,18 @@ class MailerHelper extends Mailer
 
     private function loadUser($user, bool $force = false): object
     {
-        if (is_string($user) && strpos($user, '@')) {
-            $receiver = $this->userClass->getOneByEmail($user);
-
-            if (empty($receiver)) {
-                if (($force || $this->autoAddUser) && acym_isValidEmail($user)) {
-                    $newUser = new \stdClass();
-                    $newUser->email = $user;
-                    $this->userClass->checkVisitor = false;
-                    $this->userClass->sendConf = false;
-                    acym_setVar('acy_source', 'When sending a test');
-                    $this->userClass->triggers = $this->userCreationTriggers;
-                    $userId = $this->userClass->save($newUser);
-                    $receiver = $this->userClass->getOneById($userId);
-                } else {
-                    throw new Exception(acym_translation('ACYM_USER_NOT_FOUND'));
-                }
-            }
+        if (is_numeric($user)) {
+            $receiver = $this->userClass->getOneById($user);
         } elseif (is_object($user)) {
             $receiver = $user;
-        } else {
-            $receiver = $this->userClass->getOneById($user);
+        } elseif (is_string($user) && strpos($user, '@')) {
+            acym_setVar('acy_source', 'When sending a test');
+            $this->userClass->triggers = $this->userCreationTriggers;
+            $receiver = $this->userClass->getOneByEmail($user, $force || $this->autoAddUser);
+        }
+
+        if (empty($receiver)) {
+            throw new Exception(acym_translation('ACYM_USER_NOT_FOUND'));
         }
 
         $this->userLanguage = empty($receiver->language) ? acym_getLanguageTag() : $receiver->language;
@@ -1189,7 +1181,7 @@ class MailerHelper extends Mailer
 
         if (!empty($this->defaultMail[$mailId]->preheader)) {
             $preHeader = '<!--[if !mso 9]><!--><div style="visibility:hidden;mso-hide:all;font-size:0;color:transparent;height:0;line-height:0;max-height:0;max-width:0;opacity:0;overflow:hidden;">';
-            $preHeader .= $this->defaultMail[$mailId]->preheader.str_repeat('&nbsp;&zwnj;', 100);
+            $preHeader .= $this->defaultMail[$mailId]->preheader;
             $preHeader .= '</div><!--<![endif]-->';
 
             preg_match('#(<(.*)<body(.*)>)#Uis', $this->Body, $matches);
@@ -1563,7 +1555,7 @@ class MailerHelper extends Mailer
         $emogrifiedMediaCSS = '';
 
         $style = $this->getEmailStylesheet($mail);
-        $cssInliner = CssInlinerHelper::fromHtml($mail->body)->inlineCss(implode('', $style));
+        $cssInliner = CssInliner::fromHtml($mail->body)->inlineCss(implode('', $style));
         $domDocument = $cssInliner->getDomDocument();
 
         $mail->body = preg_replace(

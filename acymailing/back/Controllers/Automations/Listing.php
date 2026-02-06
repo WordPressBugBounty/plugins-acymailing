@@ -77,7 +77,7 @@ trait Listing
                     if (!empty($action->actions) && strpos($action->actions, 'acy_add_queue') !== false) {
                         $action->actions = json_decode($action->actions, true);
                         $mailClass = new MailClass();
-                        foreach ($action->actions as &$oneAction) {
+                        foreach ($action->actions as & $oneAction) {
                             if (!empty($oneAction['acy_add_queue']['mail_id'])) {
                                 $newMail = $mailClass->duplicateMail($oneAction['acy_add_queue']['mail_id'], MailClass::TYPE_AUTOMATION);
                                 if (!empty($newMail)) {
@@ -93,5 +93,19 @@ trait Listing
         }
 
         $this->listing();
+    }
+
+    public function ajaxSetOrdering(): void
+    {
+        acym_checkToken();
+
+        $order = json_decode(acym_getVar('string', 'order') ?? '[]', true);
+
+        foreach ($order as $index => $automationId) {
+            $query = 'UPDATE #__acym_automation SET `ordering` = '.intval($index + 1).' WHERE `id` = '.intval($automationId);
+            acym_query($query);
+        }
+
+        acym_sendAjaxResponse($order, [], true);
     }
 }

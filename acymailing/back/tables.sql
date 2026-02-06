@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS `#__acym_list` (
 	`welcome_id` INT NULL,
 	`unsubscribe_id` INT NULL,
 	`cms_user_id` INT NOT NULL,
-	`access` VARCHAR(50) NOT NULL DEFAULT '',
+	`access` VARCHAR(150) NOT NULL DEFAULT '',
 	`description` TEXT NOT NULL,
 	`tracking` TINYINT(1) NOT NULL DEFAULT 1,
 	`type` VARCHAR(20) NOT NULL DEFAULT 'standard',
@@ -164,6 +164,7 @@ CREATE TABLE IF NOT EXISTS `#__acym_automation` (
 	`name` VARCHAR(255) NOT NULL,
 	`description` LONGTEXT NULL,
 	`active` TINYINT(3) NOT NULL DEFAULT 0,
+	`ordering` SMALLINT(6) NOT NULL DEFAULT 0,
 	`report` TEXT NULL,
 	`tree` LONGTEXT NULL,
 	`admin` TINYINT(3) NULL,
@@ -599,6 +600,7 @@ CREATE TABLE IF NOT EXISTS `#__acym_scenario` (
 	`active` TINYINT(1) NOT NULL DEFAULT 0,
 	`trigger_params` TEXT NULL,
 	`trigger_once` TINYINT(1) NOT NULL DEFAULT 0,
+	`ordering` SMALLINT(6) NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`)
 )
 	ENGINE = InnoDB
@@ -633,6 +635,7 @@ CREATE TABLE IF NOT EXISTS `#__acym_scenario_process` (
 	`user_id` INT NOT NULL,
 	`start_at` DATETIME NOT NULL,
 	`end_at` DATETIME NULL,
+	`unsubscribed` TINYINT(1) NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`),
 	CONSTRAINT `#__fk_acym_scenario_process1`
     		FOREIGN KEY (`scenario_id`)

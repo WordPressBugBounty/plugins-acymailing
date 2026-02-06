@@ -40,9 +40,12 @@ class plgAcymAcymailer extends AcymPlugin
         26 => 'ACYM_SERVICE_TEMPORARY_UNAVAILABLE',
         27 => 'ACYM_DOMAIN_ONLY_ON_ONE_LICENSE',
         28 => 'ACYM_EMAIL_UNDER_VERIFICATION',
+        29 => 'ACYM_DOMAIN_BLOCKED',
+        30 => 'ACYM_ACCOUNT_UNDER_REVIEW',
     ];
-    private $errorCodes = [0, 1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 25, 26, 27, 28];
-    private $cnameErrors = [];
+
+    private array $errorCodes = [0, 1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 23, 24, 25, 26, 27, 28, 29, 30];
+    private array $cnameErrors = [];
 
     public function __construct()
     {
@@ -50,7 +53,7 @@ class plgAcymAcymailer extends AcymPlugin
         $this->pluginDescription->name = self::SENDING_METHOD_NAME;
     }
 
-    protected function callApiSendingMethod($url, $data = [], $headers = [], $type = 'GET', $authentication = [], $dataDecoded = false)
+    protected function callApiSendingMethod(string $url, array $data = [], array $headers = [], string $type = 'GET', array $authentication = [], bool $dataDecoded = false): array
     {
         if (strpos($url, self::SENDING_METHOD_API_URL) === false) {
             $url = self::SENDING_METHOD_API_URL.'api/'.$url;
@@ -214,10 +217,10 @@ class plgAcymAcymailer extends AcymPlugin
                                     <?php echo acym_translation('ACYM_STATUS'); ?>
 								</div>
 								<div class="cell hide-for-small-only medium-2 acym__listing__header__title text-center">
-                                    <?php echo acym_translation('ACYM_BOUNCE_RATE').acym_info('ACYM_BOUNCE_RATE_DESC'); ?>
+                                    <?php echo acym_translation('ACYM_BOUNCE_RATE').acym_info(['textShownInTooltip' => 'ACYM_BOUNCE_RATE_DESC']); ?>
 								</div>
 								<div class="cell hide-for-small-only medium-2 acym__listing__header__title text-center">
-                                    <?php echo acym_translation('ACYM_COMPLAINT_RATE').acym_info('ACYM_COMPLAINT_RATE_DESC'); ?>
+                                    <?php echo acym_translation('ACYM_COMPLAINT_RATE').acym_info(['textShownInTooltip' => 'ACYM_COMPLAINT_RATE_DESC']); ?>
 								</div>
 								<div class="cell small-4 medium-2 acym__listing__header__title text-center">
                                     <?php echo acym_translation('ACYM_ACTIONS'); ?>
@@ -350,8 +353,8 @@ class plgAcymAcymailer extends AcymPlugin
                                             $buttonModal,
                                             $modalContent,
                                             null,
-                                            '',
-                                            '',
+                                            [],
+                                            [],
                                             true,
                                             true,
                                             'acym__config__acymailer__cname__modal__container'
@@ -373,7 +376,7 @@ class plgAcymAcymailer extends AcymPlugin
 					</div>
 					<div class="cell grid-x acym_vcenter acym__sending__methods__one__settings padding-top-1">
 						<div class="cell grid-x">
-							<div class="cell small-7 medium-4 large-3">
+							<div class="cell small-7 medium-4 large-3 margin-next-1">
 								<input id="<?php echo self::SENDING_METHOD_ID; ?>_domain"
 									   class="cell medium-6 large-4 xlarge-3"
 									   type="text"
@@ -389,7 +392,7 @@ class plgAcymAcymailer extends AcymPlugin
 									</span>
                                 <?php } ?>
 							</div>
-							<div id="acym__configuration__sending__method_addDomain_submit" class="cell grid-x small-4 medium-6 large-8 margin-left-1 acym_vcenter">
+							<div id="acym__configuration__sending__method_addDomain_submit" class="cell grid-x small-4 medium-6 large-8 acym_vcenter">
 								<button type="button"
 										id="acym__configuration__sending__method-addDomain"
 										class="cell shrink button button-secondary">
@@ -411,7 +414,7 @@ class plgAcymAcymailer extends AcymPlugin
                                 acym_translation('ACYM_REPORT_SEE'),
                                 '',
                                 null,
-                                '',
+                                [],
                                 [
                                     'class' => 'button',
                                     'data-ajax' => 'true',
@@ -468,11 +471,6 @@ class plgAcymAcymailer extends AcymPlugin
         } else {
             acym_sendAjaxResponse(acym_translation('ACYM_API_KEY_CORRECT'));
         }
-    }
-
-    public function onAcymProcessQueueExternalSendingCampaign(&$externalSending, $transactional = false)
-    {
-        if ($this->config->get('mailer_method') == self::SENDING_METHOD_ID) $externalSending = false;
     }
 
     public function onAcymSendEmail(&$response, $mailerHelper, $to, $from, $replyTo, $bcc = [], $attachments = [], $sendingMethodListParams = [])
@@ -573,7 +571,7 @@ class plgAcymAcymailer extends AcymPlugin
         }
     }
 
-    public function replaceUserInformation(&$email, &$user, $send = true)
+    public function replaceUserInformation(object &$email, ?object &$user, bool $send = true): void
     {
         if (empty($email->externalMailer) || $email->externalMailer !== self::SENDING_METHOD_ID) return;
 
@@ -659,7 +657,7 @@ class plgAcymAcymailer extends AcymPlugin
             }
         }
 
-        $this->config->save([self::SENDING_METHOD_ID.'_domains' => json_encode($domains)]);
+        $this->config->saveConfig([self::SENDING_METHOD_ID.'_domains' => json_encode($domains)]);
 
         if (!empty($errorDomains)) {
             acym_sendAjaxResponse(implode(', ', $errorDomains), [], false);
@@ -705,12 +703,10 @@ class plgAcymAcymailer extends AcymPlugin
             $field = self::SENDING_METHOD_ID.'_domains';
             $domains = json_decode($this->config->get($field, '[]'), true);
             $domains = array_filter($domains, function ($domain) use ($oneDomain) {
-                return $domain['domain'] != $oneDomain;
+                return $domain['domain'] !== $oneDomain;
             });
 
-            $newConfig = new \stdClass();
-            $newConfig->$field = json_encode($domains);
-            $this->config->save($newConfig);
+            $this->config->saveConfig([$field => json_encode($domains)]);
 
             acym_sendAjaxResponse();
         }
@@ -720,7 +716,7 @@ class plgAcymAcymailer extends AcymPlugin
     {
         $oneDomain = acym_getVar('string', 'oneDomain', '');
 
-        $this->config->save(['mailer_method' => self::SENDING_METHOD_ID]);
+        $this->config->saveConfig(['mailer_method' => self::SENDING_METHOD_ID]);
 
         if (empty($oneDomain)) {
             acym_sendAjaxResponse(acym_translation('ACYM_MISSING_DOMAIN'), [], false);
@@ -776,7 +772,7 @@ class plgAcymAcymailer extends AcymPlugin
                 'CnameRecords' => $responseApi['cnameRecords'],
                 'status' => 'PENDING',
             ];
-            $this->config->save([$field => json_encode($domains)]);
+            $this->config->saveConfig([$field => json_encode($domains)]);
             acym_sendAjaxResponse($this->translate($responseApi), ['cnameRecords' => $responseApi['cnameRecords']]);
         } else {
             $cnameRecords = $responseApi['data'][$oneDomain]['cnameRecords'];
@@ -786,7 +782,7 @@ class plgAcymAcymailer extends AcymPlugin
                 'CnameRecords' => $cnameRecords,
                 'status' => $status,
             ];
-            $this->config->save([$field => json_encode($domains)]);
+            $this->config->saveConfig([$field => json_encode($domains)]);
 
             acym_sendAjaxResponse(
                 $this->translate($responseApi),
@@ -912,13 +908,13 @@ class plgAcymAcymailer extends AcymPlugin
         $response = $this->callApiSendingMethod(self::SENDING_METHOD_API_URL.'public/licenses/'.$licenseKey);
 
         if (!empty($response['id'])) {
-            $this->config->save([self::SENDING_METHOD_ID.'_apikey' => $response['id']]);
+            $this->config->saveConfig([self::SENDING_METHOD_ID.'_apikey' => $response['id']]);
         }
     }
 
     public function onAcymDetachLicense()
     {
-        $this->config->save([self::SENDING_METHOD_ID.'_apikey' => '']);
+        $this->config->saveConfig([self::SENDING_METHOD_ID.'_apikey' => '']);
     }
 
     public function onAcymCampaignSummary(&$data)
@@ -1021,7 +1017,7 @@ class plgAcymAcymailer extends AcymPlugin
             }
         }
 
-        $this->config->save([self::SENDING_METHOD_ID.'_domains' => json_encode($domains)]);
+        $this->config->saveConfig([self::SENDING_METHOD_ID.'_domains' => json_encode($domains)]);
     }
 
     private function getVerifiedDomains(): array
@@ -1067,7 +1063,7 @@ class plgAcymAcymailer extends AcymPlugin
 
         $response = $this->callApiSendingMethod('get_credits');
 
-        $this->config->save([
+        $this->config->saveConfig([
             self::SENDING_METHOD_ID.'_credits_details' => json_encode($response),
             self::SENDING_METHOD_ID.'_last_credits_check' => $time,
         ]);
@@ -1093,7 +1089,7 @@ class plgAcymAcymailer extends AcymPlugin
         }
 
         $correspondence = '';
-        $messageData = '';
+        $messageData = [];
 
 
         if (isset($response['code']) && !empty(self::TRANSLATIONS[$response['code']])) {
@@ -1144,7 +1140,8 @@ class plgAcymAcymailer extends AcymPlugin
         return strpos($text, '{unsubscribe}') !== false
             || strpos($text, '{unsubscribeall}') !== false
             || strpos($text, 'task=unsubscribe') !== false
-            || strpos($text, 'frontusers/unsubscribe') !== false;
+            || strpos($text, 'frontusers/unsubscribe') !== false
+            || strpos($text, '{direct_unsubscribe') !== false;
     }
 
     private function checkDomainsDNS($domains): array

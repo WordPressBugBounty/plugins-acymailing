@@ -5,7 +5,7 @@ use AcyMailing\Classes\PluginClass;
 global $acymPlugins;
 global $acymAddonsForSettings;
 
-function acym_trigger($method, $args = [], $plugin = null, $callbackOnePlugin = null)
+function acym_trigger(string $method, array $args = [], ?string $plugin = null, ?callable $callbackOnePlugin = null): ?array
 {
     if (!in_array(acym_getPrefix().'acym_configuration', acym_getTableList())) {
         return null;
@@ -35,7 +35,10 @@ function acym_trigger($method, $args = [], $plugin = null, $callbackOnePlugin = 
 
         try {
             $value = call_user_func_array([$onePlugin, $method], $args);
-            if (isset($value)) $result[] = $value;
+            if (isset($value)) {
+                $result[] = $value;
+            }
+
             if (!empty($onePlugin->errors)) {
                 $onePlugin->errorCallback();
             }

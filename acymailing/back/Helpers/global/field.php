@@ -1,7 +1,15 @@
 <?php
 
-function acym_radio($options, $name, $selected = null, $attributes = [], $params = [], $frontDisplay = false, $disabledOptions = [])
-{
+function acym_radio(
+    array  $options,
+    string $name,
+           $selected = null,
+    array  $attributes = [],
+    array  $params = [],
+    bool   $frontDisplay = false,
+    array  $disabledOptions = [],
+    bool   $escapeLabels = true
+): string {
     $id = preg_replace(
         '#[^a-zA-Z0-9_]+#mi',
         '_',
@@ -17,15 +25,20 @@ function acym_radio($options, $name, $selected = null, $attributes = [], $params
 
     $attributes['type'] = 'radio';
     $attributes['name'] = $name;
-    if (empty($params['containerClass'])) $params['containerClass'] = '';
+    if (empty($params['containerClass'])) {
+        $params['containerClass'] = '';
+    }
 
-    $return = '<div class="acym_radio_group '.$params['containerClass'].'">';
+    $return = '<div class="acym_radio_group '.acym_escape($params['containerClass']).'">';
     $k = 0;
     foreach ($options as $value => $label) {
-        $attributes['class'] = '';
+        $currentAttributes = $attributes;
+        $currentAttributes['class'] = '';
+        unset($currentAttributes['related']);
+
         if (is_object($label)) {
             if (!empty($label->class)) {
-                $attributes['class'] = $label->class;
+                $currentAttributes['class'] = $label->class;
             }
 
             $value = $label->$objValue;
@@ -34,43 +47,44 @@ function acym_radio($options, $name, $selected = null, $attributes = [], $params
 
         $currentId = empty($params['useIncrement']) ? $id.$value : $id.$k;
 
-        $attributes['value'] = $value;
-        $attributes['id'] = $currentId;
+        $currentAttributes['value'] = $value;
+        $currentAttributes['id'] = $currentId;
 
         if (isset($attributes['related'][$value])) {
-            $attributes['acym-data-related'] = $attributes['related'][$value];
+            $currentAttributes['acym-data-related'] = $attributes['related'][$value];
         }
 
-        $checked = (string)$value == (string)$selected ? ' checked="checked"' : '';
-
-        $disabled = '';
         $extraClass = '';
         if (!empty($disabledOptions[$value])) {
-            $disabled = ' disabled';
+            $currentAttributes['disabled'] = 'disabled';
             $extraClass = ' '.$disabledOptions[$value]['disabledClass'];
-            $attributes['class'] .= $extraClass;
+            $currentAttributes['class'] .= $extraClass;
         }
 
-        $formattedAttributes = '';
-        foreach ($attributes as $attribute => $val) {
-            if ($attribute === 'related') continue;
-            $formattedAttributes .= ' '.$attribute.'="'.acym_escape($val).'"';
+        if ((string)$value === (string)$selected) {
+            $currentAttributes['checked'] = 'checked';
         }
+        $formattedAttributes = acym_getFormattedAttributes($currentAttributes);
+
         if (!empty($params['required'])) {
             $formattedAttributes .= ' required';
             unset($params['required']);
         }
 
-        $elementClass = empty($elementClass) ? '' : ' class="'.$elementClass.'"';
-
         $currentOption = '';
         if (!$frontDisplay) {
-            $currentOption .= '<i data-radio="'.$currentId.'" class="acymicon-radio-button-checked acym_radio_checked'.$extraClass.'"></i>';
-            $currentOption .= '<i data-radio="'.$currentId.'" class="acymicon-radio-button-unchecked acym_radio_unchecked'.$extraClass.'"></i>';
+            $currentOption .= '<i data-radio="'.acym_escape($currentId).'" class="acymicon-radio-button-checked acym_radio_checked'.acym_escape($extraClass).'"></i>';
+            $currentOption .= '<i data-radio="'.acym_escape($currentId).'" class="acymicon-radio-button-unchecked acym_radio_unchecked'.acym_escape($extraClass).'"></i>';
         }
 
-        $currentOption .= '<input'.$formattedAttributes.$checked.$disabled.' />';
-        $currentOption .= '<label for="'.$currentId.'" id="'.$currentId.'-lbl" class="'.$extraClass.'">'.acym_translation($label).'</label>';
+        $currentOption .= '<input '.$formattedAttributes.' />';
+        $currentOption .= '<label for="'.acym_escape($currentId).'" id="'.acym_escape($currentId).'-lbl" class="'.acym_escape($extraClass).'">';
+        if ($escapeLabels) {
+            $currentOption .= acym_escape(acym_translation($label));
+        } else {
+            $currentOption .= acym_translation($label);
+        }
+        $currentOption .= '</label>';
 
         if (!empty($disabledOptions[$value]['tooltipTxt'])) {
             $currentOption = acym_tooltip(
@@ -83,7 +97,9 @@ function acym_radio($options, $name, $selected = null, $attributes = [], $params
 
         $return .= $currentOption;
 
-        if (!empty($params['pluginMode'])) $return .= '<br />';
+        if (!empty($params['pluginMode'])) {
+            $return .= '<br />';
+        }
         $k++;
     }
     $return .= '</div>';
@@ -91,8 +107,14 @@ function acym_radio($options, $name, $selected = null, $attributes = [], $params
     return $return;
 }
 
-function acym_boolean($name, $selected = null, $id = null, $attributes = [], $yes = 'ACYM_YES', $no = 'ACYM_NO')
-{
+function acym_boolean(
+    string  $name,
+    bool    $selected = false,
+    ?string $id = null,
+    array   $attributes = [],
+    string  $yes = 'ACYM_YES',
+    string  $no = 'ACYM_NO'
+): string {
     $options = [
         '1' => acym_translation($yes),
         '0' => acym_translation($no),
@@ -114,29 +136,25 @@ function acym_boolean($name, $selected = null, $id = null, $attributes = [], $ye
     );
 }
 
-function acym_select($data, $name, $selected = null, $attribs = null, $optKey = 'value', $optText = 'text', $idtag = false, $translate = false): string
-{
-    $idtag = str_replace(['[', ']', ' '], '', empty($idtag) ? $name : $idtag);
-
-    $attributes = '';
-    if (!empty($attribs)) {
-        if (is_array($attribs)) {
-            foreach ($attribs as $attribName => $attribValue) {
-                if (is_array($attribValue) || is_object($attribValue)) {
-                    $attribValue = json_encode($attribValue);
-                }
-                $attribName = str_replace([' ', '"', "'"], '_', $attribName);
-                $attributes .= ' '.$attribName;
-                if ($attribValue !== true) {
-                    $attributes .= '="'.acym_escape($attribValue).'"';
-                }
-            }
-        } else {
-            $attributes = $attribs;
-        }
+function acym_select(
+    array   $data,
+    string  $name,
+            $selected = null,
+    ?array  $attribs = null,
+    string  $optKey = 'value',
+    string  $optText = 'text',
+    ?string $idtag = null,
+    bool    $translate = false
+): string {
+    if (empty($attribs)) {
+        $attribs = [];
     }
 
-    $dropdown = '<select id="'.acym_escape($idtag).'" name="'.acym_escape($name).'" '.$attributes.'>';
+    $attribs['name'] = $name;
+    $attribs['id'] = str_replace(['[', ']', ' '], '', empty($idtag) ? $name : $idtag);
+    $attributes = acym_getFormattedAttributes($attribs);
+
+    $dropdown = '<select '.$attributes.'>';
 
     foreach ($data as $key => $oneOption) {
         $disabled = false;
@@ -155,15 +173,13 @@ function acym_select($data, $name, $selected = null, $attribs = null, $optKey = 
             $text = acym_translation($text);
         }
 
-        if (strtolower($value) == '<optgroup>') {
+        if (strtolower($value) === '<optgroup>') {
             $dropdown .= '<optgroup label="'.acym_escape($text).'">';
-        } elseif (strtolower($value) == '</optgroup>') {
+        } elseif (strtolower($value) === '</optgroup>') {
             $dropdown .= '</optgroup>';
         } else {
-            $cleanValue = acym_escape($value);
-            $cleanText = acym_escape($text);
-            $dropdown .= '<option value="'.$cleanValue.'"'.(strval($value) === strval($selected) ? ' selected="selected"' : '').($disabled ? ' disabled="disabled"'
-                    : '').'>'.$cleanText.'</option>';
+            $dropdown .= '<option value="'.acym_escape($value).'"'.(strval($value) === strval($selected) ? ' selected="selected"' : '').($disabled ? ' disabled="disabled"'
+                    : '').'>'.acym_escape($text).'</option>';
         }
     }
 
@@ -172,19 +188,23 @@ function acym_select($data, $name, $selected = null, $attribs = null, $optKey = 
     return $dropdown;
 }
 
-function acym_selectMultiple($data, $name, $selected = [], $attribs = [], $optValue = 'value', $optText = 'text', $translate = false)
-{
+function acym_selectMultiple(
+    array  $data,
+    string $name,
+    array  $selected = [],
+    array  $attribs = [],
+    string $optValue = 'value',
+    string $optText = 'text',
+    bool   $translate = false
+): string {
     if (substr($name, -2) !== '[]') {
         $name .= '[]';
     }
 
     $attribs['multiple'] = 'multiple';
 
-    $dropdown = '<select name="'.acym_escape($name).'"';
-    foreach ($attribs as $attribKey => $attribValue) {
-        $dropdown .= ' '.$attribKey.'="'.addslashes($attribValue).'"';
-    }
-    $dropdown .= '>';
+    $parameters = acym_getFormattedAttributes($attribs);
+    $dropdown = '<select name="'.acym_escape($name).'"'.$parameters.'>';
 
     foreach ($data as $oneDataKey => $oneDataValue) {
         $disabled = '';
@@ -205,13 +225,12 @@ function acym_selectMultiple($data, $name, $selected = [], $attribs = [], $optVa
             $text = acym_translation($text);
         }
 
-        if (strtolower($value) == '<optgroup>') {
+        if (strtolower($value) === '<optgroup>') {
             $dropdown .= '<optgroup label="'.acym_escape($text).'">';
-        } elseif (strtolower($value) == '</optgroup>') {
+        } elseif (strtolower($value) === '</optgroup>') {
             $dropdown .= '</optgroup>';
         } else {
-            $text = acym_escape($text);
-            $dropdown .= '<option value="'.acym_escape($value).'"'.(in_array($value, $selected) ? ' selected="selected"' : '').$disabled.'>'.$text.'</option>';
+            $dropdown .= '<option value="'.acym_escape($value).'"'.(in_array($value, $selected) ? ' selected="selected"' : '').$disabled.'>'.acym_escape($text).'</option>';
         }
     }
 
@@ -220,8 +239,13 @@ function acym_selectMultiple($data, $name, $selected = [], $attribs = [], $optVa
     return $dropdown;
 }
 
-function acym_selectOption($value, $text = '', $optKey = 'value', $optText = 'text', $disable = false)
-{
+function acym_selectOption(
+    $value,
+    string $text = '',
+    string $optKey = 'value',
+    string $optText = 'text',
+    bool $disable = false
+): object {
     $option = new stdClass();
     $option->$optKey = $value;
     $option->$optText = acym_translation($text);
@@ -231,298 +255,302 @@ function acym_selectOption($value, $text = '', $optKey = 'value', $optText = 'te
 }
 
 function acym_switch(
-    $name,
-    $value,
-    $label = null,
-    $attrInput = [],
-    $labelClass = 'medium-6 small-9',
-    $switchContainerClass = 'auto',
-    $switchClass = '',
-    $toggle = null,
-    $toggleOpen = true,
-    $vModel = '',
-    $disabled = false,
-    $disabledMessage = ''
-) {
+    string  $name,
+            $value,
+    ?string $label = null,
+    array   $attrInput = [],
+    string  $labelClass = 'medium-6 small-9',
+    string  $switchContainerClass = 'auto',
+    string  $switchClass = '',
+    ?string $toggle = null,
+    bool    $toggleOpen = true,
+    string  $vModel = '',
+    bool    $disabled = false,
+    string  $disabledMessage = ''
+): string {
     static $occurrence = 100;
     $occurrence++;
 
-    $id = acym_escape('switch_'.$occurrence);
+    $id = 'switch_'.$occurrence;
     $checked = $value == 1 ? 'checked="checked"' : '';
+
+    $attrInput['name'] = $name;
+    $attrInput['data-switch'] = $id;
+    $attrInput['value'] = $value;
+
+    if (!empty($toggle)) {
+        $attrInput['data-toggle-switch'] = $toggle;
+        $attrInput['data-toggle-switch-open'] = $toggleOpen ? 'show' : 'hide';
+    }
+    $inputParameters = acym_getFormattedAttributes($attrInput);
 
     $switch = '
     <div class="switch '.acym_escape($switchClass).'">
-        <input type="hidden" name="'.acym_escape($name).'" data-switch="'.$id.'" value="'.acym_escape($value).'" '.$vModel;
+        <input type="hidden" '.$vModel.' '.$inputParameters.'>';
 
-    if (!empty($toggle)) {
-        $switch .= ' data-toggle-switch="'.acym_escape($toggle).'" data-toggle-switch-open="'.($toggleOpen ? 'show' : 'hide').'"';
-    }
-
-    foreach ($attrInput as $oneAttributeName => $oneAttributeValue) {
-        $switch .= ' '.$oneAttributeName.'="'.acym_escape($oneAttributeValue).'"';
-    }
-    $switch .= '>';
     $labelSwitchDisabled = !$disabled ? '' : ' disabled';
     $inputSwitchDisabled = !$disabled ? '' : ' disabled="disabled"';
-    $disabledTooltip = !$disabled || empty($disabledMessage) ? '' : ' data-acym-tooltip="'.$disabledMessage.'"';
+    $disabledTooltip = !$disabled || empty($disabledMessage) ? '' : ' data-acym-tooltip="'.acym_escape($disabledMessage).'"';
     $switch .= '
-        <input class="switch-input" type="checkbox" id="'.$id.'" value="1" '.$checked.$inputSwitchDisabled.'>
-        <label class="switch-paddle switch-label'.$labelSwitchDisabled.'" '.$disabledTooltip.' for="'.$id.'">
+        <input class="switch-input" type="checkbox" id="'.acym_escape($id).'" value="1" '.$checked.$inputSwitchDisabled.'>
+        <label class="switch-paddle switch-label'.$labelSwitchDisabled.'" '.$disabledTooltip.' for="'.acym_escape($id).'">
             <span class="switch-active" aria-hidden="true">1</span>
             <span class="switch-inactive" aria-hidden="true">0</span>
         </label>
     </div>';
 
     if (!empty($label)) {
-        $switch = '<label for="'.$id.'" class="cell '.$labelClass.' switch-label">'.$label.'</label><div class="cell '.$switchContainerClass.'">'.$switch.'</div>';
+        $label = '<label for="'.acym_escape($id).'" class="cell '.acym_escape($labelClass).' switch-label">'.$label.'</label>';
+        $switch = $label.'<div class="cell '.acym_escape($switchContainerClass).'">'.$switch.'</div>';
     }
 
     return $switch;
 }
 
-function acym_showMore($toggle, $text = 'ACYM_SHOW_MORE', $class = '')
+function acym_showMore(string $toggle, string $text = 'ACYM_SHOW_MORE', string $class = ''): string
 {
-    $showMore = '<div class="showmore '.$class.'" data-toggle-showmore="'.$toggle.'">';
-    $showMore .= '<label>'.acym_translation($text).'<i class="acymicon-keyboard-arrow-down"></i></label>';
+    $showMore = '<div class="showmore '.acym_escape($class).'" data-toggle-showmore="'.acym_escape($toggle).'">';
+    $showMore .= '<label>'.acym_escape(acym_translation($text)).'<i class="acymicon-keyboard-arrow-down"></i></label>';
     $showMore .= '</div>';
 
     return $showMore;
 }
 
-function acym_generateCountryNumber($name, $defaultvalue = '')
+function acym_generateCountryNumber(string $name, string $defaultvalue = ''): string
 {
-    $country = [];
-    $country['93'] = 'Afghanistan';
-    $country['355'] = 'Albania';
-    $country['213'] = 'Algeria';
-    $country['1684'] = 'American Samoa';
-    $country['376'] = 'Andorra';
-    $country['244'] = 'Angola';
-    $country['1264'] = 'Anguilla';
-    $country['672'] = 'Antarctica';
-    $country['1268'] = 'Antigua & Barbuda';
-    $country['54'] = 'Argentina';
-    $country['374'] = 'Armenia';
-    $country['297'] = 'Aruba';
-    $country['247'] = 'Ascension Island';
-    $country['61'] = 'Australia';
-    $country['43'] = 'Austria';
-    $country['994'] = 'Azerbaijan';
-    $country['1242'] = 'Bahamas';
-    $country['973'] = 'Bahrain';
-    $country['880'] = 'Bangladesh';
-    $country['1246'] = 'Barbados';
-    $country['375'] = 'Belarus';
-    $country['32'] = 'Belgium';
-    $country['501'] = 'Belize';
-    $country['229'] = 'Benin';
-    $country['1441'] = 'Bermuda';
-    $country['975'] = 'Bhutan';
-    $country['591'] = 'Bolivia';
-    $country['387'] = 'Bosnia/Herzegovina';
-    $country['267'] = 'Botswana';
-    $country['55'] = 'Brazil';
-    $country['1284'] = 'British Virgin Islands';
-    $country['673'] = 'Brunei';
-    $country['359'] = 'Bulgaria';
-    $country['226'] = 'Burkina Faso';
-    $country['257'] = 'Burundi';
-    $country['855'] = 'Cambodia';
-    $country['237'] = 'Cameroon';
-    $country['1'] = 'Canada/USA';
-    $country['238'] = 'Cape Verde Islands';
-    $country['1345'] = 'Cayman Islands';
-    $country['236'] = 'Central African Republic';
-    $country['235'] = 'Chad Republic';
-    $country['56'] = 'Chile';
-    $country['86'] = 'China';
-    $country['6724'] = 'Christmas Island';
-    $country['6722'] = 'Cocos Keeling Island';
-    $country['57'] = 'Colombia';
-    $country['269'] = 'Comoros';
-    $country['243'] = 'Congo Democratic Republic';
-    $country['242'] = 'Congo, Republic of';
-    $country['682'] = 'Cook Islands';
-    $country['506'] = 'Costa Rica';
-    $country['225'] = 'Cote D\'Ivoire';
-    $country['385'] = 'Croatia';
-    $country['53'] = 'Cuba';
-    $country['357'] = 'Cyprus';
-    $country['420'] = 'Czech Republic';
-    $country['45'] = 'Denmark';
-    $country['253'] = 'Djibouti';
-    $country['1767'] = 'Dominica';
-    $country['1809'] = 'Dominican Republic';
-    $country['593'] = 'Ecuador';
-    $country['20'] = 'Egypt';
-    $country['503'] = 'El Salvador';
-    $country['240'] = 'Equatorial Guinea';
-    $country['291'] = 'Eritrea';
-    $country['372'] = 'Estonia';
-    $country['251'] = 'Ethiopia';
-    $country['500'] = 'Falkland Islands';
-    $country['298'] = 'Faroe Island';
-    $country['679'] = 'Fiji Islands';
-    $country['358'] = 'Finland';
-    $country['33'] = 'France';
-    $country['596'] = 'French Antilles/Martinique';
-    $country['594'] = 'French Guiana';
-    $country['689'] = 'French Polynesia';
-    $country['241'] = 'Gabon Republic';
-    $country['220'] = 'Gambia';
-    $country['995'] = 'Georgia';
-    $country['49'] = 'Germany';
-    $country['233'] = 'Ghana';
-    $country['350'] = 'Gibraltar';
-    $country['30'] = 'Greece';
-    $country['299'] = 'Greenland';
-    $country['1473'] = 'Grenada';
-    $country['590'] = 'Guadeloupe';
-    $country['1671'] = 'Guam';
-    $country['502'] = 'Guatemala';
-    $country['224'] = 'Guinea Republic';
-    $country['245'] = 'Guinea-Bissau';
-    $country['592'] = 'Guyana';
-    $country['509'] = 'Haiti';
-    $country['504'] = 'Honduras';
-    $country['852'] = 'Hong Kong';
-    $country['36'] = 'Hungary';
-    $country['354'] = 'Iceland';
-    $country['91'] = 'India';
-    $country['62'] = 'Indonesia';
-    $country['964'] = 'Iraq';
-    $country['98'] = 'Iran';
-    $country['353'] = 'Ireland';
-    $country['972'] = 'Israel';
-    $country['39'] = 'Italy';
-    $country['1876'] = 'Jamaica';
-    $country['81'] = 'Japan';
-    $country['962'] = 'Jordan';
-    $country['254'] = 'Kenya';
-    $country['686'] = 'Kiribati';
-    $country['3774'] = 'Kosovo';
-    $country['965'] = 'Kuwait';
-    $country['996'] = 'Kyrgyzstan';
-    $country['856'] = 'Laos';
-    $country['371'] = 'Latvia';
-    $country['961'] = 'Lebanon';
-    $country['266'] = 'Lesotho';
-    $country['231'] = 'Liberia';
-    $country['218'] = 'Libya';
-    $country['423'] = 'Liechtenstein';
-    $country['370'] = 'Lithuania';
-    $country['352'] = 'Luxembourg';
-    $country['853'] = 'Macau';
-    $country['389'] = 'Macedonia';
-    $country['261'] = 'Madagascar';
-    $country['265'] = 'Malawi';
-    $country['60'] = 'Malaysia';
-    $country['960'] = 'Maldives';
-    $country['223'] = 'Mali Republic';
-    $country['356'] = 'Malta';
-    $country['692'] = 'Marshall Islands';
-    $country['222'] = 'Mauritania';
-    $country['230'] = 'Mauritius';
-    $country['52'] = 'Mexico';
-    $country['691'] = 'Micronesia';
-    $country['373'] = 'Moldova';
-    $country['377'] = 'Monaco';
-    $country['976'] = 'Mongolia';
-    $country['382'] = 'Montenegro';
-    $country['1664'] = 'Montserrat';
-    $country['212'] = 'Morocco';
-    $country['258'] = 'Mozambique';
-    $country['95'] = 'Myanmar (Burma)';
-    $country['264'] = 'Namibia';
-    $country['674'] = 'Nauru';
-    $country['977'] = 'Nepal';
-    $country['31'] = 'Netherlands';
-    $country['599'] = 'Netherlands Antilles';
-    $country['687'] = 'New Caledonia';
-    $country['64'] = 'New Zealand';
-    $country['505'] = 'Nicaragua';
-    $country['227'] = 'Niger Republic';
-    $country['234'] = 'Nigeria';
-    $country['683'] = 'Niue Island';
-    $country['6723'] = 'Norfolk';
-    $country['850'] = 'North Korea';
-    $country['47'] = 'Norway';
-    $country['968'] = 'Oman Dem Republic';
-    $country['92'] = 'Pakistan';
-    $country['680'] = 'Palau Republic';
-    $country['970'] = 'Palestine';
-    $country['507'] = 'Panama';
-    $country['675'] = 'Papua New Guinea';
-    $country['595'] = 'Paraguay';
-    $country['51'] = 'Peru';
-    $country['63'] = 'Philippines';
-    $country['48'] = 'Poland';
-    $country['351'] = 'Portugal';
-    $country['1787'] = 'Puerto Rico';
-    $country['974'] = 'Qatar';
-    $country['262'] = 'Reunion Island';
-    $country['40'] = 'Romania';
-    $country['7'] = 'Russia';
-    $country['250'] = 'Rwanda Republic';
-    $country['1670'] = 'Saipan/Mariannas';
-    $country['378'] = 'San Marino';
-    $country['239'] = 'Sao Tome/Principe';
-    $country['966'] = 'Saudi Arabia';
-    $country['221'] = 'Senegal';
-    $country['381'] = 'Serbia';
-    $country['248'] = 'Seychelles Island';
-    $country['232'] = 'Sierra Leone';
-    $country['65'] = 'Singapore';
-    $country['421'] = 'Slovakia';
-    $country['386'] = 'Slovenia';
-    $country['677'] = 'Solomon Islands';
-    $country['252'] = 'Somalia Republic';
-    $country['685'] = 'Somoa';
-    $country['27'] = 'South Africa';
-    $country['82'] = 'South Korea';
-    $country['34'] = 'Spain';
-    $country['94'] = 'Sri Lanka';
-    $country['290'] = 'St. Helena';
-    $country['1869'] = 'St. Kitts';
-    $country['1758'] = 'St. Lucia';
-    $country['508'] = 'St. Pierre';
-    $country['1784'] = 'St. Vincent';
-    $country['249'] = 'Sudan';
-    $country['597'] = 'Suriname';
-    $country['268'] = 'Swaziland';
-    $country['46'] = 'Sweden';
-    $country['41'] = 'Switzerland';
-    $country['963'] = 'Syria';
-    $country['886'] = 'Taiwan';
-    $country['992'] = 'Tajikistan';
-    $country['255'] = 'Tanzania';
-    $country['66'] = 'Thailand';
-    $country['228'] = 'Togo Republic';
-    $country['690'] = 'Tokelau';
-    $country['676'] = 'Tonga Islands';
-    $country['1868'] = 'Trinidad & Tobago';
-    $country['216'] = 'Tunisia';
-    $country['90'] = 'Turkey';
-    $country['993'] = 'Turkmenistan';
-    $country['1649'] = 'Turks & Caicos Island';
-    $country['688'] = 'Tuvalu';
-    $country['256'] = 'Uganda';
-    $country['380'] = 'Ukraine';
-    $country['971'] = 'United Arab Emirates';
-    $country['44'] = 'United Kingdom';
-    $country['598'] = 'Uruguay';
-    $country['1 '] = 'USA/Canada';
-    $country['998'] = 'Uzbekistan';
-    $country['678'] = 'Vanuatu';
-    $country['3966'] = 'Vatican City';
-    $country['58'] = 'Venezuela';
-    $country['84'] = 'Vietnam';
-    $country['1340'] = 'Virgin Islands (US)';
-    $country['681'] = 'Wallis/Futuna Islands';
-    $country['967'] = 'Yemen Arab Republic';
-    $country['260'] = 'Zambia';
-    $country['263'] = 'Zimbabwe';
-    $country[''] = acym_translation('ACYM_PHONE_NOCOUNTRY');
+    $country = [
+        '' => acym_translation('ACYM_PHONE_NOCOUNTRY'),
+        '93' => 'Afghanistan',
+        '355' => 'Albania',
+        '213' => 'Algeria',
+        '1684' => 'American Samoa',
+        '376' => 'Andorra',
+        '244' => 'Angola',
+        '1264' => 'Anguilla',
+        '672' => 'Antarctica',
+        '1268' => 'Antigua & Barbuda',
+        '54' => 'Argentina',
+        '374' => 'Armenia',
+        '297' => 'Aruba',
+        '247' => 'Ascension Island',
+        '61' => 'Australia',
+        '43' => 'Austria',
+        '994' => 'Azerbaijan',
+        '1242' => 'Bahamas',
+        '973' => 'Bahrain',
+        '880' => 'Bangladesh',
+        '1246' => 'Barbados',
+        '375' => 'Belarus',
+        '32' => 'Belgium',
+        '501' => 'Belize',
+        '229' => 'Benin',
+        '1441' => 'Bermuda',
+        '975' => 'Bhutan',
+        '591' => 'Bolivia',
+        '387' => 'Bosnia/Herzegovina',
+        '267' => 'Botswana',
+        '55' => 'Brazil',
+        '1284' => 'British Virgin Islands',
+        '673' => 'Brunei',
+        '359' => 'Bulgaria',
+        '226' => 'Burkina Faso',
+        '257' => 'Burundi',
+        '855' => 'Cambodia',
+        '237' => 'Cameroon',
+        '1' => 'Canada/USA',
+        '238' => 'Cape Verde Islands',
+        '1345' => 'Cayman Islands',
+        '236' => 'Central African Republic',
+        '235' => 'Chad Republic',
+        '56' => 'Chile',
+        '86' => 'China',
+        '6724' => 'Christmas Island',
+        '6722' => 'Cocos Keeling Island',
+        '57' => 'Colombia',
+        '269' => 'Comoros',
+        '243' => 'Congo Democratic Republic',
+        '242' => 'Congo, Republic of',
+        '682' => 'Cook Islands',
+        '506' => 'Costa Rica',
+        '225' => 'Cote D\'Ivoire',
+        '385' => 'Croatia',
+        '53' => 'Cuba',
+        '357' => 'Cyprus',
+        '420' => 'Czech Republic',
+        '45' => 'Denmark',
+        '253' => 'Djibouti',
+        '1767' => 'Dominica',
+        '1809' => 'Dominican Republic',
+        '593' => 'Ecuador',
+        '20' => 'Egypt',
+        '503' => 'El Salvador',
+        '240' => 'Equatorial Guinea',
+        '291' => 'Eritrea',
+        '372' => 'Estonia',
+        '251' => 'Ethiopia',
+        '500' => 'Falkland Islands',
+        '298' => 'Faroe Island',
+        '679' => 'Fiji Islands',
+        '358' => 'Finland',
+        '33' => 'France',
+        '596' => 'French Antilles/Martinique',
+        '594' => 'French Guiana',
+        '689' => 'French Polynesia',
+        '241' => 'Gabon Republic',
+        '220' => 'Gambia',
+        '995' => 'Georgia',
+        '49' => 'Germany',
+        '233' => 'Ghana',
+        '350' => 'Gibraltar',
+        '30' => 'Greece',
+        '299' => 'Greenland',
+        '1473' => 'Grenada',
+        '590' => 'Guadeloupe',
+        '1671' => 'Guam',
+        '502' => 'Guatemala',
+        '224' => 'Guinea Republic',
+        '245' => 'Guinea-Bissau',
+        '592' => 'Guyana',
+        '509' => 'Haiti',
+        '504' => 'Honduras',
+        '852' => 'Hong Kong',
+        '36' => 'Hungary',
+        '354' => 'Iceland',
+        '91' => 'India',
+        '62' => 'Indonesia',
+        '964' => 'Iraq',
+        '98' => 'Iran',
+        '353' => 'Ireland',
+        '972' => 'Israel',
+        '39' => 'Italy',
+        '1876' => 'Jamaica',
+        '81' => 'Japan',
+        '962' => 'Jordan',
+        '254' => 'Kenya',
+        '686' => 'Kiribati',
+        '3774' => 'Kosovo',
+        '965' => 'Kuwait',
+        '996' => 'Kyrgyzstan',
+        '856' => 'Laos',
+        '371' => 'Latvia',
+        '961' => 'Lebanon',
+        '266' => 'Lesotho',
+        '231' => 'Liberia',
+        '218' => 'Libya',
+        '423' => 'Liechtenstein',
+        '370' => 'Lithuania',
+        '352' => 'Luxembourg',
+        '853' => 'Macau',
+        '389' => 'Macedonia',
+        '261' => 'Madagascar',
+        '265' => 'Malawi',
+        '60' => 'Malaysia',
+        '960' => 'Maldives',
+        '223' => 'Mali Republic',
+        '356' => 'Malta',
+        '692' => 'Marshall Islands',
+        '222' => 'Mauritania',
+        '230' => 'Mauritius',
+        '52' => 'Mexico',
+        '691' => 'Micronesia',
+        '373' => 'Moldova',
+        '377' => 'Monaco',
+        '976' => 'Mongolia',
+        '382' => 'Montenegro',
+        '1664' => 'Montserrat',
+        '212' => 'Morocco',
+        '258' => 'Mozambique',
+        '95' => 'Myanmar (Burma)',
+        '264' => 'Namibia',
+        '674' => 'Nauru',
+        '977' => 'Nepal',
+        '31' => 'Netherlands',
+        '599' => 'Netherlands Antilles',
+        '687' => 'New Caledonia',
+        '64' => 'New Zealand',
+        '505' => 'Nicaragua',
+        '227' => 'Niger Republic',
+        '234' => 'Nigeria',
+        '683' => 'Niue Island',
+        '6723' => 'Norfolk',
+        '850' => 'North Korea',
+        '47' => 'Norway',
+        '968' => 'Oman Dem Republic',
+        '92' => 'Pakistan',
+        '680' => 'Palau Republic',
+        '970' => 'Palestine',
+        '507' => 'Panama',
+        '675' => 'Papua New Guinea',
+        '595' => 'Paraguay',
+        '51' => 'Peru',
+        '63' => 'Philippines',
+        '48' => 'Poland',
+        '351' => 'Portugal',
+        '1787' => 'Puerto Rico',
+        '974' => 'Qatar',
+        '262' => 'Reunion Island',
+        '40' => 'Romania',
+        '7' => 'Russia',
+        '250' => 'Rwanda Republic',
+        '1670' => 'Saipan/Mariannas',
+        '378' => 'San Marino',
+        '239' => 'Sao Tome/Principe',
+        '966' => 'Saudi Arabia',
+        '221' => 'Senegal',
+        '381' => 'Serbia',
+        '248' => 'Seychelles Island',
+        '232' => 'Sierra Leone',
+        '65' => 'Singapore',
+        '421' => 'Slovakia',
+        '386' => 'Slovenia',
+        '677' => 'Solomon Islands',
+        '252' => 'Somalia Republic',
+        '685' => 'Somoa',
+        '27' => 'South Africa',
+        '82' => 'South Korea',
+        '34' => 'Spain',
+        '94' => 'Sri Lanka',
+        '290' => 'St. Helena',
+        '1869' => 'St. Kitts',
+        '1758' => 'St. Lucia',
+        '508' => 'St. Pierre',
+        '1784' => 'St. Vincent',
+        '249' => 'Sudan',
+        '597' => 'Suriname',
+        '268' => 'Swaziland',
+        '46' => 'Sweden',
+        '41' => 'Switzerland',
+        '963' => 'Syria',
+        '886' => 'Taiwan',
+        '992' => 'Tajikistan',
+        '255' => 'Tanzania',
+        '66' => 'Thailand',
+        '228' => 'Togo Republic',
+        '690' => 'Tokelau',
+        '676' => 'Tonga Islands',
+        '1868' => 'Trinidad & Tobago',
+        '216' => 'Tunisia',
+        '90' => 'Turkey',
+        '993' => 'Turkmenistan',
+        '1649' => 'Turks & Caicos Island',
+        '688' => 'Tuvalu',
+        '256' => 'Uganda',
+        '380' => 'Ukraine',
+        '971' => 'United Arab Emirates',
+        '44' => 'United Kingdom',
+        '598' => 'Uruguay',
+        '1 ' => 'USA/Canada',
+        '998' => 'Uzbekistan',
+        '678' => 'Vanuatu',
+        '3966' => 'Vatican City',
+        '58' => 'Venezuela',
+        '84' => 'Vietnam',
+        '1340' => 'Virgin Islands (US)',
+        '681' => 'Wallis/Futuna Islands',
+        '967' => 'Yemen Arab Republic',
+        '260' => 'Zambia',
+        '263' => 'Zimbabwe',
+    ];
 
     $countryCodeForSelect = [];
 
@@ -534,7 +562,10 @@ function acym_generateCountryNumber($name, $defaultvalue = '')
         $countryCodeForSelect,
         $name,
         empty($defaultvalue) ? '' : $defaultvalue,
-        ['class' => 'acym__select__country acym__select']
+        [
+            'class' => 'acym__select__country acym__select',
+            'autocomplete' => 'tel-country-code',
+        ]
     );
 }
 
@@ -573,7 +604,7 @@ function acym_tooltip(array $options): string
     return $tooltip;
 }
 
-function acym_info($options, $class = '', $containerClass = '', $classText = '', $warningInfo = false): string
+function acym_info($options, string $class = '', string $containerClass = '', string $classText = '', bool $warningInfo = false): string
 {
     if (!is_array($options)) {
         $options = [
@@ -595,7 +626,9 @@ function acym_info($options, $class = '', $containerClass = '', $classText = '',
 
     return acym_tooltip(
         [
-            'hoveredText' => '<span class="acym__tooltip__info__container '.$options['classIcon'].'"><i class="acym__tooltip__info__icon acymicon-info-circle '.$classWarning.'"></i></span>',
+            'hoveredText' => '<span class="acym__tooltip__info__container '.$options['classIcon'].'"><i class="acym__tooltip__info__icon acymicon-info-circle '.acym_escape(
+                    $classWarning
+                ).'"></i></span>',
             'textShownInTooltip' => acym_translation($options['textShownInTooltip']),
             'classContainer' => 'acym__tooltip__info '.$options['classContainer'],
             'classText' => $options['classText'],
@@ -603,13 +636,13 @@ function acym_info($options, $class = '', $containerClass = '', $classText = '',
     );
 }
 
-function acym_sortBy($options, $listing, $default = '', $defaultSortOrdering = 'desc')
+function acym_sortBy(array $options, string $listing, string $default = '', string $defaultSortOrdering = 'desc'): string
 {
     $default = empty($default) ? reset($options) : $default;
 
     $selected = acym_getVar('string', $listing.'_ordering', $default);
     $orderingSortOrder = acym_getVar('string', $listing.'_ordering_sort_order', $defaultSortOrdering);
-    $classSortOrder = $orderingSortOrder == 'asc' ? 'acymicon-sort-amount-asc' : 'acymicon-sort-amount-desc';
+    $classSortOrder = $orderingSortOrder === 'asc' ? 'acymicon-sort-amount-asc' : 'acymicon-sort-amount-desc';
 
     $display = '<span class="acym__color__dark-gray">'.acym_translation('ACYM_SORT_BY').'</span>';
     $display .= acym_select(
@@ -622,7 +655,7 @@ function acym_sortBy($options, $listing, $default = '', $defaultSortOrdering = '
         ]
     );
 
-    $tooltipText = $orderingSortOrder == 'asc' ? acym_translation('ACYM_SORT_ASC') : acym_translation('ACYM_SORT_DESC');
+    $tooltipText = $orderingSortOrder === 'asc' ? acym_translation('ACYM_SORT_ASC') : acym_translation('ACYM_SORT_DESC');
     $display .= acym_tooltip(
         [
             'hoveredText' => '<i class="'.$classSortOrder.' acym__listing__ordering__sort-order" aria-hidden="true"></i>',
@@ -635,42 +668,52 @@ function acym_sortBy($options, $listing, $default = '', $defaultSortOrdering = '
     return $display;
 }
 
-function acym_checkbox($values, $name, $selected = [], $label = '', $parentClass = '', $labelClass = '', $dataAttr = '')
-{
-    echo '<div class="'.$parentClass.'"><div class="cell acym__label '.$labelClass.'">'.$label.'</div><div class="cell auto grid-x">';
+function acym_checkbox(
+    array  $values,
+    string $name,
+    array  $selected = [],
+    string $label = '',
+    string $parentClass = '',
+    string $labelClass = '',
+    array  $dataAttr = []
+): void {
+    echo '<div class="'.acym_escape($parentClass).'"><div class="cell acym__label '.acym_escape($labelClass).'">'.$label.'</div><div class="cell auto grid-x">';
     foreach ($values as $key => $value) {
         $dtAttr = '';
-        if (!empty($dataAttr[$key])) $dtAttr = 'data-attr="'.$dataAttr[$key].'"';
-        echo '<label class="cell grid-x margin-top-1"><input type="checkbox" name="'.$name.'" value="'.$key.'" '.(in_array(
+        if (!empty($dataAttr[$key])) {
+            $dtAttr = 'data-attr="'.acym_escape($dataAttr[$key]).'"';
+        }
+
+        echo '<label class="cell grid-x margin-top-1"><input type="checkbox" name="'.acym_escape($name).'" value="'.acym_escape($key).'" '.(in_array(
                 $key,
                 $selected
-            ) ? 'checked' : '').' '.$dtAttr.'>'.$value.'</label>';
+            ) ? 'checked="checked"' : '').' '.$dtAttr.'>'.$value.'</label>';
     }
     echo '</div></div>';
 }
 
-function acym_switchFilter($switchOptions, $selected, $name, $addClass = '')
+function acym_switchFilter(array $switchOptions, string $selected, string $name, string $addClass = ''): string
 {
-    $return = '<input type="hidden" id="acym__type-template-'.$name.'" name="'.$name.'" value="'.$selected.'">';
+    $return = '<input type="hidden" id="acym__type-template-'.acym_escape($name).'" name="'.acym_escape($name).'" value="'.acym_escape($selected).'">';
     foreach ($switchOptions as $value => $text) {
         $class = 'button button-secondary acym__type__choosen cell small-6 xlarge-auto large-shrink';
-        if ($value == $selected) {
+        if ($value === $selected) {
             $class .= ' is-active';
         }
         $class .= ' '.$addClass;
-        $return .= '<button class="'.acym_escape($class).'" type="button" data-type="'.acym_escape($value).'">'.acym_translation($text).'</button>';
+        $return .= '<button class="'.acym_escape($class).'" type="button" data-type="'.acym_escape($value).'">'.acym_escape(acym_translation($text)).'</button>';
     }
 
     return $return;
 }
 
-function acym_filterStatus($options, $selected, $name)
+function acym_filterStatus(array $options, string $selected, string $name): string
 {
     $filterStatus = '<input type="hidden" id="acym_filter_status" name="'.acym_escape($name).'" value="'.acym_escape($selected).'"/>';
 
     foreach ($options as $value => $text) {
         $class = 'acym__filter__status ';
-        if ($value == $selected) {
+        if ($value === $selected) {
             $class .= ' font-bold acym__status__select';
         }
 
@@ -683,19 +726,24 @@ function acym_filterStatus($options, $selected, $name)
             $disabled = '';
             $userCount = '';
         } else {
-            $disabled = empty($text[1]) ? ' disabled' : '';
+            $disabled = empty($text[1]) ? ' disabled="disabled"' : '';
             $userCount = ' ('.$text[1].')';
         }
         $filterStatus .= '<button type="button" acym-data-status="'.acym_escape($value).'" class="'.acym_escape($class).'"'.$disabled.'>';
-        $filterStatus .= acym_translation($text[0]).$extraIcon.'<span class="acym__filter__status__number">'.$userCount.'</span></button>';
+        $filterStatus .= acym_escape(acym_translation($text[0])).$extraIcon.'<span class="acym__filter__status__number">'.acym_escape($userCount).'</span></button>';
     }
 
     return $filterStatus;
 }
 
-function acym_filterSearch($search, $name, $placeholder = 'ACYM_SEARCH', $showClearBtn = true, $additionnalClasses = '')
-{
-    $searchField = '<div class="input-group acym__search-area '.$additionnalClasses.'">
+function acym_filterSearch(
+    string $search,
+    string $name,
+    string $placeholder = 'ACYM_SEARCH',
+    bool   $showClearBtn = true,
+    string $additionalClasses = ''
+): string {
+    $searchField = '<div class="input-group acym__search-area '.acym_escape($additionalClasses).'">
         <div class="input-group-button">
             <button class="button acym__search__button"><i class="acymicon-search"></i></button>
         </div>
@@ -710,9 +758,11 @@ function acym_filterSearch($search, $name, $placeholder = 'ACYM_SEARCH', $showCl
     return $searchField;
 }
 
-function acym_displayParam($type, $value, $name, $params = [])
+function acym_displayParam(string $type, $value, string $name): string
 {
-    if (!include_once ACYM_FRONT.'Params'.DS.$type.'.php') return '';
+    if (!include_once ACYM_FRONT.'Params'.DS.$type.'.php') {
+        return '';
+    }
 
     $class = 'JFormField'.ucfirst($type);
 
@@ -720,23 +770,39 @@ function acym_displayParam($type, $value, $name, $params = [])
     $field->value = $value;
     $field->name = $name;
 
-    if (!empty($params)) {
-        foreach ($params as $param => $val) {
-            $field->$param = $val;
-        }
-    }
-
     return $field->getInput();
 }
 
-function acym_externalLink($text, $link, $displayIcon = true, $openInNewTab = true, $classesA = [])
-{
+function acym_externalLink(
+    string $text,
+    string $link,
+    bool   $displayIcon = true,
+    bool   $openInNewTab = true,
+    array  $classesA = []
+): string {
     $target = $openInNewTab ? 'target="_blank"' : '';
-    $link = 'href="'.$link.'"';
+    $link = 'href="'.acym_escapeUrl($link).'"';
     $icon = $displayIcon ? ' <i class="acymicon-external-link"></i>' : '';
     $translatedText = acym_translation($text);
     $classesA[] = 'acym__external__link';
-    $classesAHtml = 'class="'.implode(' ', $classesA).'"';
+    $classesAHtml = 'class="'.acym_escape(implode(' ', $classesA)).'"';
 
-    return '<a '.$target.' '.$link.' '.$classesAHtml.'>'.$translatedText.$icon.'</a>';
+    return '<a '.$target.' '.$link.' '.$classesAHtml.'>'.acym_escape($translatedText).$icon.'</a>';
+}
+
+function acym_getFormattedAttributes(array $attributes): string
+{
+    $params = '';
+    foreach ($attributes as $oneAttribute => $oneValue) {
+        $params .= ' '.$oneAttribute;
+
+        if ($oneValue !== true) {
+            if (is_array($oneValue) || is_object($oneValue)) {
+                $oneValue = json_encode($oneValue);
+            }
+            $params .= '="'.acym_escape($oneValue).'"';
+        }
+    }
+
+    return $params;
 }

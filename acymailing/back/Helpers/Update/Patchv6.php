@@ -229,11 +229,8 @@ trait Patchv6
         if (!empty($socialIcons['google'])) {
             unset($socialIcons['google']);
 
-            $newConfig = new \stdClass();
-            $newConfig->social_icons = json_encode($socialIcons);
-            $config->save($newConfig);
+            $config->saveConfig(['social_icons' => json_encode($socialIcons)]);
         }
-
 
         $mailsWithGoogle = acym_loadObjectList('SELECT `id`, `body` FROM `#__acym_mail` WHERE `body` LIKE "%googleplus%"');
         foreach ($mailsWithGoogle as $oneMail) {
@@ -632,7 +629,10 @@ trait Patchv6
 
             $pluginClass = new PluginClass();
             foreach ($wrongAddons as $oneGoneWrong) {
-                $pluginClass->downloadAddon($oneGoneWrong, false);
+                $errorMessage = $pluginClass->downloadAddon($oneGoneWrong, false);
+                if (!empty($errorMessage)) {
+                    acym_enqueueMessage($errorMessage, 'error');
+                }
             }
 
             acym_deleteFolder(ACYM_ADDONS_FOLDER_PATH.'Volumes');

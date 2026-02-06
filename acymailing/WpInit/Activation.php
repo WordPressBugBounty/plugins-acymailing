@@ -73,7 +73,7 @@ class Activation
         $updateHelper->updateSQL();
         $updateHelper->checkDB();
 
-        $config->save(['downloadurl' => '', 'lastupdatecheck' => '0']);
+        $config->saveConfig(['downloadurl' => '', 'lastupdatecheck' => '0']);
 
         $languageFiles = acym_getFiles(ACYM_FOLDER.'language'.DS, '\.ini');
         acym_createFolder(ACYM_LANGUAGE);
@@ -99,7 +99,7 @@ class Activation
         $updateHelper->installAddons();
         $updateHelper->installOverrideEmails();
 
-        $config->save(['installcomplete' => 1]);
+        $config->saveConfig(['installcomplete' => 1]);
 
         acym_config(true);
     }

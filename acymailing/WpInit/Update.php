@@ -2,6 +2,8 @@
 
 namespace AcyMailing\WpInit;
 
+use AcyMailing\Helpers\UpdatemeHelper;
+
 class Update
 {
     private bool $cancelUpdate = false;
@@ -130,10 +132,11 @@ class Update
             $this->cancelUpdate = true;
         }
 
-        $newConfig = new \stdClass();
-        $newConfig->lastupdatecheck = time();
-        $newConfig->latestversion = $latestVersion;
-        $newConfig->downloadurl = $downloadURL;
+        $newConfig = [
+            'lastupdatecheck' => time(),
+            'latestversion' => $latestVersion,
+            'downloadurl' => $downloadURL,
+        ];
 
         if (is_multisite()) {
             $currentBlog = get_current_blog_id();
@@ -144,25 +147,27 @@ class Update
                     $site = get_object_vars($site);
                 }
                 switch_to_blog($site['blog_id']);
-                $config->save($newConfig);
+                $config->saveConfig($newConfig);
             }
 
             switch_to_blog($currentBlog);
         }
 
-        $config->save($newConfig);
+        $config->saveConfig($newConfig);
 
         if (acym_level(ACYM_ESSENTIAL)) {
-            acym_checkVersion();
+            UpdatemeHelper::getLicenseInfo();
         }
     }
 
     private function resetUpdateData(): void
     {
         $config = acym_config();
-        $newConfig = new \stdClass();
-        $newConfig->downloadurl = '';
-        $newConfig->lastupdatecheck = 0;
-        $config->save($newConfig);
+        $config->saveConfig(
+            [
+                'downloadurl' => '',
+                'lastupdatecheck' => 0,
+            ]
+        );
     }
 }

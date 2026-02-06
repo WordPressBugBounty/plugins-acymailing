@@ -1,6 +1,6 @@
 <?php
 
-function acym_getView(string $ctrl, string $view, bool $forceBackend = false)
+function acym_getView(string $ctrl, string $view, bool $forceBackend = false): string
 {
     $override = acym_getPageOverride($ctrl, $view, $forceBackend);
 
@@ -13,12 +13,12 @@ function acym_getView(string $ctrl, string $view, bool $forceBackend = false)
     }
 }
 
-function acym_getPartial($family, $view)
+function acym_getPartial(string $family, string $view): string
 {
     return ACYM_PARTIAL.$family.DS.$view.'.php';
 }
 
-function acym_loadAssets($ctrl, $task)
+function acym_loadAssets(string $ctrl, string $task): void
 {
     $scope = acym_isAdmin() ? 'back' : 'front';
     acym_loadCmsScripts();
@@ -27,7 +27,6 @@ function acym_loadAssets($ctrl, $task)
         true,
         'const ACYM_AVAILABLE_PLUGINS = "'.str_replace('"', '\"', ACYM_AVAILABLE_PLUGINS).'";
         const ACYM_UPDATEME_API_URL = "'.ACYM_UPDATEME_API_URL.'";
-        const AJAX_URL_ACYMAILING = "'.ACYM_ACYMAILING_WEBSITE.'";
         const ACYM_MEDIA_URL = "'.ACYM_MEDIA_URL.'";
         const ACYM_CMS = "'.addslashes(ACYM_CMS).'";
         const ACYM_J40 = '.(defined('ACYM_J40') && ACYM_J40 ? 'true' : 'false').';
@@ -80,9 +79,9 @@ function acym_loadAssets($ctrl, $task)
     }
 }
 
-function acym_getJSMessages()
+function acym_getJSMessages(): string
 {
-    $msg = "{";
+    $msg = '{';
     $msg .= '"email": "'.acym_translation('ACYM_VALID_EMAIL', true).'",';
     $msg .= '"number": "'.acym_translation('ACYM_VALID_NUMBER', true).'",';
     $msg .= '"requiredMsg": "'.acym_translation('ACYM_REQUIRED_FIELD', true).'",';
@@ -333,6 +332,8 @@ function acym_getJSMessages()
         'ACYM_TERMS_POLICY_OPTIONS',
         'ACYM_TERMS_CONDITIONS',
         'ACYM_PRIVACY_POLICY',
+        'ACYM_TERMS_CONDITIONS_URL',
+        'ACYM_PRIVACY_POLICY_URL',
         'ACYM_SUBSCRIBE_OPTIONS',
         'ACYM_SUCCESS_MODE',
         'ACYM_CONFIRMATION_MESSAGE',
@@ -396,7 +397,7 @@ function acym_getJSMessages()
         'ACYM_GET_ONE_HERE',
         'ACYM_ENTITY',
         'ACYM_DELETE_DOMAIN_CONFIRMATION',
-        'ACYM_TENOR_KEY_NEEDED',
+        'ACYM_GIPHY_KEY_NEEDED',
         'ACYM_COPY_CODE',
         'ACYM_SCENARIO_ARE_YOU_SURE_DELETE_X',
         'ACYM_DELAY',
@@ -416,26 +417,34 @@ function acym_getJSMessages()
         'ACYM_SCENARIO',
         'ACYM_SCENARIOS',
         'ACYM_EXTRA_INFORMATION',
+        'ACYM_SELECT_A_PAGE',
+        'ACYM_DEDICATED_SENDING_PROCESS_WARNING',
+        'ACYM_GET_MY_API_KEY',
     ];
 
     foreach ($keysToLoad as $oneKey) {
         $msg .= ',"'.$oneKey.'": "'.acym_translation($oneKey, true).'"';
     }
 
-    $msg .= "}";
+    $msg .= '}';
 
     return $msg;
 }
 
-function acym_isExcludedFrontView($ctrl, $task)
+function acym_isExcludedFrontView(string $ctrl, string $task): bool
 {
-    if ('archive' === $ctrl && in_array($task, ['view'])) return true;
-    if ('frontusers' === $ctrl && 'profile' === $task) return true;
+    if ('archive' === $ctrl && $task === 'view') {
+        return true;
+    }
+
+    if ('frontusers' === $ctrl && 'profile' === $task) {
+        return true;
+    }
 
     return false;
 }
 
-function acym_listingActions($actions, $deleteMessage = '', $ctrl = '')
+function acym_listingActions(array $actions, string $deleteMessage = '', string $ctrl = ''): string
 {
     $defaultAction = new stdClass();
     $defaultAction->value = 0;
@@ -465,14 +474,14 @@ function acym_listingActions($actions, $deleteMessage = '', $ctrl = '')
         ).$completeMessage;
 }
 
-function acym_backToListing($listingName = null): string
+function acym_backToListing(?string $listingName = null): string
 {
     if (empty($listingName)) {
         $listingName = acym_getVar('cmd', 'ctrl');
     }
 
     $returnLink = '<p class="acym__back_to_listing">';
-    $returnLink .= '<a href="'.acym_completeLink($listingName).'" class="acym_vcenter">';
+    $returnLink .= '<a href="'.acym_escapeUrl(acym_completeLink($listingName)).'" class="acym_vcenter">';
     $returnLink .= '<i class="acymicon-chevron-left"></i> '.acym_translation('ACYM_BACK_TO_LISTING');
     $returnLink .= '</a>';
     $returnLink .= '</p>';

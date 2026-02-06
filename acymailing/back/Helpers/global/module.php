@@ -1,13 +1,13 @@
 <?php
 
-function acym_getModuleFormName()
+function acym_getModuleFormName(): string
 {
     static $i = 1;
 
     return 'formAcym'.rand(1000, 9999).$i++;
 }
 
-function acym_initModule($params = null, $options = [])
+function acym_initModule(?object $params = null, array $options = []): void
 {
     if (acym_isAjax()) {
         return;

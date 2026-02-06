@@ -1,5 +1,5 @@
 {
-    "max_version": "10.5.0",
+    "max_version": "10.7.0",
     "splash_content": [
         {
             "menu_title": "General",
@@ -7,12 +7,24 @@
             "title": "SEE THE GENERAL CHANGES",
             "articles": [
                 {
-                    "title": "Follow-up campaigns: new trigger",
-                    "desc": "The follow-up campaigns can now be triggered when a user confirms their email address."
+                    "title": "Automations and scenarios sorting",
+                    "desc": "We added the possibility to sort the automations and scenarios in order to trigger them in the specific order you want."
                 },
                 {
-                    "title": "Improved security and reliability",
-                    "desc": "We improved security and reliability of our code by adding new automated tests."
+                    "title": "Better custom field filtering",
+                    "desc": "Filtering on custom fields in automation filters and segments now shows possible values when possible."
+                },
+                {
+                    "title": "Right-to-left language support",
+                    "desc": "The interfaces have been fully reworked to better handle right-to-left languages."
+                },
+                {
+                    "title": "Scheduled campaign sending time display",
+                    "desc": "The sending time is now also shown on the campaigns listing page for scheduled campaigns."
+                },
+                {
+                    "title": "Timezone handling improvement",
+                    "desc": "The timezone is better handled on the user subscriptions listing."
                 }
             ]
         },
@@ -22,55 +34,12 @@
             "title": "WHAT CHANGED FOR JOOMLA",
             "articles": [
                 {
-                    "title": "RSEventsPro: featured events first",
-                    "desc": "We added a setting in the email editor with RSEventsPro to display featured events first in the inserted events list."
+                    "title": "Frontend campaign creation",
+                    "desc": "The subscribers are now correctly calculated when you create a campaign from the frontend."
                 },
                 {
-                    "title": "Zoo: new field types and selection",
-                    "desc": "The Zoo integration add-on now handles more field types and lets you select which fields to insert in your emails."
-                },
-                {
-                    "title": "Community Builder: new exclusion conditions",
-                    "desc": "The way users are filtered in the Community Builder Subscription integration has been improved to also include AcyMailing users with no subscription when you select an exclusion condition."
-                },
-                {
-                    "title": "RSEventsPro fix menu item",
-                    "desc": "We fixed the menu item ID option for RSEventsPro."
-                },
-                {
-                    "title": "Compatibility with SEBLOD",
-                    "desc": "We fixed a compatibility issue with SEBLOD latest version."
-                },
-                {
-                    "title": "Follow-up campaigns: fix add-on activation",
-                    "desc": "We fixed an error that blocked the display of the follow-up campaigns listing when you deactivate an add-on used in one of the follow-up campaigns."
-                },
-                {
-                    "title": "Automation: fix blank page",
-                    "desc": "We fixed an error that could occur when trying to create an automation that caused a blank page to be shown."
-                }
-            ]
-        },
-        {
-            "menu_title": "WordPress",
-            "menu_icon": "acymicon-wordpress",
-            "title": "WHAT CHANGED FOR WORDPRESS",
-            "articles": [
-                {
-                    "title": "WordPress standards",
-                    "desc": "Default templates are now stored differently to better match WordPress standards."
-                },
-                {
-                    "title": "Auto-update fix",
-                    "desc": "In some cases the auto-update of AcyMailing could install the free version instead of the current edition. The update process has been reworked to avoid this."
-                },
-                {
-                    "title": "AcyMailing header fix",
-                    "desc": "We fixed an issue that could occur on some new WordPress installations where the AcyMailing header caused a fatal error in the plugin."
-                },
-                {
-                    "title": "Contact Form 7 fix",
-                    "desc": "Fixed an issue with Contact Form 7 integration, preventing the subscriber creation"
+                    "title": "Unpublished categories handling",
+                    "desc": "The unpublished categories are now ignored when inserting articles by category in emails."
                 }
             ]
         },
@@ -80,20 +49,24 @@
             "title": "THE FIXES INCLUDED IN THIS VERSION",
             "articles": [
                 {
-                    "title": "Subscription form: fix double display",
-                    "desc": "The subscription form in popup mode could be shown twice in some cases, this has been fixed."
+                    "title": "Maximum sites error message",
+                    "desc": "The error message which should appear when you have already attached the maximum number of sites to your license is now correctly shown."
                 },
                 {
-                    "title": "Security: fix base64 image loading",
-                    "desc": "We added a security when loading base64 encoded images in the editor."
+                    "title": "Click map redirection",
+                    "desc": "The click map in statistics now correctly redirects to the global statistics when selecting more than one campaign."
                 },
                 {
-                    "title": "Email: fix email without email address",
-                    "desc": "We have fixed the error that could occur when sending a campaign to users without an email address."
+                    "title": "Automation filters",
+                    "desc": "We fixed display issues in some automation filters for dropdown fields for product selection."
                 },
                 {
-                    "title": "Editor: fix video loading",
-                    "desc": "We fixed an issue when loading videos in the editor video block."
+                    "title": "Manual bounce processing",
+                    "desc": "We fixed an error that could occur when you manually trigger bounce processing, causing the process to stop."
+                },
+                {
+                    "title": "Attachments in welcome emails",
+                    "desc": "The attachments are now correctly shown on welcome and unsubscribe emails on the edition page."
                 }
             ]
         }

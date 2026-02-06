@@ -88,6 +88,10 @@ trait SQLPatch
         $this->updateFor1000();
         $this->updateFor1020($config);
         $this->updateFor1050();
+        $this->updateFor1060();
+        $this->updateFor1062();
+        $this->updateFor1065();
+        $this->updateFor1070();
     }
 
     public function checkDB(): void

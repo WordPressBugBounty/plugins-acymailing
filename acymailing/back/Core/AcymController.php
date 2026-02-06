@@ -47,9 +47,11 @@ abstract class AcymController extends AcymObject
         }
     }
 
-    public function getVarFiltersListing($type, $varName, $default, $overrideIfNull = false)
+    public function getVarFiltersListing(string $type, string $varName, $default, bool $overrideIfNull = false)
     {
-        if ($this->taskCalled == 'clearFilters') return $default;
+        if ($this->taskCalled === 'clearFilters') {
+            return $default;
+        }
 
         $this->initSession();
         $returnValue = acym_getVar($type, $varName);
@@ -69,14 +71,14 @@ abstract class AcymController extends AcymObject
         return $default;
     }
 
-    public function setVarFiltersListing($varName, $value)
+    public function setVarFiltersListing(string $varName, int $value): void
     {
         acym_setVar($varName, $value);
         $this->initSession();
         $_SESSION[$this->sessionName][$varName] = $value;
     }
 
-    public function clearFilters()
+    public function clearFilters(): void
     {
         $this->initSession();
         $_SESSION[$this->sessionName] = [];
@@ -87,7 +89,7 @@ abstract class AcymController extends AcymObject
 
     public function call(string $task): void
     {
-        if (!in_array($task, ['countResultsTotal', 'countGlobalBySegmentId', 'countResults']) && strpos($task, 'Ajax') === false && !acym_isAllowed($this->name, $task)) {
+        if (!in_array($task, ['countResultsTotal', 'countGlobalBySegmentId', 'countResults']) && strpos($task, 'Ajax') === false && !acym_isAllowed($this->name)) {
             acym_enqueueMessage(acym_translation('ACYM_ACCESS_DENIED'), 'warning');
             acym_redirect(acym_completeLink('dashboard'));
 
@@ -103,7 +105,7 @@ abstract class AcymController extends AcymObject
         $this->$task();
     }
 
-    public function loadScripts($task)
+    public function loadScripts(string $task): void
     {
         if (empty($this->loadScripts)) return;
 
@@ -214,13 +216,13 @@ abstract class AcymController extends AcymObject
         $view->display($this, $data);
     }
 
-    public function cancel()
+    public function cancel(): void
     {
         acym_setVar('layout', 'listing');
         $this->display();
     }
 
-    public function listing()
+    public function listing(): void
     {
         acym_setVar('layout', 'listing');
 
@@ -245,14 +247,16 @@ abstract class AcymController extends AcymObject
         }
     }
 
-    public function apply()
+    public function apply(): void
     {
-        $this->store();
+        if (method_exists($this, 'store')) {
+            $this->store();
+        }
 
-        return $this->edit();
+        $this->edit();
     }
 
-    public function add()
+    public function add(): void
     {
         acym_setVar('cid', []);
         acym_setVar('layout', 'form');
@@ -260,7 +264,7 @@ abstract class AcymController extends AcymObject
         $this->display();
     }
 
-    public function save()
+    public function save(): void
     {
         $step = acym_getVar('string', 'step', '');
 
@@ -270,15 +274,19 @@ abstract class AcymController extends AcymObject
                 die('Save method '.acym_escape($saveMethod).' not found');
             }
 
-            return $this->$saveMethod();
+            $this->$saveMethod();
+
+            return;
         }
 
-        if (method_exists($this, 'store')) $this->store();
+        if (method_exists($this, 'store')) {
+            $this->store();
+        }
 
         $this->listing();
     }
 
-    public function delete()
+    public function delete(): void
     {
         acym_checkToken();
         $ids = acym_getVar('array', 'elements_checked', []);
@@ -298,7 +306,7 @@ abstract class AcymController extends AcymObject
         }
     }
 
-    public function setActive()
+    public function setActive(): void
     {
         acym_checkToken();
         $ids = acym_getVar('array', 'elements_checked', []);
@@ -310,7 +318,7 @@ abstract class AcymController extends AcymObject
         $this->listing();
     }
 
-    public function setInactive()
+    public function setInactive(): void
     {
         acym_checkToken();
         $ids = acym_getVar('array', 'elements_checked', []);
@@ -322,7 +330,7 @@ abstract class AcymController extends AcymObject
         $this->listing();
     }
 
-    public function getMatchingElementsFromData($requestData, &$status, &$page, $class = '')
+    public function getMatchingElementsFromData(array $requestData, string &$status, int &$page, string $class = ''): array
     {
         $className = 'AcyMailing\\Classes\\'.ucfirst(strtolower($class)).'Class';
         $classElement = empty($class) ? $this->currentClass : new $className();
@@ -396,7 +404,7 @@ abstract class AcymController extends AcymObject
         return false;
     }
 
-    protected function prepareMultilingualOption(&$data)
+    protected function prepareMultilingualOption(array &$data): void
     {
         if (!acym_isMultilingual()) return;
 

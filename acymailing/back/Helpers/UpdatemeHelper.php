@@ -46,19 +46,22 @@ class UpdatemeHelper extends AcymObject
 
         if ($request['status_code'] < 200 || $request['status_code'] > 299) {
             acym_logError('Error while calling updateme on path '.$path.' with the status code: '.$request['status_code']."\r\n and body".json_encode($request), 'updateme');
+            if (!empty($request['message']) && $request['message'] === 'MAX_SITES_ATTACH') {
+                acym_enqueueMessage(acym_translation('ACYM_REACHED_MAX_SITES_ATTACHED'), 'error');
+            }
             $return['success'] = false;
         }
 
         return $return;
     }
 
-    public static function getLicenseInfo(bool $ajax): string
+    public static function getLicenseInfo(bool $ajax = false): void
     {
         ob_start();
-        $config = acym_config();
+        $config = acym_config(true);
         $url = 'public/getLicenseInfo';
         $url .= '?level='.urlencode(strtolower($config->get('level', 'starter')));
-        if (acym_level(ACYM_ESSENTIAL)) {
+        if (acym_level(ACYM_ESSENTIAL) || $config->get('isTrial', 0) == 1) {
             if ($config->get('different_admin_url_toggle', 0) === 1) {
                 $url .= '&domain='.$config->get('different_admin_url_value', 0);
             } else {
@@ -71,31 +74,34 @@ class UpdatemeHelper extends AcymObject
         $result = (!empty($warnings) && acym_isDebug()) ? $warnings : '';
 
         if (empty($userInformation)) {
-            $config->save(['lastlicensecheck' => time()]);
+            $config->saveConfig(['lastlicensecheck' => time()]);
             if ($ajax) {
                 acym_sendAjaxResponse(
                     '',
                     [
                         'content' => '<br/><span style="color:#C10000;">'.acym_translation('ACYM_ERROR_LOAD_FROM_ACYBA').'</span><br/>'.$result,
-                        'lastcheck' => acym_date(time(), 'Y/m/d H:i'),
+                        'lastcheck' => acym_date(time(), 'ACYM_DATE_FORMAT_LC2'),
                     ],
                     false
                 );
             } else {
-                return '';
+                return;
             }
         }
 
-        $newConfig = new \stdClass();
+        $newConfig = [
+            'latestversion' => $userInformation['latestversion'],
+            'expirationdate' => $userInformation['expiration'],
+            'lastlicensecheck' => time(),
+        ];
 
-        $newConfig->latestversion = $userInformation['latestversion'];
-        $newConfig->expirationdate = $userInformation['expiration'];
-        $newConfig->lastlicensecheck = time();
-        $newConfig->isTrial = empty($userInformation['isTrial']) ? 0 : 1;
-        $config->save($newConfig);
+        $licenseKey = $config->get('license_key');
+        if (!empty($licenseKey)) {
+            $newConfig['isTrial'] = empty($userInformation['isTrial']) ? 0 : 1;
+        }
+
+        $config->saveConfig($newConfig);
 
         acym_checkPluginsVersion();
-
-        return $newConfig->lastlicensecheck;
     }
 }

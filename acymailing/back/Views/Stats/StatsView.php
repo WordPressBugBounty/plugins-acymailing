@@ -18,6 +18,6 @@ class StatsView extends AcymView
     public function isMailSelected($mailId, $clickMap)
     {
 
-        $this->config->save(['mail_stats_checked_once' => 1]);
+        $this->config->saveConfig(['mail_stats_checked_once' => 1]);
     }
 }

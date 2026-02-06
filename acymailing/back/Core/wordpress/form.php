@@ -7,12 +7,12 @@ use AcyMailing\Core\AcymParameter;
 use AcyMailing\FrontControllers\FrontusersController;
 use AcyMailing\FrontControllers\ArchiveController;
 
-function acym_formToken()
+function acym_formToken(): string
 {
     return '<input type="hidden" name="_wpnonce" value="'.wp_create_nonce('acymnonce').'">';
 }
 
-function acym_checkToken()
+function acym_checkToken(): void
 {
     $token = acym_getVar('cmd', '_wpnonce');
     if (!wp_verify_nonce($token, 'acymnonce')) {
@@ -20,7 +20,7 @@ function acym_checkToken()
     }
 }
 
-function acym_getFormToken()
+function acym_getFormToken(): string
 {
     $token = acym_getVar('cmd', '_wpnonce', '');
     if (empty($token)) {
@@ -41,7 +41,7 @@ function acym_isNoTemplate(): bool
     return acym_getVar('cmd', 'noheader') == '1';
 }
 
-function acym_setNoTemplate(bool $status = true)
+function acym_setNoTemplate(bool $status = true): void
 {
     if ($status) {
         acym_setVar('noheader', '1');
@@ -50,8 +50,7 @@ function acym_setNoTemplate(bool $status = true)
     }
 }
 
-
-function acym_formOptions(bool $token = true, string $task = '', string $currentStep = '', string $currentCtrl = '', bool $addPage = true)
+function acym_formOptions(bool $token = true, string $task = '', string $currentStep = '', string $currentCtrl = '', bool $addPage = true): void
 {
     if (!empty($currentStep)) {
         echo '<input type="hidden" name="step" value="'.acym_escape($currentStep).'"/>';
@@ -69,7 +68,7 @@ function acym_formOptions(bool $token = true, string $task = '', string $current
 }
 
 global $acymMetaData;
-function acym_addMetadata($meta, $data, $name = 'name')
+function acym_addMetadata($meta, $data, string $name = 'name'): void
 {
     global $acymMetaData;
 
@@ -84,16 +83,16 @@ function acym_addMetadata($meta, $data, $name = 'name')
 add_action('wp_head', 'acym_head_wp');
 add_action('admin_head', 'acym_head_wp');
 add_action('acym_head', 'acym_head_wp');
-function acym_head_wp()
+function acym_head_wp(): void
 {
     global $acymMetaData;
 
     if (!empty($acymMetaData)) {
         foreach ($acymMetaData as $metadata) {
             if (empty($metadata->data)) {
-                echo '<meta '.$metadata->name.'="'.acym_escape($metadata->meta).'"/>';
+                echo '<meta '.acym_escape($metadata->name).'="'.acym_escape($metadata->meta).'"/>';
             } else {
-                echo '<meta '.$metadata->name.'="'.acym_escape($metadata->meta).'" content="'.acym_escape($metadata->data).'"/>';
+                echo '<meta '.acym_escape($metadata->name).'="'.acym_escape($metadata->meta).'" content="'.acym_escape($metadata->data).'"/>';
             }
         }
     }
@@ -101,16 +100,16 @@ function acym_head_wp()
     $acymMetaData = [];
 }
 
-function acym_includeHeaders()
+function acym_includeHeaders(): void
 {
     do_action('acym_head');
 }
 
-function acym_getOptionRegacyPosition()
+function acym_getOptionRegacyPosition(): void
 {
 }
 
-function acym_renderForm(AcymParameter $params, $args = [])
+function acym_renderForm(AcymParameter $params, array $args = []): string
 {
     acym_initModule($params);
 
@@ -192,7 +191,6 @@ function acym_renderForm(AcymParameter $params, $args = [])
     }
     acym_arrayToInteger($checkedLists);
 
-
     $config = acym_config();
 
     $subscribeText = $params->get('subtext', 'ACYM_SUBSCRIBE');
@@ -215,9 +213,22 @@ function acym_renderForm(AcymParameter $params, $args = [])
     $alignment = $params->get('alignment', 'none');
     $style = $alignment == 'none' ? '' : 'style="text-align: '.$alignment.'"';
 
-    $displayInAPopup = 0;
-    $termsURL = acym_getArticleURL($params->get('termscontent', 0), $displayInAPopup, 'ACYM_TERMS_CONDITIONS');
-    $privacyURL = acym_getArticleURL($params->get('privacypolicy', 0), $displayInAPopup, 'ACYM_PRIVACY_POLICY');
+    $termsURL = acym_getArticleURL($params->get('termscontent', 0), false, 'ACYM_TERMS_CONDITIONS');
+    $privacyURL = acym_getArticleURL($params->get('privacypolicy', 0), false, 'ACYM_PRIVACY_POLICY');
+
+    if (empty($termsURL)) {
+        $termsURL = $params->get('termscontentURL') ?? '';
+        if (!empty($termsURL)) {
+            $termsURL = '<a href="'.acym_escape($termsURL).'" target="_blank">'.acym_translation('ACYM_TERMS_CONDITIONS').'</a>';
+        }
+    }
+
+    if (empty($privacyURL)) {
+        $privacyURL = $params->get('privacypolicyURL') ?? '';
+        if (!empty($privacyURL)) {
+            $privacyURL = '<a href="'.acym_escape($privacyURL).'" target="_blank">'.acym_translation('ACYM_PRIVACY_POLICY').'</a>';
+        }
+    }
 
     if (empty($termsURL) && empty($privacyURL)) {
         $termslink = '';
@@ -273,7 +284,7 @@ function acym_renderForm(AcymParameter $params, $args = [])
 				  name="<?php echo acym_escape($formName); ?>"
 				  method="POST"
 				  action="<?php echo acym_escape($formAction); ?>"
-				  onsubmit="return submitAcymForm('subscribe','<?php echo $formName; ?>', 'acymSubmitSubForm')">
+				  onsubmit="return submitAcymForm('subscribe','<?php echo $formName; ?>')">
 				<div class="acym_module_form">
                     <?php
                     $introText = $params->get('introtext', '');
@@ -322,7 +333,7 @@ function acym_renderForm(AcymParameter $params, $args = [])
     return $return;
 }
 
-function acym_renderFormProfile(AcymParameter $params, $args = [])
+function acym_renderFormProfile(AcymParameter $params, array $args = []): string
 {
     acym_initModule($params);
 
@@ -367,7 +378,7 @@ function acym_renderFormProfile(AcymParameter $params, $args = [])
     return $return;
 }
 
-function acym_renderFormArchive(AcymParameter $params, $args = [])
+function acym_renderFormArchive(AcymParameter $params, array $args = []): string
 {
     acym_initModule($params);
 

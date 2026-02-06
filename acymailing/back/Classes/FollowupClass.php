@@ -24,7 +24,7 @@ class FollowupClass extends AcymClass
         $this->pkey = 'id';
     }
 
-    public function getDelayUnits()
+    public function getDelayUnits(): array
     {
         $return = self::DELAY_UNIT;
         foreach ($return as $key => $value) {
@@ -82,7 +82,7 @@ class FollowupClass extends AcymClass
         return $results;
     }
 
-    public function getNumberSubscribersByListId($listId = 0, $onlySubscribed = false)
+    public function getNumberSubscribersByListId(int $listId = 0, bool $onlySubscribed = false): int
     {
         if (empty($listId)) return 0;
 
@@ -94,10 +94,10 @@ class FollowupClass extends AcymClass
             $query .= ' AND `status` = 1';
         }
 
-        return acym_loadResult($query);
+        return (int)acym_loadResult($query);
     }
 
-    private function getGlobalStats(&$element, $urlClickClass)
+    private function getGlobalStats(object $element, UrlClickClass $urlClickClass): void
     {
         $mailsStats = acym_loadObjectList(
             'SELECT mail_stat.* 
@@ -114,7 +114,7 @@ class FollowupClass extends AcymClass
 
         foreach ($mailsStats as $key => $mailsStat) {
             $element->open += $mailsStat->open_unique;
-            $element->click += $urlClickClass->getNumberUsersClicked($mailsStat->mail_id);
+            $element->click += $urlClickClass->getNumberUsersClicked([$mailsStat->mail_id]);
             $numberMailSent += $mailsStat->sent;
         }
 
@@ -133,13 +133,15 @@ class FollowupClass extends AcymClass
         );
 
         $element->sale = $trackingSales->sale;
-        if (empty($element->currency)) $element->currency = '';
+        if (empty($element->currency)) {
+            $element->currency = '';
+        }
+
         acym_trigger('getCurrency', [&$element->currency]);
     }
 
-    public function delete($elements)
+    public function delete(array $elements): int
     {
-        if (!is_array($elements)) $elements = [$elements];
         acym_arrayToInteger($elements);
 
         if (empty($elements)) return 0;
@@ -160,12 +162,13 @@ class FollowupClass extends AcymClass
         return $result;
     }
 
-    public function getEmailsByIds($followupIds)
+    public function getEmailsByIds(array $followupIds): array
     {
-        if (!is_array($followupIds)) $followupIds = [$followupIds];
         acym_arrayToInteger($followupIds);
 
-        if (empty($followupIds)) return [];
+        if (empty($followupIds)) {
+            return [];
+        }
 
         return acym_loadResultArray(
             'SELECT `mail_id` 
@@ -175,12 +178,13 @@ class FollowupClass extends AcymClass
         );
     }
 
-    public function getListsByIds($followupIds)
+    public function getListsByIds(array $followupIds): array
     {
-        if (!is_array($followupIds)) $followupIds = [$followupIds];
         acym_arrayToInteger($followupIds);
 
-        if (empty($followupIds)) return [];
+        if (empty($followupIds)) {
+            return [];
+        }
 
         return acym_loadResultArray(
             'SELECT `list_id` 
@@ -189,11 +193,11 @@ class FollowupClass extends AcymClass
         );
     }
 
-    public function getOneById($id)
+    public function getOneById(int $id): ?object
     {
         $followup = parent::getOneById($id);
 
-        if (empty($followup)) return false;
+        if (empty($followup)) return null;
 
         if (!empty($followup->condition)) {
             $followup->condition = json_decode($followup->condition, true);
@@ -206,18 +210,22 @@ class FollowupClass extends AcymClass
         return $followup;
     }
 
-    public function getOneByListId($listId)
+    public function getOneByListId(int $listId): ?object
     {
         $followup = acym_loadObject('SELECT * FROM `#__acym_followup` WHERE `list_id` = '.intval($listId));
 
-        if (empty($followup)) return null;
+        if (empty($followup)) {
+            return null;
+        }
 
-        if (!empty($followup->condition)) $followup->condition = json_decode($followup->condition, true);
+        if (!empty($followup->condition)) {
+            $followup->condition = json_decode($followup->condition, true);
+        }
 
         return $followup;
     }
 
-    public function save($element)
+    public function save(object $element): ?int
     {
         if (!empty($element->condition) && is_array($element->condition)) {
             $element->condition = json_encode($element->condition);
@@ -232,15 +240,21 @@ class FollowupClass extends AcymClass
         return parent::save($element);
     }
 
-    private function updateListFollowup(&$element)
+    private function updateListFollowup(object $element): void
     {
         $listClass = new ListClass();
         if (empty($element->list_id)) {
             $list = new \stdClass();
             $list->name = $element->display_name;
             $list->description = '';
-            $randColor = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
-            $list->color = '#'.$randColor[rand(0, 15)].$randColor[rand(0, 15)].$randColor[rand(0, 15)].$randColor[rand(0, 15)].$randColor[rand(0, 15)].$randColor[rand(0, 15)];
+            $list->color = '#'.implode('', [
+                    ListClass::COLOR_PARTS[rand(0, 15)],
+                    ListClass::COLOR_PARTS[rand(0, 15)],
+                    ListClass::COLOR_PARTS[rand(0, 15)],
+                    ListClass::COLOR_PARTS[rand(0, 15)],
+                    ListClass::COLOR_PARTS[rand(0, 15)],
+                    ListClass::COLOR_PARTS[rand(0, 15)],
+                ]);
             $list->access = '';
             $list->type = ListClass::LIST_TYPE_FOLLOWUP;
         } else {
@@ -251,19 +265,9 @@ class FollowupClass extends AcymClass
         $element->list_id = $listClass->save($list);
     }
 
-    public function getTriggerNiceName($trigger)
+    public function getConditionSummary(object $followup): array
     {
-        $triggers = [];
-        acym_trigger('getFollowupTriggers', [&$triggers]);
-        if (key_exists($trigger, $triggers)) {
-            return $triggers[$trigger];
-        }
-
-        return '';
-    }
-
-    public function getConditionSummary($condition, $trigger)
-    {
+        $condition = $followup->condition;
         $statusArray = [
             'is' => acym_strtolower(acym_translation('ACYM_IS')),
             'is_not' => acym_strtolower(acym_translation('ACYM_IS_NOT')),
@@ -281,7 +285,7 @@ class FollowupClass extends AcymClass
                 $listsToDisplay[] = $list->name;
             }
 
-            $translationKey = $trigger === 'user_subscribe' ? 'ACYM_X_SUBSCRIBING_X_LIST' : 'ACYM_X_SUBSCRIBED_X_LIST';
+            $translationKey = $followup->trigger === 'user_subscribe' ? 'ACYM_X_SUBSCRIBING_X_LIST' : 'ACYM_X_SUBSCRIBED_X_LIST';
             $return[] = acym_translationSprintf($translationKey, acym_strtolower($statusArray[$condition['lists_status']]), implode(',', $listsToDisplay));
         }
 
@@ -297,12 +301,12 @@ class FollowupClass extends AcymClass
             $return[] = acym_translationSprintf('ACYM_X_PART_X_SEGMENT', acym_strtolower($statusArray[$condition['segments_status']]), implode(',', $segmentsToDisplay));
         }
 
-        acym_trigger('getFollowupConditionSummary', [&$return, $condition, $trigger, $statusArray]);
+        acym_trigger('getFollowupConditionSummary', [&$return, $condition, $followup->trigger, $statusArray]);
 
         return $return;
     }
 
-    private function getKeyMailArray($key, $mailsKey)
+    private function getKeyMailArray(int $key, array $mailsKey): int
     {
         if (!empty($mailsKey) && in_array($key, $mailsKey)) {
             return $this->getKeyMailArray(++$key, $mailsKey);
@@ -311,18 +315,20 @@ class FollowupClass extends AcymClass
         return $key;
     }
 
-    public function getOneByIdWithMails($id)
+    public function getOneByIdWithMails(int $id): ?object
     {
         $followup = $this->getOneById($id);
 
-        if (empty($followup)) return false;
+        if (empty($followup)) {
+            return null;
+        }
 
         $mailClass = new MailClass();
         $mails = $mailClass->decode(
             acym_loadObjectList(
                 'SELECT mail.subject, mail.id, followup_mail.delay, followup_mail.delay_unit 
-            FROM #__acym_mail AS mail 
-            JOIN #__acym_followup_has_mail AS followup_mail ON mail.id = followup_mail.mail_id AND followup_mail.followup_id = '.intval($id),
+                FROM #__acym_mail AS mail 
+                JOIN #__acym_followup_has_mail AS followup_mail ON mail.id = followup_mail.mail_id AND followup_mail.followup_id = '.intval($id),
                 'id'
             )
         );
@@ -342,18 +348,20 @@ class FollowupClass extends AcymClass
         return $followup;
     }
 
-    private function getDelayDisplay($delay, $delayUnit)
+    private function getDelayDisplay(int $delay, int $delayUnit): string
     {
         $delayUnits = $this->getDelayUnits();
 
         return acym_translationSprintf('ACYM_X_PLUS_X_FOLLOW_UP', $delayUnits[$delayUnit], $delay);
     }
 
-    public function getDelaySettingToMail(&$mail, $followupId)
+    public function getDelaySettingToMail(object $mail, int $followupId): bool
     {
         $settings = acym_loadObject('SELECT delay, delay_unit FROM #__acym_followup_has_mail WHERE followup_id = '.intval($followupId).' AND mail_id = '.intval($mail->id));
 
-        if (empty($settings)) return false;
+        if (empty($settings)) {
+            return false;
+        }
 
         $mail->delay = $settings->delay;
         $mail->delay_unit = $settings->delay_unit;
@@ -361,9 +369,11 @@ class FollowupClass extends AcymClass
         return true;
     }
 
-    public function saveDelaySettings($followupData, $mailId)
+    public function saveDelaySettings(array $followupData, int $mailId): bool
     {
-        if (empty($followupData['id']) || empty($followupData['delay_unit']) || empty($mailId)) return false;
+        if (empty($followupData['id']) || empty($followupData['delay_unit']) || empty($mailId)) {
+            return false;
+        }
 
         acym_arrayToInteger($followupData);
 
@@ -376,13 +386,18 @@ class FollowupClass extends AcymClass
         return $affectedRow !== false;
     }
 
-    public function duplicateMail($mailId, $id)
+    public function duplicateMail(int $mailId, int $id): bool
     {
-        if (empty($mailId) || empty($id)) return false;
+        if (empty($mailId) || empty($id)) {
+            return false;
+        }
+
         $mailClass = new MailClass();
         $mail = $mailClass->getOneById($mailId);
 
-        if (empty($mail)) return false;
+        if (empty($mail)) {
+            return false;
+        }
 
         $delaySettings = new \stdClass();
         $delaySettings->id = $mail->id;
@@ -392,7 +407,9 @@ class FollowupClass extends AcymClass
         $mail->name .= '_copy';
 
         $mail->id = $mailClass->save($mail);
-        if (empty($mail->id)) return false;
+        if (empty($mail->id)) {
+            return false;
+        }
 
         $affectedRow = acym_query(
             'INSERT INTO #__acym_followup_has_mail (`mail_id`, `followup_id`, `delay`, `delay_unit`) VALUE ('.intval($mail->id).', '.$id.', '.intval(
@@ -403,17 +420,19 @@ class FollowupClass extends AcymClass
         return !empty($affectedRow);
     }
 
-    public function deleteMail($mailId)
+    public function deleteMail(int $mailId): bool
     {
-        if (empty($mailId)) return false;
+        if (empty($mailId)) {
+            return false;
+        }
+
         $mailClass = new MailClass();
 
-        return $mailClass->delete($mailId);
+        return (bool)$mailClass->delete([$mailId]);
     }
 
-    public function getFollowupsWithMailsInfoByIds($followupIds)
+    public function getFollowupsWithMailsInfoByIds(array $followupIds): array
     {
-        if (!is_array($followupIds)) $followupIds = [$followupIds];
         acym_arrayToInteger($followupIds);
 
         $mailsInfo = acym_loadObjectList(
@@ -422,7 +441,9 @@ class FollowupClass extends AcymClass
                   JOIN #__acym_followup AS followup ON followup.id = followup_mail.followup_id AND followup_mail.followup_id IN ('.implode(',', $followupIds).')'
         );
 
-        if (empty($mailsInfo)) return [];
+        if (empty($mailsInfo)) {
+            return [];
+        }
 
         $return = [];
 
@@ -465,18 +486,22 @@ class FollowupClass extends AcymClass
         }
 
         $userClass = new UserClass();
-        $userClass->subscribe($userId, array_keys($followupListIds), false);
+        $userClass->subscribe([$userId], array_keys($followupListIds), false);
 
         return $followupListIds;
     }
 
-    public function addFollowupEmailsQueue($followupTrigger, $userId, $params = [])
+    public function addFollowupEmailsQueue(string $followupTrigger, int $userId, array $params = []): bool
     {
-        if (empty($followupTrigger) || empty($userId)) return false;
+        if (empty($followupTrigger) || empty($userId)) {
+            return false;
+        }
 
         $followupToTrigger = acym_loadObjectList('SELECT * FROM #__acym_followup WHERE active = 1 AND `trigger` = '.acym_escapeDB($followupTrigger), 'id');
 
-        if (empty($followupToTrigger)) return false;
+        if (empty($followupToTrigger)) {
+            return false;
+        }
 
         foreach ($followupToTrigger as $key => $followup) {
             if (!empty($followup->condition)) {
@@ -486,15 +511,21 @@ class FollowupClass extends AcymClass
 
         acym_trigger('matchFollowupsConditions', [&$followupToTrigger, $userId, $params]);
 
-        if (empty($followupToTrigger)) return false;
+        if (empty($followupToTrigger)) {
+            return false;
+        }
 
         $followupIds = $this->subscribeUserToFollowupList(array_keys($followupToTrigger), $userId);
 
-        if (empty($followupIds)) return false;
+        if (empty($followupIds)) {
+            return false;
+        }
 
         $followups = $this->getFollowupsWithMailsInfoByIds($followupIds);
 
-        if (empty($followups)) return false;
+        if (empty($followups)) {
+            return false;
+        }
 
         $priority = $this->config->get('followup_max_priority', 0) == 1 ? 1 : 2;
 
@@ -520,22 +551,22 @@ class FollowupClass extends AcymClass
         return !empty($affectedRows);
     }
 
-    private function addMailStat($mailId)
+    private function addMailStat(int $mailId): void
     {
         $mailStatClass = new MailStatClass();
         $mailStat = $mailStatClass->getOneRowByMailId($mailId);
-        $newMailStat = [
-            'mail_id' => intval($mailId),
-            'total_subscribers' => 1,
-        ];
+        $newMailStat = new \stdClass();
+        $newMailStat->mail_id = intval($mailId);
+        $newMailStat->total_subscribers = 1;
+
         if (empty($mailStat)) {
-            $newMailStat['send_date'] = acym_date('now', 'Y-m-d H:i:s', false);
+            $newMailStat->send_date = acym_date('now', 'Y-m-d H:i:s', false);
         }
 
         $mailStatClass->save($newMailStat);
     }
 
-    public function getFollowupDailyBases()
+    public function getFollowupDailyBases(): array
     {
         $triggers = [];
         acym_trigger('onAcymGetFollowupDailyBases', [&$triggers]);
@@ -543,9 +574,11 @@ class FollowupClass extends AcymClass
         return acym_loadObjectList('SELECT * FROM #__acym_followup WHERE `trigger` IN ("'.implode('","', $triggers).'") AND active  = 1');
     }
 
-    public function queueForSubscribers($emailId)
+    public function queueForSubscribers(int $emailId): bool
     {
-        if (empty($emailId)) return false;
+        if (empty($emailId)) {
+            return false;
+        }
 
         $mailInfo = acym_loadObject(
             'SELECT map.*, followup.list_id 
@@ -565,7 +598,7 @@ class FollowupClass extends AcymClass
                 WHERE status = 1 
                     AND list_id = '.intval($mailInfo->list_id);
 
-        return acym_query($query);
+        return (bool)acym_query($query);
     }
 
     public function getXFollowups(array $options): array
@@ -643,7 +676,7 @@ class FollowupClass extends AcymClass
 
         acym_query('INSERT IGNORE INTO #__acym_user_has_list (`user_id`, `list_id`, `status`, `subscription_date`) VALUES ('.$values.') ON DUPLICATE KEY UPDATE status = 1');
 
-        $followups = $this->getFollowupsWithMailsInfoByIds($followUpId);
+        $followups = $this->getFollowupsWithMailsInfoByIds([$followUpId]);
         $allValues = [];
         foreach ($followups as $mails) {
             foreach ($mails as $mail) {

@@ -66,7 +66,7 @@ class SendinblueCredentials extends SendinblueClass
 					   id="<?php echo plgAcymSendinblue::SENDING_METHOD_ID; ?>_settings_api-key"
 					   value="<?php echo empty($defaultApiKey) ? $this->config->get(plgAcymSendinblue::SENDING_METHOD_ID.'_api_key') : $defaultApiKey; ?>"
 					   name="config[<?php echo plgAcymSendinblue::SENDING_METHOD_ID; ?>_api_key]"
-					   class="cell margin-right-1 acym__configuration__mail__settings__text">
+					   class="cell margin-next-1 acym__configuration__mail__settings__text">
                 <?php echo $this->getTestCredentialsSendingMethodButton(plgAcymSendinblue::SENDING_METHOD_ID); ?>
                 <?php echo $this->getCopySettingsButton($data, plgAcymSendinblue::SENDING_METHOD_ID, 'wp_mail_smtp'); ?>
 				<div class="cell grid-x margin-top-1 acym__sending__methods__synch">
@@ -85,7 +85,7 @@ class SendinblueCredentials extends SendinblueClass
                             acym_translation('ACYM_REPORT_SEE'),
                             '',
                             null,
-                            '',
+                            [],
                             [
                                 'class' => 'button',
                                 'data-ajax' => 'true',
@@ -101,8 +101,8 @@ class SendinblueCredentials extends SendinblueClass
                         plgAcymSendinblue::SENDING_METHOD_NAME,
                         $delayType->display(
                             'config['.plgAcymSendinblue::SENDING_METHOD_ID.'_clean_frequency]',
-                            $this->config->get(plgAcymSendinblue::SENDING_METHOD_ID.'_clean_frequency', 604800), // one week
-                            4
+                            $this->config->get(plgAcymSendinblue::SENDING_METHOD_ID.'_clean_frequency', 604800),
+                            DelayType::TYPE_WEEKS_MONTHS
                         )
                     ); ?>
 				</div>

@@ -1,6 +1,6 @@
 <?php
 
-function acym_utf8Encode($string)
+function acym_utf8Encode(string $string): string
 {
     if (function_exists('mb_convert_encoding')) {
         return mb_convert_encoding($string, 'UTF-8', 'ISO-8859-1');
@@ -24,7 +24,7 @@ function acym_utf8Encode($string)
     }
 }
 
-function acym_utf8Decode($string)
+function acym_utf8Decode(string $string): string
 {
     if (function_exists('mb_convert_encoding')) {
         return mb_convert_encoding($string, 'ISO-8859-1', 'UTF-8');

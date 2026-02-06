@@ -47,7 +47,10 @@ trait Available
         }
 
         $pluginClass = new PluginClass();
-        $pluginClass->downloadAddon($plugin['file_name'], $ajax);
+        $errorMessage = $pluginClass->downloadAddon($plugin['file_name'], $ajax);
+        if (!empty($errorMessage)) {
+            return $errorMessage;
+        }
 
         $pluginToSave = new \stdClass();
         $pluginToSave->title = $plugin['name'];

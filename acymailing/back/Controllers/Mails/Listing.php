@@ -90,8 +90,12 @@ trait Listing
             '<i class="acymicon-download"></i>'.acym_translation('ACYM_IMPORT'),
             $data['templateImportView'],
             'acym__template__import__reveal',
-            '',
-            'class="button button-secondary cell medium-6 large-shrink" data-reload="true" data-ajax="false"'
+            [],
+            [
+                'class' => 'button button-secondary cell medium-6 large-shrink',
+                'data-reload' => 'true',
+                'data-ajax' => 'false',
+            ]
         );
 
         $otherContent .= acym_modal(
@@ -105,8 +109,8 @@ trait Listing
             ).'</button>
             </div>',
             '',
-            '',
-            'class="acym_vcenter button cell medium-6 large-shrink"',
+            [],
+            ['class' => 'acym_vcenter button cell medium-6 large-shrink'],
             true,
             false
         );
@@ -168,7 +172,7 @@ trait Listing
         }
 
         $favoriteTemplateId = $this->config->get('favorite_template', 0);
-        $this->config->save(['favorite_template' => (int)$favoriteTemplateId === $templateId ? 0 : $templateId]);
+        $this->config->saveConfig(['favorite_template' => (int)$favoriteTemplateId === $templateId ? 0 : $templateId]);
 
         $this->listing();
     }
@@ -212,6 +216,7 @@ trait Listing
             $newTemplate = $oldTemplate;
             $newTemplate->id = 0;
             $newTemplate->name = $oldTemplate->name.'_copy';
+            $newTemplate->creator_id = acym_currentUserId();
             unset($newTemplate->thumbnail);
 
             $mailClass->save($newTemplate);
@@ -242,16 +247,20 @@ trait Listing
     {
         acym_checkToken();
         $mailId = acym_getVar('int', 'id', 0);
-        if (empty($mailId)) acym_sendAjaxResponse(acym_translation('ACYM_COULD_NOT_FIND_MAIL'), [], false);
+        if (empty($mailId)) {
+            acym_sendAjaxResponse(acym_translation('ACYM_COULD_NOT_FIND_MAIL'), [], false);
+        }
 
         $mailClass = new MailClass();
         $mail = $mailClass->getOneById($mailId);
-        if (empty($mail)) acym_sendAjaxResponse(acym_translation('ACYM_COULD_NOT_FIND_MAIL'), [], false);
+        if (empty($mail)) {
+            acym_sendAjaxResponse(acym_translation('ACYM_COULD_NOT_FIND_MAIL'), [], false);
+        }
 
         if (!$mailClass->hasUserAccess($mailId)) {
             die('Access denied for this mail');
         }
 
-        acym_sendAjaxResponse('', $mail);
+        acym_sendAjaxResponse('', ['mail' => $mail]);
     }
 }

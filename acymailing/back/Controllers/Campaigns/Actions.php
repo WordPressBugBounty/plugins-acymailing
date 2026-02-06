@@ -13,7 +13,7 @@ trait Actions
 {
     public function duplicate(): void
     {
-        $campaignsSelected = acym_getVar('int', 'elements_checked');
+        $campaignsSelected = acym_getVar('array', 'elements_checked', []);
 
         $campaignClass = new CampaignClass();
         $mailClass = new MailClass();
@@ -89,8 +89,8 @@ trait Actions
         $followupClass = new FollowupClass();
         $mailClass = new MailClass();
 
-        foreach ($followupsSelected as $oneFollowup) {
-            $followUp = $followupClass->getOneByIdWithMails($oneFollowup);
+        foreach ($followupsSelected as $oneFollowupId) {
+            $followUp = $followupClass->getOneByIdWithMails($oneFollowupId);
             $followupEmails = $followUp->mails;
 
             unset($followUp->id, $followUp->creation_date, $followUp->list_id, $followUp->mails);
@@ -205,7 +205,7 @@ trait Actions
 
         $resultSave = $campaignClass->save($campaign);
 
-        if ($resultSave) {
+        if (!empty($resultSave)) {
             acym_enqueueMessage(acym_translationSprintf('ACYM_CONFIRMED_CAMPAIGN', acym_date($campaignSendingDate, 'j F Y H:i')));
         } else {
             acym_enqueueMessage(acym_translation('ACYM_CANT_CONFIRM_CAMPAIGN').' : '.end($campaignClass->errors), 'error');
@@ -228,7 +228,7 @@ trait Actions
 
         $resultSave = $campaignClass->save($campaign);
 
-        if ($resultSave) {
+        if (!empty($resultSave)) {
             acym_enqueueMessage(acym_translation('ACYM_CAMPAIGN_IS_ACTIVE'));
         } else {
             acym_enqueueMessage(acym_translation('ACYM_ERROR_SAVING'), 'error');
@@ -253,7 +253,7 @@ trait Actions
 
         $resultSave = $campaignClass->save($campaign);
 
-        if ($resultSave) {
+        if (!empty($resultSave)) {
             acym_enqueueMessage(acym_translation('ACYM_CAMPAIGN_SUCCESSFULLY_SAVE_AS_DRAFT'));
         } else {
             acym_enqueueMessage(acym_translation('ACYM_CAMPAIGN_CANT_BE_SAVED').' : '.end($campaignClass->errors), 'error');
@@ -284,7 +284,7 @@ trait Actions
 
         $resultSave = $campaignClass->save($campaign);
 
-        if ($resultSave) {
+        if (!empty($resultSave)) {
             acym_enqueueMessage(acym_translation('ACYM_CAMPAIGN_SUCCESSFULLY_SAVE_AS_DRAFT'));
         } else {
             acym_enqueueMessage(acym_translation('ACYM_CAMPAIGN_CANT_BE_SAVED').' : '.end($campaignClass->errors), 'error');
@@ -349,7 +349,7 @@ trait Actions
     private function updateOpenAcymailerPopup(): void
     {
         if (acym_isAdmin() && $this->config->get('mailer_method') === 'acymailer' && intval($this->config->get('acymailer_popup', 0)) === 0) {
-            $this->config->save(['acymailer_popup' => '1']);
+            $this->config->saveConfig(['acymailer_popup' => '1']);
         }
     }
 
@@ -369,7 +369,7 @@ trait Actions
         $mailArchiveClass = new MailArchiveClass();
         $archive = $mailArchiveClass->getOneByMailId($campaign->mail_id);
         if (!empty($archive)) {
-            $mailArchiveClass->delete($archive->id);
+            $mailArchiveClass->delete([$archive->id]);
         }
 
         acym_sendAjaxResponse();

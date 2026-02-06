@@ -14,8 +14,10 @@ trait License
         $resultUnlinkLicenseOnUpdateMe = $this->unlinkLicenseOnUpdateMe($licenseKey);
 
         if ($resultUnlinkLicenseOnUpdateMe['success'] === true) {
-            $this->config->save(['license_key' => '']);
+            $this->config->saveConfig(['license_key' => '']);
+            UpdatemeHelper::getLicenseInfo();
         }
+
 
         if (!empty($resultUnlinkLicenseOnUpdateMe['message'])) {
             $this->displayMessage($resultUnlinkLicenseOnUpdateMe['message']);
@@ -35,12 +37,14 @@ trait License
             return;
         }
 
-        $this->config->save(['license_key' => $config['license_key']]);
+        $this->config->saveConfig(['license_key' => $config['license_key']]);
 
         $resultAttachLicenseOnUpdateMe = $this->attachLicenseOnUpdateMe();
 
         if ($resultAttachLicenseOnUpdateMe['success'] === false) {
-            $this->config->save(['license_key' => '']);
+            $this->config->saveConfig(['license_key' => '']);
+        } else {
+            UpdatemeHelper::getLicenseInfo();
         }
 
         if (!empty($resultAttachLicenseOnUpdateMe['message'])) {
@@ -76,8 +80,6 @@ trait License
 
         $resultAttach = UpdatemeHelper::call('api/websites/attach', 'POST', $data);
 
-        acym_checkVersion();
-
         if (empty($resultAttach) || !$resultAttach['success']) {
             return $return;
         }
@@ -112,8 +114,6 @@ trait License
 
         $resultUnlink = UpdatemeHelper::call('api/websites/unlink', 'POST', $data);
 
-        acym_checkVersion();
-
         if (empty($resultUnlink) || !$resultUnlink['success']) {
             return $return;
         }
@@ -128,7 +128,7 @@ trait License
 
         $result = $this->modifyCron('activateCron');
         if (!empty($result) && !empty($this->displayMessage($result['message']))) {
-            $this->config->save(['active_cron' => 1]);
+            $this->config->saveConfig(['active_cron' => 1]);
         }
 
         $this->listing();
@@ -139,7 +139,7 @@ trait License
 
         $result = $this->modifyCron('deactivateCron', $licenseKey);
         if (!empty($result) && !empty($this->displayMessage($result['message']))) {
-            $this->config->save(['active_cron' => 0]);
+            $this->config->saveConfig(['active_cron' => 0]);
         }
 
         if ($listing) {
@@ -194,7 +194,7 @@ trait License
         if (empty($acyMailerLicenseKey)) {
             acym_enqueueMessage(acym_translation('ACYM_LICENCE_NO_SENDING_SERVICE'), 'error');
         } else {
-            $this->config->save(['mailer_method' => 'acymailer']);
+            $this->config->saveConfig(['mailer_method' => 'acymailer']);
             acym_enqueueMessage(acym_translation('ACYM_SENDING_SERVICE_ACTIVATED'), 'success', false);
         }
 

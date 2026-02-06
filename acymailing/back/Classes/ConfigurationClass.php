@@ -7,7 +7,7 @@ use AcyMailing\Core\AcymClass;
 
 class ConfigurationClass extends AcymClass
 {
-    private $values = [];
+    private array $values = [];
 
     public function __construct()
     {
@@ -17,12 +17,12 @@ class ConfigurationClass extends AcymClass
         $this->pkey = 'name';
     }
 
-    public function load()
+    public function load(): void
     {
         $this->values = acym_loadObjectList('SELECT * FROM #__acym_configuration', 'name');
     }
 
-    public function get($namekey, $default = '')
+    public function get(string $namekey, $default = '')
     {
         if (isset($this->values[$namekey])) {
             return $this->values[$namekey]->value;
@@ -31,11 +31,16 @@ class ConfigurationClass extends AcymClass
         return $default;
     }
 
-    public function save($newConfig, $escape = true)
+    public function save($element): ?int
     {
-        $oldFollowupPriority = $this->get('followup_max_priority', 0);
+        $this->saveConfig((array)$element);
 
-        $query = 'REPLACE INTO #__acym_configuration (`name`, `value`) VALUES ';
+        return null;
+    }
+
+    public function saveConfig(array $newConfig, bool $escape = true): bool
+    {
+        $oldFollowupPriority = $this->get('followup_max_priority', 0) == 1;
 
         $previousCronSecurity = $this->get('cron_security', 0);
         $previousCronSecurityKey = $this->get('cron_key');
@@ -54,7 +59,7 @@ class ConfigurationClass extends AcymClass
                 $remindme = json_decode($this->get('remindme', '[]'), true);
                 if (!in_array('multilingual', $remindme)) {
                     $remindme[] = 'multilingual';
-                    $this->save(['remindme' => json_encode($remindme)]);
+                    $params[] = '("remindme",'.acym_escapeDB(json_encode($remindme)).')';
                 }
             }
 
@@ -89,22 +94,21 @@ class ConfigurationClass extends AcymClass
             return true;
         }
 
-        $query .= implode(',', $params);
-
         try {
-            $status = acym_query($query);
+            $status = acym_query('REPLACE INTO #__acym_configuration (`name`, `value`) VALUES '.implode(',', $params));
         } catch (\Exception $e) {
             $status = false;
         }
+
         if ($status === false) {
             acym_display(isset($e) ? $e->getMessage() : substr(strip_tags(acym_getDBError()), 0, 200).'...', 'error');
         }
 
-        $newFollowupPriority = $this->get('followup_max_priority', 0);
+        $newFollowupPriority = $this->get('followup_max_priority', 0) == 1;
 
         $mailClass = new MailClass();
         $mailClass->updateFollowupPriority($oldFollowupPriority, $newFollowupPriority);
 
-        return $status;
+        return (bool)$status;
     }
 }

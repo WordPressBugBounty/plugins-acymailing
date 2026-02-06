@@ -273,12 +273,16 @@ trait GlobalStats
     {
         $opens = [];
         foreach ($campaignOpens as $one) {
-            $opens[acym_date(acym_getTime($one->open_date), $dateCode)] = $one->open;
+            if (!empty($one->open_date)) {
+                $opens[acym_date(acym_getTime($one->open_date), $dateCode)] = $one->open;
+            }
         }
 
         $clicks = [];
         foreach ($campaignClicks as $one) {
-            $clicks[acym_date(acym_getTime($one->date_click), $dateCode)] = $one->click;
+            if (!empty($one->date_click)) {
+                $clicks[acym_date(acym_getTime($one->date_click), $dateCode)] = $one->click;
+            }
         }
 
         $begin = new \DateTime(empty($campaignClicks) ? $campaignOpens[0]->open_date : min([$campaignOpens[0]->open_date, $campaignClicks[0]->date_click]));
@@ -631,14 +635,18 @@ trait GlobalStats
 
         if (!empty($this->selectedMailIds)) {
             $mailStat = $mailStatClass->getByMailIds($this->selectedMailIds);
-            $data['mail']->percentageUnsub = empty($data['mail']->sent) ? 0 : number_format(($mailStat->unsubscribe_total * 100) / $data['mail']->sent, 2);
-            $data['mail']->allUnsub = empty($data['mail']->sent)
-                ? acym_translationSprintf('ACYM_X_USERS_UNSUBSCRIBED_OF_X', 0, 0)
-                : acym_translationSprintf(
-                    'ACYM_X_USERS_UNSUBSCRIBED_OF_X',
-                    $mailStat->unsubscribe_total,
-                    $data['mail']->sent
-                );
+            $data['mail']->allUnsub = 0;
+            $data['mail']->percentageUnsub = 0;
+            if (!empty($mailStat)) {
+                $data['mail']->percentageUnsub = empty($data['mail']->sent) ? 0 : number_format(($mailStat->unsubscribe_total * 100) / $data['mail']->sent, 2);
+                $data['mail']->allUnsub = empty($data['mail']->sent)
+                    ? acym_translationSprintf('ACYM_X_USERS_UNSUBSCRIBED_OF_X', 0, 0)
+                    : acym_translationSprintf(
+                        'ACYM_X_USERS_UNSUBSCRIBED_OF_X',
+                        $mailStat->unsubscribe_total,
+                        $data['mail']->sent
+                    );
+            }
         }
 
         $this->prepareDevicesStats($data);
@@ -700,7 +708,7 @@ trait GlobalStats
         $mailClass = new MailClass();
 
         $data['mailStat'] = $mailStatClass->getByMailIds($this->selectedMailIds);
-        $data['lists'] = $mailClass->getAllListsByMailId($this->selectedMailIds);
+        $data['lists'] = $mailClass->getAllListsByMailId($this->selectedMailIds[0]);
     }
 
     private function exportGlobalFormatted(): void
@@ -814,13 +822,13 @@ trait GlobalStats
                 array_shift($history);
             }
 
-            $this->config->save([$key => json_encode($history)]);
+            $this->config->saveConfig([$key => json_encode($history)]);
 
             $evolutionKey = $this->getEvolutionKey($key);
             $oldEvolutionData[$evolutionKey] = $this->calculateEvolution($history, $isPercentage);
         }
 
-        $this->config->save(['statsEvolution' => json_encode($oldEvolutionData)]);
+        $this->config->saveConfig(['statsEvolution' => json_encode($oldEvolutionData)]);
 
         if (!empty($data)) {
             $this->updateDashboardData($data);

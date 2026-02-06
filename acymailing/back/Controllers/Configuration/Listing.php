@@ -150,8 +150,8 @@ trait Listing
                 '<i class="acymicon-'.$icon.' cursor-pointer acym__color__blue" data-open="'.$idModalLanguage.'" data-ajax="false" data-iframe="'.$linkEdit.'" data-iframe-class="acym__iframe_language" id="image'.$lang.'"></i>',
                 '', //<iframe src="'.$linkEdit.'"></iframe>
                 $idModalLanguage,
-                'data-reveal-larger',
-                '',
+                ['data-reveal-larger' => true],
+                [],
                 false
             );
 
@@ -319,7 +319,7 @@ trait Listing
 
         $licenseKeyBeforeSave = $this->config->get('license_key');
 
-        if ($this->config->save($formData)) {
+        if ($this->config->saveConfig($formData)) {
             $this->handleWebsiteLinking($formData, $licenseKeyBeforeSave);
 
             acym_enqueueMessage(acym_translation('ACYM_SUCCESSFULLY_SAVED'));
@@ -468,6 +468,8 @@ trait Listing
                     $this->displayMessage($resultUnlinkLicenseOnUpdateMe['message']);
                 }
             }
+
+            UpdatemeHelper::getLicenseInfo();
         }
     }
 
@@ -570,7 +572,7 @@ trait Listing
     private function resetQueueProcess(): void
     {
         if (!acym_level(ACYM_ESSENTIAL) && $this->config->get('queue_type', 'manual') !== 'manual') {
-            $this->config->save(['queue_type' => 'manual']);
+            $this->config->saveConfig(['queue_type' => 'manual']);
         }
     }
 

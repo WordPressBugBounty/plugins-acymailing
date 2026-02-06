@@ -2,8 +2,8 @@
 Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
-Tested up to: 6.8
-Stable tag: 10.5.1
+Tested up to: 6.9
+Stable tag: 10.7.1
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,14 +113,16 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.5.1 - September 23, 2025 =
-* The option to prevents hyphens in sent emails now works for newer versions of Outlook.
-* Improve the import of website users on WordPress multi-sites.
+= 10.7.1 - January 22, 2026 =
+* Google has disabled Tenor, their GIF integration API. The GIF block has been updated to use the Giphy API instead.
 
-* We fixed a warning that could appear when updating the plugin.
-* It was not possible to customize some themes for servers with PHP 8.2 or higher, this has been fixed.
-* The DateTime picker is now properly displayed in dark mode.
-* [add-on] The RSEventsPro insertion by category now correctly filters the events.
+* We forced the use of the UTF-8 charset for the unsubscribe page to avoid issues with some special characters in some rare cases.
 
+* The spam test feature has been adapted for the new version of this service provider.
+* The integration with the reCaptcha v3 has been fixed for forms that were submitted with a page reload.
+* We have corrected and improved the stability of the code, which could cause errors for servers running PHP 8.4.
+* The display of the right panel in the scenario performance page has been fixed
+* We have fixed an issue that caused unintended behavior when you had a subscription form and downgraded your license from the Enterprise version.
+* Fixed the default values for the products and categories options in order based follow-up
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)

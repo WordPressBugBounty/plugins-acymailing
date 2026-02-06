@@ -18,7 +18,7 @@ class SendinblueList extends SendinblueClass
         $listId = $this->createList('list_for_acym_mail_'.$mailId);
 
         $brevoLists[$mailId] = $listId;
-        $this->config->save(['list_sendinblue' => json_encode($brevoLists)]);
+        $this->config->saveConfig(['list_sendinblue' => json_encode($brevoLists)]);
     }
 
     public function createList($name)
@@ -31,7 +31,7 @@ class SendinblueList extends SendinblueClass
         $response = $this->callApiSendingMethod('contacts/lists', $data, $this->headers, 'POST');
 
         if (!empty($response['message']) && $response['message'] === 'Folder ID does not exist') {
-            $this->config->save(['sendinblue_folder_id' => 0]);
+            $this->config->saveConfig(['sendinblue_folder_id' => 0]);
 
             return $this->createList($name);
         }
@@ -52,7 +52,7 @@ class SendinblueList extends SendinblueClass
 
         if (empty($response['id'])) return 0;
 
-        $this->config->save(['sendinblue_folder_id' => $response['id']]);
+        $this->config->saveConfig(['sendinblue_folder_id' => $response['id']]);
 
         return $response['id'];
     }

@@ -2,7 +2,7 @@
 
 use AcyMailing\Classes\ConfigurationClass;
 
-function acydump($arg, $ajax = false, array $options = [])
+function acydump($arg, bool $ajax = false, array $options = []): void
 {
     $indent = $options['indent'] ?? true;
     $htmlentities = $options['htmlentities'] ?? true;
@@ -56,7 +56,7 @@ function acym_config(bool $reload = false): ConfigurationClass
     return $configClass;
 }
 
-function acym_display($messages, $type = 'success', $close = true)
+function acym_display($messages, string $type = 'success', bool $close = true): void
 {
     if (empty($messages)) return;
     if (!is_array($messages)) $messages = [$messages];
@@ -81,17 +81,20 @@ function acym_display($messages, $type = 'success', $close = true)
     }
 }
 
-function acym_increasePerf()
+function acym_increasePerf(): int
 {
-    $maxExecutionTime = ini_get('max_execution_time');
-    if ($maxExecutionTime < 600) {
-        @ini_set('max_execution_time', 600);
+    @ini_set('pcre.backtrack_limit', 1000000);
+
+    $maxExecutionTime = (int)ini_get('max_execution_time');
+
+    if (empty($maxExecutionTime) || $maxExecutionTime < 600) {
+        return set_time_limit(600) ? 600 : $maxExecutionTime;
     }
 
-    @ini_set('pcre.backtrack_limit', 1000000);
+    return $maxExecutionTime;
 }
 
-function acym_session()
+function acym_session(): void
 {
     if (empty(session_id()) || session_status() !== PHP_SESSION_ACTIVE) {
         @session_start();
@@ -111,23 +114,25 @@ function acym_getCID(string $field = ''): int
     return intval($oneResult);
 }
 
-function acym_header($header, $replace = true)
+function acym_header(string $header, bool $replace = true): void
 {
-    if (headers_sent()) return;
+    if (headers_sent()) {
+        return;
+    }
+
     header($header, $replace);
 }
 
-function acym_getSocialMedias()
+function acym_getSocialMedias(): array
 {
     return json_decode(ACYM_SOCIAL_MEDIA, true);
 }
 
-function acym_isAcyCheckerInstalled()
+function acym_isAcyCheckerInstalled(): bool
 {
     $installed = ACYM_CMS === 'joomla' && acym_isExtensionActive('com_acychecker');
-    $installed = $installed || (ACYM_CMS === 'wordpress' && acym_isExtensionActive('acychecker/acychecker.php'));
 
-    return $installed;
+    return $installed || (ACYM_CMS === 'wordpress' && acym_isExtensionActive('acychecker/acychecker.php'));
 }
 
 function acym_getErrorLogFilename(string $prefix = ''): string
@@ -159,7 +164,7 @@ function acym_logError(string $message, string $prefix = '', int $maxLines = 0)
     );
 }
 
-function acym_isLogFileErrorExist($prefix = ''): bool
+function acym_isLogFileErrorExist(string $prefix = ''): bool
 {
     $reportPath = acym_getLogPath(acym_getErrorLogFilename($prefix));
 
@@ -174,7 +179,7 @@ function acym_getJsonData(): array
     return empty($decodedData) ? [] : $decodedData;
 }
 
-function displayFreeTrialMessage()
+function displayFreeTrialMessage(): void
 {
     if (!acym_isAdmin()) {
         return;
@@ -205,7 +210,6 @@ function displayFreeTrialMessage()
     acym_enqueueMessage('<div class="cell grid-x acym_vcenter">'.$message.$buttonFullAccess.'</div>', $type, false);
 }
 
-
 function acym_removeDashboardNotification(string $name): void
 {
     $config = acym_config();
@@ -217,5 +221,5 @@ function acym_removeDashboardNotification(string $name): void
         }
     }
 
-    $config->save(['dashboard_notif' => json_encode($existingNotifications)], false);
+    $config->saveConfig(['dashboard_notif' => json_encode($existingNotifications)], false);
 }

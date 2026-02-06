@@ -14,7 +14,7 @@ class HeaderHelper extends AcymObject
 
         $header .= '<div class="cell large-6 xlarge-5 xxlarge-4 grid-x">';
 
-        $header .= '<div id="checkVersionArea" class="cell auto grid-x align-right check-version-area acym_vcenter padding-right-1">';
+        $header .= '<div id="checkVersionArea" class="cell auto grid-x align-right acym_vcenter">';
         $header .= $this->checkVersionArea();
         $header .= '</div>';
 
@@ -38,7 +38,7 @@ class HeaderHelper extends AcymObject
         if ($lastNewsCheck < time() - 7200) {
             $context = stream_context_create(['http' => ['timeout' => 1]]);
             $news = @file_get_contents(ACYM_ACYMAILING_WEBSITE.'acymnews.xml', false, $context);
-            $this->config->save(
+            $this->config->saveConfig(
                 [
                     'last_news_check' => time(),
                     'last_news' => base64_encode($news),
@@ -161,9 +161,11 @@ class HeaderHelper extends AcymObject
         $version .= '</div></div>';
 
         $expirationDate = $this->config->get('expirationdate', 0);
-        if ((empty($expirationDate) || $expirationDate == -1) && empty($this->config->get('acymailer_apikey', ''))) return $version;
+        if ((empty($expirationDate) || $expirationDate == -1) && empty($this->config->get('acymailer_apikey', ''))) {
+            return $version;
+        }
 
-        $version .= '<div id="acym_expiration" class="text-right cell">';
+        $version .= '<div id="acym_expiration" class="cell">';
         if (acym_level(ACYM_ESSENTIAL) && ACYM_PRODUCTION) {
             if ($expirationDate == -2) {
                 $version .= '<div class="acylicence_expired">
@@ -208,16 +210,16 @@ class HeaderHelper extends AcymObject
         }
 
         $lastLicenseCheck = $this->config->get('lastlicensecheck', 0);
-        $time = time();
-        $checking = ($time > $lastLicenseCheck + 604800) ? $checking = '1' : '0';
-        if (empty($lastLicenseCheck)) $lastLicenseCheck = $time;
+        if (empty($lastLicenseCheck)) {
+            $lastLicenseCheck = time();
+        }
+
+        $lastDateFormatted = acym_date($lastLicenseCheck, 'ACYM_DATE_FORMAT_LC2');
 
         return acym_tooltip(
             [
-                'hoveredText' => '<a id="checkVersionButton" type="button" class="grid-x align-center button_header medium-shrink acym_vcenter" data-check="'.acym_escape(
-                        $checking
-                    ).'"><i class="cell shrink acymicon-autorenew"></i></a>',
-                'textShownInTooltip' => acym_translation('ACYM_LAST_CHECK').' <span id="acym__check__version__last__check">'.acym_date($lastLicenseCheck, 'Y/m/d H:i').'</span>',
+                'hoveredText' => '<a id="checkVersionButton" type="button" class="grid-x align-center button_header medium-shrink acym_vcenter"><i class="cell shrink acymicon-autorenew"></i></a>',
+                'textShownInTooltip' => acym_translation('ACYM_LAST_CHECK').' <span id="acym__check__version__last__check">'.$lastDateFormatted.'</span>',
             ]
         );
     }
@@ -311,9 +313,11 @@ class HeaderHelper extends AcymObject
             $notificationCenter .= '<h2 class="cell text-center">'.acym_translation('ACYM_YOU_DONT_HAVE_NOTIFICATIONS').'</h2>';
             $notificationCenter .= '</div>';
         } else {
-            $notificationCenter .= '<div class="cell grid-x acym__header__notification__toolbox"><p class="cell auto">'.acym_translation(
-                    'ACYM_NOTIFICATIONS'
-                ).'</p><div class="cell shrink cursor-pointer acym__header__notification__toolbox__remove text-right" data-id="all">'.acym_translation('ACYM_DELETE_ALL').'</div></div>';
+            $notificationCenter .= '<div class="cell grid-x acym__header__notification__toolbox"><p class="cell auto">';
+            $notificationCenter .= acym_translation('ACYM_NOTIFICATIONS');
+            $notificationCenter .= '</p><div class="cell shrink cursor-pointer acym__header__notification__toolbox__remove text-right" data-id="all">';
+            $notificationCenter .= acym_translation('ACYM_DELETE_ALL');
+            $notificationCenter .= '</div></div>';
             foreach ($notifications as $key => $notif) {
                 $fullMessageHover = $notif['message'];
 
@@ -366,7 +370,7 @@ class HeaderHelper extends AcymObject
 
         if (count($notifications) > 10) unset($notifications[10]);
 
-        $this->config->save(['notifications' => json_encode($notifications)]);
+        $this->config->saveConfig(['notifications' => json_encode($notifications)]);
 
         return $notif->id;
     }

@@ -39,7 +39,7 @@ if (!empty($data['translation_languages'])) {
 
 <div class="cell large-12 grid-x margin-top-1">
     <?php
-    $disableActiveSwitch = in_array($data['field']->id, [2, $data['languageFieldId']]);
+    $disableActiveSwitch = !empty($data['field']->core) || in_array($data['field']->id, [2, $data['languageFieldId']]);
 
     echo acym_switch(
         'field[active]',
@@ -61,7 +61,7 @@ if (!empty($data['translation_languages'])) {
         <?php echo acym_switch(
             'field[required]',
             $data['field']->required,
-            acym_translation('ACYM_REQUIRED').acym_info('ACYM_REQUIRED_DESC'),
+            acym_translation('ACYM_REQUIRED').acym_info(['textShownInTooltip' => 'ACYM_REQUIRED_DESC']),
             [],
             'auto',
             'shrink',

@@ -33,12 +33,7 @@ abstract class AcymView extends AcymObject
         return acym_getVar('cmd', 'layout', acym_getVar('cmd', 'task', 'listing'));
     }
 
-    public function setLayout($value): void
-    {
-        acym_setVar('layout', $value);
-    }
-
-    public function display($controller, $data = [])
+    public function display(object $controller, array $data = []): void
     {
         $name = $this->getName();
         $view = $this->getLayout();
@@ -77,7 +72,7 @@ abstract class AcymView extends AcymObject
                 ).'" class="acym__form__mail__edit" method="post" name="acyForm" data-abide novalidate enctype="multipart/form-data">';
         }
 
-        if (acym_getVar('cmd', 'task') != 'ajaxEncoding') {
+        if (acym_getVar('cmd', 'task') !== 'ajaxEncoding') {
             echo '<div id="acym_wrapper" class="'.$name.'_'.$view.' cms_'.ACYM_CMS.' cms_v_'.substr(ACYM_CMSV, 0, 1).'">';
         }
 
@@ -100,13 +95,13 @@ abstract class AcymView extends AcymObject
                         acym_display($message, 'info', false);
                     } else {
                         $remindme[] = 'multilingual';
-                        $this->config->save(['remindme' => json_encode($remindme)]);
+                        $this->config->saveConfig(['remindme' => json_encode($remindme)]);
                     }
                 }
 
                 $maliciousScan = $this->config->get('malicious_scan', 0);
                 if (!empty($maliciousScan)) {
-                    $this->config->save(['malicious_scan' => 0]);
+                    $this->config->saveConfig(['malicious_scan' => 0]);
                     acym_display(acym_translation('ACYM_NEW_SECURITY_TOOL'), 'info');
                 }
             }
@@ -121,8 +116,11 @@ abstract class AcymView extends AcymObject
 
         include acym_getView($name, $view);
 
-        if (acym_isLeftMenuNecessary()) echo '</div>';
-        if (acym_getVar('cmd', 'task') != 'ajaxEncoding') {
+        if (acym_isLeftMenuNecessary()) {
+            echo '</div>';
+        }
+
+        if (acym_getVar('cmd', 'task') !== 'ajaxEncoding') {
             echo '</div>';
         }
 
@@ -130,18 +128,20 @@ abstract class AcymView extends AcymObject
             echo '</form>';
         }
 
-        if (ACYM_CMS !== 'wordpress' || !acym_isAdmin()) {
+        if (ACYM_CMS !== 'wordpress' || !acym_isAdmin() || in_array($controller->name, ['dashboard', 'language', 'campaigns']) || acym_isAjax()) {
             return;
         }
 
         $remind = json_decode($this->config->get('remindme', '[]'));
         $installationDate = $this->config->get('install_date', time());
+        $sevenDaysAgo = time() - 7 * 86400;
 
-        if (!in_array('reviews', $remind) && !in_array($controller->name, ['dashboard', 'language']) && $installationDate < time() - 7 * 86400 && !acym_isAjax()) {
+        if (!in_array('reviews', $remind) && $installationDate < $sevenDaysAgo) {
             echo '<div id="acym__reviews__footer" style="margin: 0 0 30px 30px;">';
             echo acym_translationSprintf(
                 'ACYM_REVIEW_FOOTER',
-                '<a title="reviews" id="acym__reviews__footer__link" target="_blank" href="https://wordpress.org/support/plugin/acymailing/reviews/?rate=5#new-post"><i class="acymicon-star acym__color__light-blue"></i><i class="acymicon-star acym__color__light-blue"></i><i class="acymicon-star acym__color__light-blue"></i><i class="acymicon-star acym__color__light-blue"></i><i class="acymicon-star acym__color__light-blue"></i></a>'
+                '<a title="reviews" id="acym__reviews__footer__link" target="_blank" href="https://wordpress.org/support/plugin/acymailing/reviews/?rate=5#new-post">
+                '.str_repeat('<i class="acymicon-star"></i>', 5).'</a>'
             );
             echo '</div>';
         }

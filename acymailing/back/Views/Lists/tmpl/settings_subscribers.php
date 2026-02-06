@@ -1,8 +1,7 @@
 <div class="grid-x acym__list__settings__subscribers acym__content" id="acym__list__settings__subscribers">
-	<a name="subscribers"></a>
 	<input type="hidden" name="list[name]" value="<?php echo acym_escape($data['listInformation']->name); ?>" />
 	<input type="hidden" id="subscribers_subscribed" value="<?php echo acym_escape(json_encode($data['subscribers'])); ?>" />
-	<input type="hidden" id="requireConfirmation" value="<?php echo acym_escape($this->config->get('require_confirmation', 0)); ?>" />
+	<input type="hidden" id="requireConfirmation" value="<?php echo empty($this->config->get('require_confirmation', 0)) ? 0 : 1; ?>" />
 	<h5 class="cell acym__title acym__title__secondary"><?php echo acym_translation('ACYM_SUBSCRIBERS'); ?></h5>
 
 	<div class="cell grid-x acym__list__settings__subscribers__search">
@@ -59,7 +58,7 @@
 						<h6 :class="sub.confirmed==1 || requireConfirmation==0?'':'acym__color__dark-gray'">
 							{{ sub.email }}
 							<span class="acym__hover__user_info" :data-id="sub.id">
-								<?php echo acym_info('<i class="acymicon-circle-o-notch acymicon-spin"></i>'); ?>
+								<?php echo acym_info(['textShownInTooltip' => '<i class="acymicon-circle-o-notch acymicon-spin"></i>']); ?>
 							</span>
 						</h6>
 					</div>
@@ -92,3 +91,4 @@
 			<span><?php echo acym_translation('ACYM_NO_SUBSCRIBERS_FOUND'); ?></span>
 		</div>
 	</div>
+</div>

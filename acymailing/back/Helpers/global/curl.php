@@ -93,7 +93,7 @@ function acym_makeCurlCall(string $url, array $options = []): array
     return $result;
 }
 
-function acym_asyncCurlCall(array $urls): void
+function acym_asyncUrlCalls(array $urls): void
 {
     if (!function_exists('curl_multi_exec')) {
         return;
@@ -127,7 +127,7 @@ function acym_asyncCurlCall(array $urls): void
             curl_multi_remove_handle($mh, $handle);
         }
         curl_multi_close($mh);
-    } catch (Exception $exception) {
+    } catch (Exception $e) {
         $config = acym_config();
         $reportPath = $config->get('cron_savepath');
         if (!empty($reportPath)) {
@@ -140,7 +140,7 @@ function acym_asyncCurlCall(array $urls): void
                 $reportPath,
                 $lr.$lr.'********************     '.acym_getDate(
                     time()
-                ).'     ********************'.$lr.'An error occurred while launching the multiple cron system, please make sure the PHP function "curl_multi_exec" is activated on your server: '.$exception->getMessage(
+                ).'     ********************'.$lr.'An error occurred while calling the queue sending script, please make sure the PHP function "curl_multi_exec" is activated on your server: '.$e->getMessage(
                 ),
                 FILE_APPEND
             );

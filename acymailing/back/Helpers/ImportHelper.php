@@ -76,19 +76,16 @@ class ImportHelper extends AcymObject
 
         $uploadPath = $this->createUploadFolder();
 
-        $attachment = new \stdClass();
-        $attachment->filename = uniqid('import_').'.csv';
-        acym_setVar('acym_import_filename', $attachment->filename);
+        $filename = uniqid('import_').'.csv';
+        acym_setVar('acym_import_filename', $filename);
 
-        $attachment->size = $importFile['size'];
-
-        if (!acym_uploadFile($importFile['tmp_name'], $uploadPath.$attachment->filename)) {
-            if (!move_uploaded_file($importFile['tmp_name'], $uploadPath.$attachment->filename)) {
+        if (!acym_uploadFile($importFile['tmp_name'], $uploadPath.$filename)) {
+            if (!move_uploaded_file($importFile['tmp_name'], $uploadPath.$filename)) {
                 acym_enqueueMessage(
                     acym_translationSprintf(
                         'ACYM_FAIL_UPLOAD',
                         '<b><i>'.acym_escape($importFile['tmp_name']).'</i></b>',
-                        '<b><i>'.acym_escape($uploadPath.$attachment->filename).'</i></b>'
+                        '<b><i>'.acym_escape($uploadPath.$filename).'</i></b>'
                     ),
                     'error'
                 );
@@ -132,7 +129,7 @@ class ImportHelper extends AcymObject
         if (!empty($deletedSubid)) {
             $userClass = new UserClass();
             $deletedUsers = $userClass->delete($deletedSubid);
-            acym_enqueueMessage(acym_translationSprintf('ACYM_IMPORT_DELETE', $deletedUsers), 'success');
+            acym_enqueueMessage(acym_translationSprintf('ACYM_IMPORT_DELETE', $deletedUsers));
         }
 
         $time = time();
@@ -147,7 +144,7 @@ class ImportHelper extends AcymObject
             $queryWhere[] = '`meta`.`meta_key`=\'#__capabilities\'';
         }
         $groups = acym_getVar('array', 'groups', []);
-        $this->config->save(['import_groups' => implode(',', $groups)]);
+        $this->config->saveConfig(['import_groups' => implode(',', $groups)]);
         if (!empty($groups)) {
             if (ACYM_CMS === 'joomla') {
                 acym_arrayToInteger($groups);
@@ -391,11 +388,13 @@ class ImportHelper extends AcymObject
         $this->generateName = acym_getVar('bool', 'import_generate_generic', true);
         $this->overwrite = acym_getVar('bool', 'import_overwrite_generic', true);
 
-        $newConfig = new \stdClass();
-        $newConfig->import_confirmed = $this->forceConfirm;
-        $newConfig->import_generate = $this->generateName;
-        $newConfig->import_overwrite = $this->overwrite;
-        $this->config->save($newConfig);
+        $this->config->saveConfig(
+            [
+                'import_confirmed' => $this->forceConfirm,
+                'import_generate' => $this->generateName,
+                'import_overwrite' => $this->overwrite,
+            ]
+        );
 
         $filename = str_replace(['.', ' '], '_', substr($filename, 0, strpos($filename, $extension))).$extension;
         $uploadPath = ACYM_MEDIA.'import'.DS.$filename;
@@ -456,7 +455,7 @@ class ImportHelper extends AcymObject
     public function getImportedLists(): array
     {
         $listClass = new ListClass();
-        $listsId = json_decode(acym_getVar('string', 'acym__entity_select__selected'));
+        $listsId = json_decode(acym_getVar('string', 'acym__entity_select__selected'), true);
         $newListName = acym_getVar('string', 'new_list');
 
         if (empty($listsId) && empty($newListName)) {

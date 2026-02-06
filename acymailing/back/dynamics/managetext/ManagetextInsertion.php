@@ -4,16 +4,16 @@ use AcyMailing\Classes\UserClass;
 
 trait ManagetextInsertion
 {
-    private $noIfStatementTags;
+    private array $noIfStatementTags = [];
 
-    public function replaceContent(&$email, $send = true)
+    public function replaceContent(object &$email): void
     {
         $this->replaceRandom($email);
         $this->handleAnchors($email);
         $this->fixPicturesOutlook($email);
     }
 
-    public function replaceUserInformation(&$email, &$user, $send = true)
+    public function replaceUserInformation(object &$email, ?object &$user, bool $send = true): void
     {
         $this->pluginHelper->cleanHtml($email->body);
         $this->pluginHelper->replaceVideos($email->body);
@@ -50,7 +50,7 @@ trait ManagetextInsertion
             if ($type === 'const') {
                 $tagsReplaced[$i] = defined($val) ? constant($val) : 'Constant not defined : '.$val;
             } elseif ($type === 'config') {
-                if ($val == 'sitename') {
+                if ($val === 'sitename') {
                     $tagsReplaced[$i] = acym_getCMSConfig($val);
                 }
             } else {

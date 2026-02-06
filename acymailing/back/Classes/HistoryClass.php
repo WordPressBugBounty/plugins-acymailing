@@ -13,7 +13,7 @@ class HistoryClass extends AcymClass
         $this->table = 'history';
     }
 
-    public function insert($userId, $action, $data = [], $mailid = 0, $unsubscribe_reason = null)
+    public function insert(int $userId, string $action, array $data = [], int $mailid = 0, $unsubscribe_reason = null): void
     {
         $currentUserid = acym_currentUserId();
         if (!empty($currentUserid)) {
@@ -41,17 +41,11 @@ class HistoryClass extends AcymClass
         $date = $history->date;
 
         $history->mail_id = $mailid;
-        if ($this->config->get('anonymous_tracking', 0) == 0) {
-            $history->ip = acym_getIP();
-        }
+        $history->ip = acym_getIP();
 
         if (!empty($_SERVER)) {
             $source = [];
-            if ($this->config->get('anonymous_tracking', 0) == 0) {
-                $vars = ['HTTP_REFERER', 'HTTP_USER_AGENT', 'HTTP_HOST', 'SERVER_ADDR', 'REMOTE_ADDR', 'REQUEST_URI', 'QUERY_STRING'];
-            } else {
-                $vars = ['HTTP_REFERER', 'HTTP_HOST', 'SERVER_ADDR', 'REQUEST_URI', 'QUERY_STRING'];
-            }
+            $vars = ['HTTP_REFERER', 'HTTP_USER_AGENT', 'HTTP_HOST', 'SERVER_ADDR', 'REMOTE_ADDR', 'REQUEST_URI', 'QUERY_STRING'];
 
             foreach ($vars as $oneVar) {
                 if (!empty($_SERVER[$oneVar])) {
@@ -62,22 +56,19 @@ class HistoryClass extends AcymClass
         }
 
         try {
-            $insertId = acym_insertObject('#__acym_history', $history);
+            acym_insertObject('#__acym_history', $history);
         } catch (\Exception $e) {
-            $insertId = 0;
         }
-
-        return $insertId;
     }
 
-    public function alreadyExists($userId, $date)
+    private function alreadyExists(int $userId, int $time): bool
     {
-        $result = acym_loadResult('SELECT user_id FROM #__acym_history WHERE user_id = '.intval($userId).' AND date = '.acym_escapeDB($date));
+        $result = acym_loadResult('SELECT user_id FROM #__acym_history WHERE user_id = '.intval($userId).' AND date = '.intval($time));
 
         return !empty($result);
     }
 
-    public function getHistoryOfOneById($id)
+    public function getHistoryOfOneById(int $id): array
     {
         $query = 'SELECT h.*, m.id, m.subject FROM #__acym_'.$this->table.' AS h ';
         $query .= 'LEFT JOIN #__acym_mail AS m ON h.mail_id = m.id ';
@@ -87,14 +78,14 @@ class HistoryClass extends AcymClass
         return acym_loadObjectList($query);
     }
 
-    public function getAllUnsubReasons()
+    public function getAllUnsubReasons(): array
     {
-        $query = 'SELECT action, data, unsubscribe_reason FROM #__acym_history WHERE action = "unsubscribed" AND unsubscribe_reason != ""';
+        $query = 'SELECT `action`, `data`, `unsubscribe_reason` FROM #__acym_history WHERE `action` = "unsubscribed" AND `unsubscribe_reason` != ""';
 
         return acym_loadObjectList($query);
     }
 
-    public function getAllMainLanguageUnsubReasons()
+    public function getAllMainLanguageUnsubReasons(): array
     {
         $allUnsubReasons = $this->config->get('unsub_survey', '{}');
 

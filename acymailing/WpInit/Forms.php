@@ -13,8 +13,10 @@ class Forms
         $isPreview = acym_getVar('bool', 'acym_preview', false);
         if ($isPreview) return;
 
-        add_action('wp_head', [$this, 'prepareFormsToDisplay']);
-        add_action('wp_footer', [$this, 'displayForms']);
+        if (acym_level(ACYM_ENTERPRISE)) {
+            add_action('wp_head', [$this, 'prepareFormsToDisplay']);
+            add_action('wp_footer', [$this, 'displayForms']);
+        }
         $this->registerShortcodes();
     }
 
@@ -65,7 +67,7 @@ class Forms
         $formClass = new FormClass();
         $form = $formClass->getOneById($params['id']);
 
-        if (empty($form) || empty($form->active)) return;
+        if (empty($form->active)) return;
 
         return $formClass->renderForm($form, false, true);
     }

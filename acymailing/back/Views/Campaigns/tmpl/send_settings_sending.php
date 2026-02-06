@@ -1,5 +1,5 @@
 <h5 class="cell margin-top-1 acym__title acym__title__secondary">
-    <?php echo acym_translation('ACYM_WHEN_EMAIL_WILL_BE_SENT').acym_info('ACYM_PRESELECT_DESC'); ?>
+    <?php echo acym_translation('ACYM_WHEN_EMAIL_WILL_BE_SENT').acym_info(['textShownInTooltip' => 'ACYM_PRESELECT_DESC']); ?>
 </h5>
 <div class="cell grid-x align-center">
 	<div class="cell grid-x medium-11 acym__campaign__sendsettings__send-type grid-margin-x">
@@ -65,7 +65,7 @@
 	<div class="cell grid-x acym__campaign__sendsettings__params margin-left-3"
 		 data-show="acym__campaign__sendsettings__scheduled" <?php echo $data['currentCampaign']->send_scheduled ? '' : 'style="display: none"'; ?>>
 		<div class="cell grid-x acym__campaign__sendsettings__display-send-type-scheduled">
-			<label id="acym__campaign__sendsettings__scheduled__send-date__label" class="cell shrink">
+			<label id="acym__campaign__sendsettings__scheduled__send-date__label" class="cell shrink padding-next-1">
                 <?php echo acym_translation('ACYM_CAMPAIGN_WILL_BE_SENT'); ?>
 			</label>
 			<label class="cell shrink" for="acym__campaign__sendsettings__send">
@@ -122,7 +122,7 @@
 				<label class="cell">
                     <?php
                     echo acym_translation('ACYM_START_DATE');
-                    echo acym_info('ACYM_START_DATE_AUTO_CAMPAIGN_DESC');
+                    echo acym_info(['textShownInTooltip' => 'ACYM_START_DATE_AUTO_CAMPAIGN_DESC']);
                     ?>
 				</label>
 				<div class="cell medium-5 small-10">
@@ -191,7 +191,7 @@
 			<label class="cell">
                 <?php
                 echo acym_translation('ACYM_EMAIL_LANGUAGE');
-                echo acym_info('ACYM_EMAIL_LANGUAGE_DESC');
+                echo acym_info(['textShownInTooltip' => 'ACYM_EMAIL_LANGUAGE_DESC']);
                 ?>
 			</label>
 			<div class="cell medium-5 small-10">
@@ -205,7 +205,7 @@
 	<div class="cell grid-x medium-10 large-7 xlarge-5 margin-left-3 margin-top-1">
         <?php
         $label = acym_translation('ACYM_TRACK_THIS_CAMPAIGN');
-        $label .= acym_info('ACYM_TRACK_THIS_CAMPAIGN_DESC');
+        $label .= acym_info(['textShownInTooltip' => 'ACYM_TRACK_THIS_CAMPAIGN_DESC']);
         $isTracked = $data['currentCampaign']->tracking ?? 1;
         echo acym_switch(
             'senderInformation[tracking]',

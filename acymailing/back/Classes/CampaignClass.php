@@ -21,17 +21,29 @@ class CampaignClass extends AcymClass
     ];
     const AB_TEST_VERSIONS = ['B'];
 
-    private array $jsonColumns = ['sending_params'];
-
     public function __construct()
     {
         parent::__construct();
 
         $this->table = 'campaign';
         $this->pkey = 'id';
+        $this->jsonColumns = ['sending_params'];
+        $this->intColumns = [
+            'id',
+            'mail_id',
+            'parent_id',
+            'draft',
+            'active',
+            'sent',
+            'visible',
+            'subscribers',
+            'open_unique',
+            'tracking_sale',
+            'tracking',
+        ];
     }
 
-    public function decode($campaign, $decodeMail = true)
+    public function decode($campaign, bool $decodeMail = true)
     {
         if (empty($campaign)) return $campaign;
 
@@ -39,12 +51,8 @@ class CampaignClass extends AcymClass
             foreach ($campaign as $i => $oneCampaign) {
                 $campaign[$i] = $this->decode($oneCampaign, false);
             }
-        }
-
-        foreach ($this->jsonColumns as $oneColumn) {
-            if (!isset($campaign->$oneColumn)) continue;
-
-            $campaign->$oneColumn = empty($campaign->$oneColumn) ? [] : json_decode($campaign->$oneColumn, true);
+        } else {
+            $this->fixTypes($campaign);
         }
 
         if ($decodeMail) {
@@ -229,7 +237,7 @@ class CampaignClass extends AcymClass
         return $results;
     }
 
-    private function prepareStatsCampaign(&$element)
+    private function prepareStatsCampaign(object $element): void
     {
         $query = 'SELECT SUM(mailstat.sent) AS subscribers, SUM(mailstat.open_unique) AS open_unique, SUM(mailstat.tracking_sale) AS tracking_sale
                   FROM #__acym_mail_stat AS mailstat
@@ -240,7 +248,7 @@ class CampaignClass extends AcymClass
         $element->tracking_sale += $stats->tracking_sale;
     }
 
-    public function getStatsCampaign(&$element, $urlClickClass, $isAbTest = false)
+    public function getStatsCampaign(object $element, UrlClickClass $urlClickClass, bool $isAbTest = false): void
     {
         $element->open = 0;
         $element->click = 0;
@@ -248,12 +256,12 @@ class CampaignClass extends AcymClass
         if (!empty($element->subscribers)) {
             $element->open = number_format($element->open_unique / $element->subscribers * 100, 2);
 
-            $clicksNb = $urlClickClass->getNumberUsersClicked($element->mail_id, $isAbTest);
+            $clicksNb = $urlClickClass->getNumberUsersClicked([$element->mail_id], $isAbTest);
             $element->click = number_format($clicksNb / $element->subscribers * 100, 2);
         }
     }
 
-    public function getTrackingSales(&$element)
+    public function getTrackingSales(object $element): void
     {
         $element->sale = 0;
         $element->currency = '';
@@ -272,21 +280,26 @@ class CampaignClass extends AcymClass
         $this->formatSaleTracking($element, $trackingSales);
     }
 
-    private function getStatsCampaignAuto(&$element, $urlClickClass)
+    private function getStatsCampaignAuto(object $element, UrlClickClass $urlClickClass): void
     {
         $generatedMailsStats = acym_loadObjectList(
-            'SELECT mail_stat.* FROM #__acym_mail AS mail JOIN #__acym_mail_stat AS mail_stat ON mail.id = mail_stat.mail_id WHERE mail.id IN (SELECT mail_id FROM #__acym_campaign WHERE parent_id = '.intval(
-                $element->id
-            ).')'
+            'SELECT mail_stat.* 
+            FROM #__acym_mail AS mail 
+            JOIN #__acym_mail_stat AS mail_stat 
+                ON mail.id = mail_stat.mail_id 
+            WHERE mail.id IN (SELECT mail_id FROM #__acym_campaign WHERE parent_id = '.intval($element->id).')'
         );
+
         $element->open = 0;
         $element->click = 0;
         $element->subscribers = 0;
-        if (empty($generatedMailsStats)) return;
+        if (empty($generatedMailsStats)) {
+            return;
+        }
 
         foreach ($generatedMailsStats as $key => $mailsStat) {
             $element->open += $mailsStat->open_unique;
-            $element->click += $urlClickClass->getNumberUsersClicked($element->id);
+            $element->click += $urlClickClass->getNumberUsersClicked([$element->id]);
             $element->subscribers += $mailsStat->sent;
         }
 
@@ -295,7 +308,9 @@ class CampaignClass extends AcymClass
             $element->click = number_format($element->click / $element->subscribers * 100, 2);
         }
 
-        if (!acym_isTrackingSalesActive()) return;
+        if (!acym_isTrackingSalesActive()) {
+            return;
+        }
 
         $trackingSales = acym_loadObject(
             'SELECT SUM(mail_stat.tracking_sale) AS sale, mail_stat.currency 
@@ -305,55 +320,45 @@ class CampaignClass extends AcymClass
         $this->formatSaleTracking($element, $trackingSales);
     }
 
-    private function formatSaleTracking(&$element, $trackingSales)
+    private function formatSaleTracking(object $element, object $trackingSales): void
     {
         $element->sale = $trackingSales->sale;
         if (empty($element->currency)) $element->currency = '';
         acym_trigger('getCurrency', [&$element->currency]);
     }
 
-    public function getOneById($id)
+    public function getOneById(int $id): ?object
     {
-        return $this->decode(acym_loadObject('SELECT campaign.* FROM #__acym_campaign AS campaign WHERE campaign.id = '.intval($id)));
+        $campaign = parent::getOneById($id);
+
+        return empty($campaign) ? null : $this->decode($campaign);
     }
 
-    public function getOneByIdWithMail($id)
+    public function getOneByIdWithMail(int $id): ?object
     {
-        $query = 'SELECT campaign.*, mail.name, mail.subject, mail.body, mail.from_name, mail.from_email, mail.reply_to_name, mail.reply_to_email, mail.bcc, mail.links_language, mail.tracking, mail.translation, mail.bounce_email
-                FROM #__acym_campaign AS campaign
-                JOIN #__acym_mail AS mail ON campaign.mail_id = mail.id
-                WHERE campaign.id = '.intval($id);
+        $campaign = acym_loadObject(
+            'SELECT campaign.*, mail.name, mail.subject, mail.body, mail.from_name, mail.from_email, mail.reply_to_name, mail.reply_to_email, mail.bcc, mail.links_language, mail.tracking, mail.translation, mail.bounce_email
+            FROM #__acym_campaign AS campaign
+            JOIN #__acym_mail AS mail ON campaign.mail_id = mail.id
+            WHERE campaign.id = '.intval($id)
+        );
 
-        return $this->decode(acym_loadObject($query));
+        return empty($campaign) ? null : $this->decode($campaign);
     }
 
-    public function get($identifier, $column = 'id')
-    {
-        return $this->decode(acym_loadObject('SELECT campaign.* FROM #__acym_campaign AS campaign WHERE campaign.'.acym_secureDBColumn($column).' = '.acym_escapeDB($identifier)));
-    }
-
-    public function getAllCampaignsNameMailId()
-    {
-        $query = 'SELECT m.id, m.name 
-                FROM #__acym_campaign AS c 
-                LEFT JOIN #__acym_mail AS m ON c.mail_id = m.id';
-
-        return $this->decode(acym_loadObjectList($query));
-    }
-
-    public function getOneCampaignByMailId($mailId)
+    public function getOneCampaignByMailId(int $mailId)
     {
         return $this->decode(acym_loadObject('SELECT * FROM #__acym_campaign WHERE mail_id = '.intval($mailId)));
     }
 
-    public function getAutoCampaignFromGeneratedMailId($mailId)
+    public function getAutoCampaignFromGeneratedMailId(int $mailId)
     {
         $queryCampaign = 'SELECT * FROM #__acym_campaign WHERE id = (SELECT parent_id FROM #__acym_campaign WHERE mail_id = '.intval($mailId).')';
 
         return $this->decode(acym_loadObject($queryCampaign));
     }
 
-    public function manageListsToCampaign($listsIds, $mailId, $unselectedListIds = [])
+    public function manageListsToCampaign($listsIds, int $mailId, array $unselectedListIds = []): bool
     {
         if (!empty($unselectedListIds)) {
             acym_arrayToInteger($unselectedListIds);
@@ -376,9 +381,9 @@ class CampaignClass extends AcymClass
         return true;
     }
 
-    public function save($campaignToSave)
+    public function save(object $element): ?int
     {
-        $campaign = clone $campaignToSave;
+        $campaign = clone $element;
         if (isset($campaign->tags)) {
             $tags = $campaign->tags;
             unset($campaign->tags);
@@ -403,7 +408,7 @@ class CampaignClass extends AcymClass
         return $campaignID;
     }
 
-    public function onlyManageableCampaigns(&$elements)
+    public function onlyManageableCampaigns(array &$elements): void
     {
         if (acym_isAdmin()) return;
 
@@ -448,9 +453,8 @@ class CampaignClass extends AcymClass
         return acym_loadResult($query) > 0;
     }
 
-    public function delete($elements)
+    public function delete(array $elements): int
     {
-        if (!is_array($elements)) $elements = [$elements];
         acym_arrayToInteger($elements);
         $this->onlyManageableCampaigns($elements);
 
@@ -468,7 +472,7 @@ class CampaignClass extends AcymClass
         return parent::delete($elements);
     }
 
-    public function countUsersCampaign($campaignID, $onlyActive = false): int
+    public function countUsersCampaign(int $campaignID, bool $onlyActive = false): int
     {
         $campaign = $this->getOneById($campaignID);
         if (empty($campaign)) {
@@ -529,26 +533,28 @@ class CampaignClass extends AcymClass
         }
     }
 
-    public function getFilterCampaign($sendingParams)
+    public function getFilterCampaign($sendingParams): array
     {
-        $filters = [];
+        if (empty($sendingParams['segment'])) {
+            return [];
+        }
 
-        if (!empty($sendingParams['segment'])) {
-            if (!empty($sendingParams['segment']['filters'])) {
-                $filters = $sendingParams['segment']['filters'];
-            } elseif (!empty($sendingParams['segment']['segment_id'])) {
-                $segmentClass = new SegmentClass();
-                $segment = $segmentClass->getOneById($sendingParams['segment']['segment_id']);
-                if (!empty($segment)) {
-                    $filters = $segment->filters;
-                }
+        if (!empty($sendingParams['segment']['filters'])) {
+            return $sendingParams['segment']['filters'];
+        }
+
+        if (!empty($sendingParams['segment']['segment_id'])) {
+            $segmentClass = new SegmentClass();
+            $segment = $segmentClass->getOneById($sendingParams['segment']['segment_id']);
+            if (!empty($segment)) {
+                return $segment->filters;
             }
         }
 
-        return $filters;
+        return [];
     }
 
-    public function send($campaignID, $result = 0, $abTestFinal = false)
+    public function send(int $campaignID, int $result = 0, bool $abTestFinal = false)
     {
         $campaign = $this->getOneById($campaignID);
 
@@ -691,11 +697,10 @@ class CampaignClass extends AcymClass
 
         $mailStatClass = new MailStatClass();
         foreach ($numberUsersInsertedByMailId as $mailId => $numberOfUsersInserted) {
-            $newMailStat = [
-                'mail_id' => intval($mailId),
-                'total_subscribers' => intval($numberOfUsersInserted),
-                'send_date' => $date,
-            ];
+            $newMailStat = new \stdClass();
+            $newMailStat->mail_id = intval($mailId);
+            $newMailStat->total_subscribers = intval($numberOfUsersInserted);
+            $newMailStat->send_date = $date;
 
             $mailStatClass->save($newMailStat);
         }
@@ -711,18 +716,24 @@ class CampaignClass extends AcymClass
         return $result;
     }
 
-    public function getCampaignForDashboard()
+    public function getCampaignForDashboard(): array
     {
-        $query = 'SELECT campaign.*, mail.name as name FROM #__acym_campaign as campaign LEFT JOIN #__acym_mail as mail ON campaign.mail_id = mail.id WHERE `active` = 1 AND `sending_type` = '.acym_escapeDB(
-                self::SENDING_TYPE_SCHEDULED
-            ).' AND `sent` = 0 LIMIT 3';
+        $campaigns = acym_loadObjectList(
+            'SELECT campaign.*, mail.name AS name 
+            FROM #__acym_campaign AS campaign 
+            LEFT JOIN #__acym_mail AS mail 
+                ON campaign.mail_id = mail.id 
+            WHERE `active` = 1 
+                AND `sent` = 0 
+                AND `sending_type` = '.acym_escapeDB(self::SENDING_TYPE_SCHEDULED).' 
+            LIMIT 3'
+        );
 
-        return $this->decode(acym_loadObjectList($query));
+        return $this->decode($campaigns);
     }
 
-    public function getOpenRateCampaigns($mailIds)
+    public function getOpenRateCampaigns(array $mailIds)
     {
-        if (!is_array($mailIds)) $mailIds = [$mailIds];
         acym_arrayToInteger($mailIds);
 
         $query = 'SELECT SUM(sent) AS sent, SUM(open_unique) AS open_unique FROM #__acym_mail_stat 
@@ -745,11 +756,8 @@ class CampaignClass extends AcymClass
         return acym_loadObject($query);
     }
 
-
-    public function getBounceRateCampaigns($mailIds)
+    public function getBounceRateCampaigns(array $mailIds)
     {
-        if (!is_array($mailIds)) $mailIds = [$mailIds];
-
         acym_arrayToInteger($mailIds);
 
         $query = 'SELECT SUM(sent) AS sent, SUM(bounce_unique) AS bounce_unique FROM #__acym_mail_stat 
@@ -758,7 +766,7 @@ class CampaignClass extends AcymClass
         return acym_loadObject($query);
     }
 
-    public function getOpenByMonth($mailIds = [], $start = '', $end = '')
+    public function getOpenByMonth(array $mailIds = [], string $start = '', string $end = ''): array
     {
         if (!is_array($mailIds)) $mailIds = [$mailIds];
         acym_arrayToInteger($mailIds);
@@ -773,19 +781,7 @@ class CampaignClass extends AcymClass
         return acym_loadObjectList($query);
     }
 
-    public function getOpenByWeek($mail_id = '', $start = '', $end = '')
-    {
-        $query = 'SELECT COUNT(user_id) as open, DATE_FORMAT(open_date, \'%Y-%m-%d\') as open_date FROM #__acym_user_stat WHERE open > 0';
-        $query .= empty($mail_id) ? '' : ' AND  `mail_id`='.intval($mail_id);
-        $query .= ' AND `open_date` > "0000-00-00"';
-        $query .= empty($start) ? '' : ' AND `open_date` >= '.acym_escapeDB($start);
-        $query .= empty($end) ? '' : ' AND `open_date` <= '.acym_escapeDB($end);
-        $query .= ' GROUP BY WEEK(open_date), YEAR(open_date) ORDER BY open_date';
-
-        return acym_loadObjectList($query);
-    }
-
-    public function getOpenByDay($mailIds = [], $start = '', $end = '')
+    public function getOpenByDay(array $mailIds = [], string $start = '', string $end = ''): array
     {
         if (!is_array($mailIds)) $mailIds = [$mailIds];
         acym_arrayToInteger($mailIds);
@@ -800,7 +796,7 @@ class CampaignClass extends AcymClass
         return acym_loadObjectList($query);
     }
 
-    public function getOpenByHour($mailIds = [], $start = '', $end = '')
+    public function getOpenByHour(array $mailIds = [], string $start = '', string $end = ''): array
     {
         if (!is_array($mailIds)) $mailIds = [$mailIds];
         acym_arrayToInteger($mailIds);
@@ -815,9 +811,8 @@ class CampaignClass extends AcymClass
         return acym_loadObjectList($query);
     }
 
-    public function getDevicesWithCountByMailId($mailIds = [])
+    public function getDevicesWithCountByMailId(array $mailIds = []): array
     {
-        if (!is_array($mailIds)) $mailIds = [$mailIds];
         acym_arrayToInteger($mailIds);
 
         $query = 'SELECT device, COUNT(*) as number FROM #__acym_user_stat WHERE `open` > 0';
@@ -827,7 +822,7 @@ class CampaignClass extends AcymClass
         return acym_loadObjectList($query);
     }
 
-    public function getLastNewsletters(&$params): array
+    public function getLastNewsletters(array &$params): array
     {
         $querySelect = 'SELECT mail.*, campaign.sending_date ';
         $queryCountSelect = 'SELECT COUNT(*) FROM (SELECT DISTINCT mail.id ';
@@ -920,14 +915,15 @@ class CampaignClass extends AcymClass
         return $return;
     }
 
-    public function getListsByMailId($mailId)
+    public function getListsByMailId(int $mailId): array
     {
-        $query = 'SELECT list_id FROM #__acym_mail_has_list WHERE mail_id = '.intval($mailId);
+        $listIds = acym_loadResultArray('SELECT list_id FROM #__acym_mail_has_list WHERE mail_id = '.intval($mailId));
+        acym_arrayToInteger($listIds);
 
-        return acym_loadResultArray($query);
+        return $listIds;
     }
 
-    public function triggerAutoCampaign()
+    public function triggerAutoCampaign(): void
     {
         $activeAutoCampaigns = acym_loadObjectList(
             'SELECT campaign.*, mail.name 
@@ -992,7 +988,7 @@ class CampaignClass extends AcymClass
         }
     }
 
-    private function shouldGenerateCampaign($campaign, $campaignMail): bool
+    private function shouldGenerateCampaign(object $campaign, object $campaignMail): bool
     {
         $results = acym_trigger('generateByCategory', [&$campaignMail], null, function ($plugin) {
             $plugin->generateCampaignResult->status = true;
@@ -1009,7 +1005,7 @@ class CampaignClass extends AcymClass
         return true;
     }
 
-    private function updateAutoCampaign(&$campaign, $campaignMail, $time): bool
+    private function updateAutoCampaign(object $campaign, object $campaignMail, int $time): bool
     {
         if (!$this->shouldGenerateCampaign($campaign, $campaignMail)) {
             return false;
@@ -1027,7 +1023,7 @@ class CampaignClass extends AcymClass
         return true;
     }
 
-    private function generateCampaign($campaign, $campaignMail, $lastGenerated, $mailClass)
+    private function generateCampaign(object $campaign, object $campaignMail, ?int $lastGenerated, MailClass $mailClass): object
     {
         $newMail = $this->generateMailAutoCampaign($campaignMail, $campaign->sending_params['number_generated'], $mailClass);
         $newCampaign = new \stdClass();
@@ -1049,7 +1045,7 @@ class CampaignClass extends AcymClass
         return $newCampaign;
     }
 
-    private function generateMailAutoCampaign($newMail, $generatedMailNumber, $mailClass)
+    private function generateMailAutoCampaign(object $newMail, int $generatedMailNumber, MailClass $mailClass): object
     {
         $mailId = $newMail->id;
         unset($newMail->id);
@@ -1066,7 +1062,7 @@ class CampaignClass extends AcymClass
         return $newMail;
     }
 
-    private function generateMailAutoCampaignMultilingual($mailId, $generatedMailNumber, $newParentId)
+    private function generateMailAutoCampaignMultilingual(int $mailId, int $generatedMailNumber, int $newParentId): void
     {
         $mailClass = new MailClass();
         $mails = $mailClass->getTranslationsById($mailId, true);
@@ -1080,7 +1076,7 @@ class CampaignClass extends AcymClass
         }
     }
 
-    private function setListToGeneratedCampaign($parentMailId, $newMailId, $mailClass)
+    private function setListToGeneratedCampaign(int $parentMailId, int $newMailId, MailClass $mailClass): void
     {
         $lists = $mailClass->getAllListsByMailId($parentMailId);
         $listIds = array_keys($lists);
@@ -1088,13 +1084,15 @@ class CampaignClass extends AcymClass
         $this->manageListsToCampaign($listIds, $newMailId);
     }
 
-    public function getLastGenerated($mailId)
+    public function getLastGenerated(int $mailId): int
     {
-        return acym_loadResult(
+        $lastGenerated = acym_loadResult(
             'SELECT `last_generated` 
             FROM #__acym_campaign 
             WHERE `mail_id` = '.intval($mailId)
         );
+
+        return empty($lastGenerated) ? 0 : $lastGenerated;
     }
 
     private function getNbGeneratedCampaigns(): int
@@ -1107,9 +1105,9 @@ class CampaignClass extends AcymClass
         );
     }
 
-    public function getAllCampaignsGeneratedWaiting()
+    public function getAllCampaignsGeneratedWaiting(): array
     {
-        return acym_loadObjectList(
+        $campaignIds = acym_loadObjectList(
             'SELECT id 
             FROM #__acym_campaign 
             WHERE parent_id IS NOT NULL 
@@ -1118,9 +1116,12 @@ class CampaignClass extends AcymClass
                 AND active = 1 
                 AND sent = 0'
         );
+        acym_arrayToInteger($campaignIds);
+
+        return $campaignIds;
     }
 
-    public function getCampaignsByTypes($campaignTypes, $onlyActives = false)
+    public function getCampaignsByTypes(array $campaignTypes, bool $onlyActives = false): array
     {
         if (empty($campaignTypes)) return [];
         $campaignTypes = array_map('acym_escapeDB', $campaignTypes);
@@ -1130,21 +1131,21 @@ class CampaignClass extends AcymClass
         return $this->decode(acym_loadObjectList($query), false);
     }
 
-    public function getCountCampaignType($type)
+    public function getCountCampaignType(string $type): int
     {
         if (empty($type)) return 0;
 
-        return acym_loadResult('SELECT COUNT(*) FROM #__acym_campaign WHERE sending_type = '.acym_escapeDB($type));
+        return (int)acym_loadResult('SELECT COUNT(*) FROM #__acym_campaign WHERE sending_type = '.acym_escapeDB($type));
     }
 
-    public function getAllAbTestCampaignsToFinishSending()
+    public function getAllAbTestCampaignsToFinishSending(): array
     {
         $query = 'SELECT * FROM #__acym_campaign WHERE sending_params LIKE \'%"abtest":%\' AND draft = 0 AND active = 1 AND sent = 1';
 
         return $this->decode(acym_loadObjectList($query));
     }
 
-    public function finishAbTestCampaign($campaign)
+    public function finishAbTestCampaign(object $campaign): bool
     {
         $abTestParams = empty($campaign->sending_params['abtest']) ? [] : $campaign->sending_params['abtest'];
 
@@ -1197,7 +1198,7 @@ class CampaignClass extends AcymClass
         $mail->parent_id = $campaign->mail_id;
         $mail->name .= ' - '.acym_translation('ACYM_ABTEST_WINNER');
         $newMailId = $mailClass->save($mail);
-        if (!$newMailId) {
+        if (empty($newMailId)) {
             return false;
         }
 
@@ -1210,7 +1211,7 @@ class CampaignClass extends AcymClass
         return true;
     }
 
-    public function isAbTestMail($mailId): bool
+    public function isAbTestMail(int $mailId): bool
     {
         $mailClass = new MailClass();
         $mainMailId = $mailClass->getMainMailId($mailId);
@@ -1225,7 +1226,7 @@ class CampaignClass extends AcymClass
         return !empty($campaign);
     }
 
-    public function resetAbTestVersion($campaignId): void
+    public function resetAbTestVersion(int $campaignId): void
     {
         if (empty($campaignId)) {
             return;
@@ -1244,7 +1245,7 @@ class CampaignClass extends AcymClass
         foreach (self::AB_TEST_VERSIONS as $version) {
             if (!empty($campaign->sending_params['abtest'][$version])) {
                 $mailClass = new MailClass();
-                $mailClass->delete($campaign->sending_params['abtest'][$version]);
+                $mailClass->delete([$campaign->sending_params['abtest'][$version]]);
                 unset($campaign->sending_params['abtest'][$version]);
             }
         }
@@ -1252,7 +1253,7 @@ class CampaignClass extends AcymClass
         $this->save($campaign);
     }
 
-    public function getXCampaigns(array $options)
+    public function getXCampaigns(array $options): array
     {
         $limit = $options['limit'] ?? 10;
         $offset = $options['offset'] ?? 0;

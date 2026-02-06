@@ -91,7 +91,15 @@
                 <?php } ?>
                 <?php if (acym_isAdmin()) { ?>
 					<div class="large-1 cell hide-for-small-only hide-for-medium-only text-center acym__listing__header__title">
-                        <?php echo acym_translation('ACYM_VISIBLE').acym_info('ACYM_VISIBLE_CAMPAIGN_DESC', 'acym__tooltip__in__listing__header'); ?>
+                        <?php
+                        echo acym_translation('ACYM_VISIBLE');
+                        echo acym_info(
+                            [
+                                'textShownInTooltip' => 'ACYM_VISIBLE_CAMPAIGN_DESC',
+                                'classIcon' => 'acym__tooltip__in__listing__header',
+                            ]
+                        );
+                        ?>
 					</div>
                 <?php } ?>
 				<div class="large-1 cell hide-for-small-only hide-for-medium-only text-center acym__listing__header__title">
@@ -181,10 +189,21 @@
                                 echo acym_translation('ACYM_SENT').' : '.acym_escape($campaign->subscribers).' '.acym_translation('ACYM_RECIPIENTS');
                                 echo '</span></div>';
                             } elseif ($campaign->scheduled && !$campaign->draft) {
-                                echo '<div class="cell acym__campaign__status__status acym__background-color__orange"><span>'.acym_translation('ACYM_SCHEDULED').' : '.acym_date(
-                                        $campaign->sending_date,
-                                        acym_getDateTimeFormat('ACYM_DATE_FORMAT_LC3')
-                                    ).'</span></div>';
+                                echo '<div class="cell acym__campaign__status__status acym__background-color__orange"><span>';
+                                echo acym_escape(acym_translation('ACYM_SCHEDULED').' : ');
+                                echo acym_tooltip(
+                                    [
+                                        'hoveredText' => acym_date(
+                                            $campaign->sending_date,
+                                            acym_getDateTimeFormat('ACYM_DATE_FORMAT_LC3')
+                                        ),
+                                        'textShownInTooltip' => acym_date(
+                                            $campaign->sending_date,
+                                            acym_getDateTimeFormat('ACYM_DATE_FORMAT_LC2')
+                                        ),
+                                    ]
+                                );
+                                echo '</span></div>';
                                 $target = '<div class="acym__campaign__listing__scheduled__stop grid-x cell xlarge-shrink acym_vcenter" data-campaignid="'.acym_escape(
                                         $campaign->id
                                     ).'"><i class="acymicon-times-circle cell shrink show-for-xlarge"></i><span class="cell xlarge-shrink">'.acym_translation(
