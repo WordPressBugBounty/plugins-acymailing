@@ -1,5 +1,8 @@
 <?php
 
+__('Automatic campaign [%s] failed generating a new campaign because an error occurred.', 'acymailing');
+__('Next execution date', 'acymailing');
+__('The next time this automatic campaign will be sent. It will not be sent before this date.', 'acymailing');
 __('Get my API key', 'acymailing');
 __('You need to enter your Giphy API key in the configuration to use this feature.', 'acymailing');
 __('Giphy API key', 'acymailing');
@@ -1168,7 +1171,6 @@ __('Confirmation message', 'acymailing');
 __('Addon settings', 'acymailing');
 __('After subscription', 'acymailing');
 __('Redirections', 'acymailing');
-__('The automatic campaign can\'t be generated before this date', 'acymailing');
 __('The custom field %s does not exist', 'acymailing');
 __('<b>You don\'t have any open data/click data yet</b>', 'acymailing');
 __('Number of receivers: %s', 'acymailing');

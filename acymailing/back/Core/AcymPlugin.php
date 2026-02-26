@@ -1437,7 +1437,6 @@ class AcymPlugin extends AcymObject
         $response = curl_exec($curl);
         $error = curl_error($curl);
         $this->responseCode = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
 
         if ($error) {
             return ['error_curl' => $error];

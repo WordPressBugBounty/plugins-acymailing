@@ -150,7 +150,8 @@ class AutomationClass extends AcymClass
     {
         $usersTriggeringAction = empty($data['userIds']) ? [] : $data['userIds'];
         $userTriggeringAction = empty($data['userId']) ? 0 : $data['userId'];
-        $action->actions = json_decode($action->actions, true);
+
+        $action->actions = json_decode($action->actions ?? '[]', true);
         if (empty($action->actions)) return false;
 
         $isMassAction = false;
@@ -160,7 +161,7 @@ class AutomationClass extends AcymClass
             $isMassAction = true;
         }
 
-        $action->filters = json_decode($action->filters, true);
+        $action->filters = json_decode($action->filters ?? '[]', true);
         if (empty($action->filters)) return false;
 
 
@@ -179,7 +180,7 @@ class AutomationClass extends AcymClass
             }
         }
 
-        $typeFilter = $action->filters['type_filter'];
+        $typeFilter = $action->filters['type_filter'] ?? null;
 
         unset($action->filters['type_filter']);
         if (empty($action->filters)) {
@@ -217,7 +218,9 @@ class AutomationClass extends AcymClass
         }
 
         if (!$isMassAction) {
-            $action->filters['type_filter'] = $typeFilter;
+            if ($typeFilter !== null) {
+                $action->filters['type_filter'] = $typeFilter;
+            }
             $action->filters = json_encode($action->filters);
             $action->actions = json_encode($action->actions);
             $actionClass = new ActionClass();

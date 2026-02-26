@@ -531,109 +531,72 @@ class PluginHelper extends AcymObject
 
         $tag->wrap = intval($tag->wrap);
 
-        $allowedTags = [
-            'b',
-            'strong',
-            'i',
-            'em',
-            'a',
-            'p',
-            'div',
-            'h2',
-            'h3',
-            'h4',
-            'h5',
-            'h6',
-            'ul',
-            'ol',
-            'li',
-            'table',
-            'tr',
-            'td',
-            'th',
-            'thead',
-            'tbody',
-            'tfoot',
-        ];
+        $newText = str_replace(['&lt', '&gt'], ['<', '>'], $text);
 
-        $aloneAllowedTags = [
-            'br',
-            'img',
-        ];
-
-        $newText = strip_tags($text, '<'.implode('><', array_merge($allowedTags, $aloneAllowedTags)).'>');
-
-        $newText = preg_replace('/^(\s|\n|(<br[^>]*>))+/i', '', trim($newText));
-        $newText = preg_replace('/(\s|\n|(<br[^>]*>))+$/i', '', trim($newText));
-
-        $newText = str_replace(['&lt', '&gt'], ['<', '>'], $newText);
-
-        $numChar = strlen($newText);
-
-        $numCharStrip = strlen(strip_tags($newText));
-
-        if ($numCharStrip <= $tag->wrap) {
+        if (mb_strlen(strip_tags($newText)) <= $tag->wrap) {
             return $newText;
         }
 
-        $open = [];
+        if (!class_exists('DOMDocument', false)) {
+            return mb_substr(strip_tags($newText), 0, $tag->wrap).'…';
+        }
 
-        $write = true;
+        if (function_exists('libxml_use_internal_errors')) {
+            libxml_use_internal_errors(true);
+        }
 
-        $countStripChar = 0;
+        $dom = new \DOMDocument('1.0', 'UTF-8');
+        $dom->loadHTML(
+            '<?xml encoding="UTF-8">' . $newText,
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+        );
 
-        for ($i = 0; $i < $numChar; $i++) {
-            if ($newText[$i] == '<') {
-                foreach ($allowedTags as $oneAllowedTag) {
-                    if (
-                        $numChar >= ($i + strlen($oneAllowedTag) + 1)
-                        && substr($newText, $i, strlen($oneAllowedTag) + 1) == '<'.$oneAllowedTag
-                        && in_array($newText[$i + strlen($oneAllowedTag) + 1], [' ', '>'])
-                    ) {
-                        $write = false;
-                        $open[] = '</'.$oneAllowedTag.'>';
+        $count = 0;
+        $this->truncateNode($dom, $dom, $tag->wrap, $count);
+
+        return $dom->saveHTML();
+    }
+
+    private function truncateNode(\DOMDocument $dom, \DOMNode $node, int $limit, int &$count): bool
+    {
+        for ($i = 0; $i < $node->childNodes->length; $i++) {
+            $child = $node->childNodes->item($i);
+
+            if ($child->nodeType === XML_TEXT_NODE) {
+                $text = $child->nodeValue;
+                $len = mb_strlen($text);
+
+                if ($count + $len > $limit) {
+                    $remaining = $limit - $count;
+
+                    $slice = mb_substr($text, 0, $remaining);
+
+                    if (preg_match('/^(.+?)([\s\p{P}]+)[^\s\p{P}]*$/u', $slice, $m)) {
+                        $slice = rtrim($m[1]);
                     }
 
-                    if ($numChar >= ($i + strlen($oneAllowedTag) + 2) && substr($newText, $i, strlen($oneAllowedTag) + 2) == '</'.$oneAllowedTag) {
-                        if (end($open) == '</'.$oneAllowedTag.'>') {
-                            array_pop($open);
-                        }
+                    $child->nodeValue = $slice.'…';
+
+                    while ($child->nextSibling) {
+                        $node->removeChild($child->nextSibling);
                     }
+
+                    return true;
                 }
 
-                foreach ($aloneAllowedTags as $oneAllowedTag) {
-                    if (
-                        $numChar >= ($i + strlen($oneAllowedTag) + 1)
-                        && substr($newText, $i, strlen($oneAllowedTag) + 1) === '<'.$oneAllowedTag
-                        && in_array($newText[$i + strlen($oneAllowedTag) + 1], [' ', '/', '>'])
-                    ) {
-                        $write = false;
-                    }
+                $count += $len;
+            }
+
+            if ($child->hasChildNodes() && $this->truncateNode($dom, $child, $limit, $count)) {
+                while ($child->nextSibling) {
+                    $node->removeChild($child->nextSibling);
                 }
-            }
 
-            if ($write) {
-                $countStripChar++;
-            }
-
-            if ($newText[$i] == ">") {
-                $write = true;
-            }
-
-            if ($newText[$i] == " " && $countStripChar >= $tag->wrap && $write) {
-                $newText = substr($newText, 0, $i).'...';
-
-                $open = array_reverse($open);
-                $newText = $newText.implode('', $open);
-
-                break;
+                return true;
             }
         }
 
-        $newText = preg_replace('/^(\s|\n|(<br[^>]*>))+/i', '', trim($newText));
-        $newText = preg_replace('/(\s|\n|(<br[^>]*>))+$/i', '', trim($newText));
-
-        return $newText;
+        return false;
     }
 
     public function getStandardDisplay(object $format): string
@@ -1194,13 +1157,12 @@ class PluginHelper extends AcymObject
             }
         }
 
+        $storageVar = 'window._additionalInfo'.$suffix;
         $output .= '
             <script type="text/javascript">
                 var _selectedRows'.$suffix.' = [];
                 var _selectedRows = [];
-                if("undefined" === typeof _additionalInfo'.$suffix.') {
-                	var _additionalInfo'.$suffix.' = {};
-                 }
+                '.$storageVar.' = '.$storageVar.' || {};
                 ';
         if (!empty($defaultValues->id) && (empty($defaultValues->defaultPluginTab) || $dynamicIdentifier === $defaultValues->defaultPluginTab)) {
             $delimiter = strpos($defaultValues->id, '-') ? '-' : ',';
@@ -1249,7 +1211,7 @@ class PluginHelper extends AcymObject
     
                     '.implode("\r\n\r\n", $jsOptionsMerge).'
     
-    				for (let [index, info] of Object.entries(_additionalInfo'.$suffix.')){
+    				for (let [index, info] of Object.entries('.$storageVar.')){
     					otherinfo += "| "+index+":"+info;
     				}
                     ';
@@ -1279,7 +1241,7 @@ class PluginHelper extends AcymObject
                 }
                
                 function addAdditionalInfo'.$suffix.'(index, value){
-                	_additionalInfo'.$suffix.'[index] = value;
+                	'.$storageVar.'[index] = value;
                 	'.$updateFunction.'();
                 }
             </script>';
@@ -1303,9 +1265,12 @@ class PluginHelper extends AcymObject
         } elseif (!empty($tag->lang)) {
             $langId = intval(substr($tag->lang, strpos($tag->lang, ',') + 1));
         } elseif (!empty($this->contextLanguage)) {
-            $languages = acym_loadObjectList('SELECT `lang_id`, `lang_code` FROM #__languages', 'lang_code');
-            if (!empty($languages[$this->contextLanguage])) {
-                $langId = $languages[$this->contextLanguage]->lang_id;
+            $languages = acym_loadObjectList('SELECT `lang_id`, `lang_code`, `sef` FROM #__languages');
+            foreach ($languages as $language) {
+                if (in_array($this->contextLanguage, [$language->lang_code, $language->sef])) {
+                    $langId = $language->lang_id;
+                    break;
+                }
             }
         }
 

@@ -1077,9 +1077,7 @@ class plgAcymAcymailer extends AcymPlugin
 
     private function checkSuccessCode($responseCode): bool
     {
-        $successCodes = [200, 201, 204];
-
-        return in_array($responseCode, $successCodes);
+        return in_array($responseCode, [200, 201]);
     }
 
     private function translate($response)
