@@ -119,12 +119,14 @@ class Router
         $this->router(true);
     }
 
-    public function router($front = false)
+    public function router(bool $front = false): void
     {
         displayFreeTrialMessage();
 
 
-        if (!$front) auth_redirect();
+        if (!$front) {
+            auth_redirect();
+        }
 
         if (file_exists(ACYM_FOLDER.'update.php')) {
             $acyActivation = new Activation();

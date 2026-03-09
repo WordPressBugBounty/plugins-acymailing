@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 6.9
-Stable tag: 10.8.0
+Stable tag: 10.8.1
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,33 +113,12 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.8.0 - February 26, 2026 =
+= 10.8.1 - March 9, 2026 =
+* A vulnerability on user creation impacting versions 9.11.0 to 10.8.0 has been patched. Details will be disclosed after a reasonable time to let users apply the patch first.
 
-* It is now possible to modify the next execution date of an automatic campaign after it started.
-* It is now possible to download the file inserted in the file type custom field from the user edition page in the admin.
-* The tracking of URLs in emails now correctly handles the URLs with customised dynamic parameters.
+* A security has been added on the statistics page to handle edge cases where the campaign isn't correctly selected.
+* Display properly IPv6 in user history.
 
-* A dedicated message has been added when automatic campaigns could not generate a new campaign.
-* The way dynamic content and auto-save is handled has been modified to prevent false-positives from Planet Hoster's security rules.
-* Multibyte characters (Japanese, Chinese, Arabic, Hebrew...) are now handled when wrapping text of an element inserted in an email.
-* The default bounce rules have been updated to catch more messages of blocked emails by filters.
-* Modifications have been made to prepare for PHP 8.6.
-* We have improved the accessibility of the unsubscribe page.
-* We changed the integration with Mail-Tester due to their new version, the spam test is now working again.
-* We added SEF handling for the EasySocial links.
-
-* An issue has been fixed when notification messages are configured to be sent to a non existing user and that user could not be automatically added.
-* The special chars option for email addresses was not working as intended, special chars are now correctly rejected when a new user is created.
-* The editor styling is now correctly applied to the category title when inserting items by category in emails and grouping by category.
-* The automations and scenarios ordering has been fixed on listings.
-* On firefox, the plugins card are now correctly displayed.
-* We fixed the redirection issue that could occur after a cancel or a save and exit in the email edition from the configuration page.
-* We have fixed issues that could cause errors in certain subscription forms and on automation configurations.
-* A special case has been handled on the automation summary.
-* We fixed some custom fields in the subscriber edition page that were not allowing you to empty their value.
-* We fixed a “deprecated” warning that could occur when you manually triggered bounce handling.
-* Fixed email preview in latest Firefox version (148.0).
-* We fixed an error message preventing last product insertion in the editor for WooCommerce.
-* The new account registration could lead to an error in some cases when the auto user creation was active.
+* The date in email headers for Elastic Email users is now correctly handled.
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)

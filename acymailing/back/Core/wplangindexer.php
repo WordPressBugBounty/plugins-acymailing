@@ -1,5 +1,6 @@
 <?php
 
+__('This domain is currently under review. You will be able to send your emails as soon as it gets manually approved, which is done on weekdays and can take up to 1 day.', 'acymailing');
 __('Automatic campaign [%s] failed generating a new campaign because an error occurred.', 'acymailing');
 __('Next execution date', 'acymailing');
 __('The next time this automatic campaign will be sent. It will not be sent before this date.', 'acymailing');
@@ -8,7 +9,6 @@ __('You need to enter your Giphy API key in the configuration to use this featur
 __('Giphy API key', 'acymailing');
 __('Giphy allows you to search and insert GIFs directly into your emails. You need to create an account on Giphy and create a new API key on their developer portal to use this feature.', 'acymailing');
 __('Please format the date like this: YYYY-MM-DD', 'acymailing');
-__('Your account is currently under review. You will be able to send your emails as soon as it gets approved.', 'acymailing');
 __('Please specify a sending date', 'acymailing');
 __('Only use a dedicated sending process when experiencing issues on automated tasks. This might not work for all servers!', 'acymailing');
 __('Executing automated tasks may take a lot of time. If you\'re experiencing issues you may try using a dedicated process to send queued emails.', 'acymailing');

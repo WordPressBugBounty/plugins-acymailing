@@ -118,11 +118,14 @@ class StatsController extends AcymController
     {
         $data['workflowHelper'] = new WorkflowHelper();
 
-        $overrideFilterMailIds = false;
-
-        if (acym_getVar('string', 'task', '') == 'listing' && empty(acym_getVar('array', 'mail_ids', []))) $overrideFilterMailIds = true;
-
+        $overrideFilterMailIds = acym_getVar('string', 'task', '') === 'listing' && empty(acym_getVar('array', 'mail_ids', []));
         $data['selectedMailid'] = $this->getVarFiltersListing('array', 'mail_ids', [], $overrideFilterMailIds);
+
+        foreach ($data['selectedMailid'] as $i => $mailId) {
+            if (empty($mailId)) {
+                unset($data['selectedMailid'][$i]);
+            }
+        }
 
         if ($needMailId && empty($data['selectedMailid'])) {
             $this->globalStats();
@@ -139,7 +142,9 @@ class StatsController extends AcymController
             $overrideFilterMailIdVersion = !empty(acym_getVar('array', 'mail_ids', []));
 
             $versionMailSelected = $this->getVarFiltersListing('int', 'mail_id_version', 0, $overrideFilterMailIdVersion);
-            if (!empty($versionMailSelected)) $data['selectedMailid'] = [$versionMailSelected];
+            if (!empty($versionMailSelected)) {
+                $data['selectedMailid'] = [$versionMailSelected];
+            }
         }
 
         $mailClass = new MailClass();

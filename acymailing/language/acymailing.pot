@@ -1,13 +1,16 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.8.0\n"
+"Project-Id-Version: AcyMailing 10.8.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-26\n"
+"POT-Creation-Date: 2026-03-09\n"
 "X-Domain: acymailing\n"
 
+
+msgid "This domain is currently under review. You will be able to send your emails as soon as it gets manually approved, which is done on weekdays and can take up to 1 day."
+msgstr ""
 
 msgid "Automatic campaign [%s] failed generating a new campaign because an error occurred."
 msgstr ""
@@ -31,9 +34,6 @@ msgid "Giphy allows you to search and insert GIFs directly into your emails. You
 msgstr ""
 
 msgid "Please format the date like this: YYYY-MM-DD"
-msgstr ""
-
-msgid "Your account is currently under review. You will be able to send your emails as soon as it gets approved."
 msgstr ""
 
 msgid "Please specify a sending date"
