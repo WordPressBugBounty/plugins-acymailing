@@ -66,4 +66,18 @@ class UsersController extends AcymController
 
         acym_sendAjaxResponse('', $user);
     }
+
+    public function searchTestReceiversAjax(): void
+    {
+        $search = acym_getVar('string', 'search', '');
+        $userClass = new UserClass();
+        $users = $userClass->getUsersLikeEmail($search);
+
+        $return = [];
+        foreach ($users as $oneUser) {
+            $return[] = [$oneUser->id, $oneUser->email];
+        }
+        echo json_encode($return);
+        exit;
+    }
 }

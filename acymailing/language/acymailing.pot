@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.8.1\n"
+"Project-Id-Version: AcyMailing 10.8.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-09\n"
+"POT-Creation-Date: 2026-03-13\n"
 "X-Domain: acymailing\n"
 
 
@@ -7921,9 +7921,6 @@ msgid "One or more address(es) are invalid and couldn't be imported"
 msgstr ""
 
 msgid "Invalid address"
-msgstr ""
-
-msgid "None of your campaigns are scheduled. Go schedule one!"
 msgstr ""
 
 msgid "your.mail@example.com"

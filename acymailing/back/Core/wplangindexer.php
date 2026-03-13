@@ -2661,7 +2661,6 @@ __('Are you sure?', 'acymailing');
 __('The number of arguments doesn\'t match with number of columns', 'acymailing');
 __('One or more address(es) are invalid and couldn\'t be imported', 'acymailing');
 __('Invalid address', 'acymailing');
-__('None of your campaigns are scheduled. Go schedule one!', 'acymailing');
 __('your.mail@example.com', 'acymailing');
 __('From email address', 'acymailing');
 __('Using your server', 'acymailing');

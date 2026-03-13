@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 6.9
-Stable tag: 10.8.1
+Stable tag: 10.8.2
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,12 +113,9 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.8.1 - March 9, 2026 =
-* A vulnerability on user creation impacting versions 9.11.0 to 10.8.0 has been patched. Details will be disclosed after a reasonable time to let users apply the patch first.
+= 10.8.2 - March 13, 2026 =
+* We removed some PHP warnings on very specific cases when inserting content in the editor for not saved emails.
 
-* A security has been added on the statistics page to handle edge cases where the campaign isn't correctly selected.
-* Display properly IPv6 in user history.
-
-* The date in email headers for Elastic Email users is now correctly handled.
+* The vulnerability patch has been updated to better handle databases with older character sets.
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)
