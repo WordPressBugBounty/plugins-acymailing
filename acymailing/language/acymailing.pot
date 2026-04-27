@@ -1,13 +1,76 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.8.2\n"
+"Project-Id-Version: AcyMailing 10.9.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-13\n"
+"POT-Creation-Date: 2026-04-27\n"
 "X-Domain: acymailing\n"
 
+
+msgid "Auto-login token validity (hours)"
+msgstr ""
+
+msgid "How long an auto-login link remains valid after being generated. Default is 48 hours."
+msgstr ""
+
+msgid "Next generation date"
+msgstr ""
+
+msgid "Filter by"
+msgstr ""
+
+msgid "Speakers"
+msgstr ""
+
+msgid "Sponsors"
+msgstr ""
+
+msgid "Any list"
+msgstr ""
+
+msgid "Is not currently subscribed"
+msgstr ""
+
+msgid "Not currently subscribed"
+msgstr ""
+
+msgid "Manual trigger is not available for this type of automation"
+msgstr ""
+
+msgid "%s automation(s) triggered successfully"
+msgstr ""
+
+msgid "%s user-based automation(s) skipped (only time-based automations can be triggered manually)"
+msgstr ""
+
+msgid "Fields width"
+msgstr ""
+
+msgid "The default width (65%) is based to scale on the email field size. Even if it doesn't look right in the preview, the field will be the correct size in the final rendering on your website page."
+msgstr ""
+
+msgid "Shadow color"
+msgstr ""
+
+msgid "Shadow blur"
+msgstr ""
+
+msgid "Shadow horizontal offset"
+msgstr ""
+
+msgid "Shadow vertical offset"
+msgstr ""
+
+msgid "Popup position"
+msgstr ""
+
+msgid "Top-center"
+msgstr ""
+
+msgid "Bottom-center"
+msgstr ""
 
 msgid "This domain is currently under review. You will be able to send your emails as soon as it gets manually approved, which is done on weekdays and can take up to 1 day."
 msgstr ""
@@ -1869,10 +1932,16 @@ msgstr ""
 msgid "Top-right"
 msgstr ""
 
+msgid "Middle-right"
+msgstr ""
+
 msgid "Bottom-right"
 msgstr ""
 
 msgid "Top-left"
+msgstr ""
+
+msgid "Middle-left"
 msgstr ""
 
 msgid "Bottom-left"

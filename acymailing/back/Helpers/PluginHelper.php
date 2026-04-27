@@ -547,7 +547,7 @@ class PluginHelper extends AcymObject
 
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->loadHTML(
-            '<?xml encoding="UTF-8">' . $newText,
+            '<?xml encoding="UTF-8">'.$newText,
             LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
         );
 
@@ -1134,6 +1134,12 @@ class PluginHelper extends AcymObject
         }
 
         if (!empty($outputStructure['options'])) {
+            if (isset($outputStructure['options']['ACYM_OTHER_OPTIONS'])) {
+                $otherOptions = $outputStructure['options']['ACYM_OTHER_OPTIONS'];
+                unset($outputStructure['options']['ACYM_OTHER_OPTIONS']);
+                $outputStructure['options']['ACYM_OTHER_OPTIONS'] = $otherOptions;
+            }
+
             foreach ($outputStructure['options'] as $section => $options) {
                 $formattedOptions = '';
                 foreach ($options as $label => $option) {

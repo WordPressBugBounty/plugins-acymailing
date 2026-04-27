@@ -1,5 +1,26 @@
 <?php
 
+__('Auto-login token validity (hours)', 'acymailing');
+__('How long an auto-login link remains valid after being generated. Default is 48 hours.', 'acymailing');
+__('Next generation date', 'acymailing');
+__('Filter by', 'acymailing');
+__('Speakers', 'acymailing');
+__('Sponsors', 'acymailing');
+__('Any list', 'acymailing');
+__('Is not currently subscribed', 'acymailing');
+__('Not currently subscribed', 'acymailing');
+__('Manual trigger is not available for this type of automation', 'acymailing');
+__('%s automation(s) triggered successfully', 'acymailing');
+__('%s user-based automation(s) skipped (only time-based automations can be triggered manually)', 'acymailing');
+__('Fields width', 'acymailing');
+__('The default width (65%) is based to scale on the email field size. Even if it doesn\'t look right in the preview, the field will be the correct size in the final rendering on your website page.', 'acymailing');
+__('Shadow color', 'acymailing');
+__('Shadow blur', 'acymailing');
+__('Shadow horizontal offset', 'acymailing');
+__('Shadow vertical offset', 'acymailing');
+__('Popup position', 'acymailing');
+__('Top-center', 'acymailing');
+__('Bottom-center', 'acymailing');
 __('This domain is currently under review. You will be able to send your emails as soon as it gets manually approved, which is done on weekdays and can take up to 1 day.', 'acymailing');
 __('Automatic campaign [%s] failed generating a new campaign because an error occurred.', 'acymailing');
 __('Next execution date', 'acymailing');
@@ -621,8 +642,10 @@ __('Background size', 'acymailing');
 __('Top', 'acymailing');
 __('Bottom', 'acymailing');
 __('Top-right', 'acymailing');
+__('Middle-right', 'acymailing');
 __('Bottom-right', 'acymailing');
 __('Top-left', 'acymailing');
+__('Middle-left', 'acymailing');
 __('Bottom-left', 'acymailing');
 __('Fourth', 'acymailing');
 __('Replace shortcodes', 'acymailing');

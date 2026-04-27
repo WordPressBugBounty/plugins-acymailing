@@ -2,38 +2,43 @@
 
 namespace AcyMailing\WpInit;
 
+use AcyMailing\Controllers\ConfigurationController;
+use AcyMailing\Helpers\CronHelper;
+
 class Cron
 {
     public function __construct()
     {
-        $ctrl = acym_getVar('string', 'ctrl', '');
-        if (acym_level(ACYM_ESSENTIAL) && !acym_isNoTemplate() && $ctrl !== 'cron') {
-            $this->callAcyCron();
-        }
+        add_filter('cron_schedules', [$this, 'addCronIntervals'], 100);
+        add_action(ConfigurationController::CRON_TASK_NAME, [$this, 'triggerAutomatedTasks']);
     }
 
-    public function callAcyCron()
+    public function addCronIntervals(array $schedules): array
     {
-        $config = acym_config();
+        $schedules['every_minute'] = [
+            'interval' => 60,
+            'display' => 'Every minute',
+        ];
 
-        $activeCron = $config->get('active_cron', 0);
-        if (empty($activeCron)) return;
+        return $schedules;
+    }
 
-        $queueType = $config->get('queue_type', 'manual');
-        $cronNext = $config->get('cron_next', 0);
-        if (empty($cronNext) || $cronNext > time() || $queueType === 'manual') return;
+    public function triggerAutomatedTasks()
+    {
 
-        $cronFrequency = $config->get('cron_frequency', 0);
-        $cronBatches = $config->get('queue_batch_auto', 1);
+        if (!acym_level(ACYM_ESSENTIAL)) {
+            acym_deleteScheduledTask(['name' => ConfigurationController::CRON_TASK_NAME]);
 
-        if (empty($cronFrequency)) return;
-
-        if (intval($cronFrequency) >= 900 && intval($cronBatches) < 2) return;
-
-        $cronKey = '';
-        if (!empty($config->get('cron_security', 0)) && !empty($config->get('cron_key'))) {
-            $cronKey = '&cronKey='.$config->get('cron_key');
+            return;
         }
-        acym_asyncUrlCalls([acym_frontendLink('cron&task=cron'.$cronKey)]);
+
+        if (!acym_isLicenseValidWeekly() && (empty($_SERVER['HTTP_REFERER']) || strpos($_SERVER['HTTP_REFERER'], 'api.acymailing.com') === false)) {
+            acym_deleteScheduledTask(['name' => ConfigurationController::CRON_TASK_NAME]);
+
+            return;
+        }
+
+        $cronHelper = new CronHelper();
+        $cronHelper->cron();
     }
 }

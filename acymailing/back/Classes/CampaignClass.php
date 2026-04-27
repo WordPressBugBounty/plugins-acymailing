@@ -944,7 +944,12 @@ class CampaignClass extends AcymClass
         $time = time();
 
         foreach ($activeAutoCampaigns as $campaign) {
-            if (!empty($campaign->sending_params['start_date']) && acym_getTime(acym_date($campaign->sending_params['start_date'], 'Y-m-d H:i')) > $time) {
+            $nextTrigger = $campaign->next_trigger;
+            if (empty($nextTrigger) && !empty($campaign->sending_params['start_date'])) {
+                $nextTrigger = $campaign->sending_params['start_date'];
+            }
+
+            if (!empty($nextTrigger) && acym_getTime(acym_date($nextTrigger, 'Y-m-d H:i')) > $time) {
                 continue;
             }
 

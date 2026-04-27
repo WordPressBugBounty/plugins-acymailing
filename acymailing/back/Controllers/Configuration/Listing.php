@@ -107,14 +107,14 @@ trait Listing
         $toolbarHelper->addButton(
             acym_translation('ACYM_SEND_TEST'),
             [
-                'acym-data-before' => 'jQuery.acymConfigSave();',
+                'data-before-action' => 'configSave',
                 'data-task' => 'test',
             ]
         );
         $toolbarHelper->addButton(
             acym_translation('ACYM_SAVE'),
             [
-                'acym-data-before' => 'jQuery.acymConfigSave();',
+                'data-before-action' => 'configSave',
                 'data-task' => 'save',
             ],
             '',
@@ -307,6 +307,7 @@ trait Listing
 
         $this->handleReplyTo($formData);
         $this->handleWordWrap($formData);
+        $this->handleQueueSettings($formData);
         $this->handleDemoSite($formData);
         $this->handleAcl($formData);
         $this->handleSelect2Fields($formData);
@@ -353,6 +354,47 @@ trait Listing
         }
     }
 
+    private function handleQueueSettings(array &$formData): void
+    {
+        $currentTaskId = (int)$this->config->get('scheduled_task_id');
+        $frequency = (int)$formData['cron_frequency'];
+
+        if (
+            !acym_level(ACYM_ESSENTIAL)
+            || $formData['queue_type'] === 'manual'
+            || empty($frequency)
+            || $frequency === 900
+            || !acym_isLicenseValidWeekly()
+        ) {
+            acym_deleteScheduledTask(
+                [
+                    'taskId' => $currentTaskId,
+                    'type' => 'plg_task_requests_task_get',
+                    'name' => self::CRON_TASK_NAME,
+                ]
+            );
+            $formData['scheduled_task_id'] = 0;
+
+            return;
+        }
+
+        $taskId = acym_scheduleTask(
+            [
+                'title' => 'AcyMailing – Automated tasks',
+                'type' => 'plg_task_requests_task_get',
+                'frequencyInMinutes' => $frequency / 60,
+                'name' => self::CRON_TASK_NAME,
+                'taskFrequency' => 'every_minute',
+                'taskId' => $currentTaskId,
+                'config' => $formData
+            ]
+        );
+
+        if (!empty($taskId) && ACYM_CMS === 'joomla') {
+            $formData['scheduled_task_id'] = $taskId;
+        }
+    }
+
     private function handleDemoSite(array &$formData): void
     {
     }
@@ -363,7 +405,7 @@ trait Listing
             $aclPages = array_keys(acym_getPagesForAcl());
             foreach ($aclPages as $page) {
                 if (empty($formData['acl_'.$page])) {
-                    $formData['acl_'.$page] = ['all'];
+                    $formData['acl_'.$page] = [ACYM_ADMIN_GROUP];
                 }
             }
         }

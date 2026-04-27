@@ -566,7 +566,7 @@ class QueueHelper extends AcymObject
                 break;
             case 'block':
                 $message .= ' user '.$userId.' blocked';
-                $this->userClass->deactivate($userId);
+                $this->userClass->deactivate([$userId]);
                 $this->queueClass->deleteQueuedByUserIds([$userId]);
                 break;
         }

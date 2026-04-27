@@ -804,8 +804,8 @@ class BounceHelper extends AcymObject
 
         if (!empty($this->blockedUsers)) {
             acym_arrayToInteger($this->blockedUsers);
+            $this->userClass->deactivate($this->blockedUsers);
             $allUsersId = implode(',', $this->blockedUsers);
-            acym_query('UPDATE `#__acym_user` SET `active` = 0 WHERE `id` IN ('.$allUsersId.')');
             acym_query('DELETE FROM `#__acym_queue` WHERE `user_id` IN ('.$allUsersId.')');
             $this->blockedUsers = [];
         }

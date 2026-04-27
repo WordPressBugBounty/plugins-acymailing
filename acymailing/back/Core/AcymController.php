@@ -96,7 +96,7 @@ abstract class AcymController extends AcymObject
 
     public function call(string $task): void
     {
-        if (!acym_isAllowed($this->name)) {
+        if (!acym_isAllowed($this->name, $task)) {
             acym_enqueueMessage(acym_translation('ACYM_ACCESS_DENIED'), 'warning');
             acym_redirect(acym_completeLink('dashboard'));
 

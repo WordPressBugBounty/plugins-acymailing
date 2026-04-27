@@ -190,10 +190,10 @@ function acym_noCache(): void
     acym_header('Expires: Wed, 17 Sep 1975 21:32:10 GMT');
 }
 
-function acym_isAllowed(string $controller): bool
+function acym_isAllowed(string $controller, string $task = ''): bool
 {
     $config = acym_config();
-    $globalAccess = $config->get('acl_'.$controller, 'all');
+    $globalAccess = $config->get('acl_'.$controller, ACYM_ADMIN_GROUP);
     if ($globalAccess === 'all') {
         return true;
     }
@@ -215,6 +215,21 @@ function acym_isAllowed(string $controller): bool
         if (in_array($oneGroup, $globalAccess)) {
             return true;
         }
+    }
+
+    if (in_array($task, ['countResultsTotal', 'countGlobalBySegmentId', 'countResults']) && acym_isAllowed('campaigns')) {
+        return true;
+    }
+
+    if (
+        $task === 'getOption'
+        && (
+            acym_isAllowed('campaigns')
+            || acym_isAllowed('mails')
+            || acym_isAllowed('plugins')
+        )
+    ) {
+        return true;
     }
 
     return false;
@@ -241,4 +256,43 @@ function acym_isLicenseValidWeekly(): bool
     }
 
     return $expirationDate >= time();
+}
+
+function acym_generateAutologinToken(int $subId, string $subKey): string
+{
+    $timestamp = time();
+    $payload = $subId . '|' . $timestamp;
+    $secret = $subKey . acym_getSiteSalt();
+    $signature = hash_hmac('sha256', $payload, $secret);
+
+    return dechex($timestamp) . '.' . $signature;
+}
+
+function acym_verifyAutologinToken(int $subId, string $token, string $storedKey): bool
+{
+    $parts = explode('.', $token, 2);
+    if (count($parts) !== 2) {
+        return false;
+    }
+
+    $timestamp = @hexdec($parts[0]);
+    $signature = $parts[1];
+
+    if (empty($timestamp) || $timestamp <= 0) {
+        return false;
+    }
+
+    $config = acym_config();
+    $maxAgeHours = intval($config->get('autologin_token_duration', 48));
+    $maxAge = $maxAgeHours * 3600;
+
+    if ((time() - $timestamp) > $maxAge) {
+        return false;
+    }
+
+    $payload = $subId . '|' . $timestamp;
+    $secret = $storedKey . acym_getSiteSalt();
+    $expectedSignature = hash_hmac('sha256', $payload, $secret);
+
+    return hash_equals($expectedSignature, $signature);
 }

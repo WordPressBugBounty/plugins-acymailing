@@ -60,10 +60,10 @@
                             <?php echo acym_translation('ACYM_SECURITY_KEY').acym_info(['textShownInTooltip' => 'ACYM_SECURITY_KEY_DESC']); ?>
 						</label>
 						<input class="cell large-9"
-							   id="security_key"
-							   type="text"
-							   name="config[security_key]"
-							   value="<?php echo acym_escape($this->config->get('security_key')); ?>" />
+						       id="security_key"
+						       type="text"
+						       name="config[security_key]"
+						       value="<?php echo acym_escape($this->config->get('security_key')); ?>" />
 					</div>
 					<div class="cell medium-6 grid-x acym__config__captcha__hcaptcha">
 						<label class="cell large-3" for="hcaptcha_sitekey">
@@ -80,10 +80,10 @@
                             ?>
 						</label>
 						<input class="cell large-9"
-							   id="hcaptcha_sitekey"
-							   type="text"
-							   name="config[hcaptcha_sitekey]"
-							   value="<?php echo acym_escape($this->config->get('hcaptcha_sitekey')); ?>" />
+						       id="hcaptcha_sitekey"
+						       type="text"
+						       name="config[hcaptcha_sitekey]"
+						       value="<?php echo acym_escape($this->config->get('hcaptcha_sitekey')); ?>" />
 					</div>
 					<div class="cell medium-6 grid-x acym__config__captcha__hcaptcha">
 						<label class="cell large-3" for="hcaptcha_secretkey">
@@ -100,10 +100,10 @@
                             ?>
 						</label>
 						<input class="cell large-9"
-							   id="hcaptcha_secretkey"
-							   type="text"
-							   name="config[hcaptcha_secretkey]"
-							   value="<?php echo acym_escape($this->config->get('hcaptcha_secretkey')); ?>" />
+						       id="hcaptcha_secretkey"
+						       type="text"
+						       name="config[hcaptcha_secretkey]"
+						       value="<?php echo acym_escape($this->config->get('hcaptcha_secretkey')); ?>" />
 					</div>
 
 					<div class="cell medium-6 grid-x acym__config__captcha__recaptcha">
@@ -121,10 +121,10 @@
                             ?>
 						</label>
 						<input class="cell large-9"
-							   id="recaptcha_sitekey"
-							   type="text"
-							   name="config[recaptcha_sitekey]"
-							   value="<?php echo acym_escape($this->config->get('recaptcha_sitekey')); ?>" />
+						       id="recaptcha_sitekey"
+						       type="text"
+						       name="config[recaptcha_sitekey]"
+						       value="<?php echo acym_escape($this->config->get('recaptcha_sitekey')); ?>" />
 					</div>
 					<div class="cell medium-6 grid-x acym__config__captcha__recaptcha">
 						<label class="cell large-3" for="recaptcha_secretkey">
@@ -141,10 +141,10 @@
                             ?>
 						</label>
 						<input class="cell large-9"
-							   id="recaptcha_secretkey"
-							   type="text"
-							   name="config[recaptcha_secretkey]"
-							   value="<?php echo acym_escape($this->config->get('recaptcha_secretkey')); ?>" />
+						       id="recaptcha_secretkey"
+						       type="text"
+						       name="config[recaptcha_secretkey]"
+						       value="<?php echo acym_escape($this->config->get('recaptcha_secretkey')); ?>" />
 					</div>
 					<div class="cell medium-6 grid-x acym__config__captcha__recaptcha_v3">
 						<label class="cell large-3" for="recaptcha_score">
@@ -161,14 +161,14 @@
                             ?>
 						</label>
 						<input class="cell large-9"
-							   id="recaptcha_score"
-							   type="number"
-							   name="config[recaptcha_score]"
-							   min="0"
-							   max="1"
-							   step="0.1"
-							   onKeyDown="return false"
-							   value="<?php echo acym_escape($this->config->get('recaptcha_score', 0.5)); ?>" />
+						       id="recaptcha_score"
+						       type="number"
+						       name="config[recaptcha_score]"
+						       min="0"
+						       max="1"
+						       step="0.1"
+						       onKeyDown="return false"
+						       value="<?php echo acym_escape($this->config->get('recaptcha_score', 0.5)); ?>" />
 					</div>
                 <?php } ?>
 			</div>
@@ -444,10 +444,10 @@
                     <?php echo acym_translation('ACYM_ALLOWED_FILES').acym_info(['textShownInTooltip' => 'ACYM_ALLOWED_FILES_DESC']); ?>
 				</label>
 				<input class="cell auto"
-					   id="allowed_files"
-					   type="text"
-					   name="config[allowed_files]"
-					   value="<?php echo acym_escape($this->config->get('allowed_files')); ?>" />
+				       id="allowed_files"
+				       type="text"
+				       name="config[allowed_files]"
+				       value="<?php echo acym_escape($this->config->get('allowed_files')); ?>" />
 			</div>
 			<div class="grid-x grid-margin-y margin-y">
 				<label class="cell large-3" for="uploadfolder">
@@ -509,9 +509,27 @@
                         <?php
                         echo acym_switch(
                             'config[autologin_urls]',
-                            $this->config->get('autologin_urls', 0)
+                            $this->config->get('autologin_urls', 0),
+                            '',
+                            [],
+                            '',
+                            '',
+                            '',
+                            'autologin_urls_duration'
                         );
                         ?>
+					</div>
+				</div>
+				<div class="cell grid-x acym_vcenter" id="autologin_urls_duration">
+					<label class="cell large-3">
+                        <?php echo acym_translation('ACYM_AUTOLOGIN_TOKEN_DURATION').acym_info(['textShownInTooltip' => 'ACYM_AUTOLOGIN_TOKEN_DURATION_DESC']); ?>
+					</label>
+					<div class="cell large-9">
+						<input type="number"
+						       name="config[autologin_token_duration]"
+						       value="<?php echo intval($this->config->get('autologin_token_duration', 48)); ?>"
+						       min="1"
+						       class="intext_input" />
 					</div>
 				</div>
 			</div>
@@ -538,10 +556,10 @@
                     <?php echo acym_translation('ACYM_CRON_KEY').acym_info(['textShownInTooltip' => 'ACYM_CRON_KEY_DESC']); ?>
 				</label>
 				<input class="cell large-9"
-					   id="cron_key"
-					   type="text"
-					   name="config[cron_key]"
-					   value="<?php echo acym_escape($this->config->get('cron_key', $this->config->get('security_key', ''))); ?>" />
+				       id="cron_key"
+				       type="text"
+				       name="config[cron_key]"
+				       value="<?php echo acym_escape($this->config->get('cron_key', $this->config->get('security_key', ''))); ?>" />
 			</div>
 		</div>
 
@@ -575,11 +593,11 @@
 					</label>
                     <?php $differentUrl = $this->config->get('different_admin_url_value'); ?>
 					<input class="cell large-9"
-						   id="different_admin_url_value"
-						   type="text"
-						   name="config[different_admin_url_value]"
-						   placeholder="<?php echo acym_escape(rtrim(ACYM_LIVE, '/')); ?>"
-						   value="<?php echo acym_escape($differentUrl); ?>" />
+					       id="different_admin_url_value"
+					       type="text"
+					       name="config[different_admin_url_value]"
+					       placeholder="<?php echo acym_escape(rtrim(ACYM_LIVE, '/')); ?>"
+					       value="<?php echo acym_escape($differentUrl); ?>" />
 				</div>
 			</div>
 		</div>
