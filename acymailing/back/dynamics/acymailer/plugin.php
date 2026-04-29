@@ -11,9 +11,9 @@ class plgAcymAcymailer extends AcymPlugin
     const SENDING_METHOD_API_URL = 'https://api.acymailer.com/';
     const CREDITS_RELOAD_DELAY = 900;
     const TRANSLATIONS = [
-        0 => 'ACYM_ERROR_OCCURRED',
+        0 => 'ACYM_ERROR_SEE_LOGS',
         1 => 'ACYM_PLEASE_INSTALL_LATEST_VERSION',
-        2 => 'ACYM_ERROR_OCCURRED_WHEN_TRYING_TO_SEND_THE_EMAIL',
+        2 => 'ACYM_EMAIL_SEND_FAIL_SEE_LOGS',
         3 => 'ACYM_DOMAIN_NOT_ATTACHED_TO_THE_SITE',
         4 => 'ACYM_NOT_ALLOWED_TO_DELETE_THIS_DOMAIN',
         5 => 'ACYM_DOMAIN_DOES_NOT_EXIST',

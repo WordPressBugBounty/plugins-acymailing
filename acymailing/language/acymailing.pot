@@ -1,13 +1,22 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.9.0\n"
+"Project-Id-Version: AcyMailing 10.9.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-27\n"
+"POT-Creation-Date: 2026-04-29\n"
 "X-Domain: acymailing\n"
 
+
+msgid "An error occurred."
+msgstr ""
+
+msgid "The email could not be sent. Find details in the sending service report in the configuration."
+msgstr ""
+
+msgid "An error occurred. Find details in the sending service report in the configuration."
+msgstr ""
 
 msgid "Auto-login token validity (hours)"
 msgstr ""
@@ -2001,13 +2010,7 @@ msgstr ""
 msgid "Invalid API-KEY"
 msgstr ""
 
-msgid "An error occurred, please see details in the browser console"
-msgstr ""
-
 msgid "Please install the latest version of AcyMailing, or at least the version %s"
-msgstr ""
-
-msgid "An error occurred when trying to send the email. See details in the browser console"
 msgstr ""
 
 msgid "This domain is not attached to this site"

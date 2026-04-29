@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 6.9
-Stable tag: 10.9.0
+Stable tag: 10.9.1
 Requires PHP: 7.4.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,26 +113,7 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.9.0 - April 27, 2026 =
-* We added new options for subscription forms to change the fields width, for the popup type and to change the border of the popup.
-* We added a new filter in the automations: you can now filter the users that aren't currently subscribed to any list and the ones that never subscribed.
-* We have added the ability to manually trigger an automation from the listing.
-* We now save the deactivation date of the subscribers in order to be able to filter them in automations and segments.
-* [add-on] We added new options for RSEventsPro insertions, allowing you to filter events by locations, speakers, tags and sponsors.
-
-* We optimized the way AcyMailing works to reduce the number of SQL queries performed on pages.
-* The default bounce rules have been updated to handle more cases.
-* The sending domains validation is now regularly checked with our sending service to make sure authentication remains correct.
-
-* We fixed an issue impacting automatic campaigns starting date.
-* The disabled subscribers are no longer taken into account on the summary step of a campaign when showing the number of recipients.
-* We have removed the preloading of the media manager when editing a campaign. Now, the media manager only loads when you open it in the editor to avoid unnecessary loading.
-* A deprecation message has been fixed on the queued campaigns listing.
-* The saving of a campaign or template is now fixed for users without configuration access rights.
-* Some code structure has been improved to avoid CSP blockage on the campaign saving action.
-* We fixed global security issues
-* Fix AcyChecker name check on user subscription not working in some cases.
-* We fixed a bug for the A/B testing when the campaign was scheduled. The campaign was sent to the entire list instead of a percentage.
-
+= 10.9.1 - April 29, 2026 =
+* We fixed issues that could prevent some features from being accessed based on access rights.
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)

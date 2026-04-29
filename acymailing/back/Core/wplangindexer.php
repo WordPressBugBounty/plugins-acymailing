@@ -1,5 +1,8 @@
 <?php
 
+__('An error occurred.', 'acymailing');
+__('The email could not be sent. Find details in the sending service report in the configuration.', 'acymailing');
+__('An error occurred. Find details in the sending service report in the configuration.', 'acymailing');
 __('Auto-login token validity (hours)', 'acymailing');
 __('How long an auto-login link remains valid after being generated. Default is 48 hours.', 'acymailing');
 __('Next generation date', 'acymailing');
@@ -665,9 +668,7 @@ __('You don\'t have any domain yet', 'acymailing');
 __('Update domains statuses', 'acymailing');
 __('License blocked, contact us for more information', 'acymailing');
 __('Invalid API-KEY', 'acymailing');
-__('An error occurred, please see details in the browser console', 'acymailing');
 __('Please install the latest version of AcyMailing, or at least the version %s', 'acymailing');
-__('An error occurred when trying to send the email. See details in the browser console', 'acymailing');
 __('This domain is not attached to this site', 'acymailing');
 __('You are not allowed to delete this domain', 'acymailing');
 __('This domain doesn\'t exist', 'acymailing');

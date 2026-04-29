@@ -192,6 +192,8 @@ function acym_noCache(): void
 
 function acym_isAllowed(string $controller, string $task = ''): bool
 {
+    $controller = str_replace('front', '', $controller);
+
     $config = acym_config();
     $globalAccess = $config->get('acl_'.$controller, ACYM_ADMIN_GROUP);
     if ($globalAccess === 'all') {
@@ -217,7 +219,76 @@ function acym_isAllowed(string $controller, string $task = ''): bool
         }
     }
 
+    if ($controller === 'mails' && in_array($task, ['autoSave', 'getTemplateAjax']) && acym_isAllowed('campaigns')) {
+        return true;
+    }
+
+    if ($controller === 'language' && acym_isAllowed('configuration')) {
+        return true;
+    }
+
+    if ($controller === 'file' && (acym_isAllowed('campaigns') || acym_isAllowed('mails'))) {
+        return true;
+    }
+
     if (in_array($task, ['countResultsTotal', 'countGlobalBySegmentId', 'countResults']) && acym_isAllowed('campaigns')) {
+        return true;
+    }
+
+    if ($controller === 'lists' && $task === 'setAjaxListing' && (acym_isAllowed('campaigns') || acym_isAllowed('mails'))) {
+        return true;
+    }
+
+    if (
+        $controller === 'zones'
+        && (
+            acym_isAllowed('campaigns')
+            || acym_isAllowed('mails')
+        )
+    ) {
+        return true;
+    }
+
+    if (
+        $controller === 'toggle'
+        && (
+            acym_isAllowed('campaigns')
+            || acym_isAllowed('mails')
+            || acym_isAllowed('automations')
+            || acym_isAllowed('segments')
+            || acym_isAllowed('scenarios')
+            || acym_isAllowed('forms')
+            || acym_isAllowed('users')
+            || acym_isAllowed('lists')
+            || acym_isAllowed('fields')
+            || acym_isAllowed('bounces')
+        )
+    ) {
+        return true;
+    }
+
+    if (
+        $controller === 'dynamics'
+        && (
+            acym_isAllowed('campaigns')
+            || acym_isAllowed('mails')
+            || acym_isAllowed('automations')
+            || acym_isAllowed('segments')
+            || acym_isAllowed('scenarios')
+        )
+    ) {
+        return true;
+    }
+
+    if (
+        $task === 'loadEntityFront'
+        && (
+            acym_isAllowed('campaigns')
+            || acym_isAllowed('mails')
+            || acym_isAllowed('users')
+            || acym_isAllowed('lists')
+        )
+    ) {
         return true;
     }
 
@@ -261,11 +332,11 @@ function acym_isLicenseValidWeekly(): bool
 function acym_generateAutologinToken(int $subId, string $subKey): string
 {
     $timestamp = time();
-    $payload = $subId . '|' . $timestamp;
-    $secret = $subKey . acym_getSiteSalt();
+    $payload = $subId.'|'.$timestamp;
+    $secret = $subKey.acym_getSiteSalt();
     $signature = hash_hmac('sha256', $payload, $secret);
 
-    return dechex($timestamp) . '.' . $signature;
+    return dechex($timestamp).'.'.$signature;
 }
 
 function acym_verifyAutologinToken(int $subId, string $token, string $storedKey): bool
@@ -290,8 +361,8 @@ function acym_verifyAutologinToken(int $subId, string $token, string $storedKey)
         return false;
     }
 
-    $payload = $subId . '|' . $timestamp;
-    $secret = $storedKey . acym_getSiteSalt();
+    $payload = $subId.'|'.$timestamp;
+    $secret = $storedKey.acym_getSiteSalt();
     $expectedSignature = hash_hmac('sha256', $payload, $secret);
 
     return hash_equals($expectedSignature, $signature);

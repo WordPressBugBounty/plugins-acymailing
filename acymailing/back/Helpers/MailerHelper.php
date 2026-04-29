@@ -1602,6 +1602,9 @@ class MailerHelper extends Mailer
     private function inlineCSS(int $mailId): void
     {
         $mail = empty($mailId) ? $this : $this->defaultMail[$mailId];
+        if (empty($mail->body)) {
+            return;
+        }
 
         global $emogrifiedMediaCSS;
         $emogrifiedMediaCSS = '';

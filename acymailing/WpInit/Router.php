@@ -226,7 +226,7 @@ class Router
             acym_setVar('task', $task);
         }
 
-        $controller->call($task);
+        $controller->call($task, $front);
     }
 
     public function autologin()
