@@ -7,6 +7,7 @@ use AcyMailing\Classes\ListClass;
 use AcyMailing\Classes\MailClass;
 use AcyMailing\Classes\ScenarioClass;
 use AcyMailing\Classes\UserClass;
+use AcyMailing\Classes\UserStatClass;
 use AcyMailing\Controllers\UsersController;
 use AcyMailing\Helpers\CaptchaHelper;
 use AcyMailing\Helpers\EntitySelectHelper;
@@ -210,6 +211,15 @@ class FrontusersController extends UsersController
         $unsubscribeLists = array_merge($visibleSubscription, $hiddenSubscription);
 
         $mailId = acym_getVar('int', 'mail_id', 0);
+
+        if (!empty($mailId) && !empty($currentUser->id)) {
+            $userStatClass = new UserStatClass();
+            $userStat = $userStatClass->getOneByMailAndUserId($mailId, $currentUser->id);
+            if (acym_isRobot() || (!empty($userStat) && acym_getTimeFromUTCDate($userStat->send_date) > time() - 20)) {
+                return;
+            }
+        }
+
         if (empty($unsubscribeLists)) {
             $mailClass = new MailClass();
             $mailType = $mailClass->getMailType($mailId);
@@ -225,6 +235,7 @@ class FrontusersController extends UsersController
                 }
             }
         }
+
         if (!empty($mailId)) {
             $mailClass = new MailClass();
             $unsubscribeLists = array_keys($mailClass->getAllListsByMailId($mailId));
@@ -267,7 +278,25 @@ class FrontusersController extends UsersController
             $redirectUrl = acym_rootURI();
         }
 
-        acym_redirect($redirectUrl);
+        acym_redirect($this->normalizeRedirectUrl($redirectUrl), '', 'message', true);
+    }
+
+    private function normalizeRedirectUrl(string $url): string
+    {
+        if ($url === '') {
+            return '';
+        }
+        if (preg_match('~^[a-z][a-z0-9+.\-]*://~i', $url)) {
+            return $url;
+        }
+        if (strpos($url, '/') === 0 || strpos($url, 'index.php') === 0) {
+            return $url;
+        }
+        if (preg_match('~^[^/?#]+\.[a-z]{2,}(?:[/?#]|$)~i', $url)) {
+            return 'https://'.$url;
+        }
+
+        return $url;
     }
 
     public function unsubscribe(): void
@@ -329,6 +358,10 @@ class FrontusersController extends UsersController
         if ((!empty($fromModuleOrWidget) && in_array($fromModuleOrWidget, ['form_acym', 'mod_acym', 'widget_acym'])) || $ajax || !$redirectToUnsubPage || !empty($direct)) {
             $this->unsubscribeDirectly($alreadyExists, $ajax);
         } elseif ($redirectToUnsubPage && !$ajax && !$direct) {
+            $identifiedEmail = !empty($user->email) ? $user->email : $currentEmail;
+            if (empty($identifiedEmail) || strtolower($alreadyExists->email) !== strtolower($identifiedEmail)) {
+                $this->displayMessage('ACYM_NOT_ALLOWED_MODIFY_USER', $ajax);
+            }
             $this->unsubscribePage($alreadyExists);
         }
     }
@@ -353,12 +386,15 @@ class FrontusersController extends UsersController
     {
         $userClass = new UserClass();
         $user = $this->getUserFromUnsubPage();
-        $redirectUrl = $this->config->get('unsub_redirect_url', acym_rootURI());
+        $redirectUrl = urldecode(acym_getVar('string', 'redirectunsub', ''));
+        if (empty($redirectUrl)) {
+            $redirectUrl = $this->config->get('unsub_redirect_url', '');
+        }
 
         $allLists = $userClass->getUserSubscriptionById($user->id);
         if (empty($allLists)) {
             acym_enqueueMessage(acym_translation('ACYM_NOT_SUBSCRIBED_ANY_LIST'), 'info');
-            acym_redirect(!empty($redirectUrl) ? $redirectUrl : acym_rootURI());
+            acym_redirect($this->normalizeRedirectUrl(!empty($redirectUrl) ? $redirectUrl : acym_rootURI()), '', 'message', true);
         }
 
         $lists = [];
@@ -376,9 +412,12 @@ class FrontusersController extends UsersController
     private function redirectUnsubWorked(): void
     {
         acym_enqueueMessage(acym_translation('ACYM_SUBSCRIPTION_UPDATED_OK'));
-        $redirectUrl = $this->config->get('unsub_redirect_url');
+        $redirectUrl = urldecode(acym_getVar('string', 'redirectunsub', ''));
+        if (empty($redirectUrl)) {
+            $redirectUrl = $this->config->get('unsub_redirect_url', '');
+        }
         if (!empty($redirectUrl)) {
-            acym_redirect($redirectUrl);
+            acym_redirect($this->normalizeRedirectUrl($redirectUrl), '', 'message', true);
         } else {
             acym_redirect(acym_rootURI());
         }

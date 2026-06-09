@@ -1,5 +1,6 @@
 <?php
 
+__('When active, URLs containing the AcyMailing subscriber ID and temporary token will automatically log the user in when clicked. The expected format is https://example.com?autoSubId={subscriber:id}&subKey={subscriber:autologin_token|urlencode}', 'acymailing');
 __('An error occurred.', 'acymailing');
 __('The email could not be sent. Find details in the sending service report in the configuration.', 'acymailing');
 __('An error occurred. Find details in the sending service report in the configuration.', 'acymailing');
@@ -162,7 +163,6 @@ __('Bought product', 'acymailing');
 __('There is no content for your search', 'acymailing');
 __('Copy code', 'acymailing');
 __('Activate auto login URLs', 'acymailing');
-__('When active, URLs containing the AcyMailing subscriber ID and key will automatically log the user in when clicked. The expected format is https://example.com?autoSubId=123&subKey=abc.', 'acymailing');
 __('updated', 'acymailing');
 __('not updated', 'acymailing');
 __('<b>%1$s</b> entries in the imported file: <br /> - <b>%2$s</b> new subscribers <b>imported</b><br /> - <b>%3$s</b> <b>invalid</b> lines or email addresses<br /> - <b>%4$s</b> already <b>existing</b> subscribers or <b>duplicate</b> entries (%5$s)', 'acymailing');

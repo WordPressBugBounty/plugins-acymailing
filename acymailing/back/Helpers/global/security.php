@@ -159,6 +159,11 @@ function acym_isRobot(): bool
     if (empty($_SERVER)) {
         return false;
     }
+
+    if (!empty($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'HEAD') {
+        return true;
+    }
+
     if (!empty($_SERVER['HTTP_USER_AGENT']) && strpos(strtolower($_SERVER['HTTP_USER_AGENT']), 'spambayes') !== false) {
         return true;
     }

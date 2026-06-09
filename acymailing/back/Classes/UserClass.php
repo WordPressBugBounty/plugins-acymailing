@@ -19,6 +19,14 @@ class UserClass extends AcymClass
         'creation_date',
     ];
 
+    private const FORM_ALLOWED_FIELDS = [
+        'id',
+        'email',
+        'name',
+        'language',
+        'tracking',
+    ];
+
     public bool $checkVisitor = true;
     public bool $requireId = false;
     public bool $sendConf = true;
@@ -933,14 +941,18 @@ class UserClass extends AcymClass
         }
 
         foreach ($user as $oneAttribute => $value) {
-            if (empty($value)) continue;
+            if (empty($value)) {
+                continue;
+            }
 
             $oneAttribute = trim(strtolower($oneAttribute));
             if (!in_array($oneAttribute, self::RESTRICTED_FIELDS)) {
                 $user->$oneAttribute = strip_tags($value);
             }
 
-            if (is_numeric($user->$oneAttribute)) continue;
+            if (is_numeric($user->$oneAttribute)) {
+                continue;
+            }
 
             if (function_exists('mb_detect_encoding')) {
                 if (mb_detect_encoding($user->$oneAttribute, 'UTF-8', true) !== 'UTF-8') {
@@ -954,6 +966,10 @@ class UserClass extends AcymClass
             ) {
                 $user->$oneAttribute = acym_utf8Encode($user->$oneAttribute);
             }
+        }
+
+        if (!empty($user->automation) && strlen($user->automation) > 20) {
+            $user->automation = '';
         }
 
         if (empty($user->id)) {
@@ -1043,10 +1059,11 @@ class UserClass extends AcymClass
         $userData = acym_getVar('array', 'user', []);
         if (!empty($userData)) {
             foreach ($userData as $attribute => $value) {
+                if (!in_array($attribute, self::FORM_ALLOWED_FIELDS, true)) {
+                    continue;
+                }
                 $user->$attribute = $value;
             }
-            unset($user->cms_id);
-            unset($user->key);
         }
 
         if (empty($user->email)) {
@@ -1097,11 +1114,8 @@ class UserClass extends AcymClass
 
         $this->newUser = empty($user->id);
         if (empty($user->id) || $allowUserModifications) {
-            if (isset($user->confirmed) && $user->confirmed != 1) {
+            if ($this->newUser && $this->config->get('require_confirmation', 1) == 1) {
                 $user->confirmed = 0;
-            }
-            if (isset($user->active) && $user->active != 1) {
-                $user->active = 0;
             }
             $customFieldData = acym_getVar('array', 'customField', []);
             $id = $this->save($user, $customFieldData, $ajax);
