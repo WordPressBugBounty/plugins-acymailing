@@ -1,5 +1,6 @@
 <?php
 
+__('No valid test email addresses found. Please check the email addresses you entered and try again.', 'acymailing');
 __('When active, URLs containing the AcyMailing subscriber ID and temporary token will automatically log the user in when clicked. The expected format is https://example.com?autoSubId={subscriber:id}&subKey={subscriber:autologin_token|urlencode}', 'acymailing');
 __('An error occurred.', 'acymailing');
 __('The email could not be sent. Find details in the sending service report in the configuration.', 'acymailing');

@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 7.0
-Stable tag: 10.10.0
+Stable tag: 10.10.1
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,14 +113,7 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.10.0 - June 9, 2026 =
-* Users that are not allowed to access the Subscriber controller can now send test email to manually typed email.
-* The bot protection has been updated to prevent clicks to be recorded on URLs in sent emails when a bot verifies them.
-* The preview text on the Gmail listing does not contain the email subject anymore.
-
-* We have reinforced the security of the subscription form and unsubscribe page to prevent unauthorized modification of internal subscriber fields and disclosure of authentication keys.
-* We have updated the URL redirection option for the direct unsubscribe link and the “unsubscribe from all lists” link to improve usability and ensure that redirection and unsubscription are handled correctly.
-* We have fixed some deprecated messages linked to the statistics to prepare for the future php versions.
-* We have fixed an issue that could prevent the replacement of email content, such as articles, in some rare cases.
+= 10.10.1 - June 10, 2026 =
+* We fixed an issue that was blocking the Send Test feature in some cases.
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)
