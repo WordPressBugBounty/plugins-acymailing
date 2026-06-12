@@ -69,7 +69,7 @@ class FrontstatsController extends AcymController
         $userStatToInsert->user_id = $userId;
         $userStatToInsert->mail_id = $mailId;
         $userStatToInsert->open = 1;
-        $userStatToInsert->open_date = acym_date('now', 'Y-m-d H:i:s');
+        $userStatToInsert->open_date = acym_date('now', 'Y-m-d H:i:s', false);
         $userStatToInsert->device = '';
         $userStatToInsert->opened_with = '';
 
@@ -86,7 +86,7 @@ class FrontstatsController extends AcymController
         $userClass = new UserClass();
         $subscriber = $userClass->getOneById($userId);
         if (!empty($subscriber)) {
-            $subscriber->last_open_date = acym_date('now', 'Y-m-d H:i:s');
+            $subscriber->last_open_date = $userStatToInsert->open_date;
             $userClass->triggers = false;
             $userClass->sendConf = false;
             $userClass->save($subscriber);

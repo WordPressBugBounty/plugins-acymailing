@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 7.0
-Stable tag: 10.10.1
+Stable tag: 10.10.2
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,7 +113,7 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.10.1 - June 10, 2026 =
-* We fixed an issue that was blocking the Send Test feature in some cases.
+= 10.10.2 - June 12, 2026 =
+* A timezone issue has been fixed on the send, open and click statistics, that was preventing statistics from being collected in some cases.
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)
