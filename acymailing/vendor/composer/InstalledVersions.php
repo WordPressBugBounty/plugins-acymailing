@@ -8,6 +8,8 @@ use Composer\Semver\VersionParser;
 
 class InstalledVersions
 {
+    private static $selfDir = null;
+
     private static $installed;
 
     private static $installedIsLocalDir;
@@ -190,6 +192,15 @@ class InstalledVersions
         self::$installedIsLocalDir = false;
     }
 
+    private static function getSelfDir()
+    {
+        if (self::$selfDir === null) {
+            self::$selfDir = strtr(__DIR__, '\\', '/');
+        }
+
+        return self::$selfDir;
+    }
+
     private static function getInstalled()
     {
         if (null === self::$canGetVendors) {
@@ -200,7 +211,7 @@ class InstalledVersions
         $copiedLocalDir = false;
 
         if (self::$canGetVendors) {
-            $selfDir = strtr(__DIR__, '\\', '/');
+            $selfDir = self::getSelfDir();
             foreach (ClassLoader::getRegisteredLoaders() as $vendorDir => $loader) {
                 $vendorDir = strtr($vendorDir, '\\', '/');
                 if (isset(self::$installedByVendor[$vendorDir])) {

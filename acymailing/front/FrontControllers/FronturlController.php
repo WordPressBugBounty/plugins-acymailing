@@ -50,7 +50,8 @@ class FronturlController extends AcymController
         $userStatClass = new UserStatClass();
         $userStat = $userStatClass->getOneByMailAndUserId($mailId, $userId);
 
-        if (empty($mail) || empty($userStat) || acym_getTimeFromUTCDate($userStat->send_date) > time() - 20 || acym_isRobot()) {
+        $delay = $this->config->get('tracking_delay', 0);
+        if (empty($mail) || empty($userStat) || acym_isRobot() || (!empty($delay) && acym_getTimeFromUTCDate($userStat->send_date) > time() - $delay)) {
             acym_redirect($this->resolveSubscriberTags($urlObject->url, $userId));
         }
 

@@ -3,7 +3,7 @@
         'name' => 'acyba/acymailing',
         'pretty_version' => 'dev-develop',
         'version' => 'dev-develop',
-        'reference' => '635f839b16cfa971790a4d3d39e21c4457259663',
+        'reference' => '46469c188beaf146572272f311eb03fbc389450a',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'acyba/acymailing' => array(
             'pretty_version' => 'dev-develop',
             'version' => 'dev-develop',
-            'reference' => '635f839b16cfa971790a4d3d39e21c4457259663',
+            'reference' => '46469c188beaf146572272f311eb03fbc389450a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

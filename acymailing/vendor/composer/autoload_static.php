@@ -12,27 +12,27 @@ class ComposerStaticInitaa27ffae5a54d18e2ceb750f48a9aaac
     );
 
     public static $prefixLengthsPsr4 = array (
-        'Z' => 
+        'Z' =>
         array (
             'ZBateson\\StreamDecorators\\' => 26,
             'ZBateson\\MbWrapper\\' => 19,
             'ZBateson\\MailMimeParser\\' => 24,
         ),
-        'S' => 
+        'S' =>
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Iconv\\' => 23,
         ),
-        'P' => 
+        'P' =>
         array (
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Container\\' => 14,
         ),
-        'G' => 
+        'G' =>
         array (
             'GuzzleHttp\\Psr7\\' => 16,
         ),
-        'A' => 
+        'A' =>
         array (
             'AcyMailing\\WpInit\\' => 18,
             'AcyMailing\\Libraries\\Symfony\\CssSelector\\' => 41,
@@ -44,70 +44,70 @@ class ComposerStaticInitaa27ffae5a54d18e2ceb750f48a9aaac
     );
 
     public static $prefixDirsPsr4 = array (
-        'ZBateson\\StreamDecorators\\' => 
+        'ZBateson\\StreamDecorators\\' =>
         array (
             0 => __DIR__ . '/..' . '/zbateson/stream-decorators/src',
         ),
-        'ZBateson\\MbWrapper\\' => 
+        'ZBateson\\MbWrapper\\' =>
         array (
             0 => __DIR__ . '/..' . '/zbateson/mb-wrapper/src',
         ),
-        'ZBateson\\MailMimeParser\\' => 
+        'ZBateson\\MailMimeParser\\' =>
         array (
             0 => __DIR__ . '/..' . '/zbateson/mail-mime-parser/src',
         ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
+        'Symfony\\Polyfill\\Mbstring\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
-        'Symfony\\Polyfill\\Iconv\\' => 
+        'Symfony\\Polyfill\\Iconv\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-iconv',
         ),
-        'Psr\\Http\\Message\\' => 
+        'Psr\\Http\\Message\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'Psr\\Container\\' => 
+        'Psr\\Container\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
         ),
-        'GuzzleHttp\\Psr7\\' => 
+        'GuzzleHttp\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/psr7/src',
         ),
-        'AcyMailing\\WpInit\\' => 
+        'AcyMailing\\WpInit\\' =>
         array (
             0 => __DIR__ . '/../..' . '/WpInit',
         ),
-        'AcyMailing\\Libraries\\Symfony\\CssSelector\\' => 
+        'AcyMailing\\Libraries\\Symfony\\CssSelector\\' =>
         array (
             0 => __DIR__ . '/../..' . '/back/Libraries/Symfony/CssSelector',
         ),
-        'AcyMailing\\Libraries\\Sabberworm\\CSS\\' => 
+        'AcyMailing\\Libraries\\Sabberworm\\CSS\\' =>
         array (
             0 => __DIR__ . '/../..' . '/back/Libraries/Sabberworm/CSS/src',
         ),
-        'AcyMailing\\Libraries\\Pelago\\Emogrifier\\' => 
+        'AcyMailing\\Libraries\\Pelago\\Emogrifier\\' =>
         array (
             0 => __DIR__ . '/../..' . '/back/Libraries/Pelago/Emogrifier/src',
         ),
-        'AcyMailing\\' => 
+        'AcyMailing\\' =>
         array (
             0 => __DIR__ . '/../..' . '/back',
             1 => __DIR__ . '/../..' . '/front',
         ),
-        'AcyMailerPhp\\' => 
+        'AcyMailerPhp\\' =>
         array (
             0 => __DIR__ . '/../..' . '/back/Libraries/Mailer',
         ),
     );
 
     public static $prefixesPsr0 = array (
-        'P' => 
+        'P' =>
         array (
-            'Pimple' => 
+            'Pimple' =>
             array (
                 0 => __DIR__ . '/..' . '/pimple/pimple/src',
             ),

@@ -288,7 +288,7 @@ class CronHelper extends AcymObject
 
         $newConfig = [
             'cron_last' => $time,
-            'cron_fromip' => acym_getIP(),
+            'cron_fromip' => acym_getIP(true),
             'cron_next' => $nextCronTime + $cronFrequency,
         ];
 

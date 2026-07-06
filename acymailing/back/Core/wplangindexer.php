@@ -1,5 +1,10 @@
 <?php
 
+__('IP address collection', 'acymailing');
+__('Anonymized', 'acymailing');
+__('The IP addresses are collected during confirmation and subscription for proof of consent and to limit the number of subscriptions per IP address.', 'acymailing');
+__('Tracking delay (seconds)', 'acymailing');
+__('Delay after a send during which open and click statistics are not recorded. This allows you to avoid recording clicks and opens due to image/link verification bots.', 'acymailing');
 __('No valid test email addresses found. Please check the email addresses you entered and try again.', 'acymailing');
 __('When active, URLs containing the AcyMailing subscriber ID and temporary token will automatically log the user in when clicked. The expected format is https://example.com?autoSubId={subscriber:id}&subKey={subscriber:autologin_token|urlencode}', 'acymailing');
 __('An error occurred.', 'acymailing');

@@ -53,7 +53,8 @@ class FrontstatsController extends AcymController
         $userStatClass = new UserStatClass();
         $userStat = $userStatClass->getOneByMailAndUserId($mailId, $userId);
 
-        if (empty($userStat) || acym_getTimeFromUTCDate($userStat->send_date) > time() - 20) {
+        $delay = $this->config->get('tracking_delay', 0);
+        if (empty($userStat) || acym_isRobot() || (!empty($delay) && acym_getTimeFromUTCDate($userStat->send_date) > time() - $delay)) {
             return;
         }
 
