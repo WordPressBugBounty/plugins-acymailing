@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.5
 Tested up to: 7.0
-Stable tag: 10.11.0
+Stable tag: 10.11.1
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -113,14 +113,7 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.11.0 - July 6, 2026 =
-* A new option lets you toggle on/off the IP address collection on confirmation and subscription.
-
-* A new option lets you configure a delay during which the statistics are not recorded.
-* Security has been improved on the subscription form options.
-
-* The access rights could be reset when a user is granted access to the configuration and modifies it.
-* We fixed the next execution time calculation for monthly automations and monthly automatic campaigns.
-* Fix the display of WooCommerce products and categories filters in automations, segments and follow-ups.
+= 10.11.1 - July 9, 2026 =
+* A vulnerability allowing SQL injection has been patched. Updating is strongly recommended.
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)
