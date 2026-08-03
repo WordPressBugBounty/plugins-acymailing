@@ -1,9 +1,12 @@
 <?php
 
+defined('ABSPATH') || die('Restricted Access');
+
 function acym_getTimeOffsetCMS(): int
 {
     static $timeoffset = null;
     if ($timeoffset === null) {
+        //We replace the . with : WordPress give format like UTC+5.45, but we want something like UTC+5:45
         $timeoffset = str_replace('.', ':', acym_getCMSConfig('offset'));
 
         if (!is_numeric($timeoffset)) {
@@ -17,7 +20,7 @@ function acym_getTimeOffsetCMS(): int
 
 function acym_dateTimeCMS(int $time)
 {
-    return date('Y-m-d H:i:s', $time);
+    return gmdate('Y-m-d H:i:s', $time);
 }
 
 function acym_getDateTimeFormat(string $default = ''): string

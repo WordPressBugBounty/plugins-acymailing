@@ -5,6 +5,9 @@ namespace AcyMailing\Views\Lists;
 use AcyMailing\Controllers\ListsController;
 use AcyMailing\Core\AcymView;
 
+/**
+ * Class ListsViewLists
+ */
 class ListsView extends AcymView
 {
     public $disableTabs = [];

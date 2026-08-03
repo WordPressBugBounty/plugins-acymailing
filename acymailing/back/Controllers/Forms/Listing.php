@@ -19,6 +19,7 @@ trait Listing
         $orderingSortOrder = $this->getVarFiltersListing('string', 'forms_ordering_sort_order', 'asc');
         $formClass = new FormClass();
 
+        // Get pagination data
         $formsPerPage = $pagination->getListLimit();
         $page = $this->getVarFiltersListing('int', 'forms_pagination_page', 1);
 
@@ -34,6 +35,7 @@ trait Listing
 
         $matchingForms = $this->getMatchingElementsFromData($requestData, $status, $page);
 
+        // Prepare the pagination
         $pagination->setStatus($matchingForms['total']->total, $page, $formsPerPage);
 
         $filters = [

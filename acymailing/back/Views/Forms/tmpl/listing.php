@@ -1,4 +1,8 @@
-<form id="acym_form" action="<?php echo acym_completeLink(acym_getVar('cmd', 'ctrl')); ?>" method="post" name="acyForm">
+<?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- View file, its variables are local to the include scope, not true globals.
+defined('ABSPATH') || die('Restricted Access');
+?>
+<form id="acym_form" action="<?php echo esc_url(acym_completeLink(acym_getVar('cmd', 'ctrl'))); ?>" method="post" name="acyForm">
     <?php
     $isEmpty = empty($data['allForms']) && empty($data['search']) && empty($data['active']);
     if (!$isEmpty) {

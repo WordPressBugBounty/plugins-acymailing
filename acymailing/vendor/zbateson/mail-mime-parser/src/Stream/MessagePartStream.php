@@ -1,4 +1,9 @@
 <?php
+/**
+ * This file is part of the ZBateson\MailMimeParser project.
+ *
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ */
 
 namespace ZBateson\MailMimeParser\Stream;
 
@@ -13,17 +18,32 @@ use ZBateson\MailMimeParser\MailMimeParser;
 use ZBateson\MailMimeParser\Message\IMessagePart;
 use ZBateson\MailMimeParser\Message\IMimePart;
 
+/**
+ * Provides a readable stream for a MessagePart.
+ *
+ * @author Zaahid Bateson
+ */
 #[\AllowDynamicProperties]
 class MessagePartStream implements SplObserver, StreamInterface
 {
     use StreamDecoratorTrait;
 
+    /**
+     * @var StreamFactory For creating needed stream decorators.
+     */
     protected $streamFactory;
 
+    /**
+     * @var IMessagePart The part to read from.
+     */
     protected $part;
 
     protected $appendStream = null;
 
+    /**
+     * Constructor
+     *
+     */
     public function __construct(StreamFactory $sdf, IMessagePart $part)
     {
         $this->streamFactory = $sdf;
@@ -41,11 +61,19 @@ class MessagePartStream implements SplObserver, StreamInterface
     public function update(SplSubject $subject) : void
     {
         if ($this->appendStream !== null) {
+            // unset forces recreation in StreamDecoratorTrait with a call to __get
             unset($this->stream);
             $this->appendStream = null;
         }
     }
 
+    /**
+     * Attaches and returns a CharsetStream decorator to the passed $stream.
+     *
+     * If the current attached IMessagePart doesn't specify a charset, $stream
+     * is returned as-is.
+     *
+     */
     private function getCharsetDecoratorForStream(StreamInterface $stream) : StreamInterface
     {
         $charset = $this->part->getCharset();
@@ -59,6 +87,19 @@ class MessagePartStream implements SplObserver, StreamInterface
         return $stream;
     }
 
+    /**
+     * Attaches and returns a transfer encoding stream decorator to the passed
+     * $stream.
+     *
+     * The attached stream decorator is based on the attached part's returned
+     * value from MessagePart::getContentTransferEncoding, using one of the
+     * following stream decorators as appropriate:
+     *
+     * o QuotedPrintableStream
+     * o Base64Stream
+     * o UUStream
+     *
+     */
     private function getTransferEncodingDecoratorForStream(StreamInterface $stream) : StreamInterface
     {
         $encoding = $this->part->getContentTransferEncoding();
@@ -82,6 +123,10 @@ class MessagePartStream implements SplObserver, StreamInterface
         return $decorator;
     }
 
+    /**
+     * Writes out the content portion of the attached mime part to the passed
+     * $stream.
+     */
     private function writePartContentTo(StreamInterface $stream) : self
     {
         $contentStream = $this->part->getContentStream();
@@ -95,6 +140,14 @@ class MessagePartStream implements SplObserver, StreamInterface
         return $this;
     }
 
+    /**
+     * Creates an array of streams based on the attached part's mime boundary
+     * and child streams.
+     *
+     * @param IMimePart $part passed in because $this->part is declared
+     *        as IMessagePart
+     * @return StreamInterface[]
+     */
     protected function getBoundaryAndChildStreams(IMimePart $part) : array
     {
         $boundary = $part->getHeaderParameter(HeaderConsts::CONTENT_TYPE, 'boundary');
@@ -119,6 +172,12 @@ class MessagePartStream implements SplObserver, StreamInterface
         return $streams;
     }
 
+    /**
+     * Returns an array of Psr7 Streams representing the attached part and it's
+     * direct children.
+     *
+     * @return StreamInterface[]
+     */
     protected function getStreamsArray() : array
     {
         $content = Psr7\Utils::streamFor();
@@ -133,6 +192,10 @@ class MessagePartStream implements SplObserver, StreamInterface
         return $streams;
     }
 
+    /**
+     * Creates the underlying stream lazily when required.
+     *
+     */
     protected function createStream() : StreamInterface
     {
         if ($this->appendStream === null) {

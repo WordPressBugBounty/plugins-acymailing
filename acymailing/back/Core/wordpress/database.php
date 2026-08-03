@@ -1,4 +1,19 @@
 <?php
+/**
+ * Database abstraction layer.
+ *
+ * Queries are built internally with table prefix substitution via prepareQuery().
+ * Dynamic values are escaped upstream via escapeDB() / esc_sql() before being
+ * passed here. Direct $wpdb calls and absence of per-query caching are intentional
+ * in this low-level layer — caching is handled at the business logic level.
+ *
+ * phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+ * phpcs:disable WordPress.DB.DirectDatabaseQuery.NoCaching
+ * phpcs:disable WordPress.DB.PreparedSQL.NotPrepared
+ * phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter
+ */
+
+defined('ABSPATH') || die('Restricted Access');
 
 function acym_escapeDB(?string $value): string
 {
@@ -6,6 +21,7 @@ function acym_escapeDB(?string $value): string
         $value = '';
     }
 
+    // esc_sql replaces % by something like {svzzvzevzv} but it's normal, it will be replaced back by % before the query is executed
     return "'".esc_sql($value)."'";
 }
 
@@ -142,6 +158,11 @@ function acym_getTableList(): array
     );
 }
 
+/**
+ * @param mixed $default
+ *
+ * @return mixed
+ */
 function acym_getCMSConfig(string $varname, $default = null)
 {
     $map = [
@@ -157,6 +178,7 @@ function acym_getCMSConfig(string $varname, $default = null)
     }
     $value = get_option($varname, $default);
 
+    // In WP there are multiple possible formats in the same option for the timezone
     if ($varname == 'timezone_string' && empty($value)) {
         $value = acym_getCMSConfig('gmt_offset');
 
@@ -169,6 +191,7 @@ function acym_getCMSConfig(string $varname, $default = null)
         }
     }
 
+    // In WP this could be any number, but Acy pagination only works with 5,10,15,20,25,30,50 or 100
     if ($varname === 'posts_per_page') {
         $possibilities = [5, 10, 15, 20, 25, 30, 50, 100];
         $closest = 5;

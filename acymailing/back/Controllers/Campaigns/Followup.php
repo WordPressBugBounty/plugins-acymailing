@@ -47,7 +47,7 @@ trait Followup
 
     public function deleteFollowup(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         $ids = acym_getVar('array', 'elements_checked', []);
         $allChecked = acym_getVar('string', 'checkbox_all');
         $currentPage = explode('_', acym_getVar('string', 'page'));
@@ -210,6 +210,7 @@ trait Followup
             'campaigns&task=edit&step=followupEmail&id='.$followup->id
         );
 
+        // Ask the user if he wants to add the new email to the queue for the users that already triggered the followup
         if (intval($followup->active) === 1) {
             $newlyCreatedEmail = acym_getVar('int', 'newEmailId');
             if (!empty($newlyCreatedEmail)) {
@@ -228,6 +229,8 @@ trait Followup
 
     public function followupDuplicateMail(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $mailId = acym_getVar('int', 'action_mail_id', 0);
         $id = acym_getVar('int', 'id', 0);
         $followupClass = new FollowupClass();
@@ -240,6 +243,8 @@ trait Followup
 
     public function followupDeleteMail(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $mailId = acym_getVar('int', 'action_mail_id', 0);
         $followupClass = new FollowupClass();
         if (!$followupClass->deleteMail($mailId)) {
@@ -247,16 +252,23 @@ trait Followup
         }
 
         $step = acym_getVar('cmd', 'step', 'followupEmail');
+        if (!in_array($step, ['followupEmail', 'followupSummary'], true)) {
+            $step = 'followupEmail';
+        }
         $this->$step();
     }
 
     public function followupDraft(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $this->followupFinalize(0);
     }
 
     public function followupActivate(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $this->followupFinalize(1);
     }
 
@@ -273,7 +285,9 @@ trait Followup
 
     public function saveFollowupCondition(): void
     {
-        if (!acym_isAdmin()) {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
+        if (!acym_isAdmin() || !acym_isAllowed('campaigns')) {
             die('Access denied for follow-ups');
         }
 
@@ -290,7 +304,7 @@ trait Followup
             $followup = new stdClass();
             $followup->name = '';
             $followup->display_name = '';
-            $followup->creation_date = date('Y-m-d H:i:s', time() - date('Z'));
+            $followup->creation_date = gmdate('Y-m-d H:i:s', time());
             $followup->trigger = $trigger;
             $followup->condition = json_encode($followupData['condition']);
             $followup->active = 0;
@@ -312,7 +326,9 @@ trait Followup
 
     public function saveFollowupEmail(bool $redirect = true): void
     {
-        if (!acym_isAdmin()) {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
+        if (!acym_isAdmin() || !acym_isAllowed('campaigns')) {
             die('Access denied for follow-ups');
         }
 

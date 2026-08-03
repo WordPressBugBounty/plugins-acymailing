@@ -25,7 +25,7 @@ class UrlClass extends AcymClass
                 continue;
             }
 
-            $url->$oneAttribute = strip_tags($value);
+            $url->$oneAttribute = acym_stripTags($value);
         }
 
         return parent::save($url);
@@ -65,6 +65,7 @@ class UrlClass extends AcymClass
         return $trackingUrl;
     }
 
+    // Used in checkDB to address a bug before the 12/04/19
     public function getDuplicatedUrls(): array
     {
         return acym_loadResultArray(
@@ -76,6 +77,15 @@ class UrlClass extends AcymClass
             WHERE click.url_id IS NULL
             LIMIT 500'
         );
+        /*
+        To clean the potential duplicated rows in the #__acym_url table, you can execute this query when no email is being sent:
+        DELETE url.*
+        FROM #__acym_url AS url
+        LEFT JOIN #__acym_url_click AS urlclick ON url.id = urlclick.url_id
+        WHERE urlclick.url_id IS NULL
+
+        If an email is currently being sent, exclude its urls from the delete query
+         */
     }
 
     private function getAdd(string $url): ?object

@@ -1,30 +1,34 @@
-<input type="hidden" id="default_template" value="<?php echo acym_escape($this->defaultTemplate); ?>" />
+<?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- View file, its variables are local to the include scope, not true globals.
+defined('ABSPATH') || die('Restricted Access');
+?>
+<input type="hidden" id="default_template" value="<?php echo esc_attr($this->defaultTemplate); ?>" />
 <input type="hidden" class="acym__wysid__hidden__save__content" id="editor_content" name="editor_content" value="" />
 <input type="hidden" class="acym__wysid__hidden__save__content__template" id="editor_content_template" name="editor_content_template" value="" />
 <?php $wysidStylesheet = $this->getWYSIDStylesheet(); ?>
 <input type="hidden"
-	   class="acym__wysid__hidden__save__stylesheet"
-	   id="editor_stylesheet"
-	   name="editor_stylesheet"
-	   value="<?php echo acym_escape($wysidStylesheet); ?>" />
+       class="acym__wysid__hidden__save__stylesheet"
+       id="editor_stylesheet"
+       name="editor_stylesheet"
+       value="<?php echo esc_attr($wysidStylesheet); ?>" />
 <input type="hidden"
-	   class="acym__wysid__hidden__save__stylesheet__template"
-	   id="editor_stylesheet_template"
-	   name="editor_stylesheet_template"
-	   value="<?php echo acym_escape($wysidStylesheet); ?>" />
+       class="acym__wysid__hidden__save__stylesheet__template"
+       id="editor_stylesheet_template"
+       name="editor_stylesheet_template"
+       value="<?php echo esc_attr($wysidStylesheet); ?>" />
 <?php $wysidSettings = $this->getWYSIDSettings();
 $mainColors = $this->getDefaultColors(); ?>
-<input type="hidden" class="acym__wysid__hidden__save__settings" id="editor_settings" name="editor_settings" value="<?php echo acym_escape($wysidSettings); ?>" />
+<input type="hidden" class="acym__wysid__hidden__save__settings" id="editor_settings" name="editor_settings" value="<?php echo esc_attr($wysidSettings); ?>" />
 <input type="hidden"
-	   class="acym__wysid__hidden__save__settings__template"
-	   id="editor_settings_template"
-	   name="editor_settings_template"
-	   value="<?php echo acym_escape($wysidSettings); ?>" />
-<input type="hidden" class="acym__wysid__hidden__save__colors" id="main_colors" name="main_colors" value="<?php echo acym_escape($mainColors); ?>" />
-<input type="hidden" class="acym__wysid__hidden__save__colors__template" id="main_colors_template" name="main_colors_template" value="<?php echo acym_escape($mainColors); ?>" />
-<input type="hidden" id="acym__wysid__session--lifetime" name="acym_session_lifetime" value="<?php echo acym_escape(ini_get('session.gc_maxlifetime')); ?>" />
+       class="acym__wysid__hidden__save__settings__template"
+       id="editor_settings_template"
+       name="editor_settings_template"
+       value="<?php echo esc_attr($wysidSettings); ?>" />
+<input type="hidden" class="acym__wysid__hidden__save__colors" id="main_colors" name="main_colors" value="<?php echo esc_attr($mainColors); ?>" />
+<input type="hidden" class="acym__wysid__hidden__save__colors__template" id="main_colors_template" name="main_colors_template" value="<?php echo esc_attr($mainColors); ?>" />
+<input type="hidden" id="acym__wysid__session--lifetime" name="acym_session_lifetime" value="<?php echo esc_attr(ini_get('session.gc_maxlifetime')); ?>" />
 <input type="hidden" class="acym__wysid__hidden__mailId" id="editor_mailid" name="editor_autoSave" value="<?php echo intval($this->mailId); ?>" />
-<input type="hidden" class="acym__wysid__hidden__save__auto" id="editor_autoSave" value="<?php echo acym_escape($this->autoSave); ?>">
+<input type="hidden" class="acym__wysid__hidden__save__auto" id="editor_autoSave" value="<?php echo esc_attr($this->autoSave); ?>">
 <input type="hidden" id="acym__template__preview">
 <input type="hidden" id="acym__wysid__block__html__content">
 
@@ -46,11 +50,11 @@ $mainColors = $this->getDefaultColors(); ?>
                 <?php
                 $ctrl = acym_getVar('string', 'ctrl');
                 if (in_array(acym_getVar('string', 'ctrl'), ['campaigns', 'frontcampaigns']) || !empty(acym_getVar('cmd', 'notification'))) {
-                    echo acym_translation('ACYM_EDIT_MAIL');
+                    echo esc_html(acym_translation('ACYM_EDIT_MAIL'));
                 } elseif ($this->walkThrough || !empty(acym_getVar('cmd', 'return'))) {
-                    echo acym_translation('ACYM_EDIT');
+                    echo esc_html(acym_translation('ACYM_EDIT'));
                 } else {
-                    echo acym_translation('ACYM_EDIT_TEMPLATE');
+                    echo esc_html(acym_translation('ACYM_EDIT_TEMPLATE'));
                 }
                 ?>
 			</button>
@@ -60,7 +64,7 @@ $mainColors = $this->getDefaultColors(); ?>
 		<div class="cell grid-x" id="acym__wysid__edit__preview">
             <?php
             if (!empty($data['multilingual'])) {
-                echo acym_tooltip(
+                acym_tooltip(
                     [
                         'hoveredText' => '<div id="acym__wysid__edit__preview__reset__content"><i class="acymicon-rotate-left"></i></div>',
                         'textShownInTooltip' => acym_translation('ACYM_REMOVE_TRANSLATION_DESC'),
@@ -78,7 +82,7 @@ $mainColors = $this->getDefaultColors(); ?>
                 }
             }
             ?>
-			<div id="acym__wysid__email__preview" class="acym__email__preview grid-x cell <?php echo $classes; ?> margin-top-1"></div>
+			<div id="acym__wysid__email__preview" class="acym__email__preview grid-x cell <?php echo esc_attr($classes); ?> margin-top-1"></div>
 			<div class="cell medium-auto hide-for-small-only"></div>
 		</div>
 	</div>
@@ -92,9 +96,9 @@ $mainColors = $this->getDefaultColors(); ?>
 			<!--Warning area when generating thumbnail-->
 			<div id="acym__wysid__warning__thumbnail" class="grid-x align-center" style="display: none;">
 				<div class="cell align-center acym_vcenter">
-					<h3><?php echo acym_translation('ACYM_SAVING_EMAIL'); ?></h3>
+					<h3><?php echo esc_html(acym_translation('ACYM_SAVING_EMAIL')); ?></h3>
 				</div>
-                <?php echo acym_loaderLogo(); ?>
+                <?php acym_loaderLogo(); ?>
 			</div>
 			<!--Top toolbar-->
             <?php

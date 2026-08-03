@@ -17,8 +17,12 @@ class TagClass extends AcymClass
         $this->pkey = 'id';
     }
 
+    /**
+     * Attaches the tags passed in parameter to the specified element
+     */
     public function setTags(string $type, int $elementId, array $newTags): void
     {
+        // Remove the old tags from the element
         acym_query('DELETE FROM #__acym_tag WHERE `type` = '.acym_escapeDB($type).' AND `id_element` = '.intval($elementId));
 
         $tagsToInsertQuery = [];

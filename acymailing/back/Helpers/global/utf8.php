@@ -1,5 +1,7 @@
 <?php
+defined('ABSPATH') || die('Restricted Access');
 
+// utf8_encode is deprecated in PHP 8.2
 function acym_utf8Encode(string $string): string
 {
     if (function_exists('mb_convert_encoding')) {
@@ -24,6 +26,7 @@ function acym_utf8Encode(string $string): string
     }
 }
 
+// utf8_decode is deprecated in PHP 8.2
 function acym_utf8Decode(string $string): string
 {
     if (function_exists('mb_convert_encoding')) {
@@ -42,6 +45,7 @@ function acym_utf8Decode(string $string): string
 
                 case "\xF0":
                     ++$i;
+                // no break
 
                 case "\xE0":
                     $newString[$j] = '?';

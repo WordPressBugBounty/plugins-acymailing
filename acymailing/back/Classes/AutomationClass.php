@@ -77,7 +77,7 @@ class AutomationClass extends AcymClass
                 continue;
             }
 
-            $element->$oneAttribute = is_array($value) ? json_encode($value) : strip_tags($value);
+            $element->$oneAttribute = is_array($value) ? json_encode($value) : acym_stripTags($value);
         }
 
         return parent::save($element);
@@ -96,6 +96,10 @@ class AutomationClass extends AcymClass
         return parent::delete($elements);
     }
 
+    /**
+     * @param mixed $trigger The identifier of the trigger
+     * @param array $data    An array with data for user-type triggers (user id, order, event...)
+     */
     public function trigger($triggers, array $data = []): void
     {
         if (!acym_level(ACYM_ENTERPRISE) || empty($triggers)) {
@@ -117,10 +121,13 @@ class AutomationClass extends AcymClass
             $newData = $data;
             $execute = false;
 
+            // If we reached the next execution time we execute
+            // next_execution is only set if one of the time triggers like "asap" or "day" is selected in the automation
             if (!empty($step->next_execution) && $step->next_execution <= $newData['time']) {
                 $execute = true;
             }
 
+            // Call the triggers to set the next execution time
             acym_trigger('onAcymExecuteTrigger', [&$step, &$execute, &$newData]);
 
             $newData['automation'] = $this->getOneById($step->automation_id);
@@ -130,7 +137,9 @@ class AutomationClass extends AcymClass
                 $conditions = $conditionClass->getConditionsByStepId($step->id);
                 if (!empty($conditions)) {
                     foreach ($conditions as $condition) {
-                        if (!$this->verifyCondition($condition->conditions, $newData)) continue;
+                        if (!$this->verifyCondition($condition->conditions, $newData)) {
+                            continue;
+                        }
 
                         $actions = $actionClass->getActionsByStepId($step->id);
                         if (empty($actions)) continue;
@@ -187,14 +196,17 @@ class AutomationClass extends AcymClass
             $query->where = $initialWhere;
         }
 
+        //We do the or first
         foreach ($action->filters as $or => $orValue) {
             if (empty($orValue)) {
                 continue;
             }
             $num = 0;
             $query->where = $initialWhere;
+            //Next the and
             foreach ($orValue as $and => $andValue) {
                 $num++;
+                //Finally we have all names filter
                 foreach ($andValue as $filterName => $filterOptions) {
                     acym_trigger('onAcymProcessFilter_'.$filterName, [&$query, &$filterOptions, &$num]);
                 }
@@ -232,13 +244,15 @@ class AutomationClass extends AcymClass
         return $this->didAnAction;
     }
 
-    private function verifyCondition($conditions, array $data = []): bool
+    private function verifyCondition(array $conditions, array $data = []): bool
     {
-        if (empty($conditions)) return true;
+        if (empty($conditions)) {
+            return true;
+        }
+
         $userTriggeringAction = empty($data['userId']) ? 0 : $data['userId'];
         $usersTriggeringAction = empty($data['userIds']) ? [] : $data['userIds'];
 
-        $conditions = json_decode($conditions, true);
         $query = new AutomationHelper();
         $initialWhere = ['1 = 1'];
         if (!empty($conditions['type_condition']) && $conditions['type_condition'] == 'user') {
@@ -258,11 +272,14 @@ class AutomationClass extends AcymClass
         foreach ($conditions as $or => $orValue) {
             if (empty($orValue)) continue;
 
+            // we increment id condition not validate
             $conditionNotValid = 0;
             $num = 0;
+            //Next the and
             foreach ($orValue as $and => $andValue) {
                 $num++;
                 $query->where = $initialWhere;
+                //Finally we have all names condition
                 foreach ($andValue as $filterName => $filterOptions) {
                     acym_trigger('onAcymProcessCondition_'.$filterName, [&$query, &$filterOptions, &$num, &$conditionNotValid]);
                 }

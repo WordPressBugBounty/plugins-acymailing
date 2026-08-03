@@ -21,7 +21,7 @@ class UpdateHelper extends AcymObject
     const BOUNCE_VERSION = 9;
 
     private string $level = 'starter';
-    private string $version = '10.11.1';
+    private string $version = '11.0.0';
     private string $previousVersion;
     private bool $isUpdating = false;
 
@@ -29,11 +29,12 @@ class UpdateHelper extends AcymObject
 
     public function deleteNewSplashScreenInstall(): void
     {
+        // First installation or installing the same version => don't show the splashscreen
         if (!$this->isUpdating || (!empty($this->previousVersion) && version_compare($this->previousVersion, $this->version, '='))) {
             $splashscreenJson = ACYM_PARTIAL.'update'.DS.'changelogs_splashscreen.json';
 
             if (file_exists($splashscreenJson)) {
-                @unlink($splashscreenJson);
+                acym_deleteFile($splashscreenJson);
             }
         }
     }
@@ -58,7 +59,7 @@ class UpdateHelper extends AcymObject
         }
 
         if ($res === null) {
-            $message = isset($e) ? $e->getMessage() : substr(strip_tags(acym_getDBError()), 0, 200).'...';
+            $message = isset($e) ? $e->getMessage() : substr(acym_stripTags(acym_getDBError()), 0, 200).'...';
 
             if ($messageType === 'enqueue') {
                 acym_enqueueMessage($message, 'error');

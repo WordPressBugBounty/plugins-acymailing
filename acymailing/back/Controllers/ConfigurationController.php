@@ -35,35 +35,6 @@ class ConfigurationController extends AcymController
         ];
     }
 
-    public function getOption(): void
-    {
-        acym_checkToken();
-
-        $field = acym_getVar('string', 'field', '');
-
-        $allowedFields = [
-            'level',
-            'unsplash_key',
-            'giphy_key',
-        ];
-
-        if (acym_isAdmin()) {
-            $allowedFields[] = 'save_thumbnail';
-        }
-
-        if (!in_array($field, $allowedFields)) {
-            acym_sendAjaxResponse(acym_translation('ACYM_COULD_NOT_LOAD_INFORMATION'), [], false);
-        }
-
-        $res = $this->config->get($field);
-
-        if (intval($res) !== 0 && empty($res)) {
-            acym_sendAjaxResponse(acym_translation('ACYM_COULD_NOT_LOAD_INFORMATION'), [], false);
-        } else {
-            acym_sendAjaxResponse('', ['value' => $res]);
-        }
-    }
-
     public function displayMessage(string $message, bool $ajax = false): array
     {
         $correspondences = [
@@ -121,27 +92,28 @@ class ConfigurationController extends AcymController
         $filename = acym_getVar('string', 'filename', '');
 
         if (empty($filename) || !acym_fileNameValid($filename)) {
-            echo acym_translation('ACYM_FILENAME_EMPTY_OR_NOT_VALID');
+            echo esc_html(acym_translation('ACYM_FILENAME_EMPTY_OR_NOT_VALID'));
             exit;
         }
 
         $reportPath = acym_getLogPath($filename);
 
         if (!file_exists($reportPath)) {
-            echo acym_translation('ACYM_EXIST_LOG');
+            echo esc_html(acym_translation('ACYM_EXIST_LOG'));
             exit;
         }
 
         if (ACYM_CMS === 'wordpress') @ob_get_clean();
 
         $final = acym_fileGetContent($reportPath);
-        echo nl2br($final);
+        echo nl2br(esc_html($final));
 
         exit;
     }
 
     private function loginForOAuth2(bool $isSmtp = true): void
     {
+        // Step 1: prompt consent window to the user
         $this->store();
 
         $redirectUrl = '';
@@ -153,11 +125,12 @@ class ConfigurationController extends AcymController
             return;
         }
 
-        acym_redirect($redirectUrl);
+        acym_redirect($redirectUrl, '', 'message', false);
     }
 
     public function handleOauthAuthentication(): void
     {
+        // Step 2: get the access and refresh tokens after the user is redirected to the config with a code in the URL
         $code = acym_getVar('string', 'code');
 
         if (empty($code)) {

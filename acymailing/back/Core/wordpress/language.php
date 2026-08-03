@@ -1,7 +1,9 @@
 <?php
 
-global $acyWPLangCodes;
-$acyWPLangCodes = [
+defined('ABSPATH') || die('Restricted Access');
+
+global $acymWPLangCodes;
+$acymWPLangCodes = [
     'af' => 'af-ZA',
     'ar' => 'ar-AA',
     'as' => 'as-AS', // Not sure
@@ -37,8 +39,14 @@ $acyWPLangCodes = [
 
 global $acymLanguages;
 
+/**
+ * Display the translation based on a key
+ *
+ * @param bool $interpretBackSlashes Deprecated Interpret or not the \ like \t \n etc...
+ */
 function acym_translation(string $key, bool $jsSafe = false, bool $interpretBackSlashes = true, string $textdomain = 'acymailing'): string
 {
+    // Return the key passed by default as it may be a random text instead of a key
     $translation = $key;
 
     global $acymLanguages;
@@ -53,17 +61,21 @@ function acym_translation(string $key, bool $jsSafe = false, bool $interpretBack
         }
     }
 
-    global $customTranslation;
+    global $acymailingCustomTranslation;
     acym_getCustomTranslation();
 
-    if (!empty($customTranslation) && isset($customTranslation[$key])) {
-        $translation = $customTranslation[$key];
+    if (!empty($acymailingCustomTranslation) && isset($acymailingCustomTranslation[$key])) {
+        $translation = $acymailingCustomTranslation[$key];
     } elseif (!empty($acymailingEnglishText)) {
+        // If there is an english translation, get the WordPress translation. By default, it returns the text passed, so the english translation
+        // phpcs:ignore WordPress.WP.I18n.MissingArgDomain,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralDomain
         $translation = empty($textdomain) ? __($acymailingEnglishText) : __($acymailingEnglishText, $textdomain);
 
+        // If there is no translation on the WordPress side, and we're not in english, take the AcyMailing community translation
         if ($translation === $acymailingEnglishText && $acymLanguages['currentLanguage'] != ACYM_DEFAULT_LANGUAGE) {
             foreach ($acymLanguages[$acymLanguages['currentLanguage']] as $fileContent) {
                 if (isset($fileContent[$key])) {
+                    // If a translation is found for the specified key, take it
                     $translation = $fileContent[$key];
                     break;
                 }
@@ -71,6 +83,7 @@ function acym_translation(string $key, bool $jsSafe = false, bool $interpretBack
         }
     }
 
+    // Escape the quotes if we're in a javascript context
     if ($jsSafe) {
         $translation = str_replace('"', '\"', $translation);
     } elseif ($interpretBackSlashes && strpos($translation, '\\') !== false) {
@@ -78,6 +91,7 @@ function acym_translation(string $key, bool $jsSafe = false, bool $interpretBack
     }
 
     if ($translation == $key) {
+        // phpcs:ignore WordPress.WP.I18n.MissingArgDomain,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralDomain
         $translation = empty($textdomain) ? __($translation) : __($translation, $textdomain);
     }
 
@@ -93,6 +107,9 @@ function acym_setLanguage(string $lang): string
     return $previousLanguage;
 }
 
+/**
+ * Display the according translation
+ */
 function acym_translationSprintf(): string
 {
     $args = func_get_args();
@@ -103,7 +120,7 @@ function acym_translationSprintf(): string
 
 function acym_getLanguages(bool $uppercaseLangCode = false, bool $published = false): array
 {
-    global $acyWPLangCodes;
+    global $acymWPLangCodes;
 
     $result = [];
 
@@ -112,7 +129,9 @@ function acym_getLanguages(bool $uppercaseLangCode = false, bool $published = fa
     $languages = get_available_languages();
     foreach ($languages as $oneLang) {
         $wpLangCode = $oneLang;
-        if (!empty($acyWPLangCodes[$oneLang])) $oneLang = $acyWPLangCodes[$oneLang];
+        if (!empty($acymWPLangCodes[$oneLang])) {
+            $oneLang = $acymWPLangCodes[$oneLang];
+        }
         $langTag = str_replace('_', '-', $oneLang);
 
         $lang = new stdClass();
@@ -147,7 +166,7 @@ function acym_getLanguageTag(bool $simple = false): string
         $currentLocale = get_locale();
     }
 
-    $currentLocale = convertWPLocaleToAcyLocale($currentLocale);
+    $currentLocale = acym_convertWPLocaleToAcyLocale($currentLocale);
 
     global $acymLanguages;
     if (!isset($acymLanguages['currentLanguage'])) {
@@ -159,9 +178,12 @@ function acym_getLanguageTag(bool $simple = false): string
 
 function acym_getCustomTranslation()
 {
-    global $customTranslation;
-    if (isset($customTranslation)) return;
-    $customTranslation = [];
+    global $acymailingCustomTranslation;
+    if (isset($acymailingCustomTranslation)) {
+        return;
+    }
+
+    $acymailingCustomTranslation = [];
     $currentLanguage = acym_getLanguageTag();
     $filePath = ACYM_LANGUAGE.$currentLanguage.'.'.ACYM_LANGUAGE_FILE.'_custom.ini';
     if (file_exists($filePath)) {
@@ -174,7 +196,7 @@ function acym_getCustomTranslation()
             $keyval = explode('=', $raw);
             $key = array_shift($keyval);
 
-            $customTranslation[$key] = trim(implode('=', $keyval), "\"\r\n\t ");
+            $acymailingCustomTranslation[$key] = trim(implode('=', $keyval), "\"\r\n\t ");
         }
     }
 }
@@ -240,17 +262,18 @@ function acym_getLanguagePath(string $basePath, ?string $language = null): strin
     return rtrim(ACYM_LANGUAGE, DS);
 }
 
-function acym_languageOption(?string $emailLanguage, string $name): string
+function acym_languageOption(?string $emailLanguage, string $name): void
 {
-    return '';
 }
 
-function convertWPLocaleToAcyLocale(string $locale): string
+function acym_convertWPLocaleToAcyLocale(string $locale): string
 {
     if (strpos($locale, '-') !== false) return $locale;
 
-    global $acyWPLangCodes;
-    if (!empty($acyWPLangCodes[$locale])) return $acyWPLangCodes[$locale];
+    global $acymWPLangCodes;
+    if (!empty($acymWPLangCodes[$locale])) {
+        return $acymWPLangCodes[$locale];
+    }
 
     if (strpos($locale, '_') === false) {
         return $locale.'-'.strtoupper($locale);
@@ -264,7 +287,7 @@ function acym_getCmsUserLanguage(?int $userId = null): ?string
     if ($userId === null) $userId = acym_currentUserId();
     if (empty($userId)) return '';
 
-    return convertWPLocaleToAcyLocale(get_user_locale($userId));
+    return acym_convertWPLocaleToAcyLocale(get_user_locale($userId));
 }
 
 function acym_getTranslationTools(): array

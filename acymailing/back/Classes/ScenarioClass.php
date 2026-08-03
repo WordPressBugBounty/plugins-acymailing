@@ -13,6 +13,7 @@ class ScenarioClass extends AcymClass
 
     private ScenarioStepClass $scenarioStepClass;
 
+    // This is a list of all the step ids we have to save when saving a scenario, this way we can delete all the steps that are not in this list
     private array $stepIdsToKeep = [];
 
     public function __construct()
@@ -50,6 +51,7 @@ class ScenarioClass extends AcymClass
             }
         }
 
+        // We don't filter by status on the status query this way we can select other statuses
         if (!empty($filters)) {
             $query .= ' WHERE ('.implode(') AND (', $filters).')';
             $queryCount .= ' WHERE ('.implode(') AND (', $filters).')';
@@ -82,6 +84,7 @@ class ScenarioClass extends AcymClass
         if (!empty($element->flow)) {
             $flow = json_decode($element->flow, true);
 
+            // The first step should the trigger
             if (empty($flow[0]['params'])) {
                 return 0;
             }
@@ -127,6 +130,7 @@ class ScenarioClass extends AcymClass
     private function saveFlow(array $flow, int $scenarioId): void
     {
         if (!empty($flow[0]['children'][0])) {
+            // We save all the step
             $this->saveStep($flow[0]['children'][0], $scenarioId);
         }
         $this->cleanSteps($scenarioId);
@@ -134,6 +138,7 @@ class ScenarioClass extends AcymClass
 
     private function saveStep(array $currentStep, int $scenarioId, ?string $previousStepId = null, ?int $conditionValid = null): void
     {
+        // If this is a direct child of a condition we pass it, it's a hidden object for the javascript
         if (isset($currentStep['conditionEnd'])) {
             if ($currentStep['conditionEnd'] && !empty($currentStep['children'])) {
                 $isConditionValid = empty($currentStep['conditionValid']) ? 0 : 1;

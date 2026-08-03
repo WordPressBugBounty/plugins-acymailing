@@ -29,6 +29,16 @@ trait Filter
 
         $stepAutomationId = acym_getVar('int', 'stepAutomationId');
 
+        if (acym_conditionsContainRestrictedFilter($action) && !acym_hasAdminPermissions()) {
+            acym_enqueueMessage(acym_translation('ACYM_ACCESS_DENIED'), 'error');
+
+            return [
+                'automationId' => $automationID,
+                'stepId' => $stepAutomationId,
+                'actionId' => $actionId,
+            ];
+        }
+
         if (!empty($stepAutomationId)) {
             $stepAutomation['id'] = $stepAutomationId;
         }
@@ -44,8 +54,9 @@ trait Filter
         $action['filters']['type_filter'] = acym_getVar('string', 'type_filter');
 
         if ($isMassAction) {
-            acym_session();
-            $_SESSION['massAction']['filters'] = $action['filters'];
+            $massAction = acym_getVar('array', 'massAction', [], 'SESSION');
+            $massAction['filters'] = $action['filters'];
+            acym_setSession('massAction', $massAction);
 
             return [];
         }
@@ -58,6 +69,7 @@ trait Filter
             acym_secureDBColumn($column);
         }
 
+        //We need an object to save it so we make a object
         $action = (object)$action;
 
         $action->id = $actionClass->save($action);
@@ -71,6 +83,8 @@ trait Filter
 
     public function saveExitFilters(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $this->setSaveFilters();
 
         acym_enqueueMessage(acym_translation('ACYM_SUCCESSFULLY_SAVED'), 'success');
@@ -80,6 +94,8 @@ trait Filter
 
     public function saveFilters(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $ids = $this->setSaveFilters();
 
         acym_setVar('id', $ids['automationId']);
@@ -93,6 +109,7 @@ trait Filter
         $or = acym_getVar('int', 'or');
         $and = acym_getVar('int', 'and');
         $stepAutomation = acym_getVar('array', 'acym_action');
+        acym_blockRestrictedFilterAjax($stepAutomation);
 
         if (empty($stepAutomation['filters'][$or][$and])) {
             acym_sendAjaxResponse(acym_translation('ACYM_AUTOMATION_NOT_FOUND'), [], false);
@@ -111,6 +128,7 @@ trait Filter
     {
         $or = acym_getVar('int', 'or');
         $stepAutomation = acym_getVar('array', 'acym_action');
+        acym_blockRestrictedFilterAjax($stepAutomation);
 
         $query = new AutomationHelper();
 

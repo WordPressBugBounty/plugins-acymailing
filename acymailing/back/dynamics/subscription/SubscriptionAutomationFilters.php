@@ -59,6 +59,7 @@ trait SubscriptionAutomationFilters
         if ($this->config->get('require_confirmation', '1') === '1') {
             $filters['unconfirmed'] = new stdClass();
             $filters['unconfirmed']->name = acym_translation('ACYM_UNCONFIRMED_SUBSCRIBERS');
+            // The count results doesn't show up if there are no options
             $filters['unconfirmed']->option = '<input type="hidden" name="acym_action[filters][__numor__][__numand__][unconfirmed][countresults]" />';
         }
     }
@@ -89,6 +90,13 @@ trait SubscriptionAutomationFilters
 
     public function onAcymDeclareSummary_filters(&$automation)
     {
-        $this->onAcymDeclareSummary_conditionsFilters($automation, 'ACYM_FILTER_ACY_LIST_SUMMARY', 'ACYM_SUBSCRIBED', 'ACYM_UNSUBSCRIBED', 'ACYM_NOT_SUBSCRIBED', 'ACYM_NOT_CURRENTLY_SUBSCRIBED');
+        $this->onAcymDeclareSummary_conditionsFilters(
+            $automation,
+            'ACYM_FILTER_ACY_LIST_SUMMARY',
+            'ACYM_SUBSCRIBED',
+            'ACYM_UNSUBSCRIBED',
+            'ACYM_NOT_SUBSCRIBED',
+            'ACYM_NOT_CURRENTLY_SUBSCRIBED'
+        );
     }
 }

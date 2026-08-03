@@ -114,7 +114,7 @@ trait Edition
 
     public function saveAjax(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         $formArray = acym_getVar('array', 'form');
         if (empty($formArray)) {
             acym_sendAjaxResponse(acym_translation('ACYM_COULD_NOT_GET_FORM_INFORMATION'), [], false);

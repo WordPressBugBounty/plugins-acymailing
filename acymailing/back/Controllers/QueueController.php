@@ -31,13 +31,18 @@ class QueueController extends AcymController
 
     public function continuesend(): void
     {
-        if ($this->config->get('queue_type') == 'onlyauto') {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
+        //Are we configured to use the automatic send process only?
+        //If so, we don't allow the user to access this feature!
+        if ($this->config->get('queue_type') === 'onlyauto') {
             acym_setNoTemplate();
             acym_display(acym_translation('ACYM_ONLYAUTOPROCESS'), 'warning');
 
             exit;
         }
 
+        //we move the next cron task so that we won't have problem with double send process
         $newCronTime = time() + 120;
         if ($this->config->get('cron_next') < $newCronTime) {
             $this->config->saveConfig(['cron_next' => $newCronTime]);
@@ -64,9 +69,11 @@ class QueueController extends AcymController
         $queueHelper->total = (int)$totalSend;
         $queueHelper->start = $alreadySent;
         $queueHelper->pause = (int)$this->config->get('queue_pause', 0);
+        // ->Process will exit the current page if it needs to be continued
         $queueHelper->fromManual = true;
         $queueHelper->process();
 
+        //We should never be there... but if the user tries to resume the send process and the messages are not ready to be sent then it will land here...
         acym_setNoTemplate();
         exit;
     }

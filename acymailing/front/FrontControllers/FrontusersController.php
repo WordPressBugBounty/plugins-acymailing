@@ -35,6 +35,7 @@ class FrontusersController extends UsersController
             'subscribe',
             'unsubscribe',
             'unsubscribeAll',
+            'disableTracking',
             'saveSubscriptions',
             'unsubscribePage',
             'confirm',
@@ -60,7 +61,7 @@ class FrontusersController extends UsersController
             );
         } else {
             acym_header('Content-type:text/html; charset=utf-8');
-            echo '<script>alert("'.acym_translation($message, true).'"); window.history.go(-1);</script>';
+            echo '<script>alert("'.esc_html(acym_translation($message)).'"); window.history.go(-1);</script>';
         }
         exit;
     }
@@ -69,20 +70,31 @@ class FrontusersController extends UsersController
     {
         acym_checkRobots();
 
-        if (!acym_getVar('string', 'acy_source') && !empty($_GET['user'])) {
+        $formData = acym_getVar('array', 'user', []);
+        if (!acym_getVar('string', 'acy_source') && !empty($formData)) {
+            // Coming from a subscription via url...
             acym_setVar('acy_source', 'url');
         }
 
+        // Do we have to return an ajax response or a web page ?
         $ajax = acym_getVar('int', 'ajax', 0);
         if ($ajax) {
+            //in case of the page displays some warnings or whatever
             @ob_end_clean();
             acym_header('Content-type:application/json; charset=utf-8');
         }
 
+        //We only allow logged in users and this user is not logged it...
         $currentUserid = acym_currentUserId();
         if ((int)$this->config->get('allow_visitor', 1) != 1 && empty($currentUserid)) {
             if ($ajax) {
-                echo '{"message":"'.acym_translation('ACYM_ONLY_LOGGED', true).'","type":"error","code":"0"}';
+                echo json_encode(
+                    [
+                        'message' => acym_translation('ACYM_ONLY_LOGGED'),
+                        'type' => 'error',
+                        'code' => '0',
+                    ]
+                );
                 exit;
             } else {
                 acym_askLog(false, 'ACYM_ONLY_LOGGED');
@@ -98,7 +110,6 @@ class FrontusersController extends UsersController
             }
         }
 
-        $formData = acym_getVar('array', 'user', [], '');
         $user = new \stdClass();
         if (!empty($formData['email'])) {
             $user->email = $formData['email'];
@@ -113,10 +124,13 @@ class FrontusersController extends UsersController
         }
         $user->email = trim($user->email);
 
+        // Check email validity
         if (empty($user->email) || !acym_isValidEmail($user->email, true)) {
             $this->displayMessage('ACYM_VALID_EMAIL', $ajax);
         }
 
+        // E-mail is valid now...
+        // Check if this user already exists or not...
         $alreadyExists = $userClass->getOneByEmail($user->email);
         if (!empty($alreadyExists->id)) {
             $user->id = $alreadyExists->id;
@@ -133,6 +147,7 @@ class FrontusersController extends UsersController
             $this->displayMessage('ACYM_ERROR_SAVE_USER', $ajax);
         }
 
+        //We will now load back the user from the one we saved so that we will have all its infos
         $myuser = $userClass->getOneById($user->id);
         if (empty($myuser->id)) {
             $this->displayMessage('ACYM_ERROR_SAVE_USER', $ajax);
@@ -141,7 +156,7 @@ class FrontusersController extends UsersController
         $msgtype = 'success';
         if (empty($myuser->confirmed) && $this->config->get('require_confirmation', 1) == 1) {
             if ($userClass->confirmationSentSuccess || empty($userClass->confirmationSentError)) {
-                $msg = strip_tags(acym_getVar('string', 'confirmation_message', ''));
+                $msg = acym_stripTags(acym_getVar('string', 'confirmation_message', ''));
                 if (empty($msg)) {
                     $msg = 'ACYM_CONFIRMATION_SENT';
                 }
@@ -153,7 +168,7 @@ class FrontusersController extends UsersController
             }
         } else {
             if ($userClass->subscribed) {
-                $msg = strip_tags(acym_getVar('string', 'confirmation_message', ''));
+                $msg = acym_stripTags(acym_getVar('string', 'confirmation_message', ''));
                 if (empty($msg)) {
                     $msg = 'ACYM_SUBSCRIPTION_OK';
                 }
@@ -165,6 +180,7 @@ class FrontusersController extends UsersController
             }
         }
 
+        // Replace tags inside the $msg and redirect link
         $replace = [];
         foreach ($myuser as $oneProp => $oneVal) {
             $replace['{user:'.$oneProp.'}'] = $oneVal;
@@ -173,8 +189,15 @@ class FrontusersController extends UsersController
         $msg = str_replace(array_keys($replace), $replace, acym_translation($msg));
 
         if ($ajax) {
+            //Make sure the message has a valid format for Ajax... so the user can customize it the way he wants without breaking anything
             $msg = str_replace(["\n", "\r", '"', '\\'], [' ', ' ', "'", '\\\\'], $msg);
-            echo '{"message":"'.$msg.'","type":"'.$msgtype.'","code":"'.$code.'"}';
+            echo json_encode(
+                [
+                    'message' => $msg,
+                    'type' => $msgtype,
+                    'code' => $code,
+                ]
+            );
             exit;
         } else {
             acym_enqueueMessage($msg, !empty($enqueueMsgType) ? $enqueueMsgType : $msgtype);
@@ -213,6 +236,7 @@ class FrontusersController extends UsersController
 
         $mailId = acym_getVar('int', 'mail_id', 0);
 
+        // Protect against bots
         if (!empty($mailId) && !empty($currentUser->id)) {
             $userStatClass = new UserStatClass();
             $userStat = $userStatClass->getOneByMailAndUserId($mailId, $currentUser->id);
@@ -309,6 +333,7 @@ class FrontusersController extends UsersController
         $redirectToUnsubPage = $this->config->get('unsubscribe_page', 1);
         $direct = acym_getVar('int', 'direct', 0);
 
+        // Do we have to return an ajax response or a web page ?
         $ajax = acym_getVar('int', 'ajax', 0);
         if ($ajax) {
             @ob_end_clean();
@@ -332,7 +357,7 @@ class FrontusersController extends UsersController
         $email = '';
 
         if (!empty($formData['email'])) {
-            $email = trim(strip_tags($formData['email']));
+            $email = trim(acym_stripTags($formData['email']));
         } elseif (empty($user)) {
             return;
         } elseif (!empty($user->email)) {
@@ -346,12 +371,14 @@ class FrontusersController extends UsersController
             $email = $currentEmail;
         }
 
+        // Check email validity
         if (empty($email) || !acym_isValidEmail($email)) {
             $this->displayMessage('ACYM_VALID_EMAIL', $ajax);
         }
 
         $alreadyExists = $userClass->getOneByEmail($email);
 
+        // User not found
         if (empty($alreadyExists->id)) {
             $this->displayMessage(acym_translationSprintf('ACYM_SUB_NOT_IN_LIST', $email), $ajax);
         }
@@ -366,6 +393,66 @@ class FrontusersController extends UsersController
             }
             $this->unsubscribePage($alreadyExists);
         }
+    }
+
+    public function disableTracking(): void
+    {
+        acym_checkRobots();
+
+        // Do we have to return an ajax response or a web page ?
+        $ajax = acym_getVar('int', 'ajax', 0);
+        if ($ajax) {
+            @ob_end_clean();
+            acym_header('Content-type:application/json; charset=utf-8');
+        }
+
+        $userClass = new UserClass();
+        $user = $userClass->identify(true, 'userId', 'userKey');
+
+        if (empty($user->id)) {
+            $this->displayMessage('ACYM_USER_NOT_FOUND', $ajax);
+        }
+
+        // Protect against bots opening the link right after the email was sent
+        $mailId = acym_getVar('int', 'mail_id', 0);
+        if (!empty($mailId)) {
+            $userStatClass = new UserStatClass();
+            $userStat = $userStatClass->getOneByMailAndUserId($mailId, $user->id);
+            $delay = $this->config->get('tracking_delay', 0);
+            if (acym_isRobot() || (!empty($userStat) && !empty($delay) && acym_getTimeFromUTCDate($userStat->send_date) > time() - $delay)) {
+                return;
+            }
+        }
+
+        if ((int)$user->tracking !== 0) {
+            $userClass->disableTracking($user, $mailId);
+        }
+
+        $this->endDisableTracking('ACYM_TRACKING_DISABLED_OK', $ajax);
+    }
+
+    private function endDisableTracking(string $msg, bool $ajax, string $type = 'success'): void
+    {
+        $msg = acym_translation($msg);
+
+        if ($ajax) {
+            echo json_encode(
+                [
+                    'message' => $msg,
+                    'type' => $type,
+                    'code' => '10',
+                ]
+            );
+            exit;
+        }
+        acym_enqueueMessage($msg, $type);
+
+        $redirectUrl = urldecode(acym_getVar('string', 'redirectunsub', ''));
+        if (empty($redirectUrl)) {
+            $redirectUrl = acym_rootURI();
+        }
+
+        acym_redirect($this->normalizeRedirectUrl($redirectUrl), '', 'message', true);
     }
 
     private function getUserFromUnsubPage(): object
@@ -407,6 +494,7 @@ class FrontusersController extends UsersController
         }
 
         $userClass->sendNotification($user->id, 'acy_notification_unsuball');
+        // A notification is sent when a user unsubscribes from a list, be we already sent a notification for this
         $userClass->blockNotifications = true;
         $userClass->unsubscribe([$user->id], $lists);
     }
@@ -455,19 +543,26 @@ class FrontusersController extends UsersController
             $this->displayMessage('ACYM_USER_NOT_FOUND', false);
         }
 
+        // Get the user
         $user = $this->getUserFromUnsubPage();
+        // Get the list the user want to sub
         $listsChecked = acym_getVar('array', 'lists', []);
         $listsChecked = array_filter($listsChecked, function ($status) {
             return intval($status) === 1;
         });
         $listsChecked = array_keys($listsChecked);
+        // Get the displayed lists
         $displayedCheckedLists = explode(',', acym_getVar('string', 'displayed_checked_lists', ''));
+        // We get the user subscriptions
         $userSubscriptions = $userClass->getUserSubscriptionById($user->id);
 
+        // We subscribe the user to the checked lists
         $userClass->subscribe([$user->id], $listsChecked);
 
+        // We unsub to the unchecked lists
         $listsToUnsub = [];
         foreach ($userSubscriptions as $subscription) {
+            // The list wasn't checked && the list is displayed && the user is subscribed to it
             if (
                 !in_array($subscription->id, $listsChecked)
                 && in_array($subscription->id, $displayedCheckedLists)
@@ -494,7 +589,10 @@ class FrontusersController extends UsersController
 
         $surveyAnswers = json_decode($surveyAnswers, true);
 
-        if (ACYM_CMS === 'joomla' && !empty($_GET['language'])) $lang = $_GET['language'];
+        $languageCode = acym_getVar('string', 'language');
+        if (ACYM_CMS === 'joomla' && !empty($languageCode)) {
+            $lang = $languageCode;
+        }
         acym_setLanguage($lang);
         acym_loadLanguage($lang);
 
@@ -598,6 +696,7 @@ class FrontusersController extends UsersController
             return;
         }
 
+        // We identify the user
         $userClass = new UserClass();
         $user = $userClass->identify(true, 'userId', 'userKey');
         if (empty($user)) {
@@ -615,18 +714,21 @@ class FrontusersController extends UsersController
             }
         }
 
+        // Now we can really confirm the user
         if (!$user->confirmed) {
             $userClass->confirm($user->id);
         }
 
+        // Get the redirect url from the configuration page if specified
         $redirectUrl = $this->config->get('confirm_redirect');
         if (!empty($redirectUrl)) {
             $replace = [];
+            // We replace tags in case of the user added some dynamic information to its url.
             foreach ($user as $key => $val) {
                 $replace['{user:'.$key.'}'] = $val;
             }
             $redirectUrl = str_replace(array_keys($replace), $replace, $redirectUrl);
-            acym_redirect($redirectUrl);
+            acym_redirect($redirectUrl, '', 'message', false);
 
             return;
         }
@@ -640,6 +742,7 @@ class FrontusersController extends UsersController
         $user = $userClass->identify(true);
 
         if (empty($user)) {
+            // Check if the subscription is allowed for non registered users
             $allowvisitor = $this->config->get('allow_visitor', 1);
             if (empty($allowvisitor)) {
                 acym_askLog(true, 'ACYM_ONLY_LOGGED', 'message');
@@ -658,6 +761,7 @@ class FrontusersController extends UsersController
         }
         acym_addScript(false, ACYM_JS.'module.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'module.min.js'));
 
+        // Get the page parameters
         $params = new \stdClass();
         $menu = acym_getMenu();
         if (is_object($menu)) {
@@ -666,6 +770,7 @@ class FrontusersController extends UsersController
             $menuparams = new AcymParameter($menuParameters);
 
             if (!empty($menuparams)) {
+                // Joomla specific params
                 $params->suffix = $menuparams->get('pageclass_sfx', '');
                 $params->page_heading = $menuparams->get('page_heading');
                 $params->show_page_heading = $menuparams->get('show_page_heading', 0);
@@ -680,6 +785,7 @@ class FrontusersController extends UsersController
                     acym_addMetadata('robots', $menuparams->get('robots'));
                 }
 
+                // Our params
                 $params->lists = $menuparams->get('lists', 'none');
                 $params->listschecked = $menuparams->get('listschecked', 'none');
                 $params->dropdown = $menuparams->get('dropdown');
@@ -705,6 +811,7 @@ class FrontusersController extends UsersController
 
     public function prepareParams(object $values): array
     {
+        //TODO problem with the types throughout the entire method
         if (!isset($values->lists)) {
             $values->lists = 'none';
         }
@@ -718,7 +825,9 @@ class FrontusersController extends UsersController
             $values->hiddenlists = 'None';
         }
         if (empty($values->fields)) {
-            $values->fields = ['1', '2'];
+            $values->fields = [2];
+        } elseif (is_string($values->fields)) {
+            $values->fields = explode(',', $values->fields);
         }
         if (!in_array('2', $values->fields) && !in_array(2, $values->fields)) {
             $values->fields[] = '2';
@@ -740,6 +849,7 @@ class FrontusersController extends UsersController
             $values->lists[] = 'All';
         }
 
+        // Get the current user and his subscription
         $userClass = new UserClass();
         $user = $userClass->identify(true);
         if (empty($user)) {
@@ -822,6 +932,7 @@ class FrontusersController extends UsersController
             $values->hiddenlists = $hiddenListsArray;
         }
 
+        // Overriding the list with the URL parameters: &listid= for displayed list, &hiddenlist= for hidden lists
         $defaultSubscription = $subscription;
         $forceLists = acym_getVar('string', 'listid', '');
         if (!empty($forceLists)) {
@@ -879,7 +990,7 @@ class FrontusersController extends UsersController
 
     public function savechanges(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         acym_checkRobots();
 
         $userClass = new UserClass();
@@ -907,7 +1018,7 @@ class FrontusersController extends UsersController
 
     public function exportdata(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $userClass = new UserClass();
         $user = $userClass->identify(true, 'userId', 'userKey');
@@ -939,16 +1050,18 @@ class FrontusersController extends UsersController
 
         $exportHelper = new ExportHelper();
         $exportHelper->setDownloadHeaders('export_data_user_'.$user->id, 'zip');
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- Downloading a file, better than WP functions for memory handling.
         readfile($tempFolder.'export_data_user_'.$user->id.'.zip');
 
+        // Avoid issue when user cancels the download
         ignore_user_abort(true);
-        unlink($tempFolder.'export_data_user_'.$user->id.'.zip');
+        acym_deleteFile($tempFolder.'export_data_user_'.$user->id.'.zip');
         exit;
     }
 
     public function gdprDelete(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $userClass = new UserClass();
         $user = $userClass->identify(true, 'userId', 'userKey');
@@ -957,27 +1070,29 @@ class FrontusersController extends UsersController
         }
 
         $userClass->delete([$user->id], true);
+
+        acym_redirect(acym_rootURI(), 'ACYM_GDPR_DATA_DELETED');
     }
 
     public function ajaxGetEnqueuedMessages(): void
     {
-        acym_session();
-
         $output = '';
         $types = ['success', 'info', 'warning', 'error'];
         foreach ($types as $type) {
-            if (empty($_SESSION['acymessage'.$type])) continue;
+            $messages = acym_getVar('array', 'acymessage'.$type, [], 'SESSION');
+            if (empty($messages)) {
+                continue;
+            }
 
-            $messages = $_SESSION['acymessage'.$type];
             if (!is_array($messages)) {
                 $messages = [$messages];
             }
 
-            $output .= '<div class="acym_callout acym__callout__front__'.$type.'" role="alert">';
+            $output .= '<div class="acym_callout acym__callout__front__'.esc_attr($type).'" role="alert">';
             $output .= '<div>'.implode(' ', $messages).'</div>';
-            $output .= '<button class="acym_callout_close" aria-label="'.acym_escape(acym_translation('ACYM_CLOSE_NOTIFICATION')).'">x</button></div>';
+            $output .= '<button class="acym_callout_close" aria-label="'.esc_attr(acym_translation('ACYM_CLOSE_NOTIFICATION')).'">x</button></div>';
 
-            unset($_SESSION['acymessage'.$type]);
+            acym_setSession('acymessage'.$type, null, true);
         }
 
         if (!empty($output)) {

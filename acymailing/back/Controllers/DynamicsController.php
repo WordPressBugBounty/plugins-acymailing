@@ -10,6 +10,8 @@ class DynamicsController extends AcymController
 {
     public function replaceDummy(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $mailId = acym_getVar('int', 'mailId', 0);
         $code = acym_getVar('string', 'code', '', '', ACYM_ALLOWRAW);
         $previewBody = base64_decode(acym_getVar('string', 'previewBody', '', '', ACYM_ALLOWRAW));
@@ -48,6 +50,8 @@ class DynamicsController extends AcymController
 
     public function trigger(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $plugin = acym_getVar('cmd', 'plugin', '');
         $trigger = acym_getVar('cmd', 'trigger', '');
         if (empty($plugin) || empty($trigger)) exit;

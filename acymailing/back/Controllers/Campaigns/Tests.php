@@ -307,6 +307,8 @@ trait Tests
 
     public function checkSPAM(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $message = '';
         $data = [];
         $success = false;
@@ -329,6 +331,7 @@ trait Tests
             $spamtestSystem = UpdatemeHelper::call('public/getSpamSystem?level='.$level.'&urlSite='.$urlSite);
             $warnings = ob_get_clean();
 
+            // Could not load the information
             if (empty($spamtestSystem) || !empty($warnings)) {
                 $message = acym_translation('ACYM_ERROR_LOAD_FROM_ACYBA').(!empty($warnings) && acym_isDebug() ? $warnings : '');
             } else {
@@ -343,6 +346,7 @@ trait Tests
                         $mailerHelper = new MailerHelper();
                         $mailerHelper->report = false;
 
+                        //send a message to acy-WEBSITE-randnumber@mail-tester.com
                         $receiver = new \stdClass();
                         $receiver->id = 0;
                         $receiver->email = $spamtestSystem['email'];

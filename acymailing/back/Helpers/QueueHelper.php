@@ -31,7 +31,9 @@ class QueueHelper extends AcymObject
     public array $emailTypes = [];
 
     private int $consecutiveError = 0;
+    // Check apache module "mod_security" to avoid flush issue
     private bool $mod_security2 = false;
+    // Number of ob_end_flush used in the process
     private int $obend = 0;
 
     private UserClass $userClass;
@@ -46,20 +48,25 @@ class QueueHelper extends AcymObject
 
         $this->send_limit = (int)$this->config->get('queue_nbmail', 40);
 
+        // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- The default is 60s, which is far too much for email sending.
         @ini_set('default_socket_timeout', 10);
 
+        // We call cron URLs but don't wait for the result, we still want the script to execute
         @ignore_user_abort(true);
 
+        // Increase the limit to have enough time to send, and prevent infinite process
         $timeLimit = acym_increasePerf();
         if (empty($timeLimit)) {
             $timeLimit = 600;
         }
 
+        // We keep 4 seconds to finish the process properly
         $this->stoptime = time() + $timeLimit - 4;
     }
 
     public function process(): bool
     {
+        // Check if the current sending method has credits left and load the correct number of emails to send for this batch
         $creditsLeft = 10000;
         acym_trigger('onAcymCreditsLeft', [&$creditsLeft]);
 
@@ -89,13 +96,17 @@ class QueueHelper extends AcymObject
             return true;
         }
 
+        //We stop the flush
         if ($this->report) {
             if (function_exists('apache_get_modules')) {
                 $modules = apache_get_modules();
                 $this->mod_security2 = in_array('mod_security2', $modules);
             }
 
+            /*This is to avoid the blank page... and it apparently works! ;) */
+            // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Disabled to prevent blank output pages.
             @ini_set('output_buffering', 'off');
+            // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Disabled to prevent blank output pages.
             @ini_set('zlib.output_compression', 0);
 
             if (!headers_sent()) {
@@ -104,38 +115,59 @@ class QueueHelper extends AcymObject
                 }
             }
 
-            $disp = '<html><head><meta http-equiv="Content-Type" content="text/html;charset=utf-8" />';
-            $disp .= '<title>'.acym_translation('ACYM_SEND_PROCESS').'</title>';
-            $disp .= '<style>body{font-size:12px;font-family: Arial,Helvetica,sans-serif;}</style></head><body>';
-            $disp .= '<div style="margin-bottom: 18px;padding: 8px !important; background-color: #fcf8e3; border: 1px solid #fbeed5; border-radius: 4px;"><p style="margin:0;">'.acym_translation(
-                    'ACYM_DONT_CLOSE'
-                ).'</p></div>';
-            $disp .= "<div style='display: inline;background-color : white;border : 1px solid grey; padding : 3px;font-size:14px'>";
-            $disp .= "<span id='divpauseinfo' style='padding:10px;margin:5px;font-size:16px;font-weight:bold;display:none;background-color:black;color:white;'> </span>";
-            $disp .= acym_translation('ACYM_SEND_PROCESS').': <span id="counter" >'.$this->start.'</span> / '.$this->total;
-            $disp .= '</div>';
-            $disp .= "<div id='divinfo' style='display:none; position:fixed; bottom:3px;left:3px;background-color : white; border : 1px solid grey; padding : 3px;'> </div>";
-            $disp .= '<br /><br />';
-            $url = acym_completeLink('queue&task=continuesend&id='.$this->id.'&totalsend='.$this->total, true, true).'&alreadysent=';
-            $disp .= '<script type="text/javascript" language="javascript">';
-            $disp .= 'var mycounter = document.getElementById("counter");';
-            $disp .= 'var divinfo = document.getElementById("divinfo");
-					var divpauseinfo = document.getElementById("divpauseinfo");
-					function setInfo(message){ divinfo.style.display = \'block\';divinfo.innerHTML=message; }
-					function setPauseInfo(nbpause){ divpauseinfo.style.display = \'\';divpauseinfo.innerHTML=nbpause;}
-					function setCounter(val){ mycounter.innerHTML=val;}
-					var scriptpause = '.$this->pause.';
-					function handlePause(){
-						setPauseInfo(scriptpause);
-						if(scriptpause > 0){
-							scriptpause = scriptpause - 1;
-							setTimeout(\'handlePause()\',1000);
-						}else{
-							document.location.href=\''.$url.'\'+mycounter.innerHTML;
-						}
-					}
-					</script>';
-            echo $disp;
+            ?>
+			<html>
+			<head>
+				<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+				<title><?php echo esc_html(acym_translation('ACYM_SEND_PROCESS')); ?></title>
+				<style>body{
+						font-size: 12px;
+						font-family: Arial, Helvetica, sans-serif;
+					}</style>
+			</head>
+			<body>
+			<div style="margin-bottom: 18px;padding: 8px !important; background-color: #fcf8e3; border: 1px solid #fbeed5; border-radius: 4px;">
+				<p style="margin:0;"><?php echo esc_html(acym_translation('ACYM_DONT_CLOSE')); ?></p>
+			</div>
+			<div style="display: inline;background-color : white;border : 1px solid grey; padding : 3px;font-size:14px">
+				<span id="divpauseinfo" style="padding:10px;margin:5px;font-size:16px;font-weight:bold;display:none;background-color:black;color:white;"> </span>
+                <?php echo esc_html(acym_translation('ACYM_SEND_PROCESS')); ?>:
+				<span id="counter"><?php echo intval($this->start); ?></span> / <?php echo intval($this->total); ?>
+			</div>
+			<div id="divinfo" style="display:none; position:fixed; bottom:3px;left:3px;background-color : white; border : 1px solid grey; padding : 3px;"></div>
+			<br /><br />
+			<script type="text/javascript" language="javascript">
+                function setInfo(message) {
+                    const divinfo = document.getElementById('divinfo');
+                    divinfo.style.display = 'block';
+                    divinfo.innerHTML = message;
+                }
+
+                function setPauseInfo(nbpause) {
+                    const divpauseinfo = document.getElementById('divpauseinfo');
+                    divpauseinfo.style.display = '';
+                    divpauseinfo.innerHTML = nbpause;
+                }
+
+                function setCounter(val) {
+                    document.getElementById('counter').innerHTML = val;
+                }
+
+                let acymailingScriptPause = <?php echo intval($this->pause); ?>;
+
+                function handlePause() {
+                    setPauseInfo(acymailingScriptPause);
+                    if (acymailingScriptPause > 0) {
+                        acymailingScriptPause = acymailingScriptPause - 1;
+                        setTimeout(handlePause, 1000);
+                    } else {
+                        document.location.href = <?php echo json_encode(
+                            acym_completeLink('queue&task=continuesend&id='.$this->id.'&totalsend='.$this->total, true, true).'&'.acym_getFormToken().'&alreadysent='
+                        ); ?> +document.getElementById('counter').innerHTML;
+                    }
+                }
+			</script>
+            <?php
             if (function_exists('ob_flush')) {
                 @ob_flush();
             }
@@ -150,10 +182,17 @@ class QueueHelper extends AcymObject
             $mailerHelper->SMTPKeepAlive = true;
         }
 
+        //To delete some entries from the queue
+        //$queueDelete[mailing][] = subid;
         $queueDelete = [];
+        //Update some entries with a new try and a new delay
+        //$queueUpdate[mailing][] = subid;
         $queueUpdate = [];
+        //Add some stats because we deleted the Newsletter
+        //$statsAdd[mailing][status (1 for success/0 for fail)][] = subid;
         $statsAdd = [];
 
+        //Maximum number of try...
         $maxTry = (int)$this->config->get('queue_try', 0);
 
         $currentMail = $this->start;
@@ -207,7 +246,7 @@ class QueueHelper extends AcymObject
             $currentMail++;
             $this->nbprocess++;
             if ($this->report) {
-                echo '<script type="text/javascript">setCounter('.$currentMail.')</script>';
+                echo '<script type="text/javascript">setCounter('.esc_html($currentMail).')</script>';
                 if (function_exists('ob_flush')) {
                     @ob_flush();
                 }
@@ -248,10 +287,12 @@ class QueueHelper extends AcymObject
                 $queueDelete[$oneQueue->mail_id][] = $oneQueue->user_id;
                 $statsAdd[$oneQueue->mail_id][1][] = $oneQueue->user_id;
 
+                //In case of the e-mail has been sent now, we immediately process the update/delete and stats
                 $queueDeleteOk = $this->deleteQueue($queueDelete);
                 $mailerHelper->triggerFollowUpAgain($oneQueue->mail_id, $oneQueue->user_id);
                 $queueDelete = [];
 
+                //We only update the queue and add the stats every 10 emails so that we can group things and avoid queries
                 if (!$statisticsByBatch || $this->nbprocess % 10 == 0) {
                     $this->statsAdd($statsAdd);
                     $this->queueUpdate($queueUpdate);
@@ -261,6 +302,7 @@ class QueueHelper extends AcymObject
             } elseif ($mailerHelper->dtextsFailed) {
                 $this->consecutiveError = 0;
                 $queueDelete[$oneQueue->mail_id][] = $oneQueue->user_id;
+                //In case of the e-mail has been sent now, we immediately process the update/delete and stats
                 $queueDeleteOk = $this->deleteQueue($queueDelete);
                 $queueDelete = [];
             } else {
@@ -280,17 +322,21 @@ class QueueHelper extends AcymObject
                         $this->consecutiveError++;
                     }
 
+                    //If we have 2 consecutive errors, we pause the process a little bit to avoid possible other issues.
                     if ($this->consecutiveError === 2) {
                         sleep(1);
                     }
                 }
 
+                //We delete the queue entry if it's more than number of try allowed
                 if (!$shouldTrySendingLater) {
                     $queueDelete[$oneQueue->mail_id][] = $oneQueue->user_id;
                     $statsAdd[$oneQueue->mail_id][0][] = $oneQueue->user_id;
                     if ($mailerHelper->errorNumber === 1 && $this->config->get('bounce_action_maxtry')) {
+                        //We have to delete the queue now otherwise we may have problems!
                         $queueDeleteOk = $this->deleteQueue($queueDelete);
                         $queueDelete = [];
+                        //Let's execute an action on this subscriber if we have something to do...
                         $otherMessage .= $this->failedActions((int)$oneQueue->user_id);
                     }
                 } elseif ($mailerHelper->failedCounting) {
@@ -306,6 +352,7 @@ class QueueHelper extends AcymObject
             }
             $this->displayMessage([$messageOnScreen], $result ? self::MESSAGE_TYPE_SUCCESS : self::MESSAGE_TYPE_ERROR, $currentMail);
 
+            //We didn't delete the right number of elements so to avoid a double send process, we stop immediately
             if (!$queueDeleteOk) {
                 $this->finish = true;
                 break;
@@ -320,10 +367,13 @@ class QueueHelper extends AcymObject
             }
 
             if ($this->consecutiveError > 3 && $this->successSend > 3) {
+                //We refresh the page in case of we used to send e-mails but now we can not, that may be due to a mysql close connection
                 $this->displayMessage([acym_translation('ACYM_SEND_REFRESH_CONNECTION')], self::MESSAGE_TYPE_WARNING);
                 break;
             }
 
+            //After 5 consecutive send error, we stop the process and display a message
+            //We stop the send process if the user closed the windows so that he can stop the send process at any time he wants
             if ($this->consecutiveError > 5 || ($this->report && connection_aborted())) {
                 $this->finish = true;
                 break;
@@ -338,6 +388,7 @@ class QueueHelper extends AcymObject
             }
         }
 
+        //Update all values if it's not already done (we don't do it for each error so that's why we still have some
         $this->deleteQueue($queueDelete);
         $this->statsAdd($statsAdd);
         $this->queueUpdate($queueUpdate);
@@ -346,6 +397,7 @@ class QueueHelper extends AcymObject
             $mailerHelper->smtpClose();
         }
 
+        //We finished the send process
         if (!empty($this->total) && $currentMail >= $this->total) {
             $this->finish = true;
         }
@@ -357,10 +409,12 @@ class QueueHelper extends AcymObject
         }
 
         if ($this->report && !$this->finish) {
+            //We handle the pause in JS.
             echo '<script type="text/javascript" language="javascript">handlePause();</script>';
         }
 
         if ($this->report) {
+            //We need to finish the current page properly
             echo '</body></html>';
             while ($this->obend-- > 0) {
                 ob_start();
@@ -371,6 +425,11 @@ class QueueHelper extends AcymObject
         return true;
     }
 
+    /**
+     * Function to add/update elements in the stats
+     * $statsAdd[mailing][1 for success or 0 for fail][] = subscriber id;
+     * $statsAdd[mailing][1][] = 123;
+     */
     public function statsAdd(array $statsAdd): void
     {
         if (empty($statsAdd)) {
@@ -433,6 +492,10 @@ class QueueHelper extends AcymObject
         acym_triggerCmsHook('onAcymSendMail', [$mailId]);
     }
 
+    /**
+     * Function to delete elements from the queue
+     * $queueDelete[mailId][] = subscriberId;
+     */
     private function deleteQueue(array $queueDelete): bool
     {
         if (empty($queueDelete)) {
@@ -449,6 +512,7 @@ class QueueHelper extends AcymObject
                 $status = false;
                 $this->displayMessage($this->queueClass->errors, self::MESSAGE_TYPE_ERROR);
             } else {
+                // If we didn't delete the entry, it may have been done by another send process so we stop it immediately to avoid double send
                 if ($nbDeleted !== $nbUsers) {
                     $status = false;
                     $this->displayMessage(
@@ -462,12 +526,17 @@ class QueueHelper extends AcymObject
         return $status;
     }
 
+    /**
+     * Function to update elements in the queue
+     * $queueUpdate[mailing][] = subid;
+     */
     private function queueUpdate(array $queueUpdate): void
     {
         if (empty($queueUpdate)) {
             return;
         }
 
+        //Delay to requeue the e-mail in seconds
         foreach ($queueUpdate as $mailid => $subscribers) {
             $this->queueClass->delayFailed($mailid, $subscribers);
         }
@@ -480,12 +549,14 @@ class QueueHelper extends AcymObject
         $message .= '<br />';
         $message .= acym_translation('ACYM_SEND_KEPT_ALL');
         $message .= '<br />';
+        //ERROR 1 : no e-mail sent at all...
         if ($this->report) {
             if (empty($this->successSend) && empty($this->start)) {
                 $message .= acym_translation('ACYM_SEND_CHECKONE');
                 $message .= '<br />';
                 $message .= acym_translation('ACYM_SEND_ADVISE_LIMITATION');
             } else {
+                //We used to send e-mails but now we can not any more... sounds like a server limitation!
                 $message .= acym_translation('ACYM_SEND_REFUSE');
                 $message .= '<br />';
                 if (!acym_level(ACYM_ESSENTIAL)) {
@@ -499,10 +570,13 @@ class QueueHelper extends AcymObject
         $this->displayMessage([$message], self::MESSAGE_TYPE_WARNING);
     }
 
+    /**
+     * If num is empty then it's a message otherwise it's a send status
+     */
     private function displayMessage(array $messages, int $status, int $num = 0): void
     {
         foreach ($messages as $message) {
-            $this->messages[] = strip_tags($message);
+            $this->messages[] = acym_stripTags($message);
         }
 
         if (!$this->report) {
@@ -512,9 +586,19 @@ class QueueHelper extends AcymObject
         $color = $status === self::MESSAGE_TYPE_SUCCESS ? 'green' : ($status === self::MESSAGE_TYPE_WARNING ? 'orange' : 'red');
         foreach ($messages as $message) {
             if (!empty($num)) {
-                echo '<br />'.$num.' : <span style="color:'.$color.';">'.$message.'</span>';
+                echo '<br />'.esc_html($num).' : <span style="color:'.esc_attr($color).';">'.wp_kses(
+                        $message,
+                        [
+                            'b' => [],
+                            'i' => [],
+                            'a' => [
+                                'href' => true,
+                                'target' => true,
+                            ],
+                        ]
+                    ).'</span>';
             } else {
-                echo '<script type="text/javascript" language="javascript">setInfo(\''.addslashes($message).'\')</script>';
+                echo '<script type="text/javascript" language="javascript">setInfo('.json_encode($message).')</script>';
             }
         }
 
@@ -542,6 +626,7 @@ class QueueHelper extends AcymObject
                     $message .= ' user '.$userId.' subscribed to list n°'.$listId;
                     $this->userClass->subscribe([$userId], [$listId]);
                 }
+            // There is no break here as we will remove the user from the other lists
             case 'remove':
                 $unsubLists = array_diff(array_keys($subscriptions), [$listId]);
                 if (!empty($unsubLists)) {
@@ -567,6 +652,7 @@ class QueueHelper extends AcymObject
             case 'block':
                 $message .= ' user '.$userId.' blocked';
                 $this->userClass->deactivate([$userId]);
+                // We delete any other e-mail from the queue as well
                 $this->queueClass->deleteQueuedByUserIds([$userId]);
                 break;
         }

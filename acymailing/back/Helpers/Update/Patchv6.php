@@ -41,6 +41,7 @@ trait Patchv6
         $this->updateQuery('ALTER TABLE #__acym_rule ADD COLUMN `increment_stats` TINYINT(3) NOT NULL');
         $this->updateQuery('ALTER TABLE #__acym_rule ADD COLUMN `execute_action_after` INT NOT NULL');
 
+        // Use translation keys for name and email fields
         $this->updateQuery('UPDATE #__acym_field SET `name` = "ACYM_NAME" WHERE `id` = 1 AND `name` = "Name"');
         $this->updateQuery('UPDATE #__acym_field SET `name` = "ACYM_EMAIL" WHERE `id` = 2 AND `name` = "Email"');
         $this->updateQuery('UPDATE #__acym_field SET `backend_profile` = 1, `backend_listing` = 1 WHERE `id` IN (1, 2)');
@@ -70,7 +71,8 @@ trait Patchv6
               `tree` LONGTEXT NULL,
               PRIMARY KEY (`id`)
             )
-                ENGINE = InnoDB;'
+                ENGINE = InnoDB
+                /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;'
         );
         $this->updateQuery(
             'CREATE TABLE IF NOT EXISTS `#__acym_step` (
@@ -87,7 +89,8 @@ trait Patchv6
                 ON DELETE NO ACTION
                 ON UPDATE NO ACTION
             )
-                ENGINE = InnoDB;'
+                ENGINE = InnoDB
+                /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;'
         );
         $this->updateQuery(
             'CREATE TABLE IF NOT EXISTS `#__acym_condition` (
@@ -101,7 +104,8 @@ trait Patchv6
                     ON DELETE NO ACTION
                     ON UPDATE NO ACTION
             )
-                ENGINE =InnoDB;'
+                ENGINE =InnoDB
+                /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;'
         );
         $this->updateQuery(
             'CREATE TABLE IF NOT EXISTS `#__acym_action` (
@@ -117,7 +121,8 @@ trait Patchv6
                     ON DELETE NO ACTION
                     ON UPDATE NO ACTION
             )
-                ENGINE =InnoDB;'
+                ENGINE =InnoDB
+                /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;'
         );
 
         $this->updateQuery('ALTER TABLE #__acym_user ADD COLUMN `automation` VARCHAR(50) NOT NULL');
@@ -216,6 +221,7 @@ trait Patchv6
 
         $this->updateQuery('ALTER TABLE #__acym_mail ADD `preheader` VARCHAR(255) NULL');
 
+        // Fix bounce rule "blocked by recipient filters
         $wrongRuleAddresses = acym_loadObjectList('SELECT `id`, `action_message` FROM `#__acym_rule` WHERE `action_message` LIKE "%\"forward_to\":\"\'%"');
         if (!empty($wrongRuleAddresses)) {
             foreach ($wrongRuleAddresses as $oneRule) {
@@ -225,6 +231,7 @@ trait Patchv6
             }
         }
 
+        // We remove the google+ option from the saved config
         $socialIcons = json_decode($config->get('social_icons', '{}'), true);
         if (!empty($socialIcons['google'])) {
             unset($socialIcons['google']);
@@ -232,6 +239,7 @@ trait Patchv6
             $config->saveConfig(['social_icons' => json_encode($socialIcons)]);
         }
 
+        // Then remove the google+ button from the emails containing it
         $mailsWithGoogle = acym_loadObjectList('SELECT `id`, `body` FROM `#__acym_mail` WHERE `body` LIKE "%googleplus%"');
         foreach ($mailsWithGoogle as $oneMail) {
             $body = preg_replace('#<a [^>]*googleplus[^>]*>[^<]*<img [^>]*>[^<]*</a>#Uis', '', $oneMail->body);
@@ -240,9 +248,11 @@ trait Patchv6
             $this->updateQuery('UPDATE `#__acym_mail` SET `body` = '.acym_escapeDB($body).' WHERE `id` = '.intval($oneMail->id));
         }
 
+        // Add fields for confirmation
         $this->updateQuery('ALTER TABLE #__acym_user ADD `confirmation_date` DATETIME DEFAULT NULL');
         $this->updateQuery('ALTER TABLE #__acym_user ADD `confirmation_ip` VARCHAR(16) DEFAULT NULL');
 
+        //Handle Emoji support
         $mails = acym_loadObjectList('SELECT subject, id FROM #__acym_mail');
         $mailClass = new MailClass();
         $mails = $mailClass->encode($mails);
@@ -258,6 +268,7 @@ trait Patchv6
             return;
         }
 
+        // Handle emojis in body, name, preheader and autosave
         $mails = acym_loadObjectList('SELECT `id`, `name`, `body`, `autosave`, `preheader` FROM #__acym_mail');
         $mailClass = new MailClass();
         $mails = $mailClass->encode($mails);
@@ -299,14 +310,17 @@ trait Patchv6
             return;
         }
 
+        // Get the allowed extensions
         $allowedExtensions = explode(',', $config->get('allowed_files'));
         if (!empty($allowedExtensions)) {
+            // Get the files in the upload folder
             $uploadFolder = trim(acym_cleanPath(html_entity_decode(ACYM_UPLOAD_FOLDER)), DS.' ').DS;
             $uploadPath = acym_cleanPath(ACYM_ROOT.$uploadFolder.'userfiles'.DS);
 
             if (file_exists($uploadPath)) {
                 $files = acym_getFiles($uploadPath);
                 if (!empty($files)) {
+                    // Delete unallowed files
                     foreach ($files as $fileName) {
                         if (!preg_match('#\.('.implode('|', $allowedExtensions).')$#Ui', $fileName)) {
                             acym_deleteFile($uploadPath.DS.$fileName);
@@ -323,16 +337,20 @@ trait Patchv6
             return;
         }
 
+        //we add new columns
         $this->updateQuery('ALTER TABLE #__acym_campaign ADD `sending_type` VARCHAR(16) DEFAULT NULL');
         $this->updateQuery('ALTER TABLE #__acym_campaign ADD `sending_params` TEXT DEFAULT NULL');
         $this->updateQuery('ALTER TABLE #__acym_campaign ADD `parent_id` INT DEFAULT NULL');
         $this->updateQuery('ALTER TABLE #__acym_campaign ADD `last_trigger` INT DEFAULT NULL');
         $this->updateQuery('ALTER TABLE #__acym_campaign ADD `next_trigger` INT DEFAULT NULL');
 
+        //we fill the column sending_type
         $this->updateQuery('UPDATE #__acym_campaign SET `sending_type` = "now" WHERE `scheduled` = 0');
         $this->updateQuery('UPDATE #__acym_campaign SET `sending_type` = "scheduled" WHERE `scheduled` = 1');
+        //I do this because if we do that 'ALTER TABLE #__acym_campaign ADD `sending_params` TEXT DEFAULT "[]"' I have a sql error can't set default value for column sending_params in joomla
         $this->updateQuery('UPDATE #__acym_campaign SET `sending_params` = "[]"');
 
+        //we delete the column scheduled
         $this->updateQuery('ALTER TABLE #__acym_campaign DROP `scheduled`');
     }
 
@@ -357,7 +375,8 @@ trait Patchv6
                 `latest_version` VARCHAR (255) NOT NULL,
                 PRIMARY KEY (`id`)
             )
-                ENGINE = InnoDB;'
+                ENGINE = InnoDB
+                /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;'
         );
 
         $pluginsBefore650 = [
@@ -405,6 +424,7 @@ trait Patchv6
         $mailClass = new MailClass();
         $firstEmail = $mailClass->getOneByName(acym_translation(UpdateHelper::FIRST_EMAIL_NAME_KEY));
         if (!empty($firstEmail)) {
+            // If the user installed AcyMailing but didn't save the first template, we just complete the <em>
             $firstEmail->body = preg_replace(
                 '#(<em class="acym_remove_dynamic acymicon-close">)(</em>)#Uis',
                 '$1&zwj;$2',
@@ -412,21 +432,25 @@ trait Patchv6
             );
 
 
+            // If he saved the first template, it has completely removed the dtext closing <em>
 
             $closing = '<em class="acym_remove_dynamic acymicon-close">&zwj;</em>';
 
+            // 1 - the view it online
             $firstEmail->body = preg_replace(
                 '#(<span[^>]+data\-dynamic="{readonline}.+<span class="acym_online">[^<]+</span>[^<]*</a>[^<]*)(</span>)#Uis',
                 '$1'.$closing.'$2',
                 $firstEmail->body
             );
 
+            // 2 - the user first name
             $firstEmail->body = preg_replace(
                 '#(<span[^>]+data\-dynamic="{subscriber:name[^>]+>[^<]+)(</span>)#Uis',
                 '$1'.$closing.'$2',
                 $firstEmail->body
             );
 
+            // 3 - the unsubscribe link
             $firstEmail->body = preg_replace(
                 '#(<span[^>]+data\-dynamic="{unsubscribe}.+<span class="acym_unsubscribe">[^<]+</span>[^<]*</a>[^<]*)(</span>)#Uis',
                 '$1'.$closing.'$2',
@@ -449,8 +473,10 @@ trait Patchv6
         $installedAddons = acym_loadResultArray('SELECT folder_name FROM #__acym_plugin');
 
         foreach ($joomlaPluginsBefore650 as $folderName) {
+            // The add-on is installed, there's nothing to do
             if (in_array($folderName, $installedAddons) || !file_exists(ACYM_ADDONS_FOLDER_PATH.$folderName)) continue;
 
+            // The add-on is installed but not in the DB, this is an old version that hasn't been removed
             acym_deleteFolder(ACYM_ADDONS_FOLDER_PATH.$folderName);
         }
     }
@@ -622,9 +648,11 @@ trait Patchv6
                 `pages` TEXT,
                 PRIMARY KEY (`id`)
             )
-                ENGINE = InnoDB;'
+                ENGINE = InnoDB
+                /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;'
         );
 
+        // In a release, all the content insertion addons had the structure Volumes/workspace/acymailing/addons/folder_name/plugin.php instead of just folder_name/plugin.php
         if (file_exists(ACYM_ADDONS_FOLDER_PATH.'Volumes')) {
             $wrongAddons = acym_getFolders(ACYM_ADDONS_FOLDER_PATH.'Volumes'.DS.'workspace'.DS.'acymailing'.DS.'addons'.DS);
 
@@ -689,7 +717,8 @@ trait Patchv6
                 `filters` LONGTEXT NULL,
                 PRIMARY KEY (`id`)
             )
-                ENGINE = InnoDB;'
+                ENGINE = InnoDB
+                /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;'
         );
         $automationHelper = new AutomationHelper();
         $automationHelper->deleteUnusedEmails();
@@ -723,7 +752,8 @@ trait Patchv6
                         ON DELETE NO ACTION
                         ON UPDATE NO ACTION
             )
-                ENGINE = InnoDB;'
+                ENGINE = InnoDB
+                /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;'
         );
         $this->updateQuery(
             'CREATE TABLE IF NOT EXISTS `#__acym_followup_has_mail` (
@@ -745,7 +775,8 @@ trait Patchv6
                         ON DELETE NO ACTION
                         ON UPDATE NO ACTION
             )
-                ENGINE = InnoDB;'
+                ENGINE = InnoDB
+                /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;'
         );
 
         $this->updateQuery('ALTER TABLE `#__acym_list` ADD `type` VARCHAR(20) NOT NULL DEFAULT '.acym_escapeDB(ListClass::LIST_TYPE_STANDARD));
@@ -768,7 +799,8 @@ trait Patchv6
                         ON DELETE NO ACTION
                         ON UPDATE NO ACTION
             )
-                ENGINE = InnoDB;'
+                ENGINE = InnoDB
+                /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;'
         );
     }
 

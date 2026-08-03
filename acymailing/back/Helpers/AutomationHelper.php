@@ -52,8 +52,13 @@ class AutomationHelper extends AcymObject
         }
     }
 
+    /**
+     * The main point is to simplify the queries executed on automation actions.
+     * It also avoids issues when an action modifies the matching users and they don't match anymore (so following actions won't be executed)
+     */
     public function addFlag(int $id, bool $reset = false): void
     {
+        // In MySQL, the ORDER BY and LIMIT are not supported with "IN" or in UPDATE queries... If you know how to optimize it, feel free to do so
         if (!empty($this->orderBy) || !empty($this->limit)) {
             $flagQuery = 'UPDATE #__acym_user';
             $flagQuery .= ' SET automation = CONCAT(automation, "a'.intval($id).'a")';
@@ -92,6 +97,7 @@ class AutomationHelper extends AcymObject
 
     public function convertQuery(string $table, string $column, string $operator, $value, string $type = ''): string
     {
+        //Fix operator issue...
         $operator = str_replace(['&lt;', '&gt;'], ['<', '>'], $operator);
 
         if ($operator === 'CONTAINS' || ($type === self::TYPE_PHONE && $operator === '=')) {
@@ -115,16 +121,19 @@ class AutomationHelper extends AcymObject
                 return '0 = 1';
             }
         } elseif (!in_array($operator, ['IS NULL', 'IS NOT NULL', 'NOT LIKE', 'LIKE', '=', '!=', '>', '<', '>=', '<='])) {
-            die(acym_translationSprintf('ACYM_UNKNOWN_OPERATOR', $operator));
+            die(esc_html(acym_translationSprintf('ACYM_UNKNOWN_OPERATOR', $operator)));
         }
 
+        //Is the value a time field?
+        //If so, we replace it properly and we convert it into the right time field
         if (strpos($value, '[time]') !== false) {
             $value = acym_replaceDate($value);
-            $value = date('Y-m-d H:i:s', $value);
+            $value = gmdate('Y-m-d H:i:s', $value);
         }
 
         $value = acym_replaceDateTags($value);
 
+        //If it's a number, it does not bother us to db quote if we use = or !=, but if we use < or >=, it could make '20' > '100' as it begins by '2' and 100 begins by '1'...
         if (!is_numeric($value) || in_array($operator, ['REGEXP', 'NOT REGEXP', 'NOT LIKE', 'LIKE', '=', '!='])) {
             $value = acym_escapeDB($value);
         }

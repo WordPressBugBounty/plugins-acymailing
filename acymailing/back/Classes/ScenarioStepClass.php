@@ -20,6 +20,7 @@ class ScenarioStepClass extends AcymClass
             $element->params = json_encode($element->params);
         }
 
+        // The id is a string
         $scenarioStep = acym_loadObject('SELECT * FROM #__acym_scenario_step WHERE `id` = '.acym_escapeDB($element->id));
 
         $previousForce = $this->forceInsert;
@@ -135,7 +136,7 @@ class ScenarioStepClass extends AcymClass
         $length = 24;
 
         for ($i = 0; $i < $length; $i++) {
-            $randomIndex = rand(0, strlen($letters) - 1);
+            $randomIndex = acym_rand(0, strlen($letters) - 1);
             $randomString .= $letters[$randomIndex];
         }
 

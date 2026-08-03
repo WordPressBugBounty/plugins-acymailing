@@ -1,5 +1,7 @@
 <?php
 
+defined('ABSPATH') || die('Restricted Access');
+
 function acym_route(string $url, bool $xhtml = true): string
 {
     return acym_baseURI().$url;
@@ -35,13 +37,16 @@ function acym_rootURI(bool $pathonly = false, ?string $path = 'siteurl'): string
 {
     $rootURI = rtrim(site_url(), '/').'/';
 
+    // For WPML
     if (!acym_isAdmin()) {
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML hook for integration.
         $wpmlSiteUrl = apply_filters('wpml_home_url', $rootURI);
         if ($wpmlSiteUrl !== $rootURI) {
             $rootURI = rtrim($wpmlSiteUrl, '/').'/';
         }
     }
 
+    // For WordPress bedrock
     if (defined('CONTENT_DIR') && substr($rootURI, -3) === 'wp/') {
         $rootURI = substr($rootURI, 0, -3);
     }
@@ -60,6 +65,9 @@ function acym_completeLink(string $link, bool $popup = false, bool $redirect = f
     return acym_route($link);
 }
 
+/**
+ * If you use it to prepare a POST ajax, make sure you add the action and page parameters to the data passed, it's not taken into account if it's only in the URL
+ */
 function acym_prepareAjaxURL(string $url): string
 {
     return htmlspecialchars_decode(acym_route(acym_addPageParam($url, true)));
@@ -78,4 +86,9 @@ function acym_backendLink(string $link): string
 function acym_getMenu()
 {
     return get_post();
+}
+
+function acym_parseUrl(string $url)
+{
+    return wp_parse_url($url);
 }

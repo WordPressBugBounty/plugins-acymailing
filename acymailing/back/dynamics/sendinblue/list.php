@@ -30,6 +30,7 @@ class SendinblueList extends SendinblueClass
 
         $response = $this->callApiSendingMethod('contacts/lists', $data, $this->headers, 'POST');
 
+        // The folder Id is saved in the config but the user removed it from Sendinblue, recreate a folder
         if (!empty($response['message']) && $response['message'] === 'Folder ID does not exist') {
             $this->config->saveConfig(['sendinblue_folder_id' => 0]);
 
@@ -50,6 +51,7 @@ class SendinblueList extends SendinblueClass
 
         $response = $this->callApiSendingMethod('contacts/folders', $data, $this->headers, 'POST');
 
+        // The API key may be wrong
         if (empty($response['id'])) return 0;
 
         $this->config->saveConfig(['sendinblue_folder_id' => $response['id']]);

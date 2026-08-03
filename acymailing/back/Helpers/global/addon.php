@@ -1,4 +1,5 @@
 <?php
+defined('ABSPATH') || die('Restricted Access');
 
 use AcyMailing\Classes\PluginClass;
 
@@ -7,10 +8,12 @@ global $acymAddonsForSettings;
 
 function acym_trigger(string $method, array $args = [], ?string $plugin = null, ?callable $callbackOnePlugin = null): ?array
 {
+    // On WordPress we load the addons before the tables are created on installation
     if (!in_array(acym_getPrefix().'acym_configuration', acym_getTableList())) {
         return null;
     }
 
+    // Handle multilingual
     if (in_array($method, ['replaceContent', 'replaceUserInformation']) && !empty($args[0]->language)) {
         $previousLanguage = acym_setLanguage($args[0]->language);
         acym_loadLanguage($args[0]->language);
@@ -33,6 +36,7 @@ function acym_trigger(string $method, array $args = [], ?string $plugin = null, 
         if (!method_exists($onePlugin, $method)) continue;
         if (!empty($plugin) && $class !== $plugin) continue;
 
+        // There may be an error here, but I don't know how to handle it. At least don't block the execution
         try {
             $value = call_user_func_array([$onePlugin, $method], $args);
             if (isset($value)) {

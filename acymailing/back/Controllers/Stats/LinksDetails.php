@@ -31,6 +31,8 @@ trait LinksDetails
 
     public function exportLinksDetails(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $data = [];
         if (!$this->prepareDefaultPageInfo($data, true)) {
             return;

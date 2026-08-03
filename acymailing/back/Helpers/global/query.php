@@ -1,4 +1,5 @@
 <?php
+defined('ABSPATH') || die('Restricted Access');
 
 function acym_getTables(bool $reload = false): array
 {
@@ -28,7 +29,7 @@ function acym_getColumns(string $table, bool $acyTable = true, bool $addPrefix =
 function acym_secureDBColumn(string $fieldName): string
 {
     if (preg_match('|[^a-z0-9#_.-]|i', $fieldName) !== 0) {
-        die('field, table or database "'.acym_escape($fieldName).'" not secured');
+        die('field, table or database "'.esc_html($fieldName).'" not secured');
     }
 
     return $fieldName;

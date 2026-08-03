@@ -1,9 +1,12 @@
 <?php
 
+defined('ABSPATH') || die('Restricted Access');
+
 use AcyMailing\Classes\FieldClass;
 use AcyMailing\Classes\ListClass;
 use AcyMailing\Core\AcymParameter;
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Prefixed and unique class name.
 class acySubscriptionFormWidget extends \Elementor\Widget_Base
 {
     private array $displayMode;
@@ -119,6 +122,7 @@ class acySubscriptionFormWidget extends \Elementor\Widget_Base
     {
         $this->initParams();
 
+        //Main option
         $this->startControlsSection('main_options', acym_translation('ACYM_MAIN_OPTIONS'));
         $this->getText('title', acym_translation('ACYM_TITLE'), 'Receive our newsletters');
         $this->getSimpleSelect('mode', acym_translation('ACYM_DISPLAY_MODE'), $this->displayMode, 'inline');
@@ -126,6 +130,7 @@ class acySubscriptionFormWidget extends \Elementor\Widget_Base
         $this->getText('subtextlogged', acym_translation('ACYM_SUBSCRIBE_TEXT_LOGGED_IN'), 'Subscribe');
         $this->end_controls_section();
 
+        //Lists option
         $this->startControlsSection('lists_options', acym_translation('ACYM_LISTS_OPTIONS'));
         $this->getSelect('hiddenlists', acym_translation('ACYM_AUTO_SUBSCRIBE_TO'), $this->lists, '', true);
         $this->getSelect('displists', acym_translation('ACYM_DISPLAYED_LISTS'), $this->lists, '', true);
@@ -133,29 +138,35 @@ class acySubscriptionFormWidget extends \Elementor\Widget_Base
         $this->getSelect('listposition', acym_translation('ACYM_DISPLAY_LISTS'), $this->listsPlacement, 'before');
         $this->end_controls_section();
 
+        //Fields option
         $this->startControlsSection('fields_options', acym_translation('ACYM_FIELDS_OPTIONS'));
         $this->getSelect('fields', acym_translation('ACYM_FIELDS_TO_DISPLAY'), $this->fields, '', true);
         $this->getSimpleSelect('textmode', acym_translation('ACYM_TEXT_MODE'), $this->displayTextMode, '1');
         $this->getSimpleSelect('userinfo', acym_translation('ACYM_FORM_AUTOFILL_ID'), $this->subscriberInfo, '1');
         $this->end_controls_section();
 
+        //Terms and policy option
         $this->startControlsSection('terms_condition_options', acym_translation('ACYM_TERMS_POLICY_OPTIONS'));
         $this->getSimpleSelect('termscontent', acym_translation('ACYM_TERMS_CONDITIONS'), $this->posts, '');
         $this->getSimpleSelect('privacypolicy', acym_translation('ACYM_PRIVACY_POLICY'), $this->posts, '');
+        $this->getSimpleSelect('trackingconsent', acym_translation('ACYM_DISPLAY_TRACKING_CONSENT'), $this->subscriberInfo, '0');
         $this->end_controls_section();
 
+        //Subscribe option
         $this->startControlsSection('subscribe_options', acym_translation('ACYM_SUBSCRIBE_OPTIONS'));
         $this->getSimpleSelect('successmode', acym_translation('ACYM_SUCCESS_MODE'), $this->replaceMessage, 'replace');
         $this->getText('confirmation_message', acym_translation('ACYM_CONFIRMATION_MESSAGE'));
         $this->getText('redirect', acym_translation('ACYM_REDIRECT_LINK'));
         $this->end_controls_section();
 
+        //Unsubscribe option
         $this->startControlsSection('unsubscribe_options', acym_translation('ACYM_UNSUBSCRIBE_OPTIONS'));
         $this->getSimpleSelect('unsub', acym_translation('ACYM_DISPLAY_UNSUB_BUTTON'), $this->unsubButton, '0');
         $this->getText('unsubtext', acym_translation('ACYM_UNSUBSCRIBE_TEXT'), 'Unsubscribe');
         $this->getText('unsubredirect', acym_translation('ACYM_REDIRECT_LINK_UNSUB'));
         $this->end_controls_section();
 
+        //Advanced option
         $this->startControlsSection('advanced_options', acym_translation('ACYM_ADVANCED_OPTIONS'));
         $this->getText('introtext', acym_translation('ACYM_INTRO_TEXT'));
         $this->getText('posttext', acym_translation('ACYM_POST_TEXT'));
@@ -164,6 +175,7 @@ class acySubscriptionFormWidget extends \Elementor\Widget_Base
         $this->getText('source', acym_translation('ACYM_SOURCE'), 'elementor_subscription_form');
         $this->end_controls_section();
 
+        // Style zone
         $this->startControlsSection('global_options', acym_translation('ACYM_GLOBAL_OPTIONS'), \Elementor\Controls_Manager::TAB_STYLE);
         $this->getColor('background_color', acym_translation('ACYM_BACKGROUND_COLOR'));
         $this->getColor('text_color', acym_translation('ACYM_TEXT_COLOR'));
@@ -275,8 +287,6 @@ class acySubscriptionFormWidget extends \Elementor\Widget_Base
     {
         $settings = $this->get_settings_for_display();
         $params = new AcymParameter($settings);
-        $render = acym_renderForm($params);
-
-        echo $render;
+        acym_renderForm($params);
     }
 }

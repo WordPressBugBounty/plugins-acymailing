@@ -2,6 +2,8 @@
 
 namespace AcyMailing\Helpers;
 
+defined('ABSPATH') || die('Restricted Access');
+
 use AcyMailing\Core\AcymObject;
 use AcyMailing\Types\CharsetType;
 
@@ -52,9 +54,11 @@ class EncodingHelper extends AcymObject
         }
 
         if (function_exists('iconv')) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler -- Catching iconv errors for clean handling.
             set_error_handler('AcyMailing\Helpers\acym_errorHandlerEncoding');
             $encodedData = iconv($inputCharset, $outputCharset.'//IGNORE', $data);
             restore_error_handler();
+            //Sometimes the function does not return error but remove the whole content...
             if (!empty($encodedData) && !acym_errorHandlerEncoding(-1)) {
                 return $encodedData;
             }
@@ -82,9 +86,11 @@ class EncodingHelper extends AcymObject
         }
 
         $toTest = ['UTF-8'];
+        //Depending on the current language, we test based on other charset...
 
         $tag = acym_getLanguageTag();
 
+        // If you're greek, we check based on the greek charset first!
         if ($tag == 'el-GR') {
             $toTest[] = 'ISO-8859-7';
         }
@@ -98,12 +104,13 @@ class EncodingHelper extends AcymObject
             }
         }
 
+        // Could not detect it...
         return '';
     }
 
     public function encodingField(string $name, string $selected): void
     {
-        echo acym_select(
+        acym_select(
             [
                 'binary' => 'Binary',
                 'quoted' => 'Quoted-printable',
@@ -120,28 +127,48 @@ class EncodingHelper extends AcymObject
             ],
             '',
             '',
-            'config_encoding'
+            'config_encoding',
+            false,
+            true
         );
     }
 
-    public function charsetField(string $name, string $selected, array $attribs = []): string
+    public function charsetField(string $name, string $selected, array $attribs = [], bool $display = false): string
     {
         $charsetType = new CharsetType();
 
-        return acym_select($charsetType->charsets, $name, $selected, $attribs, '', '');
+        return acym_select(
+            $charsetType->charsets,
+            $name,
+            $selected,
+            $attribs,
+            '',
+            '',
+            null,
+            false,
+            $display
+        );
     }
 }
 
+/**
+ * Logs the errors happening in the iconv function in order to know if we can use its result or not
+ *
+ * @return bool true if an error occurred
+ */
 function acym_errorHandlerEncoding(int $errno, string $errstr = ''): bool
 {
     static $error = false;
     if ($errno === -1) {
+        //return the value of the static flag and re init it
         $currentError = $error;
         $error = false;
 
         return $currentError;
     }
+    //set the satic flag
     $error = true;
 
+    //no need to display the notice
     return true;
 }

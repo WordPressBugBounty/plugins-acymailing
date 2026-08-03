@@ -10,6 +10,9 @@ class QueueClass extends AcymClass
 {
     public array $emailtypes = [];
 
+    /**
+     * Get campaigns depending on filters (search, status, pagination)
+     */
     public function getMatchingCampaigns(array $settings): array
     {
         $queuedMails = acym_loadResultArray('SELECT DISTINCT mail_id FROM #__acym_queue');
@@ -58,6 +61,7 @@ class QueueClass extends AcymClass
                     ON mail.id = campaign.mail_id 
                     OR mail.parent_id = campaign.mail_id';
 
+        // This query returns an array like "number of mails" => score. cf the equivalent in the list class to understand how it works
         $queryStatus = 'SELECT COUNT(DISTINCT mail.id) AS number, campaign.active
                         FROM #__acym_mail AS mail
                         LEFT JOIN #__acym_campaign AS campaign ON mail.id = campaign.mail_id';
@@ -90,7 +94,7 @@ class QueueClass extends AcymClass
             ];
 
             if (empty($allowedStatus[$settings['status']])) {
-                die('Unauthorized filter: '.acym_escape($settings['status']));
+                die('Unauthorized filter: '.esc_html($settings['status']));
             }
 
             $filters[] = $allowedStatus[$settings['status']];
@@ -108,8 +112,8 @@ class QueueClass extends AcymClass
 
         $isMultilingual = acym_isMultilingual();
         $campaignRecipientsMultilingual = [];
-        $automationHelper = new AutomationHelper();
 
+        // Get the recipients
         $specialTypes = [];
         acym_trigger('getCampaignTypes', [&$specialTypes]);
 
@@ -148,6 +152,8 @@ class QueueClass extends AcymClass
                     }
                 } elseif ($isMultilingual) {
                     if (empty($campaignRecipientsMultilingual[$oneMail->campaign])) {
+                        $automationHelper = new AutomationHelper();
+
                         $listIds = array_keys($results['elements'][$i]->lists);
                         acym_arrayToInteger($listIds);
 
@@ -234,6 +240,9 @@ class QueueClass extends AcymClass
         return $results;
     }
 
+    /**
+     * Get campaigns depending on filters (search, status, pagination)
+     */
     public function getMatchingScheduledCampaigns(array $settings): array
     {
         $mailClass = new MailClass();
@@ -278,6 +287,9 @@ class QueueClass extends AcymClass
         return $results;
     }
 
+    /**
+     * Get mails depending on filters (search, status, pagination)
+     */
     public function getMatchingResults(array $settings): array
     {
         $query = 'FROM #__acym_queue AS queue 
@@ -305,11 +317,13 @@ class QueueClass extends AcymClass
             $query .= ' WHERE ('.implode(') AND (', $filters).')';
         }
 
-        if (!empty($settings['tag'])) {
+        if (empty($settings['tag'])) {
+            $queryCount = 'SELECT COUNT(queue.mail_id) AS total '.$query;
+        } else {
+            $queryCount = 'SELECT COUNT(DISTINCT queue.mail_id, queue.user_id) AS total '.$query;
             $query .= ' GROUP BY queue.mail_id, queue.user_id';
         }
 
-        $queryCount = 'SELECT COUNT(queue.mail_id) AS total '.$query;
         $query = 'SELECT mail.id, queue.sending_date, mail.name, mail.subject, user.email, user.name AS user_name, queue.user_id, queue.try '.$query.' ORDER BY queue.sending_date ASC';
 
         $mailClass = new MailClass();
@@ -349,6 +363,7 @@ class QueueClass extends AcymClass
         $nbQueue = [];
 
         foreach ($mailReady as $mailId => $mail) {
+            // A/B test campaigns are queued later by CampaignClass::send(), so skip queueing here
             $sendingParams = $mail->sending_params ?? [];
             if (is_string($sendingParams)) {
                 $sendingParams = json_decode($sendingParams, true) ?? [];
@@ -466,6 +481,7 @@ class QueueClass extends AcymClass
             $query .= ' AND queue.`mail_id` = '.intval($mailId);
         }
 
+        // We don't display this option in the configuration anymore but we use its value if it's set in the database
         $sendOrder = $this->config->get('sendorder');
         if (empty($sendOrder)) {
             $order = 'queue.`user_id` ASC';
@@ -474,10 +490,11 @@ class QueueClass extends AcymClass
         } else {
             $sendOrder = str_replace('subid', 'user_id', $sendOrder);
             $ordering = explode(',', $sendOrder);
-            $order = 'queue.`'.acym_secureDBColumn(trim($ordering[0])).'` '.acym_secureDBColumn(trim($ordering[1]));
+            $order = 'queue.`'.acym_secureDBColumn(trim($ordering[0])).'` '.acym_secureDBColumn(trim($ordering[1] ?? 'ASC'));
         }
 
         $query .= ' ORDER BY queue.`priority` ASC, queue.`sending_date` ASC, '.$order;
+        // You can add a "startqueue" parameter to the url so Acy will not load the first e-mails but will start directly with the 300 or 500 or...
         $query .= ' LIMIT '.intval($startFrom).','.intval($limit);
 
         try {
@@ -487,6 +504,7 @@ class QueueClass extends AcymClass
         }
 
         if ($results === null) {
+            // We got an issue here... maybe the table is crashed so we will repair it.
             acym_query('REPAIR TABLE #__acym_queue, #__acym_user, #__acym_mail, #__acym_campaign');
         }
 
@@ -494,6 +512,10 @@ class QueueClass extends AcymClass
             return [];
         }
 
+        // This comment doesn't make any sense
+        //We update the first entry from the queue and change its sending_date with +1 so it does not get sent immediately after in case of we had an issue (a time out execution)...
+        //That way e-mails which can't be sent will be sent at the end and we will be able to clean the queue and don't care about what's left in the queue any more
+        //Also it will avoid the same user to receive messages again and again and again in case of there is a problem
         $firstElementQueued = reset($results);
         acym_query(
             'UPDATE #__acym_queue 
@@ -557,9 +579,11 @@ class QueueClass extends AcymClass
             'maillist.mail_id = '.intval(empty($mail->parent_id) ? $mail->id : $mail->parent_id),
         ];
 
+        // Send this version only to the users with the correct language
         if (!$onlyNew && acym_isMultilingual()) {
             $where = 'user.language = '.acym_escapeDB($mail->language);
             if ($mail->id == $mail->parent_id) {
+                //TODO check if a user with no language will receive every versions or only the main one
                 $where .= ' OR user.language = "" OR user.language NOT IN (SELECT language FROM #__acym_mail WHERE parent_id = '.intval($mail->id).')';
             }
             $automationHelper->where[] = $where;
@@ -575,16 +599,19 @@ class QueueClass extends AcymClass
                 ).' OR id = '.intval($mail->id).')';
             $automationHelper->where[] = '`us`.`user_id` IS NULL';
 
+            // Do not count the disabled user for the resend counter on summary
             $automationHelper->where[] = '`user`.`active` = 1';
         }
 
         $automationHelper->removeFlag(SegmentsController::FLAG_USERS);
         $automationHelper->removeFlag(SegmentsController::FLAG_COUNT);
 
+        // Handle potential segment
         if (empty($mail->filters)) {
             return $automationHelper;
         }
 
+        // Mark users matching the segment
         foreach ($mail->filters as $orValues) {
             if (empty($orValues)) continue;
 
@@ -610,6 +637,7 @@ class QueueClass extends AcymClass
     public function queue(object $mail): int
     {
         $automationHelper = $this->getMailReceivers($mail);
+        // Only queue enabled users
         $automationHelper->where[] = '`user`.`active` = 1';
 
         $priority = $this->config->get('priority_newsletter', 3);

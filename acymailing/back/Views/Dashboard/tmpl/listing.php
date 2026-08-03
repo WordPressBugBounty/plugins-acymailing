@@ -1,3 +1,6 @@
+<?php
+defined('ABSPATH') || die('Restricted Access');
+?>
 <div id="acym__dashboard">
     <?php include acym_getView('dashboard', 'important_notice'); ?>
 

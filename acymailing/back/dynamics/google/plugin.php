@@ -40,61 +40,62 @@ class plgAcymGoogle extends AcymPlugin
 
         ob_start();
         ?>
-		<div class="send_settings grid-x cell large-6 xlarge-5 xxlarge-4 margin-auto" id="<?php echo self::SENDING_METHOD_ID; ?>_settings">
+		<div class="send_settings grid-x cell large-6 xlarge-5 xxlarge-4 margin-auto" id="<?php echo esc_attr(self::SENDING_METHOD_ID); ?>_settings">
 			<div class="acym_port_465_closed is-hidden">
                 <?php acym_display(acym_translation('ACYM_PORT_NEEDED'), 'error', false); ?>
 			</div>
 			<div class="cell grid-x acym_vcenter acym__sending__methods__one__settings">
 				<label for="google_username" class="cell">
-                    <?php echo acym_translation('ACYM_SMTP_USERNAME').acym_info(['textShownInTooltip' => 'ACYM_SMTP_USERNAME_DESC']); ?>
+                    <?php echo esc_html(acym_translation('ACYM_SMTP_USERNAME'));
+                    acym_info(['textShownInTooltip' => 'ACYM_SMTP_USERNAME_DESC']); ?>
 				</label>
 				<input id="google_username"
-					   class="cell"
-					   type="text"
-					   name="config[google_username]"
-					   value="<?php echo acym_escape($username); ?>">
+				       class="cell"
+				       type="text"
+				       name="config[google_username]"
+				       value="<?php echo esc_attr($username); ?>">
 			</div>
 			<div class="cell grid-x acym_vcenter acym__sending__methods__one__settings">
-				<label for="google_client_id" class="cell"><?php echo acym_externalLink('ACYM_SMTP_CLIENT_ID', $setupDocumentation, false); ?></label>
+				<label for="google_client_id" class="cell"><?php acym_externalLink('ACYM_SMTP_CLIENT_ID', $setupDocumentation, false); ?></label>
 				<input id="google_client_id"
-					   class="cell"
-					   type="text"
-					   name="config[google_client_id]"
-					   value="<?php echo acym_escape($this->config->get('google_client_id')); ?>">
+				       class="cell"
+				       type="text"
+				       name="config[google_client_id]"
+				       value="<?php echo esc_attr($this->config->get('google_client_id')); ?>">
 			</div>
 			<div class="cell grid-x acym_vcenter acym__sending__methods__one__settings">
-				<label for="google_client_secret" class="cell"><?php echo acym_externalLink('ACYM_SMTP_CLIENT_SECRET', $setupDocumentation, false); ?></label>
+				<label for="google_client_secret" class="cell"><?php acym_externalLink('ACYM_SMTP_CLIENT_SECRET', $setupDocumentation, false); ?></label>
 				<input id="google_client_secret"
-					   class="cell"
-					   type="text"
-					   name="config[google_client_secret]"
-					   value="<?php echo acym_escape($this->config->get('google_client_secret')); ?>">
+				       class="cell"
+				       type="text"
+				       name="config[google_client_secret]"
+				       value="<?php echo esc_attr($this->config->get('google_client_secret')); ?>">
 			</div>
 			<div class="cell grid-x acym_vcenter acym__sending__methods__one__settings">
-				<label for="google_redirect_url" class="cell"><?php echo acym_translation('ACYM_SMTP_REDIRECT_URL'); ?></label>
+				<label for="google_redirect_url" class="cell"><?php echo esc_html(acym_translation('ACYM_SMTP_REDIRECT_URL')); ?></label>
 				<input id="google_redirect_url"
-					   class="cell"
-					   type="text"
-					   name="config[google_redirect_url]"
-					   value="<?php echo acym_escape($redirectUrl); ?>">
+				       class="cell"
+				       type="text"
+				       name="config[google_redirect_url]"
+				       value="<?php echo esc_attr($redirectUrl); ?>">
 			</div>
 			<div class="cell grid-x acym_vcenter acym__sending__methods__one__settings">
                 <?php if ($mustAuthenticate) { ?>
 					<button data-before-action="configSave"
-							data-task="loginForOAuth2Smtp"
-							class="button acy_button_submit margin-next-1">
-                        <?php echo acym_translation('ACYM_AUTHENTICATE'); ?>
+					        data-task="loginForOAuth2Smtp"
+					        class="button acy_button_submit margin-next-1">
+                        <?php echo esc_html(acym_translation('ACYM_AUTHENTICATE')); ?>
 					</button>
-                    <?php echo $this->getCopySettingsButton($data, self::SENDING_METHOD_ID, 'wp_mail_smtp', false); ?>
+                    <?php $this->getCopySettingsButton($data, self::SENDING_METHOD_ID, 'wp_mail_smtp', false); ?>
                 <?php } else { ?>
 					<button data-before-action="configSave"
-							data-task="logoutForOAuth2Smtp"
-							class="button acy_button_submit button-secondary margin-bottom-1">
-						<?php echo acym_translation('ACYM_REVOKE_PERMISSIONS'); ?>
+					        data-task="logoutForOAuth2Smtp"
+					        class="button acy_button_submit button-secondary margin-bottom-1">
+                        <?php echo esc_html(acym_translation('ACYM_REVOKE_PERMISSIONS')); ?>
 					</button>
                     <?php
                     if (!empty($refreshTokenExpiration)) {
-                        echo acym_translationSprintf('ACYM_AUTHENTICATION_WILL_EXPIRE', acym_date($refreshTokenExpiration, 'ACYM_DATE_FORMAT_LC2'));
+                        echo esc_html(acym_translationSprintf('ACYM_AUTHENTICATION_WILL_EXPIRE', acym_date($refreshTokenExpiration, 'ACYM_DATE_FORMAT_LC2')));
                     }
                     ?>
                 <?php } ?>
@@ -123,6 +124,9 @@ class plgAcymGoogle extends AcymPlugin
         }
     }
 
+    /**
+     * Doc: https://developers.google.com/identity/protocols/oauth2/web-server#httprest_2
+     */
     public function onAcymOauthAuthenticate(string &$consentUrl, bool $isSmtp): void
     {
         if ($isSmtp) {
@@ -157,6 +161,9 @@ class plgAcymGoogle extends AcymPlugin
         $consentUrl .= '&state=acymailing'.($isSmtp ? 'smtp' : 'bounce');
     }
 
+    /**
+     * Doc: https://developers.google.com/identity/protocols/oauth2/web-server#httprest_3
+     */
     public function onAcymOauthCredentialsCreation(bool $isSmtp, string $code): void
     {
         if ($isSmtp) {

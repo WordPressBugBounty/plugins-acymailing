@@ -33,6 +33,7 @@ trait Info
             $automation['id'] = $automationId;
         }
 
+        // if the automation already exists
         if (!empty($stepAutomationId)) {
             $stepAutomation['id'] = $stepAutomationId;
             $conditionClass = new ConditionClass();
@@ -40,13 +41,16 @@ trait Info
             $condition = $conditionClass->getOneByStepId($stepAutomationId);
             $step = $stepClass->getOneById($stepAutomationId);
 
+            // and the type_trigger has changed from "user" to "classic"
             $triggerChanged = $typeTrigger === 'classic' && json_decode($step->triggers)->type_trigger === 'user';
             if ($triggerChanged && !empty($condition)) {
                 $action = $actionClass->getOneByConditionId($condition->id);
+                // if conditions are set on "user", we reset conditions
                 if (json_decode($condition->conditions)->type_condition === 'user') {
                     $condition->conditions = null;
                     $conditionClass->save($condition);
                 }
+                // if actions filters are set on "user", we reset actions filters
                 if (!empty($action->filters) && json_decode($action->filters)->type_filter === 'user') {
                     $action->filters = null;
                     $actionClass->save($action);
@@ -83,6 +87,7 @@ trait Info
             acym_secureDBColumn($stepColumn);
         }
 
+        //We need objects to save it so we make objects
         $automation = (object)$automation;
         $stepAutomation = (object)$stepAutomation;
 
@@ -105,6 +110,8 @@ trait Info
 
     public function saveExitInfo(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $ids = $this->saveInfos();
 
         if (empty($ids)) {
@@ -120,6 +127,8 @@ trait Info
 
     public function saveInfo(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $ids = $this->saveInfos();
 
         if (empty($ids)) {

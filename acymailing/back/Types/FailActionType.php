@@ -52,6 +52,7 @@ class FailActionType extends AcymObject
             'bounce_action_'.$num
         );
 
+        //We add a span with an ID around the dropdown as we can't hide/display the dropdown itself any more due to bootstrap integration
         $return .= '<span id="bounce_action_lists_'.$num.'" style="display:none">';
 
         $return .= acym_select(

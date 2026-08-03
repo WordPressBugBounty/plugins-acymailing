@@ -1,3 +1,6 @@
+<?php
+defined('ABSPATH') || die('Restricted Access');
+?>
 <div class="cell">
-	<spectrum :name="'<?php echo acym_escape($name); ?>'" v-model="<?php echo acym_escape($vModel); ?>" :value="'<?php echo acym_escape($value); ?>'">
+	<spectrum :name="'<?php echo esc_attr($name); ?>'" v-model="<?php echo esc_attr($vModel); ?>" :value="'<?php echo esc_attr($value); ?>'">
 </div>

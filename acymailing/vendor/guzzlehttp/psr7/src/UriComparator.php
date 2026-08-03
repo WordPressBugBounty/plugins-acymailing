@@ -6,8 +6,17 @@ namespace GuzzleHttp\Psr7;
 
 use Psr\Http\Message\UriInterface;
 
+/**
+ * Provides methods to determine if a modified URL should be considered cross-origin.
+ *
+ * @author Graham Campbell
+ */
 final class UriComparator
 {
+    /**
+     * Determines if a modified URL should be considered cross-origin with
+     * respect to an original URL.
+     */
     public static function isCrossOrigin(UriInterface $original, UriInterface $modified): bool
     {
         if (\strcasecmp($original->getHost(), $modified->getHost()) !== 0) {
@@ -38,5 +47,6 @@ final class UriComparator
 
     private function __construct()
     {
+        // cannot be instantiated
     }
 }

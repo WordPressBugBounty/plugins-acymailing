@@ -1,4 +1,9 @@
 <?php
+/**
+ * This file is part of the ZBateson\MailMimeParser project.
+ *
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ */
 
 namespace ZBateson\MailMimeParser;
 
@@ -13,10 +18,25 @@ use ZBateson\MailMimeParser\Message\PartFilter;
 use ZBateson\MailMimeParser\Message\PartHeaderContainer;
 use ZBateson\MailMimeParser\Message\PartStreamContainer;
 
+/**
+ * An email message.
+ *
+ * The message could represent a simple text email, a multipart message with
+ * children, or a non-mime message containing UUEncoded parts.
+ *
+ * @author Zaahid Bateson
+ */
 class Message extends MimePart implements IMessage
 {
+    /**
+     * @var MultipartHelper service providing functions for multipart messages.
+     */
     private $multipartHelper;
 
+    /**
+     * @var PrivacyHelper service providing functions for multipart/signed
+     *      messages.
+     */
     private $privacyHelper;
 
     public function __construct(
@@ -41,6 +61,24 @@ class Message extends MimePart implements IMessage
         $this->privacyHelper = $privacyHelper;
     }
 
+    /**
+     * Convenience method to parse a handle or string into an IMessage without
+     * requiring including MailMimeParser, instantiating it, and calling parse.
+     *
+     * If the passed $resource is a resource handle or StreamInterface, the
+     * resource must remain open while the returned IMessage object exists.
+     * Pass true as the second argument to have the resource attached to the
+     * IMessage and closed for you when it's destroyed, or pass false to
+     * manually close it if it should remain open after the IMessage object is
+     * destroyed.
+     *
+     * @param resource|StreamInterface|string $resource The resource handle to
+     *        the input stream of the mime message, or a string containing a
+     *        mime message.
+     * @param bool $attached pass true to have it attached to the returned
+     *        IMessage and destroyed with it.
+     * @return IMessage
+     */
     public static function from($resource, $attached)
     {
         static $mmp = null;
@@ -50,6 +88,13 @@ class Message extends MimePart implements IMessage
         return $mmp->parse($resource, $attached);
     }
 
+    /**
+     * Returns true if the current part is a mime part.
+     *
+     * The message is considered 'mime' if it has either a Content-Type or
+     * MIME-Version header defined.
+     *
+     */
     public function isMime() : bool
     {
         $contentType = $this->getHeaderValue(HeaderConsts::CONTENT_TYPE);
@@ -123,6 +168,9 @@ class Message extends MimePart implements IMessage
         return null;
     }
 
+    /**
+     * @return static
+     */
     public function setTextPart($resource, string $charset = 'UTF-8')
     {
         $this->multipartHelper
@@ -207,6 +255,9 @@ class Message extends MimePart implements IMessage
         return \count($this->getAllAttachmentParts());
     }
 
+    /**
+     * @return static
+     */
     public function addAttachmentPart($resource, string $mimeType, ?string $filename = null, string $disposition = 'attachment', string $encoding = 'base64')
     {
         $this->multipartHelper
@@ -221,6 +272,9 @@ class Message extends MimePart implements IMessage
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function addAttachmentPartFromFile($filePath, string $mimeType, ?string $filename = null, string $disposition = 'attachment', string $encoding = 'base64')
     {
         $handle = Psr7\Utils::streamFor(\fopen($filePath, 'r'));
@@ -261,6 +315,9 @@ class Message extends MimePart implements IMessage
 
     }
 
+    /**
+     * @return static
+     */
     public function setAsMultipartSigned(string $micalg, string $protocol)
     {
         $this->privacyHelper

@@ -309,6 +309,7 @@ class CampaignClass extends AcymClass
             $element->click = number_format($element->click / $element->subscribers * 100, 2);
         }
 
+        //Tracking sales
         if (!acym_isTrackingSalesActive()) {
             return;
         }
@@ -395,7 +396,7 @@ class CampaignClass extends AcymClass
                 $campaign->$oneAttribute = json_encode(empty($value) ? [] : $value);
             } else {
                 if (empty($value)) continue;
-                $campaign->$oneAttribute = strip_tags($value);
+                $campaign->$oneAttribute = acym_stripTags($value);
             }
         }
 
@@ -432,11 +433,11 @@ class CampaignClass extends AcymClass
             return false;
         }
 
-        if (acym_isAdmin()) {
+        if (acym_isAdmin() && acym_isAllowed('campaigns')) {
             return true;
         }
 
-        $query = 'SELECT COUNT(*) FROM #__acym_campaign AS campaign 
+        $query = 'SELECT COUNT(*) FROM #__acym_campaign AS campaign
             JOIN #__acym_mail AS mail ON campaign.mail_id = mail.id ';
 
         $condition = 'mail.creator_id = '.intval($userId);
@@ -454,6 +455,10 @@ class CampaignClass extends AcymClass
         return acym_loadResult($query) > 0;
     }
 
+    /**
+     * Delete a campaign. Needs to delete the tag associated with the campaign and the mail attached to the campaign.
+     * Deleting a mail of a campaign needs to clean the association table mail_has_list and its tags
+     */
     public function delete(array $elements): int
     {
         acym_arrayToInteger($elements);
@@ -557,6 +562,7 @@ class CampaignClass extends AcymClass
 
     public function send(int $campaignID, int $result = 0, bool $abTestFinal = false)
     {
+        // Make sure the email we're trying to send exists
         $campaign = $this->getOneById($campaignID);
 
         if (empty($campaign->mail_id)) {
@@ -572,15 +578,18 @@ class CampaignClass extends AcymClass
             $filters = [0 => []];
             acym_trigger('onAcymSendCampaignSpecial', [$campaign, &$filters[0], &$pluginIsExisting]);
         } else {
+            // Adds the special campaigns conditions to the "OR" blocs of the segment
             foreach ($filters as $key => $filter) {
                 acym_trigger('onAcymSendCampaignSpecial', [$campaign, &$filters[$key], &$pluginIsExisting]);
             }
         }
 
+        // This is a special campaign type, but the required plugin is not installed
         if (!$pluginIsExisting) {
             return false;
         }
 
+        // Make sure some receivers have been selected
         $lists = acym_loadResultArray('SELECT list_id FROM #__acym_mail_has_list WHERE mail_id = '.intval($campaign->mail_id));
         if (empty($lists)) {
             $this->errors[] = acym_translation('ACYM_NO_LIST_SELECTED');
@@ -639,6 +648,7 @@ class CampaignClass extends AcymClass
                 $select = [intval($campaign->mail_id), 'ul.`user_id`', acym_escapeDB($date)];
             }
 
+            // Resending a campaign only to users who didn't receive it
             if (!empty($campaign->sending_params['resendTarget']) && 'new' === $campaign->sending_params['resendTarget']) {
                 if (acym_isMultilingual()) {
                     $automationHelper->leftjoin['us'] = '`#__acym_user_stat` AS `us` ON `us`.`user_id` = `user`.`id` AND `us`.`mail_id` IN (SELECT id FROM #__acym_mail WHERE parent_id = '.intval(
@@ -662,8 +672,9 @@ class CampaignClass extends AcymClass
                     'INSERT IGNORE INTO `#__acym_queue` (`mail_id`, `user_id`, `sending_date`) '.$automationHelper->getQuery($select1)
                 );
 
+                // If we have an odd number of users to send, we send one more to the first mail
                 $numberOfUsersToSend2 = $numberOfUsersToSend1 * 2 > $numberOfUsersToSend ? $numberOfUsersToSend1 - 1 : $numberOfUsersToSend1;
-                $automationHelper->limit = $numberOfUsersToSend.', '.$numberOfUsersToSend2;
+                $automationHelper->limit = $numberOfUsersToSend1.', '.$numberOfUsersToSend2;
                 $select2 = [intval($campaign->sending_params['abtest']['B']), 'ul.`user_id`', acym_escapeDB($date)];
                 $numberUsersInsertedByMailId[intval($campaign->sending_params['abtest']['B'])] = acym_query(
                     'INSERT IGNORE INTO `#__acym_queue` (`mail_id`, `user_id`, `sending_date`) '.$automationHelper->getQuery($select2)
@@ -737,6 +748,7 @@ class CampaignClass extends AcymClass
     {
         acym_arrayToInteger($mailIds);
 
+        //TODO move these methods in mail stat class
         $query = 'SELECT SUM(sent) AS sent, SUM(open_unique) AS open_unique FROM #__acym_mail_stat 
                     WHERE mail_id IN ('.implode(',', $mailIds).')';
 
@@ -825,28 +837,35 @@ class CampaignClass extends AcymClass
 
     public function getLastNewsletters(array &$params): array
     {
+        // Init select elements
         $querySelect = 'SELECT mail.*, campaign.sending_date ';
         $queryCountSelect = 'SELECT COUNT(*) FROM (SELECT DISTINCT mail.id ';
 
+        // Form the query
         $query = 'FROM #__acym_campaign AS campaign
                   JOIN #__acym_mail AS mail ON campaign.mail_id = mail.id ';
 
+        // We may need some joins depending on the selected options
         if (isset($params['userId']) || isset($params['lists'])) {
             $query .= 'JOIN #__acym_mail_has_list AS maillist ON mail.id = maillist.mail_id ';
             if (isset($params['userId'])) $query .= 'JOIN #__acym_user_has_list AS userlist ON maillist.list_id = userlist.list_id ';
         }
 
+        // Make sure we display only active campaigns
         $where = 'WHERE campaign.active = 1 AND campaign.sent = 1 AND mail.type = '.acym_escapeDB(MailClass::TYPE_STANDARD).' AND campaign.visible = 1 ';
 
+        // If we want an archive of some specific lists
         if (isset($params['lists'])) {
             acym_arrayToInteger($params['lists']);
             $where .= 'AND maillist.list_id IN ('.implode(', ', $params['lists']).') ';
         }
 
+        // If we want an archive for a specific user
         if (isset($params['userId']) && !empty($params['displayUserListOnly'])) {
             $where .= 'AND userlist.user_id = '.intval($params['userId']).' ';
         }
 
+        // If the user search for a newsletter
         if (isset($params['search'])) {
             $search = acym_escapeDB('%'.acym_utf8Encode($params['search']).'%');
             $where .= 'AND (mail.subject LIKE '.$search.' OR mail.body LIKE '.$search.')';
@@ -856,9 +875,11 @@ class CampaignClass extends AcymClass
         $return = [];
         $return['count'] = (int)acym_loadResult($queryCountSelect.$query.') AS r ');
 
+        // Make sure we display campaigns only once
         $endQuerySelect = 'GROUP BY mail.id ';
         $endQuerySelect .= 'ORDER BY campaign.sending_date DESC';
 
+        // Init the pagination
         $page = $params['page'] ?? 0;
         $numberPerPage = $params['numberPerPage'] ?? 0;
         $lastNewsletters = $params['limit'] ?? 0;
@@ -945,6 +966,7 @@ class CampaignClass extends AcymClass
         $time = time();
 
         foreach ($activeAutoCampaigns as $campaign) {
+            // Check the start date
             $nextTrigger = $campaign->next_trigger;
             if (empty($nextTrigger) && !empty($campaign->sending_params['start_date'])) {
                 $nextTrigger = $campaign->sending_params['start_date'];
@@ -954,6 +976,7 @@ class CampaignClass extends AcymClass
                 continue;
             }
 
+            //check if we trigger the campaign
             $step = new \stdClass();
             $step->triggers = $campaign->sending_params;
             $step->last_execution = $campaign->last_generated;
@@ -968,6 +991,7 @@ class CampaignClass extends AcymClass
                 continue;
             }
 
+            //update the campaign
             $campaignMail = $mailClass->getOneById($campaign->mail_id);
 
             $lastGenerated = $campaign->last_generated;
@@ -978,6 +1002,7 @@ class CampaignClass extends AcymClass
                 continue;
             }
 
+            //We generate the new campaign
             $generatedCampaign = $this->generateCampaign($campaign, $campaignMail, $lastGenerated, $mailClass);
             if (empty($generatedCampaign)) {
                 $this->messages[] = acym_translationSprintf('ACYM_CAMPAIGN_FAILED_GENERATING', $campaign->name);
@@ -986,6 +1011,7 @@ class CampaignClass extends AcymClass
 
             $this->messages[] = acym_translationSprintf('ACYM_CAMPAIGN_GENERATED', $campaign->name, $campaign->sending_params['number_generated']);
 
+            // We send it directly if no confirmation is needed
             if (empty($campaign->sending_params['need_confirm_to_send'])) {
                 $this->send($generatedCampaign->id);
             } elseif (!empty($campaign->sending_params['admin_notification_emails']) && !empty($adminNotificationEmail)) {
@@ -1002,10 +1028,12 @@ class CampaignClass extends AcymClass
 
     private function shouldGenerateCampaign(object $campaign, object $campaignMail): bool
     {
+        // The generateByCategory function is the only one that can stop a campaign generation, with min number of items
         $results = acym_trigger('generateByCategory', [&$campaignMail], null, function ($plugin) {
             $plugin->generateCampaignResult->status = true;
         });
 
+        // If one of the return statuses is "false", we won't generate the campaign
         foreach ($results as $oneResult) {
             if (isset($oneResult->status) && !$oneResult->status) {
                 $this->messages[] = acym_translationSprintf('ACYM_CAMPAIGN_NOT_GENERATED', $campaign->name, $oneResult->message);
@@ -1053,6 +1081,7 @@ class CampaignClass extends AcymClass
 
         $newCampaign->id = $this->save($newCampaign);
 
+        // Replace content in the generated mail. MUST be done after campaign has been saved
         acym_trigger('replaceContent', [&$newMail, false]);
         $mailClass->save($newMail);
 

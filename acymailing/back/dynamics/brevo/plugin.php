@@ -27,32 +27,34 @@ class plgAcymBrevo extends AcymPlugin
     {
         ob_start();
         ?>
-		<div class="send_settings cell grid-x acym_vcenter" id="<?php echo self::SENDING_METHOD_ID; ?>_settings">
+		<div class="send_settings cell grid-x acym_vcenter" id="<?php echo esc_attr(self::SENDING_METHOD_ID); ?>_settings">
 			<div class="cell grid-x acym_vcenter acym__sending__methods__one__settings">
 				<div class="cell grid-x acym_vcenter acym__sending__methods__one__settings">
 					<label for="brevo_identifier" class="cell shrink margin-right-1">
-                        <?php echo acym_translation('ACYM_BREVO_LOGIN'); ?>
+                        <?php echo esc_html(acym_translation('ACYM_BREVO_LOGIN')); ?>
 					</label>
-                    <?php echo $this->getLinks(
+                    <?php $this->getLinks(
                         'https://get.brevo.com/hbvmwg6onvve'
                     ); ?>
 					<div class="margin-left-1 cell grid-x acym-grid-margin-x shrink acym_vcenter">
-						<p class="cell shrink"><?php echo acym_translation('ACYM_ALREADY_HAVE_AN_ACCOUNT'); ?></p>
-						<a target="_blank" class="cell shrink" href="https://app.brevo.com/settings/keys/smtp"><?php echo strtolower(acym_translation('ACYM_HERE')); ?></a>
+						<p class="cell shrink"><?php echo esc_html(acym_translation('ACYM_ALREADY_HAVE_AN_ACCOUNT')); ?></p>
+						<a target="_blank" class="cell shrink" href="https://app.brevo.com/settings/keys/smtp"><?php echo esc_html(
+                                strtolower(acym_translation('ACYM_HERE'))
+                            ); ?></a>
 					</div>
 					<input id="brevo_identifier"
-						   class="cell"
-						   type="text"
-						   name="config[brevo_identifier]"
-						   value="<?php echo acym_escape($this->config->get('brevo_identifier', '')); ?>">
+					       class="cell"
+					       type="text"
+					       name="config[brevo_identifier]"
+					       value="<?php echo esc_attr($this->config->get('brevo_identifier', '')); ?>">
 				</div>
 				<div class="cell grid-x acym_vcenter acym__sending__methods__one__settings">
-					<label for="brevo_smtp_key" class="cell"><?php echo acym_translation('ACYM_BREVO_SMTP_KEY'); ?></label>
+					<label for="brevo_smtp_key" class="cell"><?php echo esc_html(acym_translation('ACYM_BREVO_SMTP_KEY')); ?></label>
 					<input id="brevo_smtp_key"
-						   class="cell"
-						   type="text"
-						   name="config[brevo_smtp_key]"
-						   value="<?php echo acym_escape($this->config->get('brevo_smtp_key')); ?>">
+					       class="cell"
+					       type="text"
+					       name="config[brevo_smtp_key]"
+					       value="<?php echo esc_attr($this->config->get('brevo_smtp_key')); ?>">
 				</div>
 			</div>
 		</div>
@@ -60,6 +62,13 @@ class plgAcymBrevo extends AcymPlugin
         $data['sendingMethodsHtmlSettings'][self::SENDING_METHOD_ID] = ob_get_clean();
     }
 
+    /**
+     * @param array $credentials
+     * @param string $sendingMethod
+     * @param array $sendingMethodListParams this parameter is only used for the plugin sending method list
+     *
+     * @return void
+     */
     public function onAcymGetCredentialsSendingMethod(array &$credentials, string $sendingMethod, array $sendingMethodListParams = [])
     {
         if ($sendingMethod != self::SENDING_METHOD_ID) return;

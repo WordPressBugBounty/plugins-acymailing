@@ -18,7 +18,7 @@ trait Edition
     public function edit(): void
     {
         if (!acym_isAdmin()) {
-            acym_checkToken();
+            wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         }
 
         $tempId = acym_getVar('int', 'id');
@@ -71,6 +71,7 @@ trait Edition
             $isAutomationAdmin = true;
         }
 
+        // new mails
         if (empty($tempId)) {
             if (empty($fromId)) {
                 $mail = new \stdClass();
@@ -132,6 +133,7 @@ trait Edition
             $breadcrumbTitle = acym_translation($breadcrumbTitle);
             $breadcrumbUrl = 'mails&task=edit&type_editor='.$typeEditor.(!empty($fromId) ? '&from='.$fromId : '').'&type='.$type;
         } else {
+            // Existing mails and notifications
             if (!$mailClass->hasUserAccess($tempId)) {
                 die('Access denied for this email');
             }
@@ -182,7 +184,8 @@ trait Edition
                 $breadcrumbUrl = 'mails&task=edit&id='.$mail->id;
             } else {
                 if (empty($return)) {
-                    $return = empty($_SERVER['HTTP_REFERER']) ? '' : $_SERVER['HTTP_REFERER'];
+                    $httpReferer = acym_getVar('string', 'HTTP_REFERER', '', 'SERVER');
+                    $return = empty($httpReferer) ? '' : $httpReferer;
                 }
 
                 $notifName = acym_translation('ACYM_NOTIFICATIION_'.strtoupper(substr($mail->name, 4)));
@@ -221,7 +224,7 @@ trait Edition
         if (!empty($return)) {
             $breadcrumbUrl .= '&return='.urlencode(base64_encode($return));
         }
-        $this->breadcrumb[acym_escape($breadcrumbTitle)] = acym_completeLink($breadcrumbUrl);
+        $this->breadcrumb[$breadcrumbTitle] = acym_completeLink($breadcrumbUrl);
 
         $lists = [];
 
@@ -241,14 +244,22 @@ trait Edition
             $mail->attachments = [];
         }
 
+        $mail->thumbnail = $mail->thumbnail ?? '';
+
         $tagClass = new TagClass();
+        $languages = acym_getLanguages(true, true);
         $data = [
             'mail' => $mail,
             'allTags' => $tagClass->getAllTagsByType(TagClass::TYPE_MAIL),
             'isAutomationAdmin' => $isAutomationAdmin,
             'social_icons' => $this->config->get('social_icons', '{}'),
             'fromId' => $fromId,
-            'langChoice' => acym_languageOption($mail->links_language, 'mail[links_language]'),
+            'langChoice' => count($languages) < 2
+                ? []
+                : [
+                    'links' => $mail->links_language,
+                    'name' => 'mail[links_language]',
+                ],
             'list_id' => $listIds,
             'lists' => $lists,
             'delay_unit' => $followupClass->getDelayUnits(),
@@ -341,16 +352,22 @@ trait Edition
         }
     }
 
+    /**
+     * Spaghetti code, needs refactoring.
+     *
+     * 1 - Save the main mail
+     * 2 - Save the alternate versions if any
+     */
     public function store(bool $ajax = false): int
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $mailClass = new MailClass();
         $formData = acym_getVar('array', 'mail', []);
         $versions = acym_getVar('array', 'versions', [], 'REQUEST', ACYM_ALLOWRAW);
         $versionType = acym_getVar('string', 'version_type', '');
         $currentVersion = acym_getVar('string', 'current_version', 'main');
-        $allowedFields = acym_getColumns('mail');
+        $allowedFields = array_diff(acym_getColumns('mail'), ['creator_id']);
         $fromId = acym_getVar('int', 'fromId', 0);
         $return = acym_getVar('string', 'return');
 
@@ -369,7 +386,7 @@ trait Edition
         }
 
         if (!empty($mail->id)) {
-            if (!$mailClass->hasUserAccess($mail->id)) {
+            if (!$mailClass->hasUserAccess($mail->id, true)) {
                 die('Cannot save this mail');
             }
 
@@ -456,6 +473,7 @@ trait Edition
         $mailSettings->mainColors = acym_getVar('string', $inputNameColors, '', 'REQUEST', ACYM_ALLOWRAW);
         $mail->mail_settings = json_encode($mailSettings);
 
+        // Use the thumbnail of the source mail if not modified
         if (!empty($fromId) && empty($mail->thumbnail) && !$fromAutomation) {
             $thumbnail = $this->setThumbnailFrom($fromId);
             if (!empty($thumbnail)) {
@@ -506,6 +524,7 @@ trait Edition
             $listClass = new ListClass();
             $listClass->setWelcomeUnsubEmail($listIds, (int)$mailID, $mail->type);
         } elseif (!empty($mail->type) && $mail->type === MailClass::TYPE_FOLLOWUP) {
+            // Pass the new email ID in the return URL to ask user if we should add it to the queue
             acym_setVar('return', acym_getVar('string', 'return').'&newEmailId='.$mailID);
 
             $followupData = acym_getVar('array', 'followup', []);
@@ -615,6 +634,7 @@ trait Edition
             $mail->attachments = [];
         }
 
+        // Attachments
         $newAttachments = [];
         $attachments = acym_getVar('array', 'attachments', []);
         if (!empty($attachments)) {
@@ -626,6 +646,7 @@ trait Edition
                     'size' => filesize(ACYM_ROOT.$filepath),
                 ];
 
+                //We will never allow some files to be uploaded...
                 if (preg_match('#\.(php.?|.?htm.?|pl|py|jsp|asp|sh|cgi)#Ui', $attachment['filename'])) {
                     acym_enqueueMessage(
                         acym_translationSprintf(
@@ -642,6 +663,7 @@ trait Edition
 
                 $newAttachments[] = $attachment;
             }
+            // Add to previous attachments
             if (!empty($mail->attachments)) {
                 $newAttachments = array_merge($mail->attachments, $newAttachments);
             }
@@ -691,7 +713,13 @@ trait Edition
     {
         $mailId = $this->store();
 
-        $return = str_replace('{mailid}', empty($mailId) ? '' : $mailId, acym_getVar('string', 'return', ''));
+        // When saving notifications, we return to page where we clicked the "Edit email" button
+        $return = str_replace(
+            '{mailid}',
+            empty($mailId) ? '' : $mailId,
+            acym_getVar('string', 'return', '')
+        );
+
         if (empty($return)) {
             $this->listing();
         } else {
@@ -701,6 +729,8 @@ trait Edition
 
     public function autoSave(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $mailClass = new MailClass();
         $mail = new \stdClass();
 
@@ -708,7 +738,7 @@ trait Edition
         $mail->id = acym_getVar('int', 'mailId', 0);
         $mail->autosave = base64_decode(acym_getVar('string', 'autoSave', '', 'REQUEST', ACYM_ALLOWRAW));
 
-        if (empty($mail->id) || !$mailClass->hasUserAccess($mail->id) || !$mailClass->autoSave($mail, $language)) {
+        if (empty($mail->id) || !$mailClass->hasUserAccess($mail->id, true) || !$mailClass->autoSave($mail, $language)) {
             acym_sendAjaxResponse('', [], false);
         } else {
             acym_sendAjaxResponse();
@@ -717,7 +747,7 @@ trait Edition
 
     public function ajaxCheckVideoUrl(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         $videoUrl = acym_getVar('string', 'url', '');
 
         if (!acym_isValidUrl($videoUrl)) {
@@ -789,19 +819,20 @@ trait Edition
         $status = imagejpeg($output, null, 95);
         $imageContent = ob_get_clean();
         if ($status && acym_writeFile(ACYM_ROOT.ACYM_UPLOAD_FOLDER.$fileName, $imageContent)) {
-            unlink($tmpFilePath);
+            acym_deleteFile($tmpFilePath);
 
             return ACYM_UPLOADS_URL.$fileName;
         }
 
-        unlink($tmpFilePath);
+        acym_deleteFile($tmpFilePath);
 
         return '';
     }
 
     public function getTemplateAjax(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $pagination = new PaginationHelper();
         $id = acym_getVar('int', 'id');
         $id = empty($id) ? '' : '&id='.$id;
@@ -849,7 +880,7 @@ trait Edition
             $listId = acym_getVar('int', 'list_id', 0);
         }
         foreach ($matchingMails['elements'] as $oneTemplate) {
-            $return .= '<div class="cell grid-x acym__templates__oneTpl acym__listing__block" id="'.acym_escape($oneTemplate->id).'">
+            $return .= '<div class="cell grid-x acym__templates__oneTpl acym__listing__block" id="'.esc_attr($oneTemplate->id).'">
                 <div class="cell acym__templates__pic text-center">';
 
             $url = acym_getVar('cmd', 'ctrl').'&task=edit&step=editEmail&from='.intval($oneTemplate->id).$returnUrl.'&type='.$type.$id.'&'.acym_getFormToken();
@@ -863,48 +894,51 @@ trait Edition
                 $url .= '&id='.intval($this->data['campaignInformation']);
             }
             if (!$automation || !empty($returnUrl)) {
-                $return .= '<a href="'.acym_completeLink($url, false, false, true).'">';
+                $return .= '<a href="'.esc_url(acym_completeLink($url, false, false, true)).'">';
             }
 
-            $return .= '<img src="'.acym_escapeUrl(acym_getMailThumbnail($oneTemplate->thumbnail)).'" alt="template thumbnail"/>';
+            $return .= '<img src="'.esc_url(acym_getMailThumbnail($oneTemplate->thumbnail)).'" alt="template thumbnail"/>';
             if (!$automation || !empty($returnUrl)) {
                 $return .= '</a>';
             }
 
             if ($oneTemplate->drag_editor) {
-                $return .= '<div class="acym__templates__choose__ribbon acyeditor">'.acym_translation('ACYM_DD_EDITOR').'</div>';
+                $return .= '<div class="acym__templates__choose__ribbon acyeditor">'.esc_html(acym_translation('ACYM_DD_EDITOR')).'</div>';
             } else {
-                $return .= '<div class="acym__templates__choose__ribbon htmleditor">'.acym_translation('ACYM_HTML_EDITOR').'</div>';
+                $return .= '<div class="acym__templates__choose__ribbon htmleditor">'.esc_html(acym_translation('ACYM_HTML_EDITOR')).'</div>';
             }
 
             if (strlen($oneTemplate->name) > 55) {
                 $oneTemplate->name = substr($oneTemplate->name, 0, 50).'...';
             }
             $return .= '</div>
-                            <div class="cell grid-x acym__templates__footer text-center">
-                                <div class="cell acym__templates__footer__title acym_text_ellipsis" title="'.acym_escape($oneTemplate->name).'">'.acym_escape($oneTemplate->name).'</div>
-                                <div class="cell">'.acym_date($oneTemplate->creation_date, 'ACYM_DATE_FORMAT_LC3').'</div>
-                            </div>
-                        </div>';
+                        <div class="cell grid-x acym__templates__footer text-center">
+                            <div class="cell acym__templates__footer__title acym_text_ellipsis" title="'.esc_attr($oneTemplate->name).'">';
+            $return .= esc_html($oneTemplate->name).'</div>
+                            <div class="cell">'.esc_html(acym_date($oneTemplate->creation_date, 'ACYM_DATE_FORMAT_LC3')).'</div>
+                        </div>
+                    </div>';
         }
 
         $return .= '</div>';
 
         $pagination->setStatus((int)$matchingMails['total']->total, $page, $mailsPerPage);
 
-        $return .= $pagination->displayAjax();
+        ob_start();
+        $pagination->display('', '__ajax');
+        $return .= ob_get_clean();
 
-        echo $return;
+        acym_sendAjaxResponse('', ['pagination' => $return]);
         exit;
     }
 
     public function setNewThumbnail(): void
     {
-        if (!acym_isAdmin()) {
+        if (!acym_isAdmin() || (!acym_isAllowed('mails') && !acym_isAllowed('campaigns'))) {
             die('Access denied for thumbnail creation');
         }
 
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         $contentThumbnail = acym_getVar('string', 'content', '');
         if (strpos($contentThumbnail, 'data:image/png') !== 0) {
             acym_sendAjaxResponse('This file is not allowed.', [], false);
@@ -938,21 +972,25 @@ trait Edition
 
     public function setNewIconShare(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         $socialName = acym_getVar('string', 'social', '');
         $socialMedias = acym_getSocialMedias();
         if (!in_array($socialName, $socialMedias)) {
             acym_sendAjaxResponse(acym_translationSprintf('ACYM_UNKNOWN_SOCIAL', $socialName), [], false);
         }
 
-        $extension = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
+        $file = acym_getVar('array', 'file', [], 'FILES');
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $newPath = ACYM_UPLOAD_FOLDER.'socials'.DS.$socialName;
         $newPathComplete = $newPath.'.'.$extension;
 
-        $allowedExtensions = acym_getImageFileExtensions();
+        $allowedExtensions = acym_getImageFileExtensions(true);
         if (!in_array($extension, $allowedExtensions)) {
             $errorMessage = acym_translationSprintf('ACYM_ACCEPTED_TYPE', $extension, implode(', ', $allowedExtensions));
-        } elseif (!acym_uploadFile($_FILES['file']['tmp_name'], ACYM_ROOT.$newPathComplete)) {
+        } elseif (!acym_uploadFile($file['tmp_name'], ACYM_ROOT.$newPathComplete)) {
+            $errorMessage = acym_translationSprintf('ACYM_ERROR_UPLOADING_FILE_X', $newPathComplete);
+        } elseif (strtolower($extension) === 'svg' && !acym_isSvgFileSafe(ACYM_ROOT.$newPathComplete)) {
+            acym_deleteFile(ACYM_ROOT.$newPathComplete);
             $errorMessage = acym_translationSprintf('ACYM_ERROR_UPLOADING_FILE_X', $newPathComplete);
         }
 
@@ -998,10 +1036,14 @@ trait Edition
         $mailClass = new MailClass();
         $mail = $mailClass->getOneById($idMail);
 
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Returning content as text/css, need to output raw content.
         echo $mailClass->buildCSS($mail->stylesheet);
         exit;
     }
 
+    /*
+     * Method used to send a test when editing a notification email
+     */
     public function test(): void
     {
         $mailId = $this->store();
@@ -1040,7 +1082,7 @@ trait Edition
 
     public function sendTest(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         $controller = acym_getVar('string', 'controller', 'mails');
         $level = 'info';
 

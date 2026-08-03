@@ -10,10 +10,12 @@ trait Listing
 {
     public function prepareMailboxesListing(array &$data): void
     {
+        // Prepare the pagination
         $mailboxesPerPage = $data['pagination']->getListLimit();
         $page = $this->getVarFiltersListing('int', 'mailboxes_pagination_page', 1);
         $status = $data['status'];
 
+        // Get the matching mailboxes
         $matchingMailboxes = $this->getMatchingElementsFromData(
             [
                 'ordering' => $data['ordering'],
@@ -56,6 +58,8 @@ trait Listing
 
     public function duplicateMailboxAction(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $mailboxActionSelected = acym_getVar('int', 'elements_checked');
         if (empty($mailboxActionSelected)) {
             return;
@@ -69,6 +73,8 @@ trait Listing
 
     public function deleteMailboxAction(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $mailboxActionSelected = acym_getVar('array', 'elements_checked');
         if (empty($mailboxActionSelected)) {
             return;
@@ -94,6 +100,7 @@ trait Listing
                 continue;
             }
 
+            // We build the actions to display in the listing
             $actionsRendered = [];
             foreach ($actions as $action) {
                 acym_trigger('onAcymMailboxActionSummaryListing', [&$action, &$actionsRendered]);

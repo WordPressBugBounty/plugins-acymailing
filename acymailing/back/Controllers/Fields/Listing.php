@@ -28,6 +28,8 @@ trait Listing
 
     public function ajaxSetOrdering(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $order = json_decode(acym_getVar('string', 'order'), true);
         if (empty($order)) {
             $order = [];

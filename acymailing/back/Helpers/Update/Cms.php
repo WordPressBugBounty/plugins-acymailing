@@ -71,6 +71,7 @@ trait Cms
         if (!empty($errorLoad)) acym_enqueueMessage(acym_translationSprintf('ACYM_ERROR_LOAD_LANGUAGE', implode(', ', $errorLoad)), 'warning');
     }
 
+    // translates the Acy menus on back-end and Joomla menus
     public function installBackLanguages(string $onlyCode = ''): void
     {
         if (ACYM_CMS !== 'joomla') {
@@ -117,6 +118,9 @@ trait Cms
             $content = file_get_contents($path);
             if (empty($content)) continue;
 
+            // The first key is to translate "Acym" into "AcyMailing blabla" in the Joomla Extension manager
+            // The second key is to translate "com_acym" into "AcyMailing" in the Joomla global configuration page
+            // DON'T CHANGE THE KEY !!
             $menuFileContent = 'ACYM="AcyMailing"'."\r\n";
             $menuFileContent .= 'COM_ACYM="AcyMailing"'."\r\n";
             $menuFileContent .= 'COM_ACYM_CONFIGURATION="AcyMailing"'."\r\n";

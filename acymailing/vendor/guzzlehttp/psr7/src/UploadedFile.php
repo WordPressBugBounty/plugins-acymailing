@@ -22,20 +22,44 @@ class UploadedFile implements UploadedFileInterface
         UPLOAD_ERR_EXTENSION,
     ];
 
+    /**
+     * @var string|null
+     */
     private $clientFilename;
 
+    /**
+     * @var string|null
+     */
     private $clientMediaType;
 
+    /**
+     * @var int
+     */
     private $error;
 
+    /**
+     * @var string|null
+     */
     private $file;
 
+    /**
+     * @var bool
+     */
     private $moved = false;
 
+    /**
+     * @var int|null
+     */
     private $size;
 
+    /**
+     * @var StreamInterface|null
+     */
     private $stream;
 
+    /**
+     * @param StreamInterface|string|resource $streamOrFile
+     */
     public function __construct(
         $streamOrFile,
         ?int $size,
@@ -53,6 +77,13 @@ class UploadedFile implements UploadedFileInterface
         }
     }
 
+    /**
+     * Depending on the value set file or stream variable
+     *
+     * @param StreamInterface|string|resource $streamOrFile
+     *
+     * @throws InvalidArgumentException
+     */
     private function setStreamOrFile($streamOrFile): void
     {
         if (is_string($streamOrFile)) {
@@ -68,6 +99,9 @@ class UploadedFile implements UploadedFileInterface
         }
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     private function setError(int $error): void
     {
         if (false === in_array($error, UploadedFile::ERRORS, true)) {
@@ -84,6 +118,9 @@ class UploadedFile implements UploadedFileInterface
         return is_string($param) && false === empty($param);
     }
 
+    /**
+     * Return true if there is no upload error
+     */
     private function isOk(): bool
     {
         return $this->error === UPLOAD_ERR_OK;
@@ -94,6 +131,9 @@ class UploadedFile implements UploadedFileInterface
         return $this->moved;
     }
 
+    /**
+     * @throws RuntimeException if is moved or not ok
+     */
     private function validateActive(): void
     {
         if (false === $this->isOk()) {
@@ -113,6 +153,7 @@ class UploadedFile implements UploadedFileInterface
             return $this->stream;
         }
 
+        /** @var string $file */
         $file = $this->file;
 
         return new LazyOpenStream($file, 'r+');

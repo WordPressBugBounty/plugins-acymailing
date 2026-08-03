@@ -1,9 +1,11 @@
 <?php
+defined('ABSPATH') || die('Restricted Access');
 
 use AcyMailing\Classes\FieldClass;
 
 include_once __DIR__.DIRECTORY_SEPARATOR.'AcymJFormField.php';
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Joomla specific class naming with imposed prefix "JFormField".
 class JFormFieldFields extends AcymJFormField
 {
     public function __construct($form = null)
@@ -23,6 +25,7 @@ class JFormFieldFields extends AcymJFormField
         }
 
 
+        // In Joomla, when the user chooses to empty a field, it sets the default value of this field... that's not what we want
         if (ACYM_CMS == 'joomla' && $this->value == '1') {
             $formId = $this->form->getData()->get('id');
             if (!empty($formId)) {

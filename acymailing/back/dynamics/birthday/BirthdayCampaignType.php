@@ -44,7 +44,7 @@ trait BirthdayCampaignType
         if (!empty($sendingParams) && isset($sendingParams[$this->mailType.'_number'])) {
             $defaultNumber = $sendingParams[$this->mailType.'_number'];
         }
-        $inputTime = '<input type="number" min="0" stp="1" name="acym_birthday_time_number" class="intext_input" value="'.$defaultNumber.'">';
+        $inputTime = '<input type="number" min="0" step="1" name="acym_birthday_time_number" class="intext_input" value="'.esc_attr($defaultNumber).'">';
 
         $timeSelectOptions = [
             'days' => acym_translation('ACYM_DAYS'),
@@ -87,6 +87,7 @@ trait BirthdayCampaignType
         $whenSettings .= acym_translationSprintf('ACYM_SEND_IT_BEFORE_USER_BIRTHDAY', $inputTime, $timeSelect, $inputRelative);
         $whenSettings .= '</div>';
 
+        // Birthday field choice
         $fieldClass = new FieldClass();
         $dateFields = $fieldClass->getFieldsByType(['date']);
 

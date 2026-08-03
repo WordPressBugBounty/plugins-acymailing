@@ -1,0 +1,39 @@
+{
+    "name": "acyba/acymailing",
+    "authors": [
+        {
+            "name": "Acyba SAS",
+            "email": "sales@acyba.com"
+        }
+    ],
+    "require": {
+        "psr/container": "^1.0",
+        "ext-json": "*",
+        "ext-simplexml": "*",
+        "ext-mbstring": "*",
+        "ext-curl": "*",
+        "ext-gd": "*",
+        "zbateson/mail-mime-parser": "^2.2"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.13"
+    },
+    "autoload": {
+        "psr-4": {
+            "AcyMailing\\": [
+                "./back",
+                "./front"
+            ],
+            "AcyMailing\\WpInit\\": "./WpInit",
+            "AcyMailerPhp\\": "./back/Libraries/Mailer",
+            "AcyMailing\\Libraries\\Pelago\\Emogrifier\\": "./back/Libraries/Pelago/Emogrifier/src",
+            "AcyMailing\\Libraries\\Sabberworm\\CSS\\": "./back/Libraries/Sabberworm/CSS/src",
+            "AcyMailing\\Libraries\\Symfony\\CssSelector\\": "./back/Libraries/Symfony/CssSelector/"
+        },
+        "exclude-from-classmap": [
+            "packages/",
+            "back/Libraries/Override/",
+            "front/Params/"
+        ]
+    }
+}

@@ -6,6 +6,7 @@ use AcyMailing\Classes\ConfigurationClass;
 
 class AcymObject
 {
+    // public for the sending methods
     public ConfigurationClass $config;
 
     public function __construct()

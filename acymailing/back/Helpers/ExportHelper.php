@@ -14,25 +14,30 @@ class ExportHelper extends AcymObject
 
     public function setDownloadHeaders(string $filename = 'export', string $extension = 'csv'): void
     {
+        // Fix for IE catching
         acym_header('Pragma: public');
         acym_header('Expires: 0');
         acym_header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 
+        // force download dialog
         acym_header('Content-Type: application/force-download');
         acym_header('Content-Type: application/octet-stream');
         acym_header('Content-Type: application/download');
 
+        // Set file name and force the browser to display the save dialog
         acym_header('Content-Disposition: attachment; filename='.$filename.'.'.$extension);
         acym_header('Content-Transfer-Encoding: binary');
     }
 
     public function exportTemplate(object $template): void
     {
+        // 1 - Create a folder with the data to export
         $name = preg_replace('#[^a-z0-9]#Uis', '_', $template->name);
         $name = preg_replace('#_+#s', '_', $name);
         $exportFolder = ACYM_ROOT.ACYM_MEDIA_FOLDER.'tmp'.DS.$name;
         acym_createFolder($exportFolder);
 
+        // 2 - Copy the images in the folder, and change the src in the <img> tags
         $template->body = acym_absoluteURL($template->body);
         $images = [];
         preg_match_all('#<img[^>]* src="([^"]+)"#Uis', $template->body, $images);
@@ -50,13 +55,15 @@ class ExportHelper extends AcymObject
                     [ACYM_ROOT, DS],
                     $oneImage
                 );
+                // Still an http picture? Must be a picture out of the domain... so we just leave it that way
                 if (strpos($location, 'http') === 0) continue;
 
+                // We can't find the image? We leave it that way
                 if (!file_exists($location)) continue;
 
                 $filename = basename($location);
                 while (file_exists($imagesFolder.DS.$filename)) {
-                    $filename = rand(0, 99).$filename;
+                    $filename = acym_rand(0, 99).$filename;
                 }
 
                 acym_copyFile($location, $imagesFolder.DS.$filename);
@@ -66,6 +73,7 @@ class ExportHelper extends AcymObject
             $template->body = str_replace(array_keys($replace), $replace, $template->body);
         }
 
+        // 3 - Copy the template's content
         $structure = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -81,7 +89,7 @@ class ExportHelper extends AcymObject
         ];
         foreach ($dataToCopy as $oneData) {
             if (empty($template->$oneData)) continue;
-            $structure .= "\n".'<meta name="'.$oneData.'" content="'.acym_escape($template->$oneData).'" />';
+            $structure .= "\n".'<meta name="'.$oneData.'" content="'.esc_attr($template->$oneData).'" />';
         }
 
         $structure .= "\n".'<title>'.$template->name.'</title>
@@ -93,21 +101,25 @@ class ExportHelper extends AcymObject
 
         acym_writeFile($exportFolder.DS.'template.html', $structure);
 
+        // 4 - Copy the thumbnail
         $thumbnail = acym_getMailThumbnail($template->thumbnail);
         $thumbnail = str_replace(ACYM_LIVE, ACYM_ROOT, $thumbnail);
         acym_copyFile($thumbnail, $exportFolder.DS.'thumbnail.png');
 
+        // 5 - Handle custom stylesheet
         if (!empty($template->stylesheet)) {
             acym_createFolder($exportFolder.DS.'css');
             acym_writeFile($exportFolder.DS.'css'.DS.'custom.css', $template->stylesheet);
         }
 
+        // 6 - Create the zip archive
         $zipFiles = [];
         $folders = acym_getFolders($exportFolder, '.', true, true);
         $folders[] = $exportFolder;
         foreach ($folders as $folder) {
             $files = acym_getFiles($folder, '.', false, true);
             foreach ($files as $file) {
+                // Avoid J3 issue on thumbnail and index.php path, last separator was not DS
                 $posSlash = strrpos($file, '/');
                 $posASlash = strrpos($file, '\\');
                 $pos = ($posSlash < $posASlash) ? $posASlash : $posSlash;
@@ -127,9 +139,12 @@ class ExportHelper extends AcymObject
 
         acym_createArchive($exportFolder, $zipFiles);
 
+        // 7 - Remove the temporary folder
         acym_deleteFolder($exportFolder);
 
+        // 8 - Download the zip
         $this->setDownloadHeaders($name, 'zip');
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Downloading an export file.
         echo acym_fileGetContent($exportFolder.'.zip');
         acym_deleteFile($exportFolder.'.zip');
 
@@ -180,6 +195,7 @@ class ExportHelper extends AcymObject
         $nbExport = $this->getExportLimit();
         $mailsStats = acym_loadObjectList($query.' LIMIT '.intval($nbExport));
         $mailClass = new MailClass();
+        // We don't want to decode the user's name
         $mailClass->exceptKeysDecode = ['name'];
         $mailsStats = $mailClass->decode($mailsStats);
         acym_displayErrors();
@@ -222,6 +238,7 @@ class ExportHelper extends AcymObject
 
                 $oneLine[] = htmlspecialchars($line, ENT_QUOTES, 'UTF-8');
             }
+            //We delete the double quote so it won't break the CSV
             $csvLines[] = $this->before.implode($separator, $oneLine).$this->after;
         }
 
@@ -235,8 +252,9 @@ class ExportHelper extends AcymObject
         if (ACYM_CMS === 'wordpress') {
             @ob_get_clean();
         }
-        $filename = 'export_stats_'.$type.'_'.date('Y-m-d');
+        $filename = 'export_stats_'.$type.'_'.gmdate('Y-m-d');
         $this->setDownloadHeaders($filename);
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Exporting CSV data.
         echo $final;
     }
 
@@ -289,17 +307,21 @@ class ExportHelper extends AcymObject
             }
         }
 
+        // This first line shows the column headers ("name", "email", etc...)
         $firstLine = $this->before.implode($separator, $allFieldsToExport).$this->after.$this->eol;
 
         if (empty($exportFile)) {
             @ob_get_clean();
-            $filename = 'export_'.date('Y-m-d');
+            $filename = 'export_'.gmdate('Y-m-d');
             $this->setDownloadHeaders($filename);
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Exporting CSV data.
             echo $firstLine;
         } else {
+            // Make sure the folder exists
             preg_match('#^(.+/)[^/]+$#', $exportFile, $folder);
             if (!empty($folder[1]) && !file_exists($folder[1])) acym_createDir($folder[1]);
 
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen -- Using buffer for big exports.
             $fp = fopen($exportFile, 'w');
             if (false === $fp) {
                 if ($flagToRemove !== 0) {
@@ -310,6 +332,7 @@ class ExportHelper extends AcymObject
                 return acym_translationSprintf('ACYM_FAIL_SAVE_FILE', $exportFile);
             }
 
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite -- Using buffer for big exports.
             $error = fwrite($fp, $firstLine);
             if (false === $error) {
                 if ($flagToRemove !== 0) {
@@ -331,11 +354,13 @@ class ExportHelper extends AcymObject
             $start += $nbExport;
 
             if ($users === false) {
-                $errorLine = $this->eol.$this->eol.'Error: '.(isset($e) ? $e->getMessage() : acym_getDBError());
+                $errorLine = $this->eol.$this->eol.'Error: '.esc_html(isset($e) ? $e->getMessage() : acym_getDBError());
 
                 if (empty($exportFile)) {
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Exporting CSV data.
                     echo $errorLine;
                 } else {
+                    // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite -- Using buffer for big exports.
                     $error = fwrite($fp, $errorLine);
                     if (false === $error) {
                         if ($flagToRemove !== 0) {
@@ -348,6 +373,7 @@ class ExportHelper extends AcymObject
                 }
             }
 
+            // There is no other user to export, end here
             if (empty($users)) break;
 
             foreach ($users as $userID => $oneUser) {
@@ -408,6 +434,7 @@ class ExportHelper extends AcymObject
                         continue;
                     }
 
+                    // Not using empty() because 0 and '0' are valid values
                     if ($excelSecure == 1) {
                         $firstCharacter = substr($oneData, 0, 1);
                         if (in_array($firstCharacter, ['=', '+', '-', '@'])) {
@@ -423,8 +450,10 @@ class ExportHelper extends AcymObject
 
                 $oneLine = $this->before.$encodingClass->change($dataexport, 'UTF-8', $charset).$this->after.$this->eol;
                 if (empty($exportFile)) {
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Exporting CSV data.
                     echo $oneLine;
                 } else {
+                    // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fwrite -- Using buffer for big exports.
                     $error = fwrite($fp, $oneLine);
                     if (false === $error) {
                         if ($flagToRemove !== 0) {
@@ -445,13 +474,17 @@ class ExportHelper extends AcymObject
             $automationHelper->removeFlag($flagToRemove);
         }
 
-        if (!empty($exportFile)) fclose($fp);
+        if (!empty($exportFile)) {
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- Using buffer for big exports.
+            fclose($fp);
+        }
 
         return '';
     }
 
     private function getExportLimit(): int
     {
+        // Getting X users per batch based on the memory limit
         $serverLimit = acym_bytes(ini_get('memory_limit'));
         if ($serverLimit > 500000000) {
             return 250000;
@@ -571,7 +604,7 @@ class ExportHelper extends AcymObject
                 continue;
             }
 
-            @unlink(acym_getLogPath($file));
+            acym_deleteFile(acym_getLogPath($file));
         }
     }
 }

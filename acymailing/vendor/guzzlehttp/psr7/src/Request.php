@@ -9,16 +9,29 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
 
+/**
+ * PSR-7 request implementation.
+ */
 class Request implements RequestInterface
 {
     use MessageTrait;
 
+    /** @var string */
     private $method;
 
+    /** @var string|null */
     private $requestTarget;
 
+    /** @var UriInterface */
     private $uri;
 
+    /**
+     * @param string                               $method  HTTP method
+     * @param string|UriInterface                  $uri     URI
+     * @param (string|string[])[]                  $headers Request headers
+     * @param string|resource|StreamInterface|null $body    Request body
+     * @param string                               $version Protocol version
+     */
     public function __construct(
         string $method,
         $uri,
@@ -129,9 +142,14 @@ class Request implements RequestInterface
             $header = 'Host';
             $this->headerNames['host'] = 'Host';
         }
+        // Ensure Host is the first header.
+        // See: https://datatracker.ietf.org/doc/html/rfc7230#section-5.4
         $this->headers = [$header => [$host]] + $this->headers;
     }
 
+    /**
+     * @param mixed $method
+     */
     private function assertMethod($method): void
     {
         if (!is_string($method) || $method === '') {

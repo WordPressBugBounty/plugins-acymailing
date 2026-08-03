@@ -6,6 +6,12 @@ namespace GuzzleHttp\Psr7;
 
 use Psr\Http\Message\StreamInterface;
 
+/**
+ * Compose stream implementations based on a hash of functions.
+ *
+ * Allows for easy testing and extension of a provided stream without needing
+ * to create a concrete class for a simple extension point.
+ */
 #[\AllowDynamicProperties]
 final class FnStream implements StreamInterface
 {
@@ -15,23 +21,36 @@ final class FnStream implements StreamInterface
         'isReadable', 'read', 'getContents', 'getMetadata',
     ];
 
+    /** @var array<string, callable> */
     private $methods;
 
+    /**
+     * @param array<string, callable> $methods Hash of method name to a callable.
+     */
     public function __construct(array $methods)
     {
         $this->methods = $methods;
 
+        // Create the functions on the class
         foreach ($methods as $name => $fn) {
             $this->{'_fn_'.$name} = $fn;
         }
     }
 
+    /**
+     * Lazily determine which methods are not implemented.
+     *
+     * @throws \BadMethodCallException
+     */
     public function __get(string $name): void
     {
         throw new \BadMethodCallException(str_replace('_fn_', '', $name)
             .'() is not implemented in the FnStream');
     }
 
+    /**
+     * The close method is called on the underlying stream only if possible.
+     */
     public function __destruct()
     {
         if (isset($this->_fn_close)) {
@@ -39,14 +58,31 @@ final class FnStream implements StreamInterface
         }
     }
 
+    /**
+     * An unserialize would allow the __destruct to run when the unserialized value goes out of scope.
+     *
+     * @throws \LogicException
+     */
     public function __wakeup(): void
     {
         throw new \LogicException('FnStream should never be unserialized');
     }
 
+    /**
+     * Adds custom functionality to an underlying stream by intercepting
+     * specific method calls.
+     *
+     * @param StreamInterface         $stream  Stream to decorate
+     * @param array<string, callable> $methods Hash of method name to a closure
+     *
+     * @return FnStream
+     */
     public static function decorate(StreamInterface $stream, array $methods)
     {
+        // If any of the required methods were not provided, then simply
+        // proxy to the decorated stream.
         foreach (array_diff(self::SLOTS, array_keys($methods)) as $diff) {
+            /** @var callable $callable */
             $callable = [$stream, $diff];
             $methods[$diff] = $callable;
         }
@@ -57,6 +93,7 @@ final class FnStream implements StreamInterface
     public function __toString(): string
     {
         try {
+            /** @var string */
             return ($this->_fn___toString)();
         } catch (\Throwable $e) {
             if (\PHP_VERSION_ID >= 70400) {
@@ -133,6 +170,9 @@ final class FnStream implements StreamInterface
         return ($this->_fn_getContents)();
     }
 
+    /**
+     * @return mixed
+     */
     public function getMetadata($key = null)
     {
         return ($this->_fn_getMetadata)($key);

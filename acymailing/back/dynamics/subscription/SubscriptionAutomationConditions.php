@@ -150,6 +150,7 @@ trait SubscriptionAutomationConditions
                 $query->join['listtype'.$num] = '#__acym_list AS list'.$num.' ON userlist'.$num.'.list_id = list'.$num.'.id AND list'.$num.'.type = '.$standardListType;
             }
         } else {
+            // specific list
             $query->leftjoin['list'.$num] = '#__acym_user_has_list AS userlist'.$num.' ON user.id = userlist'.$num.'.user_id AND userlist'.$num.'.list_id = '.intval(
                     $options['list']
                 ).$otherConditions;

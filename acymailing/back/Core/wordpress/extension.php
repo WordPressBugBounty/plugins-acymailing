@@ -1,9 +1,12 @@
 <?php
 
+defined('ABSPATH') || die('Restricted Access');
+
 use AcyMailing\Classes\PluginClass;
 
 function acym_isExtensionActive(string $extension): bool
 {
+    // Test first as mu-plugins don't have an active status for WP
     if (acym_isMuPlugin($extension)) return true;
 
     if (function_exists('is_plugin_active')) return is_plugin_active($extension);
@@ -30,37 +33,37 @@ function acym_coreAddons(): array
         (object)[
             'title' => acym_translation('ACYM_ARTICLE'),
             'folder_name' => 'post',
-            'version' => '10.11.1',
+            'version' => '11.0.0',
             'active' => '1',
             'category' => 'Content management',
             'level' => 'starter',
             'uptodate' => '1',
             'description' => '- Insert WordPress posts in your emails<br/>- Insert the latest posts of a category in an automatic email',
-            'latest_version' => '10.11.1',
+            'latest_version' => '11.0.0',
             'type' => 'CORE',
         ],
         (object)[
             'title' => acym_translation('ACYM_PAGE'),
             'folder_name' => 'page',
-            'version' => '10.11.1',
+            'version' => '11.0.0',
             'active' => '1',
             'category' => 'Content management',
             'level' => 'starter',
             'uptodate' => '1',
             'description' => '- Insert pages in your emails',
-            'latest_version' => '10.11.1',
+            'latest_version' => '11.0.0',
             'type' => 'CORE',
         ],
         (object)[
             'title' => acym_translation('ACYM_CREATE_USER'),
             'folder_name' => 'createuser',
-            'version' => '10.11.1',
+            'version' => '11.0.0',
             'active' => '1',
             'category' => 'User management',
             'level' => 'starter',
             'uptodate' => '1',
             'description' => '- Automatically creates a site user when an AcyMailing subscriber is created',
-            'latest_version' => '10.11.1',
+            'latest_version' => '11.0.0',
             'type' => 'CORE',
         ],
     ];
@@ -105,11 +108,13 @@ function acym_loadPlugins(): void
         }
     }
 
+    // Some plugins need to be called last
     $dynamics = array_merge($dynamics, $dynamicsLoadedLast);
 
     global $acymPlugins;
     global $acymAddonsForSettings;
 
+    // Load the installed integrations
     $integrationsRaw = [];
     $acyVersion = acym_config()->get('version');
     do_action_ref_array('acym_load_installed_integrations', [&$integrationsRaw, $acyVersion]);
@@ -133,6 +138,7 @@ function acym_loadPlugins(): void
         }
         $className = 'plgAcym'.ucfirst($oneDynamic);
 
+        // Load the plugin
         if (isset($acymPlugins[$className]) || !file_exists($dynamicFile) || (!class_exists($className) && !include_once $dynamicFile)) {
             continue;
         }
@@ -147,6 +153,7 @@ function acym_loadPlugins(): void
             $pluginClass->addIntegrationIfMissing($plugin);
         }
 
+        // If it's for another CMS or if the related extension isn't installed, skip it
         if (in_array($plugin->cms, ['all', 'WordPress'])) {
             $acymAddonsForSettings[$className] = $plugin;
         }

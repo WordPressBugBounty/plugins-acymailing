@@ -1,5 +1,21 @@
 <?php
+defined('ABSPATH') || die('Restricted Access');
 
+
+__('Do not track new subscribers by default', 'acymailing');
+__('When enabled, new subscribers are created with tracking disabled (no open/click pixel) unless they explicitly consent. Existing subscribers are not affected.', 'acymailing');
+__('Allow subscribers to manage their tracking from their profile page', 'acymailing');
+__('I allow my activity (email opens and clicks) to be tracked', 'acymailing');
+__('Display a tracking consent checkbox', 'acymailing');
+__('Adds an unchecked opt-in checkbox to the subscription form. New subscribers are only tracked if they tick it.', 'acymailing');
+__('I agree to have my activity (email opens and clicks) tracked', 'acymailing');
+__('Insert a <b>stop tracking</b> link in your email', 'acymailing');
+__('Stop tracking me', 'acymailing');
+__('Your activity will no longer be tracked.', 'acymailing');
+__('API key', 'acymailing');
+__('Secret key sent in the Api-Key header to authenticate REST API calls. Change this value to rotate the key. For backward compatibility the license key is still accepted, but switching your integrations to this dedicated key is recommended.', 'acymailing');
+__('You don\'t have any open data/click data yet', 'acymailing');
+__('Your data has been successfully deleted.', 'acymailing');
 __('IP address collection', 'acymailing');
 __('Anonymized', 'acymailing');
 __('The IP addresses are collected during confirmation and subscription for proof of consent and to limit the number of subscriptions per IP address.', 'acymailing');
@@ -20,7 +36,9 @@ __('Any list', 'acymailing');
 __('Is not currently subscribed', 'acymailing');
 __('Not currently subscribed', 'acymailing');
 __('Manual trigger is not available for this type of automation', 'acymailing');
+/* translators: %s: number of automations triggered */
 __('%s automation(s) triggered successfully', 'acymailing');
+/* translators: %s: number of user-based automations skipped */
 __('%s user-based automation(s) skipped (only time-based automations can be triggered manually)', 'acymailing');
 __('Fields width', 'acymailing');
 __('The default width (65%) is based to scale on the email field size. Even if it doesn\'t look right in the preview, the field will be the correct size in the final rendering on your website page.', 'acymailing');
@@ -32,6 +50,7 @@ __('Popup position', 'acymailing');
 __('Top-center', 'acymailing');
 __('Bottom-center', 'acymailing');
 __('This domain is currently under review. You will be able to send your emails as soon as it gets manually approved, which is done on weekdays and can take up to 1 day.', 'acymailing');
+/* translators: %s: automatic campaign name */
 __('Automatic campaign [%s] failed generating a new campaign because an error occurred.', 'acymailing');
 __('Next execution date', 'acymailing');
 __('The next time this automatic campaign will be sent. It will not be sent before this date.', 'acymailing');
@@ -44,6 +63,7 @@ __('Please specify a sending date', 'acymailing');
 __('Only use a dedicated sending process when experiencing issues on automated tasks. This might not work for all servers!', 'acymailing');
 __('Executing automated tasks may take a lot of time. If you\'re experiencing issues you may try using a dedicated process to send queued emails.', 'acymailing');
 __('Use dedicated sending process', 'acymailing');
+/* translators: %s: list of campaign ids */
 __('An error occurred while retrieving the triggers of automatic campaigns. Please reconfigure the sending settings, save and reactivate them. Campaign ids: %s', 'acymailing');
 __('Go to automatic campaigns', 'acymailing');
 __('You have been unsubscribed from an automatic process.', 'acymailing');
@@ -118,10 +138,12 @@ __('Welcome your new subscribers with a nice welcoming email.', 'acymailing');
 __('Invalid name', 'acymailing');
 __('Please enter your client ID and client secret.', 'acymailing');
 __('Outlook', 'acymailing');
+/* translators: %s: expiration date */
 __('The authentication will expire on %s. Your app needs to be published to avoid this.', 'acymailing');
 __('Revoke permissions', 'acymailing');
 __('Authenticate', 'acymailing');
 __('Google / Gmail', 'acymailing');
+/* translators: %s: date when re-authentication is required */
 __('The authentication was successful, but is temporary. You will need to authenticate again after %s', 'acymailing');
 __('Care to share your reasons for unsubscribing?', 'acymailing');
 __('Mobile', 'acymailing');
@@ -132,6 +154,7 @@ __('Coming soon', 'acymailing');
 __('Copy', 'acymailing');
 __('Scenarios', 'acymailing');
 __('Return to user listing', 'acymailing');
+/* translators: %s: element type name */
 __('Are you sure you want to delete this %s with all of its children nodes?', 'acymailing');
 __('This scenario has not been triggered yet', 'acymailing');
 __('Do you want this scenario to be triggered only once per user?', 'acymailing');
@@ -139,15 +162,19 @@ __('You must set a delay', 'acymailing');
 __('Start a new scenario', 'acymailing');
 __('Scenario ended', 'acymailing');
 __('Create one and let AcyMailing do it!', 'acymailing');
+/* translators: %1$s: amount to wait, %2$s: time unit (minutes, hours, days...) */
 __('Wait %1$s %2$s', 'acymailing');
 __('Add delay', 'acymailing');
 __('Execution date', 'acymailing');
 __('Total users processed', 'acymailing');
 __('Click to see details', 'acymailing');
+/* translators: %s: date the action was executed on */
 __('Executed on %s', 'acymailing');
 __('No user triggered scenario', 'acymailing');
 __('Number of triggers', 'acymailing');
+/* translators: %1$s: recipient user, %2$s: error message */
 __('Could not send the email to the user %1$s. Error: %2$s', 'acymailing');
+/* translators: %s: recipient user */
 __('Could not send the email to the user %s', 'acymailing');
 __('No user found', 'acymailing');
 __('No email set', 'acymailing');
@@ -155,6 +182,7 @@ __('Scenario email', 'acymailing');
 __('New scenario', 'acymailing');
 __('Send email', 'acymailing');
 __('Trigger once', 'acymailing');
+/* translators: %s: element type name */
 __('Are you sure you want to delete this %s?', 'acymailing');
 __('Settings', 'acymailing');
 __('Use a template', 'acymailing');
@@ -171,6 +199,7 @@ __('Copy code', 'acymailing');
 __('Activate auto login URLs', 'acymailing');
 __('updated', 'acymailing');
 __('not updated', 'acymailing');
+/* translators: %1$s: total entries in the file, %2$s: new imported subscribers, %3$s: invalid lines or email addresses, %4$s: existing or duplicate entries, %5$s: extra details */
 __('<b>%1$s</b> entries in the imported file: <br /> - <b>%2$s</b> new subscribers <b>imported</b><br /> - <b>%3$s</b> <b>invalid</b> lines or email addresses<br /> - <b>%4$s</b> already <b>existing</b> subscribers or <b>duplicate</b> entries (%5$s)', 'acymailing');
 __('The automated tasks reached the server time limit, the process stopped. Please either reduce the number of sent emails per batch or increase the time limit in your server configuration.', 'acymailing');
 __('AcyMailing subscribers will be created for the recipients.', 'acymailing');
@@ -216,7 +245,9 @@ __('And much more!', 'acymailing');
 __('Take advantage of our 30-days money-back guarantee on all our downloadable products. Plus, for only €29, try the Pro version of AcyMailing. If it meets your needs, you can easily upgrade to the Enterprise version for even more advanced features.', 'acymailing');
 __('Make automatic emails efficient', 'acymailing');
 __('Use AcyMailing for your automatic emails', 'acymailing');
+/* translators: %s: example extension name */
 __('Overriding your emails means you can customize the default automatic emails generated by your site or emails generated by your favorite extensions (%s and others...)', 'acymailing');
+/* translators: %s: extension or shop name */
 __('These can be emails sent for: user creation, login information details, password reset, confirmation of actions taken on the site, order modification in %s, etc...', 'acymailing');
 __('Why use email overriding?', 'acymailing');
 __('Because WordPress and Joomla users cannot customize these emails. AcyMailing allows you to create custom overrides of these emails.', 'acymailing');
@@ -224,8 +255,10 @@ __('You can create your own template for your brand and customize these emails a
 __('Do you want to make all the emails on your site beautiful and more efficient? Try it!', 'acymailing');
 __('Upgrade now', 'acymailing');
 __('Upgrade to the Enterprise version', 'acymailing');
+/* translators: %s: price per month */
 __('Starting from %s€/month only!', 'acymailing');
 __('Quickly discover all the benefits of our paid versions: campaign automation, subscription forms, custom fields, efficient sending service, etc. Don\'t wait any longer and join the 7000+ already satisfied customers.', 'acymailing');
+/* translators: %s: number of additional subscribers */
 __('Up to %s more subscribers', 'acymailing');
 __('Custom Fields Image', 'acymailing');
 __('Try free trial now', 'acymailing');
@@ -240,6 +273,7 @@ __('Why send them information about the next Google product if they are Apple fa
 __('It also allows you to insert personalized information into your emails: \'Hey _username_, We know that _userchildname_ loves all these sports _favoritessports_, that\'s why we decided to inform you that...\'', 'acymailing');
 __('Use custom fields', 'acymailing');
 __('Follow-up not found', 'acymailing');
+/* translators: %1$s: message id, %2$s: recipient, %3$s: sending method name */
 __('Message %1$s successfully sent to %2$s with sending method %3$s', 'acymailing');
 __('Version', 'acymailing');
 __('Pause campaign', 'acymailing');
@@ -247,14 +281,18 @@ __('Could not load GIFs, please try again in a few minutes.', 'acymailing');
 __('Administrator email', 'acymailing');
 __('Site icon', 'acymailing');
 __('Tagline', 'acymailing');
+/* translators: %s: type of address */
 __('%s address', 'acymailing');
+/* translators: %s: type of URL */
 __('%s URL', 'acymailing');
 __('Website', 'acymailing');
 __('The uploaded template contains unallowed files.', 'acymailing');
 __('Your free trial period has ended. Please add a payment method to continue using AcyMailing.', 'acymailing');
+/* translators: %s: number of days */
 __('Your free trial period ends in %s days.', 'acymailing');
 __('Get full access', 'acymailing');
 __('Ignored', 'acymailing');
+/* translators: %s: source name */
 __('Import from contacts on %s', 'acymailing');
 __('No contacts to import', 'acymailing');
 __('<b>Update</b> the AcyMailing users from your Joomla! contacts', 'acymailing');
@@ -262,14 +300,18 @@ __('<b>Add</b> all your Joomla! contacts into AcyMailing if they are not already
 __('<b>Subscribe</b> all your Joomla! contacts to the selected lists if they are not already subscribed or unsubscribed from it', 'acymailing');
 __('Leave empty if you want to import all contacts, regardless of their category.', 'acymailing');
 __('Only import contacts from the following categories', 'acymailing');
+/* translators: %s: number of contacts */
 __('There are %s contacts on your website.', 'acymailing');
 __('Contacts', 'acymailing');
 __('Create a subscriber on contact creation', 'acymailing');
 __('Send a confirmation email on contact registration', 'acymailing');
 __('Delete the subscriber on contact deletion', 'acymailing');
+/* translators: %s: integration name */
 __('%s contacts integration', 'acymailing');
-__('%s: %s', 'acymailing');
-__('This is an inquiry email via %s from:\n%s <%s>\n\n%s', 'acymailing');
+/* translators: %1$s: site name, %2$s: enquiry subject */
+__('%1$s: %2$s', 'acymailing');
+/* translators: %1$s: site name, %2$s: sender name, %3$s: sender email, %4$s: message body */
+__('This is an inquiry email via %1$s from:\n%2$s <%3$s>\n\n%4$s', 'acymailing');
 __('This is an enquiry email via {URL} from:\n{NAME} <{EMAIL}>\n\n{BODY}', 'acymailing');
 __('This is the email sent when you send an email via a single contact menu', 'acymailing');
 __('Contact', 'acymailing');
@@ -333,10 +375,13 @@ __('Product', 'acymailing');
 __('Order type', 'acymailing');
 __('Are you sure you want to delete this domain?', 'acymailing');
 __('At least one CNAME entry is missing or incorrect. Open this domain\'s DNS settings to have more details.', 'acymailing');
+/* translators: %s: domain or host name */
 __('A DNS entry has been found for %s, but it was not a CNAME entry.', 'acymailing');
+/* translators: %1$s: CNAME value entered, %2$s: domain name */
 __('The value you entered for the CNAME entry %1$s is incorrect for the domain %2$s', 'acymailing');
 __('Add a play button on video thumbnails', 'acymailing');
 __('Mail ID', 'acymailing');
+/* translators: %s: mail id */
 __('Mail ID: %s', 'acymailing');
 __('You cannot delete the final rule', 'acymailing');
 __('AcyMailing can add a \'List-Unsubscribe\' header to emails sent to allow your users to easily unsubscribe and prevent you from being considered a spam sender. This sends you an email \'Please unsubscribe user ID xxx\'. This bounce rule will automatically handle this type of email so you don\'t have to manually unsubscribe users.', 'acymailing');
@@ -359,10 +404,12 @@ __('This rule will be executed if a message does not match any of the previous r
 __('Manage bounce rules!', 'acymailing');
 __('Insert an <b>unsubscribe from all lists</b> link in your email', 'acymailing');
 __('Unsubscribe from all lists', 'acymailing');
+/* translators: %1$s: automatic campaign name, %2$s: generated campaign number */
 __('Automatic campaign [%1$s] generated a new campaign n°%2$s', 'acymailing');
 __('Show campaigns sent to allowed lists', 'acymailing');
 __('Show only campaigns created by the user', 'acymailing');
 __('Filter listed campaigns', 'acymailing');
+/* translators: %s: list name or id */
 __('List not found: %s', 'acymailing');
 __('Activate the REST API', 'acymailing');
 __('When activated, the routes will be open to authenticated external calls.', 'acymailing');
@@ -376,17 +423,29 @@ __('Remove users from the group', 'acymailing');
 __('Warning: if you remove users from all of their groups, they may stop working properly', 'acymailing');
 __('Add users to the group', 'acymailing');
 __('Select a group', 'acymailing');
+/* translators: %s: group name */
 __('Will be deleted from the group: %s', 'acymailing');
+/* translators: %s: group name */
 __('Will be added to the group: %s', 'acymailing');
+/* translators: %s: number of users */
 __('The group has been updated for %s user(s)', 'acymailing');
+/* translators: %1$s: table name, %2$s: error message */
 __('[ERROR]Could not get current columns for table %1$s to check for default value: %2$s', 'acymailing');
+/* translators: %1$s: column name, %2$s: table name */
 __('[OK]Problem solved: Updated the default value for the column %1$s in the table %2$s', 'acymailing');
+/* translators: %1$s: column name, %2$s: table name, %3$s: error message */
 __('[ERROR]Could not update the default value for the column %1$s in the table %2$s: %3$s', 'acymailing');
+/* translators: %1$s: column name, %2$s: table name */
 __('The default value for the column %1$s in the table %2$s is not correct', 'acymailing');
+/* translators: %1$s: column name, %2$s: table name, %3$s: error message */
 __('[ERROR]Could not remove the column %1$s from the table %2$s: %3$s', 'acymailing');
+/* translators: %1$s: column name, %2$s: table name */
 __('[OK]Problem solved: Removed column %1$s from table %2$s', 'acymailing');
+/* translators: %1$s: column name, %2$s: table name */
 __('Extra column %1$s detected in table %2$s', 'acymailing');
+/* translators: %1$s: registration status, %2$s: event or list name */
 __('who has not the registration status %1$s to %2$s', 'acymailing');
+/* translators: %1$s: registration status, %2$s: event or list name */
 __('who has the registration status %1$s to %2$s', 'acymailing');
 __('Your website is already attached to another license, please go to acymailing.com to manage your licenses', 'acymailing');
 __('Email delivery failed due to potentially unsafe content, likely spam. You will be able to resume your email sending in a few moments if this is a false alarm.', 'acymailing');
@@ -402,11 +461,17 @@ __('In the header with async and defer', 'acymailing');
 __('Follow-up campaigns', 'acymailing');
 __('Mailbox Action', 'acymailing');
 __('Template', 'acymailing');
+/* translators: %s: element type (singular) */
 __('Are you sure you want to delete this %s?', 'acymailing');
+/* translators: %s: element type (plural) */
 __('Are you sure you want to delete these %s?', 'acymailing');
+/* translators: %s: element type (plural) */
 __('Are you sure you want to enable these %s?', 'acymailing');
+/* translators: %s: element type (plural) */
 __('Are you sure you want to disable these %s?', 'acymailing');
+/* translators: %s: element type (singular) */
 __('Are you sure you want to enable this %s?', 'acymailing');
+/* translators: %s: element type (singular) */
 __('Are you sure you want to disable this %s?', 'acymailing');
 __('Forms', 'acymailing');
 __('Form', 'acymailing');
@@ -422,11 +487,14 @@ __('Allows AcyMailing to search for custom view files you created when it insert
 __('Allow PHP custom views', 'acymailing');
 __('Processing', 'acymailing');
 __('Specify a version', 'acymailing');
+/* translators: %s: campaign ID */
 __('A/B Test final version of campaign with ID %s sent', 'acymailing');
 __('Cannot send an A/B test again', 'acymailing');
 __('Please make sure you have enough users in your lists to start an A/B test', 'acymailing');
 __('Please create a version A and a version B to start the A/B test', 'acymailing');
+/* translators: %s: version name */
 __('Version %s (empty)', 'acymailing');
+/* translators: %1$s: version name, %2$s: number of subscribers */
 __('%1$s will be sent to %2$s subscriber(s)', 'acymailing');
 __('A/B Testing', 'acymailing');
 __('Could not load the A/B test emails', 'acymailing');
@@ -435,12 +503,14 @@ __('A/B test winner', 'acymailing');
 __('Automatically generate and send a version with the subject of the best open rate and the body of the best click rate', 'acymailing');
 __('Automatically generate and send the version with the best click rate', 'acymailing');
 __('Automatically generate and send the version with the best open rate', 'acymailing');
+/* translators: %s: number of days */
 __('After %s day(s)', 'acymailing');
 __('Percentage of receivers used to test both versions. The test will be equally divided between the two versions of the newsletter', 'acymailing');
 __('A/B test repartition', 'acymailing');
 __('You can copy the version A, start a version from scratch or start from template', 'acymailing');
 __('No email set for this version.', 'acymailing');
 __('Versions', 'acymailing');
+/* translators: %s: version number */
 __('Version %s', 'acymailing');
 __('Improve your campaigns by testing different designs and options. Do your test on a sample and send the best performing campaign', 'acymailing');
 __('A/B test campaign', 'acymailing');
@@ -496,8 +566,11 @@ __('Joomla users', 'acymailing');
 __('Make sure your server can handle the number of batches you\'ve set. We would recommend not going over 5 batches for most websites.', 'acymailing');
 __('Want to send emails faster? Decrease the wait time between each email.', 'acymailing');
 __('Want to send emails faster? Decrease the number of emails sent per batch and increase the number of batches instead (an email takes approximately one second to be sent depending on your server and the email content).', 'acymailing');
+/* translators: %s: number of emails */
 __('Based on your configuration, AcyMailing will send approximately %s emails per hour', 'acymailing');
+/* translators: %1$s: number of emails, %2$s: number of seconds */
 __('Send %1$s emails and then wait %2$s seconds before sending another batch', 'acymailing');
+/* translators: %s: number of seconds */
 __('Wait %s seconds between each email', 'acymailing');
 __('This URL is called by our server to trigger the automated tasks on your website. You can also set up a cron task on your server using this URL if you prefer.', 'acymailing');
 __('Sending restrictions', 'acymailing');
@@ -510,6 +583,7 @@ __('Delete the email archive history after', 'acymailing');
 __('Module not found', 'acymailing');
 __('Only insert simple modules, the ones containing forms or JavaScript actions will not work in your receivers mailbox', 'acymailing');
 __('You need to activate the Joomla multilingual plugin and module for this option to take effect', 'acymailing');
+/* translators: %s: number of users */
 __('Randomly select %s AcyMailing users', 'acymailing');
 __('Free', 'acymailing');
 __('Suppression list', 'acymailing');
@@ -534,7 +608,9 @@ __('Automatic', 'acymailing');
 __('If you don\'t have any issue with the position of your AcyMailing list don\'t touch anything but if the AcyMailing form doesn\'t display after the input that you\'ve chosen, you can try different options.', 'acymailing');
 __('HTML registration form structure', 'acymailing');
 __('Close the notification', 'acymailing');
+/* translators: %s: malformed CNAME entry */
 __('A malformed CNAME entry has been found: %s', 'acymailing');
+/* translators: %1$s: CNAME entry with domain, %2$s: CNAME entry without domain */
 __('Your server may automatically add your domain name to CNAME entries, try to enter them without the domain name, for example: %1$s => %2$s', 'acymailing');
 __('Never subscribed', 'acymailing');
 __('Use our database cleaning tool: https://www.acychecker.com/', 'acymailing');
@@ -543,6 +619,7 @@ __('Make sure you have an unsubscribe link in your email.', 'acymailing');
 __('To avoid this, you can:', 'acymailing');
 __('You\'re about to send your first campaign with AcyMailing Sending Service. We remind you that if your deliverability score is not good, your account may be suspended until your recipient base quality is restored.', 'acymailing');
 __('Warning', 'acymailing');
+/* translators: %1$s: start date, %2$s: end date */
 __('%1$s to %2$s', 'acymailing');
 __('You must include an unsubscribe link in your email to use our sending service.', 'acymailing');
 __('The complaint rate is the percentage of emails that were marked as spam by the recipient.', 'acymailing');
@@ -570,36 +647,57 @@ __('All languages', 'acymailing');
 __('Display only for those languages', 'acymailing');
 __('You can select the languages for which the form will be displayed', 'acymailing');
 __('Order partially refunded emails are sent to customers when their orders are partially refunded.', 'acymailing');
+/* translators: %s: follow-up name */
 __('Will be unsubscribed from the follow-up %s', 'acymailing');
 __('Unsubscribe from a follow-up', 'acymailing');
+/* translators: %s: mailbox name */
 __('No message found in mailbox %s', 'acymailing');
+/* translators: %s: mailbox action name */
 __('Connection failed for mailbox action %s', 'acymailing');
+/* translators: %s: original email subject */
 __('Forward: %s', 'acymailing');
+/* translators: %1$s: user, %2$s: list name */
 __('Could not unsubscribe user %1$s from %2$s', 'acymailing');
+/* translators: %1$s: user, %2$s: list name */
 __('Unsubscribe user %1$s from list %2$s', 'acymailing');
+/* translators: %s: list name */
 __('Could not subscribe the user to the list %s', 'acymailing');
 __('Campaign successfully added to the queue', 'acymailing');
 __('Could not send the campaign', 'acymailing');
 __('Could not assign list to campaign', 'acymailing');
 __('Could not create campaign', 'acymailing');
 __('Could not forward the email', 'acymailing');
+/* translators: %1$s: attachment name, %2$s: error message */
 __('Error uploading the attachment %1$s: %2$s', 'acymailing');
 __('The template does not contain the {emailcontent} shortcode', 'acymailing');
 __('Could not find the selected template', 'acymailing');
+/* translators: %s: action name */
 __('Action %s', 'acymailing');
+/* translators: %s: email address */
 __('Invalid email: %s', 'acymailing');
+/* translators: %s: email address */
 __('Empty email: %s', 'acymailing');
 __('The subject doesn\'t match the condition', 'acymailing');
+/* translators: %s: sender email */
 __('Sender %s not allowed, user is not subscribed to one of the allowed lists', 'acymailing');
+/* translators: %s: sender email */
 __('Sender %s not allowed, user doesn\'t exist in AcyMailing', 'acymailing');
+/* translators: %1$s: sender email, %2$s: allowed groups */
 __('Sender %1$s not allowed, user is not in the allowed groups: %2$s', 'acymailing');
+/* translators: %1$s: sender email, %2$s: CMS name */
 __('Sender %1$s not allowed, user doesn\'t exist in %2$s', 'acymailing');
+/* translators: %s: sender email */
 __('Sender %s not allowed', 'acymailing');
 __('Distribution lists', 'acymailing');
+/* translators: %s: user */
 __('Unsubscribe the user: %s', 'acymailing');
+/* translators: %s: user */
 __('Subscribe the user: %s', 'acymailing');
+/* translators: %s: email address */
 __('Forward the message to: %s', 'acymailing');
+/* translators: %s: list name */
 __('Forward to a list: %s', 'acymailing');
+/* translators: %s: template name */
 __('Include the message in the template %s', 'acymailing');
 __('Please add the shortcode {emailcontent} in the templates you would like to see in this list. The forwarded email\'s content will be included where you put this shortcode.', 'acymailing');
 __('Connection failed', 'acymailing');
@@ -623,6 +721,7 @@ __('Everyone', 'acymailing');
 __('Allowed sender', 'acymailing');
 __('Only the emails sent by someone matching this condition will be taken into account.', 'acymailing');
 __('Test connection', 'acymailing');
+/* translators: %s: mailbox action name */
 __('Error duplicating mailbox action: <b>%s</b>', 'acymailing');
 __('Bounce rules', 'acymailing');
 __('Create new mailbox action', 'acymailing');
@@ -637,6 +736,7 @@ __('When the user has never opened any email', 'acymailing');
 __('Has never opened any email', 'acymailing');
 __('Postmark Stream ID', 'acymailing');
 __('Here you can add a default Stream Id. It will be used if no Stream Id is filled in an email campaign', 'acymailing');
+/* translators: %s: IP address */
 __('In order to have your CRON process working, you may need to whitelist our IP. The IP address to whitelist is %s', 'acymailing');
 __('Important information', 'acymailing');
 __('Save new custom view version', 'acymailing');
@@ -662,6 +762,7 @@ __('Domain has been successfully validated. You can now start sending emails usi
 __('Unfortunately, we couldn\'t find the CNAME entries you set in your server DNS. If you have issues, feel free to contact the support', 'acymailing');
 __('Waiting for CNAME entries to be added into your DNS entries', 'acymailing');
 __('Don\'t know how to do it?', 'acymailing');
+/* translators: %s: domain name */
 __('We won\'t be able to send emails from our sending service using your domain name (@%s) without this step.', 'acymailing');
 __('To send emails you need to add some CNAME entries into the DNS configuration of your server.', 'acymailing');
 __('Get a license', 'acymailing');
@@ -674,6 +775,7 @@ __('You don\'t have any domain yet', 'acymailing');
 __('Update domains statuses', 'acymailing');
 __('License blocked, contact us for more information', 'acymailing');
 __('Invalid API-KEY', 'acymailing');
+/* translators: %s: version number */
 __('Please install the latest version of AcyMailing, or at least the version %s', 'acymailing');
 __('This domain is not attached to this site', 'acymailing');
 __('You are not allowed to delete this domain', 'acymailing');
@@ -710,13 +812,17 @@ __('Colors that will be available in the color pickers', 'acymailing');
 __('Conditions and filters based on the user who triggered the automation will be deleted. Are you sure you want to continue?', 'acymailing');
 __('Ordering', 'acymailing');
 __('This domain has already been sent for approval', 'acymailing');
+/* translators: %s: domain name */
 __('The domain %s is not valid', 'acymailing');
+/* translators: %s: domain name */
 __('The domain: %s doesn\'t exist', 'acymailing');
 __('Not enough credits to send this email', 'acymailing');
 __('Your site couldn\'t contact acymailing.com', 'acymailing');
 __('Get more credits', 'acymailing');
+/* translators: %s: list of domains */
 __('You have unverified domains preventing emails from being sent, please verify them: %s', 'acymailing');
 __('Add a domain', 'acymailing');
+/* translators: %s: domain name */
 __('%s domain already exists', 'acymailing');
 __('Too many request please wait few minutes and try again', 'acymailing');
 __('You don\'t have the right to delete this domain', 'acymailing');
@@ -731,12 +837,15 @@ __('Here', 'acymailing');
 __('Client id', 'acymailing');
 __('Client secret', 'acymailing');
 __('Redirect URL', 'acymailing');
+/* translators: %s: error message */
 __('An error occurred during authentication: %s', 'acymailing');
 __('Authentication successful!', 'acymailing');
+/* translators: %s: error message */
 __('An error occurred while retrieving a new token to your SMTP server: %s', 'acymailing');
 __('Remove VAT', 'acymailing');
 __('If this option is selected, the VAT will not be included in incomes', 'acymailing');
 __('Clickable image', 'acymailing');
+/* translators: %1$s: user, %2$s: email address, %3$s: rule, %4$s: error message */
 __('Error saving bounce email for user %1$s, email %2$s, rule %3$s: %4$s', 'acymailing');
 __('The function curl_multi_exec is disabled on your server, your host must activate it for the sending configuration you set to work.', 'acymailing');
 __('Transfer my email to AcyMailing support so that they can contact me regarding my problem', 'acymailing');
@@ -749,9 +858,11 @@ __('reCAPTCHA v3 returns a score (1.0 is very likely a good interaction, 0.0 is 
 __('Score to reach', 'acymailing');
 __('reCaptcha v3', 'acymailing');
 __('Campaigns number per page', 'acymailing');
+/* translators: %s: number of items */
 __('%s per page', 'acymailing');
 __('No filter', 'acymailing');
 __('Only newly created or modified', 'acymailing');
+/* translators: %1$s: hour, %2$s: minute */
 __('%1$s : %2$s', 'acymailing');
 __('Execute daily tasks at', 'acymailing');
 __('Only available in our commercial versions', 'acymailing');
@@ -767,8 +878,10 @@ __('Users will have to enter their e-mail address twice, in order to avoid keybo
 __('Add a validation field for the email field', 'acymailing');
 __('Any vendor', 'acymailing');
 __('Show own user\'s products only', 'acymailing');
+/* translators: %1$s: product, %2$s: store or list name */
 __('Wish listed %1$s in %2$s', 'acymailing');
 __('Wishlist', 'acymailing');
+/* translators: %1$s: integration or store name */
 __('When %1$s wishlist is updated', 'acymailing');
 __('A custom zone with the same name already exists', 'acymailing');
 __('Do you confirm the deletion of this custom zone?', 'acymailing');
@@ -786,6 +899,7 @@ __('You can drag these zones to your email, you\'ll then be able to insert block
 __('You can drag these blocks in the zones of your email.', 'acymailing');
 __('Zones', 'acymailing');
 __('Stop sending during the week-end', 'acymailing');
+/* translators: %1$s: start date, %2$s: start time, %3$s: end date, %4$s: end time */
 __('Send from %1$s : %2$s to %3$s : %4$s', 'acymailing');
 __('Your Brevo account needs to be validated before being able to send campaigns. Please follow the validation steps listed by Brevo:', 'acymailing');
 __('Scroll', 'acymailing');
@@ -794,17 +908,22 @@ __('AcyMailing: User profile', 'acymailing');
 __('AcyMailing: Newsletter archive', 'acymailing');
 __('Filter inserted articles by meta keywords, separated by a comma. Articles having at least one of the keywords will be inserted.', 'acymailing');
 __('Meta Keywords', 'acymailing');
+/* translators: %s: event category */
 __('Is attending an event of %s', 'acymailing');
+/* translators: %s: event name */
 __('Is attending the event %s', 'acymailing');
 __('Any profile', 'acymailing');
+/* translators: %1$s: operator (is or is not), %2$s: profile name */
 __(' %1$s the profile %2$s', 'acymailing');
 __('Any group', 'acymailing');
 __('If specified, this name will be displayed instead of the list name on subscription forms and the unsubscribe page', 'acymailing');
 __('Not enabled yet', 'acymailing');
 __('You can find your license in your account', 'acymailing');
+/* translators: %s: AcyMailing level name */
 __('To activate all AcyMailing %s features, please enter your license key', 'acymailing');
 __('Please attach your license before activating automated tasks', 'acymailing');
 __('The license key allows you to activate AcyMailing features', 'acymailing');
+/* translators: %s: AcyMailing version */
 __('Thank you for installing AcyMailing %s!', 'acymailing');
 __('License activated', 'acymailing');
 __('Activation status:', 'acymailing');
@@ -815,6 +934,7 @@ __('Alt Text', 'acymailing');
 __('Text shown when the image fails to load, and used as a description for visually impaired people.', 'acymailing');
 __('(Pro version only)', 'acymailing');
 __('Currency symbol position', 'acymailing');
+/* translators: %1$s: statistic action, %2$s: email or campaign, %3$s: target, %4$s: ID */
 __('Where the user has %1$s on %2$s for %3$s [ID: %4$s]', 'acymailing');
 __('Clicked', 'acymailing');
 __('Clicked a link', 'acymailing');
@@ -825,19 +945,24 @@ __('Discount name', 'acymailing');
 __('IP address of the user', 'acymailing');
 __('IP address', 'acymailing');
 __('Click here', 'acymailing');
+/* translators: %1$s: add-on name, %2$s: link to download the new plugin */
 __('You installed the %1$s add-on, it has been converted into a WordPress plugin for wordpress.org rules compliancy. %2$s to download the new plugin.', 'acymailing');
 __('Menu order', 'acymailing');
 __('Featured image size', 'acymailing');
 __('Original image resolution', 'acymailing');
+/* translators: %s: follow-up name */
 __('Will be subscribed to the follow-up %s', 'acymailing');
 __('Select a follow-up', 'acymailing');
 __('Subscribe to a follow-up', 'acymailing');
 __('Please note that this campaign is based on a deactivated plugin and will therefore not work. Modify the birthday field or reactivate the plugin.', 'acymailing');
 __('AcyMailing Segment', 'acymailing');
+/* translators: %s: segment name */
 __('Match with this segment: %s', 'acymailing');
 __('No field available', 'acymailing');
 __('Select a field', 'acymailing');
+/* translators: %s: plugin name */
 __('Choose a plugin to select a birthday field %s', 'acymailing');
+/* translators: %s: plugin name */
 __('Birthday field %s', 'acymailing');
 __('Only publish newsletters attached to at least one of the selected lists', 'acymailing');
 __('Extension plugin for Perfect Publisher. Choose AcyMailing emails as possible content to share.', 'acymailing');
@@ -867,7 +992,9 @@ __('Skip & deactivate', 'acymailing');
 __('Quick feedback', 'acymailing');
 __('Unsubscribe reason:', 'acymailing');
 __('No reason set by the user', 'acymailing');
+/* translators: %1$s: integration or store name */
 __('When %1$s order is created', 'acymailing');
+/* translators: %1$s: number of attendees */
 __('%1$s attendees', 'acymailing');
 __('Organizer', 'acymailing');
 __('Next occurrences', 'acymailing');
@@ -882,11 +1009,13 @@ __('You have disabled the edition in the custom field configuration', 'acymailin
 __('Preview (Custom view)', 'acymailing');
 __('You are using a custom view, all the &quot;Display&quot; settings in the right menu won\'t be taken into account', 'acymailing');
 __('The send frequency cannot be set to 0 minute when the Automated tasks option is active in the License tab. The frequency used will be 15 minutes with one batch.', 'acymailing');
+/* translators: %s: number of missing keys added */
 __('%s missing keys added to subscribers', 'acymailing');
 __('The PHP extension zlib is needed for this feature, activate it on your server.', 'acymailing');
 __('Only the elements created/published since the specified date will be inserted in your email.', 'acymailing');
 __('Min. publishing date', 'acymailing');
 __('An error occurred while adding the emails to the queue.', 'acymailing');
+/* translators: %s: number of users */
 __('Click here if you would like to add this new email to the queue for the %s users that already triggered the follow-up.', 'acymailing');
 __('For example you can set to delete the emails stuck in queue after 10 days. If you set 0 this option will be ignored', 'acymailing');
 __('Number of days before deleting emails in the queue', 'acymailing');
@@ -908,6 +1037,7 @@ __('Disposable email addresses are clearly meant to avoid giving you a real emai
 __('- A disposable email address (Yopmail, Tempemail, etc...)', 'acymailing');
 __('Block the subscription if it uses:', 'acymailing');
 __('Check the email address when someone subscribes.', 'acymailing');
+/* translators: %s: security score out of 100 */
 __('Security score: %s/100', 'acymailing');
 __('Mail checker integration (Recommended)', 'acymailing');
 __('You\'re going to send a lot of emails.<br />To make sure you won\'t be considered as SPAM by sending emails to non-existing email addresses, you should consider cleaning your lists first.', 'acymailing');
@@ -946,20 +1076,25 @@ __('You can disable this by getting an AcyMailing Pro version.', 'acymailing');
 __('License prices start at 29€ per year.', 'acymailing');
 __('See Pro versions features', 'acymailing');
 __('See documentation', 'acymailing');
+/* translators: %s: list name */
 __('Subscribed to the list %s', 'acymailing');
+/* translators: %s: list name */
 __('Unsubscribed from the list %s', 'acymailing');
 __('Maximum width', 'acymailing');
 __('Maximum height', 'acymailing');
 __('Column vertical padding', 'acymailing');
 __('Column horizontal padding', 'acymailing');
+/* translators: %s: mail name */
 __('Mail name: %s', 'acymailing');
 __('Validate', 'acymailing');
 __('Default font', 'acymailing');
 __('Any email', 'acymailing');
 __('Go Pro', 'acymailing');
 __('Create personalized campaigns with segments!<br />Segment your subscribers according to their age, their location, their behavior or their hobbies.<br />You can better target your customers and create more personal emails!', 'acymailing');
+/* translators: %s: store or integration name */
 __('%s abandoned cart', 'acymailing');
 __('Your customers forgot to complete their shopping cart?<br />Create your own personalized abandoned cart emails and remind them to finish their shopping.', 'acymailing');
+/* translators: %1$s: CMS or shop name, %2$s: CMS or shop name */
 __('Tired of standard %1$s automatic emails?<br />Create and personnalise your emails that look like you. You can also customize %2$s standard emails.', 'acymailing');
 __('The newsletters of your choice', 'acymailing');
 __('Have more choices when you create a newsletter.<br /><br />Create scheduled, automatic or follow-up campaigns.<br />Adapt your emails to your needs.', 'acymailing');
@@ -974,22 +1109,27 @@ __('Terms and policy options', 'acymailing');
 __('Fields options', 'acymailing');
 __('Lists options', 'acymailing');
 __('AcyMailing: Subscription Form', 'acymailing');
+/* translators: %1$s: status, %2$s: email or campaign, %3$s: ID, %4$s: time delay */
 __('Where the user has the status %1$s for %2$s [ID: %3$s] %4$s after the email is sent', 'acymailing');
 __('If you select 0 in the input no condition on the time will be applied', 'acymailing');
+/* translators: %s: time delay */
 __('%s after the mail is sent', 'acymailing');
 __('The filters you\'ve set on the subscribers listing will be applied to your export', 'acymailing');
 __('The captcha provides an anti-spam security on your subscription forms', 'acymailing');
 __('Note that if you change the opacity of the background color it may not work on all mail clients', 'acymailing');
 __('List-Unsubscribe handling', 'acymailing');
 __('Name of the field to use as user name', 'acymailing');
+/* translators: %1$s: products, %2$s: amount, %3$s: time unit, %4$s: order status */
 __('Created an order with %1$s %2$s %3$s ago and status is %4$s', 'acymailing');
 __('Please select the lists you want to unsubscribe from', 'acymailing');
+/* translators: %s: field name */
 __('Incorrect value for the field %s', 'acymailing');
 __('Filename empty or not valid', 'acymailing');
 __('Error creating export file', 'acymailing');
 __('Synchronize existing users', 'acymailing');
 __('No user to synchronize', 'acymailing');
 __('Users synchronized with success', 'acymailing');
+/* translators: %1$s: data type, %2$s: frequency */
 __('Clean data on %1$s every %2$s', 'acymailing');
 __('Select the dynamic text you would like to insert then click the insert button', 'acymailing');
 __('You can expand the available types by installing add-ons', 'acymailing');
@@ -1022,13 +1162,16 @@ __('Number of subscribers', 'acymailing');
 __('the subscriber', 'acymailing');
 __('Execute conditions on all subscribers', 'acymailing');
 __('Execute conditions on the subscriber triggering the automation', 'acymailing');
+/* translators: %s: trigger or automation type */
 __('The subscribers selected by this %s ', 'acymailing');
 __('Execute actions on the subscriber triggering the automation', 'acymailing');
 __('Execute actions on all subscribers', 'acymailing');
 __('Export subscribers', 'acymailing');
 __('Import subscribers', 'acymailing');
 __('New subscriber', 'acymailing');
+/* translators: %s: email address */
 __('The e-mail address %s is not in the list of subscribers', 'acymailing');
+/* translators: %s: number of new subscribers */
 __('%s new subscribers imported', 'acymailing');
 __('All the subscribers will be exported', 'acymailing');
 __('You don\'t have any subscriber.', 'acymailing');
@@ -1066,6 +1209,7 @@ __('Paste your text here, the users will be selected based on the email addresse
 __('Users extracted from a text', 'acymailing');
 __('Selected by the specified SQL query', 'acymailing');
 __('Users based on an advanced SQL query', 'acymailing');
+/* translators: %s: table name */
 __('Contained in the table %s', 'acymailing');
 __('Users matching an other database table', 'acymailing');
 __('With this option you can change the from name, from email, reply to name and reply to email of the sender information for the chosen language', 'acymailing');
@@ -1082,6 +1226,7 @@ __('Create user', 'acymailing');
 __('User group', 'acymailing');
 __('Create on subscriber modification', 'acymailing');
 __('Create from subscription on', 'acymailing');
+/* translators: %1$s: subscription or product, %2$s: store or list name */
 __('That have a subscription for %1$s in %2$s', 'acymailing');
 __('Any product', 'acymailing');
 __('The user has a subscription for', 'acymailing');
@@ -1121,6 +1266,7 @@ __('If you turn Off this option, your subscribers will only see your email addre
 __('The &quot;Reply-to&quot; information can be different from the &quot;From&quot; one. If a subscriber hits the &quot;Reply&quot; button in their mail client, it will send an email to the &quot;Reply-to&quot; you specified instead of the &quot;From&quot; address.', 'acymailing');
 __('This is shown above your emails when your subscribers receive them. It helps them know who sent the email they received.', 'acymailing');
 __('Could not retrieve data', 'acymailing');
+/* translators: %s: source name */
 __('Copy settings from %s', 'acymailing');
 __('If you use the subscription via URL and you want to enable the captcha, you will have to add this security key on your subscription via URL (by adding the argument seckey=YOUR_KEY) otherwise the subscription via URL won\'t work. This key is randomly generated during the install process but you can change it if you want.', 'acymailing');
 __('See users', 'acymailing');
@@ -1149,9 +1295,11 @@ __('Customer billing full name', 'acymailing');
 __('Insert the order number of the new order', 'acymailing');
 __('Order number', 'acymailing');
 __('New order emails are sent to chosen recipient(s) when a new order is received.', 'acymailing');
+/* translators: %1$s: email name, %2$s: user */
 __('The email %1$s not sent to the user %2$s, there was not enough products in the user\'s cart', 'acymailing');
 __('Products in cart', 'acymailing');
 __('User detailed statistics', 'acymailing');
+/* translators: %1$s: number of rows, %2$s: table name */
 __('Deleted %1$s rows of the table %2$s', 'acymailing');
 __('Delete user history after', 'acymailing');
 __('Delete detailed statistics after', 'acymailing');
@@ -1163,6 +1311,7 @@ __('The PHP function &quot;curl_multi_exec&quot; is disabled on your server, you
 __('In addition to our server your cron can be triggered every time a page is visited on your website. So if you don\'t have any visitors the cron will only be triggered every 15 minutes', 'acymailing');
 __('credits remaining', 'acymailing');
 __('It will insert only the products bought since the date set, if no date is set it will take since the start', 'acymailing');
+/* translators: %1$s: email name, %2$s: user */
 __('The email %1$s not sent to the user %2$s, he/she didn\'t buy enough products', 'acymailing');
 __('The maximum number of products purchased by the user that you would like to display', 'acymailing');
 __('The minimum number of products purchased by the user that you would like to display', 'acymailing');
@@ -1171,26 +1320,36 @@ __('Category filter', 'acymailing');
 __('Last purchased products', 'acymailing');
 __('Start from template', 'acymailing');
 __('The values for the automatic send process that you\'ve set in the configuration might be too high for your server performances, you can keep it that way but it\'s at your own risk', 'acymailing');
+/* translators: %1$s: number of batches, %2$s: number of emails, %3$s: time interval */
 __('Send %1$s batches of %2$s e-mails every %3$s', 'acymailing');
 __('Delete this block', 'acymailing');
 __('This option is disabled because the sending method you chose doesn\'t handle it.', 'acymailing');
 __('EU', 'acymailing');
 __('US', 'acymailing');
+/* translators: %s: sending method name */
 __('%s domain', 'acymailing');
+/* translators: %s: sending method name */
 __('%s region', 'acymailing');
+/* translators: %s: sending method name */
 __('%s allows the ability to send emails in either US or EU region. Be sure to select the appropriate region on which you\'ve created your domain in.', 'acymailing');
 __('Can\'t retrieve credits left', 'acymailing');
 __('Your sending method', 'acymailing');
+/* translators: %1$s: label, %2$s: value, %3$s: unit */
 __('%1$s: %2$s %3$s', 'acymailing');
 __('getting remaining credits', 'acymailing');
+/* translators: %1$s: sending method name, %2$s: action being performed, %3$s: error message */
 __('%1$s returned an error while %2$s: %3$s', 'acymailing');
+/* translators: %1$s: label, %2$s: current value, %3$s: maximum value, %4$s: unit */
 __('%1$s: %2$s/%3$s %4$s', 'acymailing');
 __('Test credentials', 'acymailing');
 __('Could not find sending method', 'acymailing');
 __('API key correct', 'acymailing');
+/* translators: %s: error message */
 __('The API returned this error: %s', 'acymailing');
 __('Authentication fails with this API key', 'acymailing');
+/* translators: %s: error message */
 __('An error occurred while calling the API: %s', 'acymailing');
+/* translators: %s: sending method name */
 __('%s API key', 'acymailing');
 __('Table name', 'acymailing');
 __('No block selected', 'acymailing');
@@ -1201,19 +1360,24 @@ __('Confirmation message', 'acymailing');
 __('Addon settings', 'acymailing');
 __('After subscription', 'acymailing');
 __('Redirections', 'acymailing');
+/* translators: %s: custom field name */
 __('The custom field %s does not exist', 'acymailing');
-__('<b>You don\'t have any open data/click data yet</b>', 'acymailing');
+/* translators: %s: number of receivers */
 __('Number of receivers: %s', 'acymailing');
 __('Opening platforms', 'acymailing');
+/* translators: %s: plugin name */
 __('You don\'t have any %s custom field', 'acymailing');
+/* translators: %1$s: integration name, %2$s: target or product */
 __('When a new subscription is created on %1$s for %2$s', 'acymailing');
 __('On membership', 'acymailing');
 __('On member transaction complete', 'acymailing');
 __('Activated or deactivated', 'acymailing');
+/* translators: %1$s: integration name, %2$s: subscription, %3$s: status */
 __('Subscribed to %1$s and the subscription is %2$s with the status to %3$s', 'acymailing');
 __('Any membership', 'acymailing');
 __('Stopped', 'acymailing');
 __('Suspended', 'acymailing');
+/* translators: %s: integration name */
 __('%s membership', 'acymailing');
 __('Unknown', 'acymailing');
 __('Opened with', 'acymailing');
@@ -1221,9 +1385,12 @@ __('New unsubscribers', 'acymailing');
 __('New subscribers', 'acymailing');
 __('Evolution of the subscribers during the last 12 months', 'acymailing');
 __('Searching...', 'acymailing');
+/* translators: %s: maximum number of items */
 __('You can only select %s items', 'acymailing');
 __('Loading more results...', 'acymailing');
+/* translators: %s: number of characters */
 __('Please enter %s or more characters', 'acymailing');
+/* translators: %s: number of characters */
 __('Please delete %s characters', 'acymailing');
 __('The results could not be loaded.', 'acymailing');
 __('Devices', 'acymailing');
@@ -1231,6 +1398,7 @@ __('Bullet list', 'acymailing');
 __('New line', 'acymailing');
 __('Generate the table of contents based on', 'acymailing');
 __('Existing anchors', 'acymailing');
+/* translators: %s: level number */
 __('Level %s', 'acymailing');
 __('Open percentage', 'acymailing');
 __('You don\'t have open data yet, these stats are an example of what you can have on your email', 'acymailing');
@@ -1244,8 +1412,10 @@ __('Total clicks', 'acymailing');
 __('Unique clicks', 'acymailing');
 __('User click details', 'acymailing');
 __('Links details', 'acymailing');
+/* translators: %1$s: template name(s) */
 __('Could not duplicate the template: template(s) %1$s not found', 'acymailing');
 __('Unsubscribe rate', 'acymailing');
+/* translators: %1$s: number of unsubscribed users, %2$s: total number of users */
 __('%1$s users out of %2$s unsubscribed', 'acymailing');
 __('Receiver lists', 'acymailing');
 __('Open and click rate', 'acymailing');
@@ -1334,14 +1504,20 @@ __('Reset email overrides', 'acymailing');
 __('Install email overrides', 'acymailing');
 __('Email overrides are not installed', 'acymailing');
 __('Email overrides', 'acymailing');
+/* translators: %1$s: foreign key name, %2$s: table name */
 __('[OK]Problem solved: Added foreign key %1$s to table %2$s', 'acymailing');
+/* translators: %1$s: foreign key name, %2$s: table name, %3$s: error message */
 __('[ERROR]Could not add the foreign key %1$s on the table %2$s : %3$s', 'acymailing');
+/* translators: %1$s: foreign key name, %2$s: table name */
 __('Foreign key %1$s not well set for table %2$s', 'acymailing');
+/* translators: %1$s: user, %2$s: list name */
 __('The user %1$s subscribing to %2$s', 'acymailing');
 __('Could not delete the email', 'acymailing');
 __('This delay is based on the time the user triggers the follow-up campaign', 'acymailing');
 __('This follow-up doesn\'t have any email', 'acymailing');
+/* translators: %s: number of users */
 __('Triggered for %s users', 'acymailing');
+/* translators: %s: number of emails */
 __('%s emails', 'acymailing');
 __('There isn\'t a specific delay to use for follow-up emails as it really depends on your activity.<br />For example a follow-up email that asks for a review sent after the purchase of a product, you can use some weeks of delay to let your customers the time to test your product.<br />The best solution is to test and learn. Try to send them some days after the event trigger and see how it goes.', 'acymailing');
 __('When to send follow-ups?', 'acymailing');
@@ -1351,10 +1527,13 @@ __('A follow-up email is an email or sequence of emails sent in response to the 
 __('What are follow-ups?', 'acymailing');
 __('Follow-up', 'acymailing');
 __('Please wait while we\'re saving your email', 'acymailing');
+/* translators: %1$s: operator (is or is not), %2$s: list name(s) */
 __('User %1$s subscribing to the list(s) %2$s', 'acymailing');
 __('The birthday field is an AcyMailing date custom field', 'acymailing');
+/* translators: %1$s: first value, %2$s: second value */
 __('%1$s + %2$s', 'acymailing');
 __('Could not save the delay settings for this email', 'acymailing');
+/* translators: %1$s: amount, %2$s: time unit */
 __('Send this email %1$s %2$s after the trigger', 'acymailing');
 __('Add an email', 'acymailing');
 __('Create your first follow-up email!', 'acymailing');
@@ -1363,17 +1542,26 @@ __('Display name', 'acymailing');
 __('Send once', 'acymailing');
 __('Do you want this follow-up to be sent only once per user?', 'acymailing');
 __('No condition applied', 'acymailing');
+/* translators: %s: field name */
 __('Birthday field is %s', 'acymailing');
+/* translators: %1$s: operator, %2$s: store name */
 __('One of the product categories %1$s in %2$s', 'acymailing');
+/* translators: %1$s: product, %2$s: store name */
 __('Product %1$s in %2$s', 'acymailing');
+/* translators: %1$s: order status, %2$s: store name */
 __('Order status %1$s in %2$s', 'acymailing');
 __('Every order status', 'acymailing');
+/* translators: %1$s: operator (is or is not), %2$s: segment name(s) */
 __('The user %1$s part of the segment(s) %2$s', 'acymailing');
 __('No condition on the segments', 'acymailing');
 __('No condition on the user\'s subscription', 'acymailing');
+/* translators: %1$s: operator (is or is not), %2$s: list name(s) */
 __('The user %1$s subscribed to %2$s', 'acymailing');
+/* translators: %1$s: category, %2$s: store name */
 __('Category %1$s in %2$s', 'acymailing');
+/* translators: %1$s: product, %2$s: store name */
 __('Product %1$s in %2$s', 'acymailing');
+/* translators: %1$s: order status, %2$s: store name */
 __('Order status %1$s in %2$s', 'acymailing');
 __('Is not', 'acymailing');
 __('Is', 'acymailing');
@@ -1381,7 +1569,9 @@ __('Send follow-up email if:', 'acymailing');
 __('You can leave conditions empty. But that means follow-up emails will be executed for every single user belonging to your trigger', 'acymailing');
 __('Here you will be able to define some conditions. Emails will be sent only if the user matches these conditions', 'acymailing');
 __('Could not load data', 'acymailing');
+/* translators: %1$s: operator (is or is not), %2$s: segment name(s) */
 __('User %1$s part of the segment(s) %2$s', 'acymailing');
+/* translators: %1$s: operator (is or is not), %2$s: list name(s) */
 __('User %1$s subscribed to the list(s) %2$s', 'acymailing');
 __('Suggest an idea', 'acymailing');
 __('Share it with us so that we can add it to our TODO list', 'acymailing');
@@ -1400,9 +1590,12 @@ __('If you check <b>yes</b> a new tab <b>segment</b> will appear after you\'ve s
 __('Number of AcyMailing users matching these conditions:', 'acymailing');
 __('Birthday email', 'acymailing');
 __('If you delete a date field that is used in a birthday campaign, this campaign will be disabled.', 'acymailing');
+/* translators: %s: field name */
 __('Birthday field %s', 'acymailing');
+/* translators: %1$s: amount, %2$s: time unit, %3$s: before or after */
 __('Send it %1$s %2$s %3$s user\'s birthday', 'acymailing');
 __('Special mail will be sent to: ', 'acymailing');
+/* translators: %1$s: number of days, %2$s: time unit, %3$s: order status */
 __('Send it if the user placed an order %1$s %2$s ago and the order status is currently %3$s', 'acymailing');
 __('Please select an email first', 'acymailing');
 __('Times', 'acymailing');
@@ -1442,8 +1635,10 @@ __('You don\'t have any segment', 'acymailing');
 __('Segments', 'acymailing');
 __('List description', 'acymailing');
 __('List descriptions', 'acymailing');
+/* translators: %s: language name */
 __('The specified language &quot;%s&quot; is not installed on your site', 'acymailing');
 __('Language code not found', 'acymailing');
+/* translators: %s: file name */
 __('File not found: %s', 'acymailing');
 __('Page not found', 'acymailing');
 __('Invalid image', 'acymailing');
@@ -1453,6 +1648,7 @@ __('Replace the form', 'acymailing');
 __('Temporarily replace the form', 'acymailing');
 __('Temporarily display above the form', 'acymailing');
 __('Display in the standard message area', 'acymailing');
+/* translators: %1$s: previous order status, %2$s: new order status */
 __('When a WooCommerce user order status changes from %1$s to %2$s', 'acymailing');
 __('When a WooCommerce user order status changes', 'acymailing');
 __('The number of hours before the cookie expires', 'acymailing');
@@ -1487,12 +1683,14 @@ __('The vertical padding is for the columns in mobile view, which are one below 
 __('Vertical Padding', 'acymailing');
 __('Horizontal Padding', 'acymailing');
 __('This option will allow you to know how many sales you make per email. Be careful as this option adds a cookie on the clicked links so don\'t forget to add it in your privacy policy!', 'acymailing');
+/* translators: %s: social media name */
 __('Unknown social media: %s', 'acymailing');
 __('The selected lists will be checked by default on the subscription form if they are visible', 'acymailing');
 __('Your server failed to send the email', 'acymailing');
 __('No detailed statistics available for this email', 'acymailing');
 __('You are about to remove the translation for the current language, are you sure?', 'acymailing');
 __('Click here to remove this translation', 'acymailing');
+/* translators: %s: list of languages */
 __('You removed the following languages: %s. All the related email translations will be deleted, are you sure?', 'acymailing');
 __('The subject cannot be empty', 'acymailing');
 __('No email version set for this language.', 'acymailing');
@@ -1571,6 +1769,7 @@ __('This feature allows to customize/override the way the content will be displa
 __('End date simple', 'acymailing');
 __('Start date simple', 'acymailing');
 __('Start date', 'acymailing');
+/* translators: %1$s: field name, %2$s: column name */
 __('Duplicate field &quot;%1$s&quot; for the column %2$s', 'acymailing');
 __('Please assign a column for the e-mail field', 'acymailing');
 __('Please fill all information', 'acymailing');
@@ -1588,6 +1787,7 @@ __('Custom view not found', 'acymailing');
 __('If your custom view doesn\'t have any tags (for example {title} to display the title of your article) we will display the default layout', 'acymailing');
 __('Dynamic content', 'acymailing');
 __('You need a Pro version to see the results', 'acymailing');
+/* translators: %1$s: field name, %2$s: operator, %3$s: value, %4$s: extra detail */
 __('Has the %1$s field %2$s %3$s %4$s', 'acymailing');
 __('By group', 'acymailing');
 __('You need the Enterprise version to see the results', 'acymailing');
@@ -1607,6 +1807,7 @@ __('This campaign is not being tracked', 'acymailing');
 __('This campaign is being tracked', 'acymailing');
 __('Custom view', 'acymailing');
 __('Custom view well saved', 'acymailing');
+/* translators: %s: name */
 __('Custom view for %s', 'acymailing');
 __('Could not save the settings', 'acymailing');
 __('By tag', 'acymailing');
@@ -1662,6 +1863,7 @@ __('This option is preselected depending on the choice you\'ve made in the first
 __('Next trigger', 'acymailing');
 __('Last generation', 'acymailing');
 __('Error while recovering the campaigns triggers', 'acymailing');
+/* translators: %s: item type */
 __('You don\'t have any %s', 'acymailing');
 __('Create new email', 'acymailing');
 __('Emails', 'acymailing');
@@ -1678,6 +1880,7 @@ __('What are the risks?', 'acymailing');
 __('You will start being considered as SPAM by mail servers as you\'re getting too many bounce emails.<br />If you don\'t optimize this then your emails won\'t be received anymore. That\'s that simple!', 'acymailing');
 __('How AcyMailing can help?', 'acymailing');
 __('Bounce handling feature allows to stop sending emails to invalid recipients and stop receiving bounces to not be considered as SPAM.<br />Here are some actions you will be able to define:<br /> - Delete a user from your receivers when its email address doesn\'t exist <br /> - Forward the message to your email address when it is a Vacation/Auto-Reply message <br /> - Unsubscribe users from the list <br /> - So many more ...', 'acymailing');
+/* translators: %s: error message */
 __('Curl error message: %s', 'acymailing');
 __('Could not upload this csv file', 'acymailing');
 __('Never', 'acymailing');
@@ -1689,6 +1892,7 @@ __('See more', 'acymailing');
 __('The name will be generated from the first part of the email address. Numbers and some special characters will be removed.', 'acymailing');
 __('You can use the first line to define the column names. Use one line per user to import and separate each data with a comma. Here is an example:', 'acymailing');
 __('Import from database', 'acymailing');
+/* translators: %s: CMS name */
 __('Import %s users', 'acymailing');
 __('By default only the administrators have access to AcyMailing. The users having one of the selected roles will also have access to it when connected', 'acymailing');
 __('Allow these user groups to access AcyMailing', 'acymailing');
@@ -1725,25 +1929,40 @@ __('On the module itself', 'acymailing');
 __('In the header', 'acymailing');
 __('How should AcyMailing add the necessary JS files', 'acymailing');
 __('Load javascript module', 'acymailing');
+/* translators: %s: error message */
 __('Could not save the thumbnail of this template. Error: %s', 'acymailing');
+/* translators: %s: number of emails */
 __('%s emails removed from the queue for unconfirmed or inactive users', 'acymailing');
 __('Some duplicated URLs have been removed, but there are still duplicates. Script interrupted to avoid impacting performances. You can re-run the check to continue until a success message is displayed', 'acymailing');
 __('[OK]Problem solved: Duplicated URLs successfully removed', 'acymailing');
 __('Duplicated URLs found in the acym_url table', 'acymailing');
+/* translators: %1$s: index name, %2$s: table name, %3$s: error message */
 __('[ERROR]Could not add the %1$s on the table %2$s : %3$s', 'acymailing');
+/* translators: %1$s: index name, %2$s: table name */
 __('[OK]Problem solved: Added %1$s to %2$s', 'acymailing');
+/* translators: %1$s: index name, %2$s: table name */
 __('%1$s missing in %2$s', 'acymailing');
+/* translators: %1$s: column name, %2$s: table name, %3$s: error message */
 __('[ERROR]Could not add the column %1$s on the table %2$s : %3$s', 'acymailing');
+/* translators: %1$s: column name, %2$s: table name */
 __('[OK]Problem solved: Added %1$s in %2$s', 'acymailing');
+/* translators: %1$s: column name, %2$s: table name */
 __('Column %1$s missing in %2$s', 'acymailing');
+/* translators: %1$s: table name, %2$s: error message */
 __('[ERROR]Could not create the table %1$s : %2$s', 'acymailing');
+/* translators: %s: table name */
 __('[OK]Problem solved: Table %s created', 'acymailing');
+/* translators: %1$s: table name, %2$s: error message */
 __('[ERROR]Could not repair the table %1$s : %2$s', 'acymailing');
+/* translators: %s: table name */
 __('[OK]Problem solved: Table %s repaired', 'acymailing');
+/* translators: %1$s: table name, %2$s: error message */
 __('Could not load columns from the table %1$s : %2$s', 'acymailing');
+/* translators: %1$s: event or list name */
 __('Registered to %1$s', 'acymailing');
 __('Could not delete the attachment', 'acymailing');
 __('Attachment well deleted', 'acymailing');
+/* translators: %1$s: first item, %2$s: second item */
 __('%1$s and %2$s:', 'acymailing');
 __('Space between blocks:', 'acymailing');
 __('When a new user is created, send an e-mail to', 'acymailing');
@@ -1778,6 +1997,7 @@ __('Structure', 'acymailing');
 __('Error when trying to create a management list', 'acymailing');
 __('Emails management page', 'acymailing');
 __('Allow users to manage their own emails on the front-end of your site, BIND THIS MENU TO A SPECIFIC USER GROUP', 'acymailing');
+/* translators: %s: number of entries */
 __('Display %s entries', 'acymailing');
 __('Redirect to an unsubscribe page after the user clicks on an unsubscribe link', 'acymailing');
 __('Unsubscribe page', 'acymailing');
@@ -1786,7 +2006,9 @@ __('Delete button behavior', 'acymailing');
 __('Should the delete button really delete or simply unsubscribe the user from the current list?', 'acymailing');
 __('Front-end edition', 'acymailing');
 __('Edition', 'acymailing');
+/* translators: %s: label */
 __('Frontend %s', 'acymailing');
+/* translators: %s: label */
 __('Backend %s', 'acymailing');
 __('Prevent hyphens in text paragraphs', 'acymailing');
 __('This will not work on mobile version for languages without spaces, like Chinese for example.', 'acymailing');
@@ -1833,10 +2055,12 @@ __('Automatic campaigns options', 'acymailing');
 __('All emails', 'acymailing');
 __('Download my first one!', 'acymailing');
 __('You don\'t have add-ons yet.', 'acymailing');
+/* translators: %s: file name */
 __('An error occurred when deleting the file %s, please delete it manually', 'acymailing');
 __('Add-on successfully updated', 'acymailing');
 __('Could not update add-on', 'acymailing');
 __('Update', 'acymailing');
+/* translators: %s: number of add-ons */
 __('Add-ons (%s)', 'acymailing');
 __('Check for updates', 'acymailing');
 __('Could not save add-on', 'acymailing');
@@ -1847,7 +2071,6 @@ __('You need the latest version of AcyMailing to download add-ons', 'acymailing'
 __('Purchase', 'acymailing');
 __('Domain missing', 'acymailing');
 __('Download', 'acymailing');
-__('Could not load all information', 'acymailing');
 __('You don\'t have the right AcyMailing edition to download this add-on, you need at least AcyMailing ', 'acymailing');
 __('An issue occurred while installing the add-on', 'acymailing');
 __('An issue occurred while downloading the add-on', 'acymailing');
@@ -1866,8 +2089,11 @@ __('Add-ons', 'acymailing');
 __('Only newly created', 'acymailing');
 __('Only featured elements', 'acymailing');
 __('Start from empty template', 'acymailing');
+/* translators: %s: file name or path */
 __('Users have been exported to %s', 'acymailing');
+/* translators: %s: file name */
 __('Unable to write in the file %s', 'acymailing');
+/* translators: %1$s: operator (is or is not), %2$s: category name */
 __(' %1$s the category %2$s', 'acymailing');
 __('The RSS feed could not be loaded', 'acymailing');
 __('Min. number of elements', 'acymailing');
@@ -1886,14 +2112,18 @@ __('Save the list first', 'acymailing');
 __('Delivery rate', 'acymailing');
 __('Disabled', 'acymailing');
 __('Please enter a start date under the end date', 'acymailing');
+/* translators: %s: content name or id */
 __('The content %s could not be found', 'acymailing');
+/* translators: %1$s: dynamic content name, %2$s: available number, %3$s: required number */
 __('Not enough elements for the dynamic content %1$s: %2$s/%3$s', 'acymailing');
 __('Activate', 'acymailing');
 __('The campaign will also be sent to the email addresses you specify but they will be invisible for original subscribers. Note that the BCC is added on every email so if you send the newsletter to 1500 users, your BCC address will get 1500 emails in its mailbox!', 'acymailing');
 __('Additional settings', 'acymailing');
 __('Deactivate', 'acymailing');
+/* translators: %s: number of campaigns */
 __('%s campaign(s) generated', 'acymailing');
-__('Campaign [%s] not generated: %s', 'acymailing');
+/* translators: %1$s: campaign name, %2$s: reason */
+__('Campaign [%1$s] not generated: %2$s', 'acymailing');
 __('The initial automatic campaign has been deleted', 'acymailing');
 __('Occurrence number of the automatic campaign', 'acymailing');
 __('Reply-to:', 'acymailing');
@@ -1901,9 +2131,11 @@ __('Waiting for confirmation', 'acymailing');
 __('Ask for confirmation before sending the generated campaigns', 'acymailing');
 __('Generated', 'acymailing');
 __('This campaign has been disabled', 'acymailing');
+/* translators: %s: date */
 __('This campaign has been sent on the %s', 'acymailing');
 __('Could not load the campaign', 'acymailing');
 __('Lists:', 'acymailing');
+/* translators: %s: source campaign name */
 __('This campaign has been generated from %s', 'acymailing');
 __('From:', 'acymailing');
 __('This campaign will automatically generate and send a new campaign', 'acymailing');
@@ -1913,11 +2145,15 @@ __('This campaign is now active and will generate new campaigns', 'acymailing');
 __('Automatic', 'acymailing');
 __('Be careful you\'ve set a date in the past, this campaign will be directly sent', 'acymailing');
 __('You don\'t have any date custom field in AcyMailing. If you want to use this trigger, you have to create one. Please go to the &quot;Custom fields&quot; menu to create one.', 'acymailing');
+/* translators: %1$s: field type, %2$s: field name */
 __('for the %1$s field <strong>%2$s</strong>', 'acymailing');
+/* translators: %1$s: hour, %2$s: minute */
 __('at %1$s:%2$s', 'acymailing');
+/* translators: %s: number of days */
 __('%s day(s) before the user\'s birthday', 'acymailing');
 __('The automation will be triggered every year based on the &quot;Field&quot; provided', 'acymailing');
-__('Trigger %s day(s) before the date at %s&nbsp;:&nbsp;%s', 'acymailing');
+/* translators: %1$s: number of days, %2$s: hour, %3$s: minute */
+__('Trigger %1$s day(s) before the date at %2$s&nbsp;:&nbsp;%3$s', 'acymailing');
 __('Field', 'acymailing');
 __('On user birthday', 'acymailing');
 __('Are you sure you want to replace the content of your email by your selection?', 'acymailing');
@@ -1929,6 +2165,7 @@ __('Well done, now drop it here!', 'acymailing');
 __('Drag a block from the &quot;contents&quot; section then drop it here to start', 'acymailing');
 __('Your template is empty!', 'acymailing');
 __('Content type', 'acymailing');
+/* translators: %s: operation name */
 __('Operation not found: %s', 'acymailing');
 __('m/d/Y', 'acymailing');
 __('Content to insert', 'acymailing');
@@ -1937,7 +2174,9 @@ __('This is a preview, the content that will be sent can be seen on the summary 
 __('No content found based on the criteria you\'ve selected', 'acymailing');
 __('Preview', 'acymailing');
 __('Position', 'acymailing');
+/* translators: %s: encoding name */
 __('Encoding not supported: %s', 'acymailing');
+/* translators: %s: option name */
 __('You may need to turn ON the option %s', 'acymailing');
 __('Notification not found', 'acymailing');
 __('Notifications', 'acymailing');
@@ -1950,6 +2189,7 @@ __('available', 'acymailing');
 __('selected', 'acymailing');
 __('Select all +', 'acymailing');
 __('Unselect all -', 'acymailing');
+/* translators: %s: template name */
 __('An error occurred while installing the template %s', 'acymailing');
 __('In HTML the id of an element is unique and used for the CSS', 'acymailing');
 __('Block HTML id', 'acymailing');
@@ -1962,6 +2202,7 @@ __('Please add at least one user to your testing list.', 'acymailing');
 __('Your first email', 'acymailing');
 __('HTML tag', 'acymailing');
 __('Links', 'acymailing');
+/* translators: %s: integration or store name */
 __('Display a subscribe option on %s checkout', 'acymailing');
 __('Let the user choose if he wants to subscribe during checkout.', 'acymailing');
 __('If the user chooses to subscribe, he will be automatically subscribed to the selected lists (not displayed on your subscription form).', 'acymailing');
@@ -1972,11 +2213,14 @@ __('Text displayed next to the subscribe checkbox. If you don\'t specify anythin
 __('Display the lists after', 'acymailing');
 __('Loading error, please refresh the page and retry.', 'acymailing');
 __('Thank you for installing AcyMailing! 🤩', 'acymailing');
+/* translators: %s: number of translations */
 __('%s translation(s) successfully installed', 'acymailing');
+/* translators: %s: language name(s) */
 __('Our server didn\'t find the language(s) %s, you can start your own translation in the AcyMailing configuration page, tab &quot;Languages&quot; then share it', 'acymailing');
 __('Could not load the language files from our server, you can update them in the AcyMailing configuration page, tab &quot;Languages&quot; or start your own translation and share it', 'acymailing');
 __('Average open rate', 'acymailing');
 __('Average click rate', 'acymailing');
+/* translators: %s: list number */
 __('Lists n° %s', 'acymailing');
 __('Created', 'acymailing');
 __('Modified', 'acymailing');
@@ -1989,6 +2233,7 @@ __('View source', 'acymailing');
 __('IP', 'acymailing');
 __('This website isn\'t attached to any valid AcyMailing license. Click the &quot;Check Again&quot; button on the Updates page after attaching it.', 'acymailing');
 __('Thanks 🙂', 'acymailing');
+/* translators: %s: link to leave a review */
 __('If you love AcyMailing please help us by posting a %s review. Thanks for your help!', 'acymailing');
 __('Mail', 'acymailing');
 __('Bounced', 'acymailing');
@@ -2010,11 +2255,14 @@ __('Full width', 'acymailing');
 __('Font', 'acymailing');
 __('Cron URL', 'acymailing');
 __('You have an old version', 'acymailing');
+/* translators: %s: version number */
 __('Click to update to %s', 'acymailing');
+/* translators: %1$s: store or integration name, %2$s: new order status */
 __('When %1$s order status changed to %2$s', 'acymailing');
 __('End date', 'acymailing');
 __('Any plan', 'acymailing');
 __('an event in', 'acymailing');
+/* translators: %1$s: file name, %2$s: folder path */
 __('The file %1$s is missing in the folder <pre>%2$s</pre>, please make sure that your host doesn\'t automatically delete this file using a security script', 'acymailing');
 __('When an order is placed', 'acymailing');
 __('Any status', 'acymailing');
@@ -2035,11 +2283,13 @@ __('Campaign successfully duplicated', 'acymailing');
 __('Campaign successfully resumed', 'acymailing');
 __('Campaign successfully paused', 'acymailing');
 __('Resume campaign', 'acymailing');
+/* translators: %s: item name */
 __('%s not found', 'acymailing');
 __('Couldn\'t duplicate the email', 'acymailing');
 __('Are you sure you want to duplicate this email?', 'acymailing');
 __('Choose existing', 'acymailing');
 __('Any', 'acymailing');
+/* translators: %1$s: event or list name, %2$s: registration status */
 __('Registered to %1$s and the registration status is %2$s', 'acymailing');
 __('Any event', 'acymailing');
 __('Fields', 'acymailing');
@@ -2059,16 +2309,24 @@ __('This automation allows you to send a message to the admin when a user is cre
 __('Send notification on user creation', 'acymailing');
 __('Custom headers', 'acymailing');
 __('WARNING: Your session will end in 1 minute, don\'t forget to save your work!', 'acymailing');
+/* translators: %s: number */
 __('%s of clicks', 'acymailing');
+/* translators: %1$s: number of bounced emails, %2$s: total sent emails */
 __('%1$s sent emails bounced back out of %2$s', 'acymailing');
+/* translators: %1$s: number of users who clicked, %2$s: total number of users */
 __('%1$s users out of %2$s clicked a link', 'acymailing');
+/* translators: %1$s: number of opened mails, %2$s: total number of mails */
 __('%1$s mails opened out of %2$s', 'acymailing');
+/* translators: %1$s: number of sent mails, %2$s: total number of mails */
 __('%1$s mails successfully sent out of %2$s', 'acymailing');
 __('Click map', 'acymailing');
+/* translators: %1$s: number of clicks, %2$s: total number */
 __('%1$s clicks out of %2$s', 'acymailing');
 __('All mails', 'acymailing');
+/* translators: %s: plugin name */
 __('The system plugin %s must be activated for these options to work', 'acymailing');
 __('Send a confirmation email in addition to the site account creation email', 'acymailing');
+/* translators: %s: integration name */
 __('%s integration', 'acymailing');
 __('The icon has been successfully imported', 'acymailing');
 __('Select a new icon', 'acymailing');
@@ -2092,20 +2350,28 @@ __('Format', 'acymailing');
 __('Send mails manually', 'acymailing');
 __('Mail from automation will be sent to: ', 'acymailing');
 __('Mails', 'acymailing');
+/* translators: %s: time period */
 __('%s in the past', 'acymailing');
+/* translators: %s: time period */
 __('%s in the future', 'acymailing');
+/* translators: %1$s: product, %2$s: store name */
 __('Bought %1$s in %2$s', 'acymailing');
+/* translators: %1$s: products, %2$s: number of days, %3$s: order status */
 __('Created an order with %1$s %2$s day(s) ago and status is %3$s', 'acymailing');
 __('Select the targets of your actions', 'acymailing');
 __('Actions targets', 'acymailing');
 __('You didn\'t set any condition for this automation', 'acymailing');
 __('Please set a <b>condition</b> or click on <b>save & continue</b> if you don\'t want conditions', 'acymailing');
+/* translators: %1$s: field name, %2$s: operator, %3$s: value */
 __('Has their account field %1$s %2$s %3$s', 'acymailing');
 __('Is subscribed', 'acymailing');
 __('Is unsubscribed', 'acymailing');
 __('Is not subscribed', 'acymailing');
+/* translators: %1$s: operator (subscribed or unsubscribed), %2$s: list name */
 __(' %1$s to the list %2$s', 'acymailing');
+/* translators: %1$s: field name, %2$s: operator, %3$s: value */
 __('Has the field %1$s %2$s %3$s', 'acymailing');
+/* translators: %s: conditions description */
 __('This automation will be executed if %s', 'acymailing');
 __('Add condition', 'acymailing');
 __('Select condition', 'acymailing');
@@ -2116,8 +2382,10 @@ __('At least one product', 'acymailing');
 __('Any category', 'acymailing');
 __('Any payment method', 'acymailing');
 __('Purchased a product', 'acymailing');
+/* translators: %1$s: number of days, %2$s: order status */
 __('Placed an order %1$s days ago and the order status is currently %2$s', 'acymailing');
 __('Reminder', 'acymailing');
+/* translators: %1$s: first label, %2$s: second label */
 __('%1$s - %2$s', 'acymailing');
 __('Choose a column', 'acymailing');
 __('V5 data migration', 'acymailing');
@@ -2125,8 +2393,11 @@ __('Here are some gifs to wait', 'acymailing');
 __('You are not connected. The newsletter may include some user information, so they may not be displayed correctly.', 'acymailing');
 __('Clear', 'acymailing');
 __('Please check the Terms and Conditions / Privacy policy', 'acymailing');
+/* translators: %1$s: terms link, %2$s: privacy policy link */
 __('I agree with the %1$s and the %2$s', 'acymailing');
+/* translators: %s: terms link */
 __('I agree with the %s', 'acymailing');
+/* translators: %s: privacy policy link */
 __('I agree with the %s', 'acymailing');
 __('Select an article', 'acymailing');
 __('Terms and conditions', 'acymailing');
@@ -2153,6 +2424,7 @@ __('Overwrite existing user\'s information', 'acymailing');
 __('Excel security', 'acymailing');
 __('If this option is active, values starting with a =, +, - or @ will be prefixed by a tab to avoid any CSV injection when opening the exported file with Excel.<br />Make sure the tab is automatically removed or turn Off this option if you import the file somewhere else than AcyMailing', 'acymailing');
 __('Some CSS code is not compatible with all the editors, prefer using th.your_class rather than th[class=&quot;your_class&quot;]', 'acymailing');
+/* translators: %1$s: source folder, %2$s: destination folder */
 __('Error copying folder from %1$s to %2$s', 'acymailing');
 __('Can\'t find file', 'acymailing');
 __('Sent with automation', 'acymailing');
@@ -2164,6 +2436,7 @@ __('your html code', 'acymailing');
 __('template.zip', 'acymailing');
 __('If you want to import your template please upload a zip with this structure: ', 'acymailing');
 __('An error occurred', 'acymailing');
+/* translators: %s: operator */
 __('Unknown operator: %s', 'acymailing');
 __('Please select actions', 'acymailing');
 __('Please select filters', 'acymailing');
@@ -2171,51 +2444,76 @@ __('Content top margin', 'acymailing');
 __('Select a list', 'acymailing');
 __('When the user subscribes', 'acymailing');
 __('Create new mail', 'acymailing');
+/* translators: %s: number of users */
 __('%s users subscribed', 'acymailing');
+/* translators: %s: number of user subscriptions */
 __('%s user subscriptions removed', 'acymailing');
+/* translators: %s: number of users */
 __('%s users unsubscribed', 'acymailing');
 __('Automation not found', 'acymailing');
+/* translators: %s: number of emails */
 __('%s emails removed from the queue', 'acymailing');
+/* translators: %s: number of emails */
 __('%s emails added to the queue', 'acymailing');
+/* translators: %s: number of users */
 __('%s users updated', 'acymailing');
 __('deleted', 'acymailing');
 __('activated', 'acymailing');
 __('blocked', 'acymailing');
 __('unconfirmed', 'acymailing');
 __('confirmed', 'acymailing');
+/* translators: %1$s: number of users, %2$s: action */
 __('%1$s users %2$s', 'acymailing');
 __('not subscribed', 'acymailing');
 __('Mass action', 'acymailing');
 __('removed from', 'acymailing');
 __('subscribed to', 'acymailing');
 __('unsubscribed from', 'acymailing');
+/* translators: %1$s: action (subscribed or unsubscribed), %2$s: list name */
 __('Will be %1$s the list %2$s', 'acymailing');
+/* translators: %s: mail name */
 __('Will not receive the mail %s', 'acymailing');
+/* translators: %1$s: mail name, %2$s: date */
 __('Will receive the mail %1$s on the %2$s', 'acymailing');
+/* translators: %1$s: field name, %2$s: operator, %3$s: value */
 __('Will have the field %1$s %2$s %3$s', 'acymailing');
 __('Will be deleted', 'acymailing');
 __('Will be blocked', 'acymailing');
 __('Will be activated', 'acymailing');
 __('Will be unconfirmed', 'acymailing');
 __('Will be confirmed', 'acymailing');
+/* translators: %1$s: field name, %2$s: operator, %3$s: value */
 __('With the account field %1$s %2$s %3$s', 'acymailing');
 __('including sub groups', 'acymailing');
+/* translators: %1$s: operator (in or not in), %2$s: group name */
 __(' %1$s the group %2$s', 'acymailing');
+/* translators: %s: date */
 __(' is lower than %s', 'acymailing');
+/* translators: %s: date */
 __(' is higher than %s', 'acymailing');
+/* translators: %1$s: date condition */
 __(' where the %1$s', 'acymailing');
+/* translators: %1$s: operator (subscribed or unsubscribed), %2$s: list name */
 __(' %1$s to the list %2$s', 'acymailing');
 __('one AcyMailing user', 'acymailing');
 __('all AcyMailing users', 'acymailing');
+/* translators: %1$s: filter type, %2$s: target */
 __('This %1$s will be applied to %2$s', 'acymailing');
+/* translators: %1$s: field name, %2$s: operator, %3$s: value */
 __('With the field %1$s %2$s %3$s', 'acymailing');
 __('Triggers', 'acymailing');
 __('The automation will be triggered:', 'acymailing');
+/* translators: %1$s: amount, %2$s: time unit */
 __('Every %1$s %2$s', 'acymailing');
+/* translators: %1$s: ordinal (first, second...), %2$s: day of the week */
 __('On the %1$s %2$s of each month', 'acymailing');
+/* translators: %s: day of the week */
 __('Every week on %s', 'acymailing');
+/* translators: %1$s: hour, %2$s: minute */
 __('Every day at %1$s:%2$s', 'acymailing');
+/* translators: %s: number of users */
 __('Total: <b>%s</b> AcyMailing users match these conditions', 'acymailing');
+/* translators: %s: number of users */
 __('<b>%s</b> AcyMailing users match this condition', 'acymailing');
 __('Begins with', 'acymailing');
 __('Ends with', 'acymailing');
@@ -2248,11 +2546,13 @@ __('Action on user', 'acymailing');
 __('Unsubscribe users from', 'acymailing');
 __('Remove users from', 'acymailing');
 __('Subscribe users to', 'acymailing');
+/* translators: %s: number of subscriptions */
 __('%s subscriptions have been inserted', 'acymailing');
 __('Last check:', 'acymailing');
 __('Assign your website to your licence!', 'acymailing');
 __('Your licence has expired', 'acymailing');
 __('Click to renew it!', 'acymailing');
+/* translators: %s: date */
 __('Valid Until: %s', 'acymailing');
 __('Add action', 'acymailing');
 __('Select the actions', 'acymailing');
@@ -2288,36 +2588,50 @@ __('Trigger based on user actions', 'acymailing');
 __('Description', 'acymailing');
 __('New', 'acymailing');
 __('Please enable the javascript to submit this form', 'acymailing');
+/* translators: %s: field name */
 __('Please fill in the field %s', 'acymailing');
 __('Please confirm your subscription', 'acymailing');
 __('You\'ve subscribed to our newsletters from our website', 'acymailing');
 __('We need you to activate your subscription by clicking the link below:', 'acymailing');
+/* translators: %s: error message */
 __('Error Uploading file: %s', 'acymailing');
+/* translators: %1$s: source file, %2$s: destination file */
 __('Could not copy the file %1$s to %2$s', 'acymailing');
+/* translators: %s: folder name */
 __('Couldn\'t upload file, check permissions for the folder %s', 'acymailing');
 __('The file has been rejected for safety reason', 'acymailing');
 __('Could not move the file', 'acymailing');
+/* translators: %s: file name */
 __('Could not find source file, check permissions: %s', 'acymailing');
-__('Failed to delete %s', 'acymailing');
+/* translators: %s: file name */
 __('Copy file %s failed, check permissions', 'acymailing');
 __('Cannot open source folder', 'acymailing');
 __('Cannot create destination folder', 'acymailing');
+/* translators: %s: folder name */
 __('Folder %s already exists', 'acymailing');
+/* translators: %s: folder name */
 __('Folder %s does not exist', 'acymailing');
+/* translators: %s: path */
 __('%s is not a folder', 'acymailing');
-__('%s is not a file', 'acymailing');
+/* translators: %s: folder name */
 __('Could not delete folder %s', 'acymailing');
 __('The uploaded file exceeds the upload_max_filesize directive in php configuration.', 'acymailing');
 __('The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.', 'acymailing');
 __('The uploaded file was only partially uploaded.', 'acymailing');
 __('No file was uploaded.', 'acymailing');
+/* translators: %s: error details */
 __('Error uploading the file on the server, unknown error %s.', 'acymailing');
 __('Can not upload the file, please make sure file_uploads is enabled on your php.ini file.', 'acymailing');
+/* translators: %1$s: source path, %2$s: destination path */
 __('Error uploading the file from %1$s to %2$s.', 'acymailing');
+/* translators: %s: file name */
 __('File %s deleted from the template pack.', 'acymailing');
+/* translators: %1$s: source file, %2$s: destination */
 __('Error extracting the file %1$s to %2$s.', 'acymailing');
 __('Error installing template.', 'acymailing');
+/* translators: %s: number of templates */
 __('%s templates Installed', 'acymailing');
+/* translators: %1$s: site or page name, %2$s: section name */
 __('%1$s - %2$s', 'acymailing');
 __('You are up to date', 'acymailing');
 __('Export both', 'acymailing');
@@ -2374,6 +2688,7 @@ __('Draft', 'acymailing');
 __('Email', 'acymailing');
 __('Error saving', 'acymailing');
 __('Export', 'acymailing');
+/* translators: %s: file name */
 __('Couldn\'t save the file %s', 'acymailing');
 __('February', 'acymailing');
 __('Friday', 'acymailing');
@@ -2390,6 +2705,7 @@ __('List', 'acymailing');
 __('Lists', 'acymailing');
 __('The list doesn\'t exist', 'acymailing');
 __('List ID', 'acymailing');
+/* translators: %s: list name */
 __('The list %s is saved', 'acymailing');
 __('List name', 'acymailing');
 __('March', 'acymailing');
@@ -2398,6 +2714,7 @@ __('Monday', 'acymailing');
 __('Name', 'acymailing');
 __('No', 'acymailing');
 __('No list selected', 'acymailing');
+/* translators: %1$s: field name(s), %2$s: allowed fields */
 __('The field(s) %1$s are not in the allowed fields: %2$s', 'acymailing');
 __('November', 'acymailing');
 __('October', 'acymailing');
@@ -2456,6 +2773,7 @@ __('The campaign was successfully saved as draft', 'acymailing');
 __('The campaign information are not available', 'acymailing');
 __('Edit', 'acymailing');
 __('Edit template', 'acymailing');
+/* translators: %1$s: date, %2$s: time */
 __('This campaign will be sent on %1$s at %2$s', 'acymailing');
 __('Back', 'acymailing');
 __('New campaign', 'acymailing');
@@ -2529,6 +2847,7 @@ __('Import', 'acymailing');
 __('Choose a <b>CSV</b> file with your user data', 'acymailing');
 __('Please make sure the contacts you import accepted to receive emails from you', 'acymailing');
 __('Please browse for a file to import', 'acymailing');
+/* translators: %s: file name */
 __('Could not open the file %s', 'acymailing');
 __('Click to edit', 'acymailing');
 __('Confirm', 'acymailing');
@@ -2537,29 +2856,43 @@ __('Ascending sort (click for descending sort)', 'acymailing');
 __('Descending sort (click for ascending sort)', 'acymailing');
 __('l, j F Y', 'acymailing');
 __('l, j F Y g:i a', 'acymailing');
+/* translators: %1$s: source file, %2$s: destination */
 __('Could not upload the file %1$s to %2$s', 'acymailing');
+/* translators: %s: folder path */
 __('Please make sure the folder ( %s ) is writable', 'acymailing');
 __('Uploaded file not found:', 'acymailing');
 __('Columns not found', 'acymailing');
+/* translators: %s: first line content */
 __('The first line of your file (%s) must contain only columns of the acym_user table', 'acymailing');
 __('You need at least the column <b>email</b> <br /> Example: name,email', 'acymailing');
+/* translators: %s: number of arguments */
 __('You need %s arguments per line, one or more line(s) couldn\'t be imported', 'acymailing');
 __('Click here to download all lines containing errors', 'acymailing');
+/* translators: %1$s: column name, %2$s: list of possible columns */
 __('The column %1$s is not in the list of possible columns: %2$s', 'acymailing');
 __('The uploaded file exceeds the upload_max_filesize directive in php configuration', 'acymailing');
 __('The uploaded file was only partially uploaded', 'acymailing');
 __('No file was uploaded', 'acymailing');
+/* translators: %s: error details */
 __('Error uploading the file on the server, unknown error: %s', 'acymailing');
 __('Import from file', 'acymailing');
 __('Import from text', 'acymailing');
+/* translators: %s: number of users */
 __('%s AcyMailing users updated', 'acymailing');
+/* translators: %s: number of users */
 __('%s AcyMailing users deleted', 'acymailing');
+/* translators: %s: number of users */
 __('There are <b>%s</b> users on your website', 'acymailing');
+/* translators: %s: number of users */
 __('There are <b>%s</b> registered users in AcyMailing', 'acymailing');
 __('If you click on the \'import\' button, the system will:', 'acymailing');
+/* translators: %s: CMS name */
 __('<b>Update</b> the AcyMailing users from your %s users', 'acymailing');
+/* translators: %s: CMS name */
 __('<b>Delete</b> the AcyMailing users if they were linked to a %s user that does not exist any more', 'acymailing');
+/* translators: %s: CMS name */
 __('<b>Add</b> all your %s users into AcyMailing if they are not already there', 'acymailing');
+/* translators: %s: CMS name */
 __('<b>Subscribe</b> all your %s users to the selected lists if they are not already subscribed or unsubscribed from it', 'acymailing');
 __('Files', 'acymailing');
 __('Allowed files', 'acymailing');
@@ -2567,6 +2900,7 @@ __('Empty textarea', 'acymailing');
 __('Database', 'acymailing');
 __('Please select a table name from your database', 'acymailing');
 __('Please select a field for the email', 'acymailing');
+/* translators: %1$s: field name, %2$s: table columns */
 __('The field &quot;%1$s&quot; could not be found. Please specify a field from the table:<br /><b>%2$s</b>', 'acymailing');
 __('Subscription', 'acymailing');
 __('Require confirmation', 'acymailing');
@@ -2596,15 +2930,20 @@ __('Campaign name', 'acymailing');
 __('Email subject', 'acymailing');
 __('Apply', 'acymailing');
 __('There is no Subject or Body in this e-mail', 'acymailing');
+/* translators: %1$s: message id, %2$s: recipient */
 __('Error sending message %1$s to %2$s', 'acymailing');
+/* translators: %1$s: message id, %2$s: recipient */
 __('Message %1$s successfully sent to %2$s', 'acymailing');
+/* translators: %s: user */
 __('User not found: %s', 'acymailing');
 __('Send a test', 'acymailing');
 __('If you receive this message, that means your configuration is Ok', 'acymailing');
 __('The PHP Extension openssl is not enabled on your server, this extension is required to use an SSL connection, please enable it', 'acymailing');
+/* translators: %s: bounce email address */
 __('The specified bounce e-mail address %s might cause the problem, please delete it (leave the field bounce address empty) and try again.', 'acymailing');
 __('You specified an SMTP password but you don\'t require an authentication, you might want to turn the SMTP authentication ON.', 'acymailing');
 __('Your local website may not have a mail server. Please make sure you can send e-mails with the site first (password request, registration confirmation...).', 'acymailing');
+/* translators: %s: port number */
 __('The port you specified (%s) is not a common port for smtp connexions... Please leave the port empty and give it a new try', 'acymailing');
 __('Add names', 'acymailing');
 __('Accept special chars in email addresses', 'acymailing');
@@ -2617,12 +2956,14 @@ __('Authentication', 'acymailing');
 __('Username', 'acymailing');
 __('Password', 'acymailing');
 __('Which port can I use from my website?', 'acymailing');
+/* translators: %s: port number */
 __('The port %s is available.', 'acymailing');
+/* translators: %1$s: port number, %2$s: error message */
 __('The port %1$s is not opened on your server: %2$s', 'acymailing');
 __('fsockopen is not enabled, please contact your hosting company to enable it', 'acymailing');
-__('API key', 'acymailing');
 __('REST API', 'acymailing');
 __('DKIM Settings', 'acymailing');
+/* translators: %s: domain name */
 __('Configure your DNS by adding a TXT record on your domain %s using the key/value as shown below:', 'acymailing');
 __('Key', 'acymailing');
 __('Value', 'acymailing');
@@ -2634,8 +2975,11 @@ __('Identity', 'acymailing');
 __('Private key', 'acymailing');
 __('Public Key', 'acymailing');
 __('Cron', 'acymailing');
+/* translators: %s: domain name */
 __('The domain name is not valid (%s). If you use your own cron system, please make sure you trigger AcyMailing with the full domain name.', 'acymailing');
+/* translators: %s: date and time */
 __('AcyMailing Triggered at %s', 'acymailing');
+/* translators: %s: date and time */
 __('The system won\'t be triggered before %s', 'acymailing');
 __('Automatic send process', 'acymailing');
 __('Seconds', 'acymailing');
@@ -2657,7 +3001,9 @@ __('See the report', 'acymailing');
 __('Each time AcyMailing is triggered', 'acymailing');
 __('Only if AcyMailing executes an action', 'acymailing');
 __('Only if an error occurs', 'acymailing');
+/* translators: %s: number of minutes */
 __('%s minutes ago', 'acymailing');
+/* translators: %s: current time */
 __('Your current time is %s', 'acymailing');
 __('The log file must only contain alphanumeric characters and end with .log', 'acymailing');
 __('The log file is empty', 'acymailing');
@@ -2668,12 +3014,15 @@ __('Last Cron', 'acymailing');
 __('Last Run time', 'acymailing');
 __('Triggered from the IP', 'acymailing');
 __('Send', 'acymailing');
+/* translators: %s: campaign name */
 __('The campaign <b>%s</b> has been added to the queue', 'acymailing');
+/* translators: %s: campaign name */
 __('Couldn\'t add the campaign %s to the queue', 'acymailing');
 __('This campaign is already in the queue', 'acymailing');
 __('Queue', 'acymailing');
 __('Detailed queue', 'acymailing');
 __('Paused', 'acymailing');
+/* translators: %1$s: number of emails, %2$s: scheduled campaign name */
 __('%1$s emails have been added to the queue for the Scheduled Campaign %2$s', 'acymailing');
 __('Select a table', 'acymailing');
 __('Field matching', 'acymailing');
@@ -2683,6 +3032,7 @@ __('Please select at least one list', 'acymailing');
 __('Please select at least one field to export', 'acymailing');
 __('Data will be exported to CSV format', 'acymailing');
 __('Fields to export', 'acymailing');
+/* translators: %s: number of recipients */
 __('%s recipients', 'acymailing');
 __('Sending...', 'acymailing');
 __('Ready to be sent', 'acymailing');
@@ -2702,6 +3052,7 @@ __('There is nothing to send', 'acymailing');
 __('Send Process', 'acymailing');
 __('You must keep this popup opened to continue sending. If you want to be able to close the page and turn Off your computer, you can let the cron task run the automatic send process (only available in our commercial versions)', 'acymailing');
 __('Send process running in parallel detected, the system stopped but you will be able to resume it', 'acymailing');
+/* translators: %s: number of minutes */
 __('Next try in %s minutes', 'acymailing');
 __('Process refreshed to avoid a time limit', 'acymailing');
 __('Process refreshed to avoid a possible loss of connection', 'acymailing');
@@ -2712,7 +3063,9 @@ __('If you recently, successfully, sent a lot of e-mails, those errors may also 
 __('Your server apparently refuses to send more e-mails', 'acymailing');
 __('Using one of our commercial versions, the system would be able to continue automatically the send process using a Cron', 'acymailing');
 __('If you configured a cron task, the system will automatically continue the send process', 'acymailing');
+/* translators: %s: number of attempts */
 __('Try %s times to deliver the message.', 'acymailing');
+/* translators: %s: action to perform */
 __('If it still fails, %s', 'acymailing');
 __('Maximum number of tries', 'acymailing');
 __('If AcyMailing can not send the e-mail after X tries, AcyMailing will delete the e-mail from the queue.', 'acymailing');
@@ -2723,7 +3076,9 @@ __('Subscribe the user', 'acymailing');
 __('Block the user', 'acymailing');
 __('Send now', 'acymailing');
 __('Send all', 'acymailing');
+/* translators: %s: number of campaigns */
 __('%s campaign(s) scheduled', 'acymailing');
+/* translators: %1$s: number of processed messages, %2$s: number successful, %3$s: number failed */
 __('%1$s messages processed: %2$s successful, %3$s failed', 'acymailing');
 __('The name of the picture is not correct and may not be displayed on some mail clients. Do you want to insert it?', 'acymailing');
 __('It\'s not a valid URL. Please correct it and try again.', 'acymailing');
@@ -2760,7 +3115,9 @@ __('Create or import your first one!', 'acymailing');
 __('Add recipients to send this campaign', 'acymailing');
 __('You don\'t have any campaign in the queue', 'acymailing');
 __('Send one and see how amazing the queue is!', 'acymailing');
+/* translators: %1$s: date, %2$s: time */
 __('This campaign has been sent on %1$s at %2$s', 'acymailing');
+/* translators: %s: item name */
 __('%s already exists', 'acymailing');
 __('Time', 'acymailing');
 __('Subscriber', 'acymailing');
@@ -2790,6 +3147,7 @@ __('Time format', 'acymailing');
 __('List(s) selected: ', 'acymailing');
 __('Click here to view it online', 'acymailing');
 __('Insert a <b>view it online</b> link in your email', 'acymailing');
+/* translators: %s: CMS name */
 __('%s user', 'acymailing');
 __('Login name of the user', 'acymailing');
 __('User groups', 'acymailing');
@@ -2797,6 +3155,7 @@ __('No group', 'acymailing');
 __('Custom fields', 'acymailing');
 __('Visitor', 'acymailing');
 __('Default', 'acymailing');
+/* translators: %s: date and time */
 __('The campaign has been confirmed. It will be add to the queue at <b>%s</b>', 'acymailing');
 __('The campaign couldn\'t be confirmed', 'acymailing');
 __('Your template has been changed please save the modifications by clicking the save button', 'acymailing');
@@ -2846,10 +3205,12 @@ __('Order by', 'acymailing');
 __('Sort ordering', 'acymailing');
 __('Tables', 'acymailing');
 __('Input width (px)', 'acymailing');
+/* translators: %1$s: action or link, %2$s: target */
 __('%1$s to enter the %2$s', 'acymailing');
 __('Day', 'acymailing');
 __('Month', 'acymailing');
 __('Year', 'acymailing');
+/* translators: %d, %m, %y: date format tokens (day, month, year) shown as an example */
 __('For example with the format %d%m%y the date will be 14/06/1997', 'acymailing');
 __('No country', 'acymailing');
 __('No file chosen', 'acymailing');
@@ -2888,6 +3249,7 @@ __('The following expressions are not recommended:', 'acymailing');
 __('Missing test email address', 'acymailing');
 __('Could not load your information from our server', 'acymailing');
 __('Test email sent, waiting for the report...', 'acymailing');
+/* translators: %s: menu item name */
 __('AcyMailing: %s', 'acymailing');
 __('Newsletter subscription form', 'acymailing');
 __('Form used by your users to subscribe to the contact lists in order to receive your newsletters', 'acymailing');
@@ -2921,9 +3283,12 @@ __('An email to verify your identity has been sent.<br />Please click on the lin
 __('New custom field', 'acymailing');
 __('Upload folder', 'acymailing');
 __('Attach a new file', 'acymailing');
+/* translators: %s: maximum upload file size */
 __('(total max upload file size: %s)', 'acymailing');
 __('File successfully uploaded', 'acymailing');
+/* translators: %s: new file name */
 __('An image with this name already exists. Image has been renamed as %s', 'acymailing');
+/* translators: %1$s: rejected file type, %2$s: accepted file types */
 __('This file type (%1$s) is not accepted, the accepted file types are: %2$s', 'acymailing');
 __('Select', 'acymailing');
 __('No file here', 'acymailing');
@@ -2962,6 +3327,7 @@ __('Descending', 'acymailing');
 __('Read more', 'acymailing');
 __('Display', 'acymailing');
 __('Truncate the text', 'acymailing');
+/* translators: %s: number of characters */
 __('After %s characters', 'acymailing');
 __('From', 'acymailing');
 __('To', 'acymailing');
@@ -2977,6 +3343,7 @@ __('Please check your e-mail to see the coupon', 'acymailing');
 __('None', 'acymailing');
 __('Copy default translations', 'acymailing');
 __('This will override the current custom translations and keep the additional language keys you may have created.', 'acymailing');
+/* translators: %s: version number */
 __('To use this feature please upgrade your version to %s', 'acymailing');
 __('No discount', 'acymailing');
 __('Edit email', 'acymailing');
@@ -2993,7 +3360,9 @@ __('Next run time', 'acymailing');
 __('Bounces', 'acymailing');
 __('Action on the user', 'acymailing');
 __('Forward the message to', 'acymailing');
+/* translators: %s: server name */
 __('Successfully connected to %s', 'acymailing');
+/* translators: %s: number of messages */
 __('There are %s messages in your mailbox', 'acymailing');
 __('Rule', 'acymailing');
 __('Handle the messages now', 'acymailing');
@@ -3002,6 +3371,7 @@ __('Increment the bounce statistics if the rule matches', 'acymailing');
 __('Enabled', 'acymailing');
 __('Body', 'acymailing');
 __('Regex', 'acymailing');
+/* translators: %s: number of bounce messages */
 __('Execute the following actions only after receiving %s bounce messages from this user', 'acymailing');
 __('Action on the email', 'acymailing');
 __('Delete the user subscription', 'acymailing');
@@ -3029,28 +3399,45 @@ __('Run bounce handling', 'acymailing');
 __('Configure', 'acymailing');
 __('Please create a rule to process the bounce handling', 'acymailing');
 __('You can\'t delete a user and save the mail in the same rule', 'acymailing');
+/* translators: %1$s: number of messages, %2$s: user */
 __('AcyMailing received %1$s messages from the user %2$s', 'acymailing');
+/* translators: %s: number of messages */
 __('Actions will be executed after %s messages', 'acymailing');
+/* translators: %s: number of records */
 __('Successfully deleted %s record(s)', 'acymailing');
 __('Message deleted', 'acymailing');
 __('Click here to handle all messages until your mailbox is empty', 'acymailing');
 __('Please configure the bounce handling from the configuration page first', 'acymailing');
+/* translators: %s: server name */
 __('Error connecting to %s', 'acymailing');
+/* translators: %s: error details */
 __('Identification error %s', 'acymailing');
+/* translators: %1$s: attachment name, %2$s: error message */
 __('Error uploading the attachment %1$s: %2$s', 'acymailing');
+/* translators: %s: user */
 __('User %s deleted', 'acymailing');
+/* translators: %1$s: user, %2$s: list name */
 __('User %1$s subscribed to %2$s', 'acymailing');
+/* translators: %1$s: user, %2$s: list name */
 __('User %1$s not subscribed to %2$s: ', 'acymailing');
 __('User already subscribed', 'acymailing');
 __('User already unsubscribed', 'acymailing');
+/* translators: %1$s: user, %2$s: list names */
 __('User %1$s removed from lists %2$s', 'acymailing');
+/* translators: %s: user */
 __('User %s not subscribed', 'acymailing');
+/* translators: %1$s: user, %2$s: list names */
 __('User %1$s unsubscribed from lists %2$s', 'acymailing');
+/* translators: %s: user */
 __('User %s blocked', 'acymailing');
+/* translators: %1$s: user, %2$s: queue details */
 __('User %1$s queue: %2$s', 'acymailing');
 __('The forward e-mail address is the same as the bounce one... AcyMailing will not forward the message', 'acymailing');
+/* translators: %s: user */
 __('Message saved (user %s)', 'acymailing');
+/* translators: %s: recipient */
 __('Forwarded to %s', 'acymailing');
+/* translators: %1$s: recipient, %2$s: error message */
 __('Couldn\'t forward to %1$s: %2$s', 'acymailing');
 __('Duplicate', 'acymailing');
 __('If you add some CSS style you will have to save to see the modifications. Note that not all editors allow you to load custom CSS', 'acymailing');

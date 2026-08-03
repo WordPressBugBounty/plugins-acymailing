@@ -15,9 +15,11 @@ trait Detailed
         acym_setVar('layout', 'detailed');
         $pagination = new PaginationHelper();
 
+        // Get filters data
         $searchFilter = $this->getVarFiltersListing('string', 'dqueue_search', '');
         $tagFilter = $this->getVarFiltersListing('string', 'dqueue_tag', '');
 
+        // Get pagination data
         $elementsPerPage = $pagination->getListLimit();
         $page = $this->getVarFiltersListing('int', 'dqueue_pagination_page', 1);
 
@@ -31,6 +33,7 @@ trait Detailed
             ]
         );
 
+        // Prepare the pagination
         $pagination->setStatus((int)$matchingElements['total']->total, $page, $elementsPerPage);
 
         $tagClass = new TagClass();
@@ -53,19 +56,20 @@ trait Detailed
     {
         $toolbarHelper = new ToolbarHelper();
         $toolbarHelper->addSearchBar($data['search'], 'dqueue_search', 'ACYM_SEARCH');
-        $otherContent = acym_modal(
-            '<i class="acymicon-paper-plane"></i>'.acym_translation('ACYM_SEND_ALL'),
-            '',
-            null,
-            ['data-reveal-larger' => true],
+        $toolbarHelper->addModalButton(
             [
-                'class' => 'cell medium-shrink button',
-                'data-reload' => 'true',
-                'data-ajax' => 'true',
-                'data-iframe' => '&ctrl=queue&task=continuesend&id=0&totalsend=0',
+                'button' => '<i class="acymicon-paper-plane"></i>'.esc_html(acym_translation('ACYM_SEND_ALL')),
+                'attributesModal' => [
+                    'data-reveal-larger' => true,
+                ],
+                'attributesButton' => [
+                    'class' => 'cell medium-shrink button',
+                    'data-reload' => 'true',
+                    'data-ajax' => 'true',
+                    'data-iframe' => '&ctrl=queue&task=continuesend&id=0&totalsend=0',
+                ],
             ]
         );
-        $toolbarHelper->addOtherContent($otherContent);
         $toolbarHelper->addFilterByTag($data, 'dqueue_tag', 'acym__queue__filter__tags acym__select');
 
         $data['toolbar'] = $toolbarHelper;

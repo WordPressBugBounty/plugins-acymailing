@@ -111,6 +111,7 @@ class SendinblueUsers extends SendinblueClass
 
     private function sendUsers($listId)
     {
+        // Call API to import
         $data = [
             'fileUrl' => ACYM_TMP_URL.plgAcymSendinblue::SENDING_METHOD_ID.'.txt',
             'listIds' => [$listId],
@@ -118,6 +119,7 @@ class SendinblueUsers extends SendinblueClass
         ];
 
         $response = $this->callApiSendingMethod('contacts/import', $data, $this->headers, 'POST');
+        //TODO delete the import file to avoid leaking user data
 
         if (!empty($response['error_curl'])) {
             $this->errors[] = acym_translationSprintf('ACYM_ERROR_OCCURRED_WHILE_CALLING_API', $response['error_curl']);
@@ -274,6 +276,7 @@ class SendinblueUsers extends SendinblueClass
 
     public function synchronizeExistingUsers()
     {
+        // Generate file with user to import
         $userClass = new UserClass();
         $users = $userClass->getAllSimpleData();
         if (empty($users)) {

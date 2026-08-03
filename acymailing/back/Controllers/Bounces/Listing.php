@@ -80,8 +80,11 @@ trait Listing
         parent::display($data);
     }
 
+    // When one of the raw of the listing is moved we set the ordering
     public function ajaxSetOrdering(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $order = json_decode(acym_getVar('string', 'order'), true);
         if (empty($order)) {
             $order = [];
@@ -98,8 +101,11 @@ trait Listing
         acym_sendAjaxResponse('', [], !$error);
     }
 
+    // Click on the button Run Bounce Handling
     public function test(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $ruleClass = new RuleClass();
 
         if ($ruleClass->getOrderingNumber() < 1) {
@@ -123,8 +129,10 @@ trait Listing
                 $errorString = implode(' ', $errors);
                 $port = $this->config->get('bounce_port');
                 if (preg_match('#certificate#i', $errorString) && !$this->config->get('bounce_certif', false)) {
+                    //Self signed certificate issue
                     acym_enqueueMessage(acym_translationSprintf('ACYM_YOU_MAY_TURN_ON_OPTION', '<i>'.acym_translation('ACYM_SELF_SIGNED_CERTIFICATE').'</i>'), 'warning');
                 } elseif (!empty($port) && !in_array($port, ['993', '143', '110'])) {
+                    //Not the right port... ?
                     acym_enqueueMessage(acym_translation('ACYM_BOUNCE_WRONG_PORT'), 'warning');
                 }
             }
@@ -133,8 +141,11 @@ trait Listing
         $this->listing();
     }
 
+    // Process bounce handling after clicking on the button Run Bounce Handling
     public function process(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         acym_increasePerf();
 
         $bounceHelper = new BounceHelper();
@@ -147,34 +158,50 @@ trait Listing
 
             return;
         }
-        $disp = "<html>\n<head>\n<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />\n";
-        $disp .= '<title>'.addslashes(acym_translation('ACYM_BOUNCE_PROCESS')).'</title>'."\n";
-        $disp .= "<style>body{font-size:12px;font-family: Arial,Helvetica,sans-serif;padding-top:30px;}</style>\n</head>\n<body>";
-        echo $disp;
-
+        ?>
+		<html>
+		<head>
+			<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+			<title><?php echo esc_html(acym_translation('ACYM_BOUNCE_PROCESS')); ?></title>
+			<style>
+				body{
+					font-size: 12px;
+					font-family: Arial, Helvetica, sans-serif;
+					padding-top: 30px;
+				}
+			</style>
+		</head>
+		<body>
+        <?php
         acym_display(acym_translationSprintf('ACYM_BOUNCE_CONNECT_SUCC', $this->config->get('bounce_username')), 'success');
         $nbMessages = $bounceHelper->getNBMessages();
         $nbMessagesReport = acym_translationSprintf('ACYM_NB_MAIL_MAILBOX', $nbMessages);
         acym_display($nbMessagesReport, 'info');
 
+        //that should not happen as we check it before anyway...
         if (empty($nbMessages)) {
             exit;
         }
 
         $bounceHelper->handleMessages();
 
+        //Load the cron class to save the report if there is one
         $cronHelper = new CronHelper();
         $cronHelper->saveReport([$nbMessagesReport], $bounceHelper->messages);
 
         if ($this->config->get('bounce_max', 0) != 0 && $nbMessages > $this->config->get('bounce_max', 0)) {
-            $url = acym_completeLink('bounces&task=process&continuebounce=1', true, true);
+            //We still have some messages...
+            $url = acym_completeLink('bounces&task=process&continuebounce=1', true, true).'&'.acym_getFormToken();
             if (acym_getVar('int', 'continuebounce')) {
-                echo '<script type="text/javascript">document.location.href=\''.$url.'\';</script>';
+                //We already started the bounce handling and we should resume it until the end...
+                echo '<script type="text/javascript">document.location.href = '.json_encode($url).';</script>';
             } else {
-                echo '<div style="padding:20px;"><a href="'.$url.'">'.acym_translation('ACYM_CLICK_HANDLE_ALL_BOUNCES').'</a></div>';
+                //We should propose to the user to resume the bounce process until the end...
+                echo '<div style="padding:20px;"><a href="'.esc_url($url).'">'.esc_html(acym_translation('ACYM_CLICK_HANDLE_ALL_BOUNCES')).'</a></div>';
             }
         }
 
+        //We need to finish the current page properly
         echo '</body></html>';
         while ($bounceHelper->obend-- > 0) {
             ob_start();
@@ -182,8 +209,11 @@ trait Listing
         exit;
     }
 
+    // Click on the button Reset to default rules
     public function reinstall(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $ruleClass = new RuleClass();
         $ruleClass->cleanTable();
 
@@ -193,6 +223,7 @@ trait Listing
         $this->listing();
     }
 
+    // Click on the button configuration
     public function config(): void
     {
         acym_redirect(acym_completeLink('configuration', false, true));
@@ -200,6 +231,8 @@ trait Listing
 
     public function delete(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $rulesSelected = acym_getVar('array', 'elements_checked', []);
 
         if (in_array(RuleClass::FINAL_RULE_ID, $rulesSelected)) {
@@ -219,6 +252,8 @@ trait Listing
 
     public function setInactive(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $rulesSelected = acym_getVar('array', 'elements_checked', []);
         $ruleClass = new RuleClass();
         $ruleClass->setInactive($rulesSelected);
@@ -228,6 +263,8 @@ trait Listing
 
     public function setActive(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $rulesSelected = acym_getVar('array', 'elements_checked', []);
         $ruleClass = new RuleClass();
         $ruleClass->setActive($rulesSelected);

@@ -63,6 +63,7 @@ class MailStatClass extends AcymClass
         }
 
         if (isset($mailStat['tracking_sale'])) {
+            // Cannot be changed as it is not guaranteed that the plugin is updated at the same time
             $onDuplicate[] = 'tracking_sale = '.floatval($mailStat['tracking_sale']);
         }
 

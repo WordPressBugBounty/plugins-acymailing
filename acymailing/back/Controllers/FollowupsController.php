@@ -64,7 +64,7 @@ class FollowupsController extends AcymController
 
     public function addQueueAjax(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $emailId = acym_getVar('int', 'emailId', 0);
         if (empty($emailId)) {

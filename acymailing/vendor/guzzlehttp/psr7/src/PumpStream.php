@@ -6,18 +6,43 @@ namespace GuzzleHttp\Psr7;
 
 use Psr\Http\Message\StreamInterface;
 
+/**
+ * Provides a read only stream that pumps data from a PHP callable.
+ *
+ * When invoking the provided callable, the PumpStream will pass the amount of
+ * data requested to read to the callable. The callable can choose to ignore
+ * this value and return fewer or more bytes than requested. Any extra data
+ * returned by the provided callable is buffered internally until drained using
+ * the read() function of the PumpStream. The provided callable MUST return
+ * false when there is no more data to read.
+ */
 final class PumpStream implements StreamInterface
 {
+    /** @var callable(int): (string|false|null)|null */
     private $source;
 
+    /** @var int|null */
     private $size;
 
+    /** @var int */
     private $tellPos = 0;
 
+    /** @var array */
     private $metadata;
 
+    /** @var BufferStream */
     private $buffer;
 
+    /**
+     * @param callable(int): (string|false|null)  $source  Source of the stream data. The callable MAY
+     *                                                     accept an integer argument used to control the
+     *                                                     amount of data to return. The callable MUST
+     *                                                     return a string when called, or false|null on error
+     *                                                     or EOF.
+     * @param array{size?: int, metadata?: array} $options Stream options:
+     *                                                     - metadata: Hash of metadata to use with stream.
+     *                                                     - size: Size of the stream, if known.
+     */
     public function __construct(callable $source, array $options = [])
     {
         $this->source = $source;
@@ -124,6 +149,9 @@ final class PumpStream implements StreamInterface
         return $result;
     }
 
+    /**
+     * @return mixed
+     */
     public function getMetadata($key = null)
     {
         if (!$key) {

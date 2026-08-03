@@ -21,9 +21,11 @@ class UpdatemeHelper extends AcymObject
     {
         $url = ACYM_UPDATEME_API_URL.$path;
 
+        // No array merge because we need to keep the keys
         $headers = $headers + self::getDefaultHeaders();
 
         if (ACYM_CMS === 'joomla' && acym_getCMSConfig('proxy_enable', false)) {
+            // https://github.com/WordPress/Requests/blob/stable/docs/proxy.md
             $options['proxy'] = ['host' => acym_getCMSConfig('proxy_host', '').':'.acym_getCMSConfig('proxy_port', '')];
             if (!empty(acym_getCMSConfig('proxy_user', '')) && !empty(acym_getCMSConfig('proxy_pass', ''))) {
                 $options['proxy']['auth'] = acym_getCMSConfig('proxy_user', '').':'.acym_getCMSConfig('proxy_pass', '');
@@ -57,22 +59,27 @@ class UpdatemeHelper extends AcymObject
 
     public static function getLicenseInfo(bool $ajax = false): void
     {
+        // Get any error correctly
         ob_start();
         $config = acym_config(true);
         $url = 'public/getLicenseInfo';
+        // Know which version to look at
         $url .= '?level='.urlencode(strtolower($config->get('level', 'starter')));
         if (acym_level(ACYM_ESSENTIAL) || $config->get('isTrial', 0) == 1) {
+            // Tell the user if the automatic features are available for the current installation
             if ($config->get('different_admin_url_toggle', 0) === 1) {
                 $url .= '&domain='.$config->get('different_admin_url_value', 0);
             } else {
                 $url .= '&domain='.urlencode(rtrim(ACYM_LIVE, '/'));
             }
         }
+        // Tell the user if a newer version is available
         $url .= '&version=latest';
         $userInformation = self::call($url);
         $warnings = ob_get_clean();
         $result = (!empty($warnings) && acym_isDebug()) ? $warnings : '';
 
+        // Could not load the user information
         if (empty($userInformation)) {
             $config->saveConfig(['lastlicensecheck' => time()]);
             if ($ajax) {
@@ -102,6 +109,7 @@ class UpdatemeHelper extends AcymObject
 
         $config->saveConfig($newConfig);
 
+        //check for plugins
         acym_checkPluginsVersion();
     }
 }

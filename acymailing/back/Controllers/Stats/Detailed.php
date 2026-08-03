@@ -31,6 +31,8 @@ trait Detailed
 
     public function exportDetailed(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $exportHelper = new ExportHelper();
         $data = [];
         $this->prepareDefaultPageInfo($data);
@@ -93,6 +95,7 @@ trait Detailed
             ]
         );
 
+        // Prepare the pagination
         $pagination->setStatus((int)$matchingDetailedStats['total']->total, $page, $detailedStatsPerPage);
 
         $data['pagination'] = $pagination;

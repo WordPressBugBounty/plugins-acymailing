@@ -1,9 +1,20 @@
 <?php
+/**
+ * This file is part of the ZBateson\MailMimeParser project.
+ *
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ */
 
 namespace ZBateson\MailMimeParser\Header;
 
+/**
+ * List of header name constants.
+ *
+ * @author Thomas Landauer
+ */
 abstract class HeaderConsts
 {
+    // Headers according to the table at https://tools.ietf.org/html/rfc5322#section-3.6
     public const RETURN_PATH = 'Return-Path';
 
     public const RECEIVED = 'Received';
@@ -52,6 +63,7 @@ abstract class HeaderConsts
 
     public const KEYWORDS = 'Keywords';
 
+    // https://datatracker.ietf.org/doc/html/rfc4021#section-2.2
     public const MIME_VERSION = 'MIME-Version';
 
     public const CONTENT_TYPE = 'Content-Type';
@@ -78,5 +90,6 @@ abstract class HeaderConsts
 
     public const CONTENT_DURATION = 'Content-Duration';
 
+    // https://datatracker.ietf.org/doc/html/rfc3834
     public const AUTO_SUBMITTED = 'Auto-Submitted';
 }

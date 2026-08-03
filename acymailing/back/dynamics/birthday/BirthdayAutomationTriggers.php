@@ -95,7 +95,7 @@ trait BirthdayAutomationTriggers
                             <div class="cell auto word-break acym__automation__trigger__action__birthday">
                             '.acym_translationSprintf(
                     'ACYM_TRIGGER_EVENT_BEFORE_BIRTHDAY',
-                    '<input type="number" name="[triggers][user][on_birthday][day_before]" class="intext_input" min="0" value="'.acym_escape($defaultDayBefore).'">',
+                    '<input type="number" name="[triggers][user][on_birthday][day_before]" class="intext_input" min="0" value="'.esc_attr($defaultDayBefore).'">',
                     $hourSelector,
                     $minuteSelector
                 ).'
@@ -124,6 +124,7 @@ trait BirthdayAutomationTriggers
 
         if (empty($triggers['on_birthday'])) return;
 
+        //Values from trigger
         $sourceName = $triggers['on_birthday']['source'];
         $fieldId = $triggers['on_birthday']['field'];
         $dayBefore = $triggers['on_birthday']['day_before'];

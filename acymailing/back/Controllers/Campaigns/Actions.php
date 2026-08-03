@@ -13,6 +13,9 @@ trait Actions
 {
     public function duplicate(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
+        //We get the id of campaign checked
         $campaignsSelected = acym_getVar('array', 'elements_checked', []);
 
         $campaignClass = new CampaignClass();
@@ -24,8 +27,10 @@ trait Actions
         }
 
         foreach ($campaignsSelected as $campaignSelected) {
+            //we get the campaign
             $campaign = $campaignClass->getOneById($campaignSelected);
 
+            //remove id and set to draft and not sent
             unset($campaign->id);
             unset($campaign->sending_date);
             $campaign->draft = 1;
@@ -35,6 +40,7 @@ trait Actions
                 unset($campaign->sending_params['resendTarget']);
             }
 
+            //We get the mail to duplicate it
             $mail = $mailClass->getOneById($campaign->mail_id);
             $oldMailId = $mail->id;
             unset($mail->id);
@@ -67,9 +73,11 @@ trait Actions
                 }
             }
 
+            //we set the new mail id and save campaign
             $campaign->mail_id = $idNewMail;
             $campaignId = $campaignClass->save($campaign);
 
+            //We get the lists
             $allLists = $campaignClass->getListsByMailId($oldMailId);
 
             $campaignClass->manageListsToCampaign($allLists, $idNewMail);
@@ -87,12 +95,16 @@ trait Actions
 
     public function duplicateFollowup(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
+        //We get the id of follow-ups checked
         $followupsSelected = acym_getVar('int', 'elements_checked');
 
         $followupClass = new FollowupClass();
         $mailClass = new MailClass();
 
         foreach ($followupsSelected as $oneFollowupId) {
+            // Duplicate the follow-up + list associated
             $followUp = $followupClass->getOneByIdWithMails($oneFollowupId);
             $followupEmails = $followUp->mails;
 
@@ -109,6 +121,7 @@ trait Actions
             }
             $followUp->id = $newFollowUpId;
 
+            // Duplicate emails of the follow-up and attach them to the new followup
             foreach ($followupEmails as $oneEmail) {
                 $mail = $mailClass->getOneById($oneEmail->id);
                 unset($mail->id, $mail->creation_date, $mail->creator_id, $mail->autosave);
@@ -138,7 +151,11 @@ trait Actions
             return;
         }
 
-        acym_redirect(acym_completeLink('queue', false, true).'&task=playPauseSending&acym__queue__play_pause__active__new_value=1&acym__queue__play_pause__campaign_id='.$id);
+        acym_redirect(
+            acym_completeLink('queue', false, true)
+            .'&task=playPauseSending&acym__queue__play_pause__active__new_value=1&acym__queue__play_pause__campaign_id='.$id
+            .'&'.acym_getFormToken()
+        );
     }
 
     public function stopSending(): void
@@ -153,7 +170,7 @@ trait Actions
 
     private function stopAction(string $action): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $campaignID = acym_getVar('int', $action);
         $campaignClass = new CampaignClass();
@@ -183,6 +200,8 @@ trait Actions
 
     public function confirmCampaign(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $this->updateOpenAcymailerPopup();
         $campaignId = acym_getVar('int', 'campaignId');
         $campaignSendingDate = acym_getVar('string', 'sending_date');
@@ -219,6 +238,8 @@ trait Actions
 
     public function activeAutoCampaign(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $this->updateOpenAcymailerPopup();
         $campaignId = acym_getVar('int', 'campaignId');
         $campaignClass = new CampaignClass();
@@ -242,6 +263,8 @@ trait Actions
 
     public function saveAsDraftCampaign(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $campaignId = acym_getVar('int', 'campaignId');
         $campaignClass = new CampaignClass();
 
@@ -267,6 +290,7 @@ trait Actions
 
     public function toggleActivateColumnCampaign(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $campaignId = acym_getVar('int', 'campaignId');
         $campaignClass = new CampaignClass();
@@ -281,6 +305,7 @@ trait Actions
 
         $campaign->active = empty($campaign->active) ? 1 : 0;
 
+        // Remove the next trigger when disabling the automatic campaign. It will be calculated again properly if reactivated
         if ($campaign->active === 0 && $campaign->sending_type === CampaignClass::SENDING_TYPE_AUTO) {
             $campaign->next_trigger = null;
         }
@@ -298,7 +323,7 @@ trait Actions
 
     public function addQueue(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         $this->updateOpenAcymailerPopup();
 
         $campaignClass = new CampaignClass();
@@ -323,7 +348,7 @@ trait Actions
             $status = $campaignClass->send($campaignID);
 
             if ($status) {
-                acym_enqueueMessage(acym_translationSprintf('ACYM_CAMPAIGN_ADDED_TO_QUEUE', $campaign->name), 'info');
+                acym_enqueueMessage(acym_translationSprintf('ACYM_CAMPAIGN_ADDED_TO_QUEUE', $campaign->name, 'info'));
             } else {
                 if (empty($campaignClass->errors)) {
                     $notification = [
@@ -358,6 +383,8 @@ trait Actions
 
     public function updateArchive(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $campaignId = acym_getVar('int', 'campaignId', 0);
         if (empty($campaignId)) {
             acym_sendAjaxResponse('', [], false);

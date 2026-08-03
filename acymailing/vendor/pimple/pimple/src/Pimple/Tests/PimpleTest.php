@@ -1,11 +1,37 @@
 <?php
 
+/*
+ * This file is part of Pimple.
+ *
+ * Copyright (c) 2009 Fabien Potencier
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is furnished
+ * to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
 namespace Pimple\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Pimple\Container;
 
+/**
+ * @author Igor Wiedler <igor@wiedler.ch>
+ */
 class PimpleTest extends TestCase
 {
     public function testWithString()
@@ -89,6 +115,9 @@ class PimpleTest extends TestCase
         echo $pimple['foo'];
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyOffsetGetValidatesKeyIsPresent()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -118,6 +147,9 @@ class PimpleTest extends TestCase
         $this->assertFalse(isset($pimple['service']));
     }
 
+    /**
+     * @dataProvider serviceDefinitionProvider
+     */
     public function testShare($service)
     {
         $pimple = new Container();
@@ -132,6 +164,9 @@ class PimpleTest extends TestCase
         $this->assertSame($serviceOne, $serviceTwo);
     }
 
+    /**
+     * @dataProvider serviceDefinitionProvider
+     */
     public function testProtect($service)
     {
         $pimple = new Container();
@@ -178,6 +213,9 @@ class PimpleTest extends TestCase
         $pimple->raw('foo');
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyRawValidatesKeyIsPresent()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -187,6 +225,9 @@ class PimpleTest extends TestCase
         $pimple->raw('foo');
     }
 
+    /**
+     * @dataProvider serviceDefinitionProvider
+     */
     public function testExtend($service)
     {
         $pimple = new Container();
@@ -248,6 +289,9 @@ class PimpleTest extends TestCase
         });
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyExtendValidatesKeyIsPresent()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -267,6 +311,7 @@ class PimpleTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $pimple->keys());
     }
 
+    /** @test */
     public function settingAnInvokableObjectShouldTreatItAsFactory()
     {
         $pimple = new Container();
@@ -275,6 +320,7 @@ class PimpleTest extends TestCase
         $this->assertInstanceOf('Pimple\Tests\Fixtures\Service', $pimple['invokable']);
     }
 
+    /** @test */
     public function settingNonInvokableObjectShouldTreatItAsParameter()
     {
         $pimple = new Container();
@@ -283,6 +329,9 @@ class PimpleTest extends TestCase
         $this->assertInstanceOf('Pimple\Tests\Fixtures\NonInvokable', $pimple['non_invokable']);
     }
 
+    /**
+     * @dataProvider badServiceDefinitionProvider
+     */
     public function testFactoryFailsForInvalidServiceDefinitions($service)
     {
         $this->expectException(\Pimple\Exception\ExpectedInvokableException::class);
@@ -292,6 +341,10 @@ class PimpleTest extends TestCase
         $pimple->factory($service);
     }
 
+    /**
+     * @group legacy
+     * @dataProvider badServiceDefinitionProvider
+     */
     public function testLegacyFactoryFailsForInvalidServiceDefinitions($service)
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -301,6 +354,9 @@ class PimpleTest extends TestCase
         $pimple->factory($service);
     }
 
+    /**
+     * @dataProvider badServiceDefinitionProvider
+     */
     public function testProtectFailsForInvalidServiceDefinitions($service)
     {
         $this->expectException(\Pimple\Exception\ExpectedInvokableException::class);
@@ -310,6 +366,10 @@ class PimpleTest extends TestCase
         $pimple->protect($service);
     }
 
+    /**
+     * @group legacy
+     * @dataProvider badServiceDefinitionProvider
+     */
     public function testLegacyProtectFailsForInvalidServiceDefinitions($service)
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -319,6 +379,9 @@ class PimpleTest extends TestCase
         $pimple->protect($service);
     }
 
+    /**
+     * @dataProvider badServiceDefinitionProvider
+     */
     public function testExtendFailsForKeysNotContainingServiceDefinitions($service)
     {
         $this->expectException(\Pimple\Exception\InvalidServiceIdentifierException::class);
@@ -330,6 +393,10 @@ class PimpleTest extends TestCase
         });
     }
 
+    /**
+     * @group legacy
+     * @dataProvider badServiceDefinitionProvider
+     */
     public function testLegacyExtendFailsForKeysNotContainingServiceDefinitions($service)
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -341,6 +408,10 @@ class PimpleTest extends TestCase
         });
     }
 
+    /**
+     * @group legacy
+     * @expectedDeprecation How Pimple behaves when extending protected closures will be fixed in Pimple 4. Are you sure "foo" should be protected?
+     */
     public function testExtendingProtectedClosureDeprecation()
     {
         $pimple = new Container();
@@ -355,6 +426,9 @@ class PimpleTest extends TestCase
         $this->assertSame('bar-baz', $pimple['foo']);
     }
 
+    /**
+     * @dataProvider badServiceDefinitionProvider
+     */
     public function testExtendFailsForInvalidServiceDefinitions($service)
     {
         $this->expectException(\Pimple\Exception\ExpectedInvokableException::class);
@@ -366,6 +440,10 @@ class PimpleTest extends TestCase
         $pimple->extend('foo', $service);
     }
 
+    /**
+     * @group legacy
+     * @dataProvider badServiceDefinitionProvider
+     */
     public function testLegacyExtendFailsForInvalidServiceDefinitions($service)
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -407,6 +485,9 @@ class PimpleTest extends TestCase
         });
     }
 
+    /**
+     * Provider for invalid service definitions.
+     */
     public function badServiceDefinitionProvider()
     {
         return [
@@ -415,6 +496,9 @@ class PimpleTest extends TestCase
         ];
     }
 
+    /**
+     * Provider for service definitions.
+     */
     public function serviceDefinitionProvider()
     {
         return [
@@ -458,6 +542,9 @@ class PimpleTest extends TestCase
         };
     }
 
+    /**
+     * @group legacy
+     */
     public function testLegacyOverridingServiceAfterFreeze()
     {
         $this->expectException(\RuntimeException::class);

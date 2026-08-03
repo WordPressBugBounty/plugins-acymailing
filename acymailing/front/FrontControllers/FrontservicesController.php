@@ -26,25 +26,32 @@ class FrontservicesController extends AcymController
 
     public function sendinblue(): void
     {
+        // Check security key
         $securityKey = acym_getVar('string', 'seckey');
-        if (empty($securityKey) || $securityKey !== $this->config->get('sendinblue_webhooks_seckey')) exit;
+        $storedKey = $this->config->get('sendinblue_webhooks_seckey');
+        if (empty($securityKey) || empty($storedKey) || !hash_equals((string)$storedKey, (string)$securityKey)) exit;
 
+        // Check if sending method is sendinblue
         $mailerMethod = $this->config->get('mailer_method');
         if (!in_array($mailerMethod, ['brevo-smtp', 'sendinblue'])) exit;
 
+        // Get the data passed by Sendinblue
         $data = acym_getJsonData();
         if (empty($data['email'])) exit;
 
+        // Get the user from the email
         $userClass = new UserClass();
         $user = $userClass->getOneByEmail($data['email']);
         if (empty($user)) exit;
 
         $action = empty($data['event']) ? 'brevo' : $data['event'];
 
+        // Get the related email id if there is one
         $mailId = 0;
         if (!empty($data['campaign name']) && strpos($data['campaign name'], 'AcyMailing Mail ') === 0) {
             $mailId = preg_replace('#^AcyMailing Mail (\d+) \(.*$#Uis', '$1', $data['campaign name']);
 
+            // Register the unsubscription on the email's stats
             if (in_array($action, ['unsubscribe', 'spam'])) {
                 acym_query('UPDATE #__acym_user_stat SET unsubscribe = unsubscribe + 1 WHERE user_id = '.intval($user->id).' AND mail_id = '.intval($mailId));
                 acym_query('UPDATE #__acym_mail_stat SET unsubscribe_total = unsubscribe_total + 1 WHERE mail_id = '.intval($mailId));
@@ -61,6 +68,7 @@ class FrontservicesController extends AcymController
             }
         }
 
+        // If found, disable the user and add the reason in their history
         $user->active = 0;
         $userClass->save($user);
 

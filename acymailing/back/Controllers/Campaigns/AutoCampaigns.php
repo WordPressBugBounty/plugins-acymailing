@@ -84,10 +84,12 @@ trait AutoCampaigns
             ];
         }
 
+        //if campaign wait for confirmation
         $campaign->waiting_confirmation = false;
         if ($campaign->draft && $campaign->active) {
             $campaign->waiting_confirmation = true;
         }
+        //if campaign canceled
         $campaign->canceled = false;
         if (!$campaign->draft && !$campaign->active) {
             $campaign->canceled = true;
@@ -106,7 +108,7 @@ trait AutoCampaigns
         $this->prepareMultilingual($data, false);
         $this->prepareAllMailsForMultilingual($data);
 
-        $this->breadcrumb[acym_escape($mail->name)] = acym_completeLink('campaigns&task=summaryGenerated&campaignId='.$campaign->id);
+        $this->breadcrumb[$mail->name] = acym_completeLink('campaigns&task=summaryGenerated&campaignId='.$campaign->id);
         parent::display($data);
     }
 
@@ -155,11 +157,15 @@ trait AutoCampaigns
 
     public function disableGeneratedCampaign(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $this->changeStatusGeneratedCampaign();
     }
 
     public function enableGeneratedCampaign(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $this->changeStatusGeneratedCampaign('enable');
     }
 

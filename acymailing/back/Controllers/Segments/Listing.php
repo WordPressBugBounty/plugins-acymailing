@@ -27,6 +27,8 @@ trait Listing
 
     public function duplicate(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $ids = acym_getVar('array', 'elements_checked', []);
 
         $segmentClass = new SegmentClass();

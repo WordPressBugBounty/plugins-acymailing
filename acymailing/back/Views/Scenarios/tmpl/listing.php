@@ -1,4 +1,7 @@
-<form id="acym_form" action="<?php echo acym_completeLink(acym_getVar('cmd', 'ctrl')); ?>" method="post" name="acyForm">
+<?php
+defined('ABSPATH') || die('Restricted Access');
+?>
+<form id="acym_form" action="<?php echo esc_url(acym_completeLink(acym_getVar('cmd', 'ctrl'))); ?>" method="post" name="acyForm">
     <?php
     if (empty($data['totalOverall'])) { ?>
 		<div class="acym__content cell">

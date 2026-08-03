@@ -33,7 +33,7 @@ class SendinblueCampaign extends SendinblueClass
             'sender' => $this->sender->getSender($mail),
             'name' => 'AcyMailing Mail '.$mail->id.' ('.$mail->subject.')',
             'htmlContent' => $commonContent,
-            'scheduledAt' => date('c', time() + 60),
+            'scheduledAt' => gmdate('c', time() + 60),
             'subject' => '{{ contact.'.$this->user->getSubjectAttributeName($mail->id).' }}',
             'replyTo' => $this->sender->getReplyToEmail($mail),
             'recipients' => [
@@ -61,21 +61,25 @@ class SendinblueCampaign extends SendinblueClass
             $this->headers
         );
 
-        if (empty($response['campaigns'])) return true;
-
-        $startSendDate = date('c', $time - $cleanFrequency);
+        if (empty($response['campaigns'])) {
+            return true;
+        }
 
         foreach ($response['campaigns'] as $campaign) {
-            $sendDate = strtotime($campaign['sentDate']);
-            if ($sendDate > $startSendDate) continue;
+            //If it is a recent campaign we don't delete it
+            $sendDate = strtotime($campaign['sentDate'].' UTC');
+            if ($sendDate > $time - $cleanFrequency) continue;
 
+            //If it's not an AcyMailing campaign we get out
             preg_match('#AcyMailing Mail ([0-9]+)#is', $campaign['name'], $match);
             if (empty($match)) continue;
 
+            //We get the id of the email
             $id = intval($match[1]);
 
             if (empty($id)) continue;
 
+            //We delete what we created in Sendinblue
             $this->user->deleteAttribute($id);
             $this->list->deleteList($id);
             $this->deleteCampaign($campaign['id']);

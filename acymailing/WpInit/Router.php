@@ -2,17 +2,22 @@
 
 namespace AcyMailing\WpInit;
 
+defined('ABSPATH') || die('Restricted Access');
+
 use AcyMailing\Classes\PluginClass;
 
 class Router
 {
     public function __construct()
     {
+        // Back router
         add_action('wp_ajax_acymailing_router', [$this, 'router']);
+        // Front router
         if (!acym_isAdmin()) {
             add_action('wp_loaded', [$this, 'frontRouter']);
         }
 
+        // Make sure we can redirect / download / modify headers if needed after some checks
         $pages = [
             'automation',
             'bounces',
@@ -52,8 +57,10 @@ class Router
         ];
         foreach ($pages as $page) {
             if (in_array($page, $headerPages)) {
+                // Ensure we can set headers in the plugin
                 add_action('load-acymailing_page_acymailing_'.$page, [$this, 'waitHeaders']);
             }
+            // Disable WP emojis in AcyMailing only
             add_action('admin_print_scripts-acymailing_page_acymailing_'.$page, [$this, 'disableJsBreakingPages']);
             add_action('admin_print_styles-acymailing_page_acymailing_'.$page, [$this, 'removeCssBreakingPages']);
         }
@@ -65,12 +72,16 @@ class Router
 
     public function protectAcyMailingPages()
     {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Make sure we're on an AcyMailing page.
         $page = isset($_REQUEST['page']) ? sanitize_text_field(wp_unslash($_REQUEST['page'])) : '';
-        if (empty($page) || strpos($page, 'acymailing_') === false) return;
+        if (empty($page) || strpos($page, 'acymailing_') === false) {
+            return;
+        }
 
         wp_dequeue_script('responsive-lightbox-admin-select2');
         wp_dequeue_style('responsive-lightbox-admin-select2');
 
+        // Remove theme loading select2 from Supreme module pro for divi
         wp_dequeue_script('dsm-select-two');
         wp_dequeue_style('dsm-select-two');
     }
@@ -82,18 +93,25 @@ class Router
 
     public function disableJsBreakingPages()
     {
+        // Show normal emojis on AcyMailing pages
         remove_action('admin_print_scripts', 'print_emoji_detection_script');
 
+        // Slideshow ck breaks the editor
         remove_action('wp_enqueue_media', '\\Slideshowck\\Tinymce\\register_scripts_styles');
 
+        // Skaut Google Drive gallery breaks the editor
         remove_action('wp_enqueue_media', '\\Sgdg\\Admin\\TinyMCE\\register_scripts_styles');
 
+        // Remove theme loading select2 which breaks select2 in vueJS
         wp_dequeue_script('select2.js');
 
+        // The "Checkout Field Manager for WooCommerce" plugin breaks the js on every pages
         wp_dequeue_script('checkout_fields_js');
 
+        // Fixed editor incompatibility
         wp_dequeue_script('wp-optimize-minify-admin-purge');
 
+        // Remove Happy Elementor Addons select2 which breaks our select2
         wp_dequeue_script('happy-elementor-addons-select2');
         wp_dequeue_script('select2');
     }
@@ -105,9 +123,11 @@ class Router
         wp_dequeue_style('wpml-select-2');
         wp_dequeue_style('swcfpc_admin_css');
 
+        // Remove Happy Elementor Addons select2 which breaks our select2
         wp_dequeue_style('happy-elementor-addons-select2');
         wp_dequeue_style('select2');
 
+        // Messes with the tooltips, the schedule date in emails for example
         wp_dequeue_style('qlwapp-admin-menu');
     }
 
@@ -121,18 +141,23 @@ class Router
 
     public function router(bool $front = false): void
     {
-        displayFreeTrialMessage();
+        acym_displayFreeTrialMessage();
 
 
         if (!$front) {
             auth_redirect();
+
+            // The router only enforces auth_redirect() and the 'dashboard' controller is exempt from call()'s ACL, so mirror Menu.php's back-office access gate (wp_access groups) to keep arbitrary logged-in users out.
+            if (!acym_hasBackofficeAccess()) {
+                wp_die(esc_html(acym_translation('ACYM_ACCESS_DENIED')), '', ['response' => 403]);
+            }
         }
 
         if (file_exists(ACYM_FOLDER.'update.php')) {
             $acyActivation = new Activation();
             if (is_multisite()) {
                 $currentBlog = get_current_blog_id();
-                $sites = function_exists('get_sites') ? get_sites() : wp_get_sites();
+                $sites = get_sites();
 
                 foreach ($sites as $site) {
                     if (is_object($site)) {
@@ -148,15 +173,16 @@ class Router
                 $acyActivation->updateAcym();
             }
 
-            unlink(ACYM_FOLDER.'update.php');
+            acym_deleteFile(ACYM_FOLDER.'update.php');
         }
 
         $config = acym_config(true);
 
+        // Get controller. If not found, take it from the page
         $ctrl = acym_getVar('cmd', 'ctrl', '');
         $task = acym_getVar('cmd', 'task', '');
 
-        if (!$front && acym_isAdmin() && file_exists(ACYM_NEW_FEATURES_SPLASHSCREEN_JSON) && is_writable(ACYM_NEW_FEATURES_SPLASHSCREEN_JSON)) {
+        if (!$front && acym_isAdmin() && file_exists(ACYM_NEW_FEATURES_SPLASHSCREEN_JSON) && acym_isWritable(ACYM_NEW_FEATURES_SPLASHSCREEN_JSON)) {
             $ctrl = 'dashboard';
             $task = 'features';
             acym_setVar('ctrl', $ctrl);
@@ -174,8 +200,9 @@ class Router
             $ctrl = str_replace(ACYM_COMPONENT.'_', '', acym_getVar('cmd', 'page', ''));
 
             if (empty($ctrl)) {
-                echo acym_translation('ACYM_PAGE_NOT_FOUND');
+                echo esc_html(acym_translation('ACYM_PAGE_NOT_FOUND'));
 
+                // For Google search console in the frontend to prevent from doing 404 errors
                 $noCache = acym_getVar('int', 'nocache', 0);
                 if (!empty($noCache)) {
                     acym_redirect(acym_rootURI());
@@ -192,7 +219,7 @@ class Router
         $controllerNamespace = 'AcyMailing\\'.$subNamespace.'Controllers\\'.ucfirst($ctrl).'Controller';
 
         if (!class_exists($controllerNamespace)) {
-            echo acym_translation('ACYM_PAGE_NOT_FOUND').': '.$ctrl;
+            echo esc_html(acym_translation('ACYM_PAGE_NOT_FOUND').': '.$ctrl);
 
             return;
         }
@@ -200,16 +227,15 @@ class Router
         if (!$front && acym_isAdmin() && $task != 'edit' && !(defined('DOING_AJAX') && DOING_AJAX)) {
             $pluginClass = new PluginClass();
             $installedPlugins = $pluginClass->getAll('title');
-            $newPlugins = json_decode(ACYM_AVAILABLE_PLUGINS);
-            foreach ($newPlugins as $onePlugin) {
-                if (empty($installedPlugins[$onePlugin->name])) continue;
-                if ($installedPlugins[$onePlugin->name]->type !== 'ADDON') continue;
+            foreach (ACYM_AVAILABLE_PLUGINS as $onePlugin) {
+                if (empty($installedPlugins[$onePlugin['name']])) continue;
+                if ($installedPlugins[$onePlugin['name']]->type !== 'ADDON') continue;
 
                 acym_enqueueMessage(
                     acym_translationSprintf(
                         'ACYM_NEW_PLUGIN_FORMAT',
-                        $onePlugin->name,
-                        '<a target="_blank" style="color: #00a5ff;" href="'.$onePlugin->downloadlink.'">'.acym_translation('ACYM_CLICK_HERE').'</a>'
+                        $onePlugin['name'],
+                        '<a target="_blank" style="color: #00a5ff;" href="'.$onePlugin['downloadlink'].'">'.acym_translation('ACYM_CLICK_HERE').'</a>'
                     ),
                     'error'
                 );
@@ -261,6 +287,7 @@ class Router
             acym_redirect($cleanedUrl);
         }
 
+        // Never allow autologin for administrator accounts
         if ($user->has_cap('manage_options')) {
             acym_redirect($cleanedUrl);
         }
@@ -274,6 +301,7 @@ class Router
 
     private function deactivateHookAdminFooter()
     {
+        //Remove hook function which break AcyMailing pages
         remove_action('admin_footer', 'Freemius::_enrich_ajax_url');
         remove_action('admin_footer', 'Freemius::_open_support_forum_in_new_page');
     }

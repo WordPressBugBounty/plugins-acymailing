@@ -54,6 +54,7 @@ class PluginClass extends AcymClass
         $plugins = $this->getPlugins();
         $data = $plugins[$plugin->name] ?? null;
 
+        // Prepare the missing entry in the db
         $newPlugin = new \stdClass();
         $newPlugin->title = $plugin->pluginDescription->name;
         $newPlugin->folder_name = $plugin->name;
@@ -74,7 +75,9 @@ class PluginClass extends AcymClass
                 return;
             }
 
+            // The integration has just been activated and the old addon was installed
 
+            // Remove the old addon's files
             if (file_exists(ACYM_ADDONS_FOLDER_PATH.$plugin->name)) {
                 acym_deleteFolder(ACYM_ADDONS_FOLDER_PATH.$plugin->name);
             }
@@ -106,7 +109,7 @@ class PluginClass extends AcymClass
         $plugin = $this->getOnePluginByFolderName($folderName);
         if (empty($plugin)) return;
 
-        parent::delete($plugin->id);
+        parent::delete([$plugin->id]);
     }
 
     public function updateAddon(string $addon): ?int

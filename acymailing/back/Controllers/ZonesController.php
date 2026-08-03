@@ -11,7 +11,7 @@ class ZonesController extends AcymController
 
     public function save(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $zone = new \stdClass();
         $zone->name = acym_getVar('string', 'name');
@@ -32,11 +32,17 @@ class ZonesController extends AcymController
 
         $dataResponse = ['id' => $zone->id];
 
-        if (!empty($_FILES['image']['name'])) {
-            $extension = pathinfo($_FILES['image']['name']);
+        $image = acym_getVar('array', 'image', [], 'FILES');
+        if (!empty($image['name'])) {
+            $extension = pathinfo($image['name']);
             $newPath = self::ZONE_IMAGE_FOLDER.$zone->id.'.'.$extension['extension'];
 
-            if (in_array($extension['extension'], acym_getImageFileExtensions()) && acym_uploadFile($_FILES['image']['tmp_name'], ACYM_ROOT.$newPath)) {
+            if (in_array($extension['extension'], acym_getImageFileExtensions(true)) && acym_uploadFile($image['tmp_name'], ACYM_ROOT.$newPath)) {
+                if (strtolower($extension['extension']) === 'svg' && !acym_isSvgFileSafe(ACYM_ROOT.$newPath)) {
+                    acym_deleteFile(ACYM_ROOT.$newPath);
+                    acym_sendAjaxResponse(acym_translation('ACYM_FAILED_CUSTOM_ZONE_SAVE'), [], false);
+                }
+
                 $zone->image = $newPath;
                 $savedZoneId = $zoneClass->save($zone);
                 if (!empty($savedZoneId)) {
@@ -50,7 +56,7 @@ class ZonesController extends AcymController
 
     private function getZoneData(): array
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         $zoneId = acym_getVar('int', 'zoneId', 0);
         if (empty($zoneId)) {
             acym_sendAjaxResponse(acym_translation('ACYM_FAILED_CUSTOM_ZONE_FIND'), [], false);

@@ -1,4 +1,5 @@
 <?php
+defined('ABSPATH') || die('Restricted Access');
 
 if (!class_exists('AcymJFormField')) {
     if ('WordPress' === 'Joomla') {

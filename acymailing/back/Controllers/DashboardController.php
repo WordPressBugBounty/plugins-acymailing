@@ -44,8 +44,8 @@ class DashboardController extends AcymController
 
         $splashJson = acym_fileGetContent(ACYM_NEW_FEATURES_SPLASHSCREEN_JSON);
         $version = json_decode($splashJson);
-        if (version_compare($this->config->get('previous_version', '10.11.1'), $version->max_version, '>=')) {
-            @unlink(ACYM_NEW_FEATURES_SPLASHSCREEN_JSON);
+        if (version_compare($this->config->get('previous_version', '11.0.0'), $version->max_version, '>=')) {
+            acym_deleteFile(ACYM_NEW_FEATURES_SPLASHSCREEN_JSON);
             $this->listing();
 
             return;
@@ -57,11 +57,13 @@ class DashboardController extends AcymController
             'content' => ob_get_clean(),
         ];
 
-        if (!@unlink(ACYM_NEW_FEATURES_SPLASHSCREEN_JSON)) {
+        if (!acym_deleteFile(ACYM_NEW_FEATURES_SPLASHSCREEN_JSON)) {
             $this->listing();
 
             return;
         }
+
+        $data['splashJson'] = $version;
 
         acym_setVar('layout', 'features');
 

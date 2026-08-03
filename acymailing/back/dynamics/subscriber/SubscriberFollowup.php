@@ -37,10 +37,12 @@ trait SubscriberFollowup
                     foreach ($segment->filters as $orBlock) {
                         if ($this->isUserMatchingOr($userId, $orBlock)) {
                             $segmentMatched = true;
+                            // No need to test the other OR blocks since one matched
                             break;
                         }
                     }
 
+                    // Must match all segments and the user didn't match a segment
                     if (!$segmentMatched) {
                         unset($followups[$key]);
 
@@ -50,6 +52,7 @@ trait SubscriberFollowup
             } else {
                 foreach ($segments as $segment) {
                     foreach ($segment->filters as $orBlock) {
+                        // Must not match the segments and the user matched at least one OR of a segment
                         if ($this->isUserMatchingOr($userId, $orBlock)) {
                             unset($followups[$key]);
 

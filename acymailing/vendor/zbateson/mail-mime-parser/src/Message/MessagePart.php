@@ -1,4 +1,9 @@
 <?php
+/**
+ * This file is part of the ZBateson\MailMimeParser project.
+ *
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ */
 
 namespace ZBateson\MailMimeParser\Message;
 
@@ -9,16 +14,41 @@ use SplObjectStorage;
 use SplObserver;
 use ZBateson\MailMimeParser\MailMimeParser;
 
+/**
+ * Most basic representation of a single part of an email.
+ *
+ * @author Zaahid Bateson
+ */
 abstract class MessagePart implements IMessagePart
 {
+    /**
+     * @var ?IMimePart parent part
+     */
     protected $parent;
 
+    /**
+     * @var PartStreamContainer holds 'stream' and 'content stream'.
+     */
     protected $partStreamContainer;
 
+    /**
+     * @var ?string can be used to set an override for content's charset in cases
+     *      where a user knows the charset on the content is not what it claims
+     *      to be.
+     */
     protected $charsetOverride;
 
+    /**
+     * @var bool set to true when a user attaches a stream manually, it's
+     *      assumed to already be decoded or to have relevant transfer encoding
+     *      decorators attached already.
+     */
     protected $ignoreTransferEncoding;
 
+    /**
+     * @var SplObjectStorage attached observers that need to be notified of
+     *      modifications to this part.
+     */
     protected $observers;
 
     public function __construct(PartStreamContainer $streamContainer, ?IMimePart $parent = null)
@@ -63,6 +93,9 @@ abstract class MessagePart implements IMessagePart
         return null;
     }
 
+    /**
+     * @return static
+     */
     public function setCharsetOverride(string $charsetOverride, bool $onlyIfNoCharset = false)
     {
         if (!$onlyIfNoCharset || $this->getCharset() === null) {
@@ -115,6 +148,8 @@ abstract class MessagePart implements IMessagePart
 
         if (!\is_string($filenameResourceOrStream)
             && !($filenameResourceOrStream instanceof StreamInterface)) {
+            // only detach if it wasn't a string or StreamInterface, so the
+            // fopen call can be properly closed if it was
             $stream->detach();
         }
         return $this;
@@ -129,6 +164,9 @@ abstract class MessagePart implements IMessagePart
         return null;
     }
 
+    /**
+     * @return static
+     */
     public function attachContentStream(StreamInterface $stream, string $streamCharset = MailMimeParser::DEFAULT_CHARSET)
     {
         $ch = $this->charsetOverride ?? $this->getCharset();
@@ -141,6 +179,9 @@ abstract class MessagePart implements IMessagePart
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function detachContentStream()
     {
         $this->partStreamContainer->setContentStream(null);
@@ -148,10 +189,14 @@ abstract class MessagePart implements IMessagePart
         return $this;
     }
 
+    /**
+     * @return static
+     */
     public function setContent($resource, string $charset = MailMimeParser::DEFAULT_CHARSET)
     {
         $stream = Utils::streamFor($resource);
         $this->attachContentStream($stream, $charset);
+        // this->notify() called in attachContentStream
         return $this;
     }
 
@@ -165,6 +210,9 @@ abstract class MessagePart implements IMessagePart
         return $this->partStreamContainer->getStream();
     }
 
+    /**
+     * @return static
+     */
     public function save($filenameResourceOrStream, string $filemode = 'w+')
     {
         $resourceOrStream = $filenameResourceOrStream;
@@ -179,6 +227,8 @@ abstract class MessagePart implements IMessagePart
 
         if (!\is_string($filenameResourceOrStream)
             && !($filenameResourceOrStream instanceof StreamInterface)) {
+            // only detach if it wasn't a string or StreamInterface, so the
+            // fopen call can be properly closed if it was
             $stream->detach();
         }
         return $this;

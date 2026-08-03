@@ -67,6 +67,7 @@ trait Patchv9
             'bounce_email' => acym_strtolower($config->get('bounce_email')),
         ]);
 
+        // Make sure that all domains in AcyMailer configuration are in lower cases
         $acymailerParams = $config->get('acymailer_domains', '[]');
         $acymailerParams = @json_decode($acymailerParams, true);
         if (!empty($acymailerParams)) {
@@ -141,6 +142,7 @@ trait Patchv9
             return;
         }
 
+        // On some servers, there is a limit of 767 bytes for the index length, which corresponds to VARCHAR(191)
         $this->updateQuery('ALTER TABLE #__acym_user DROP INDEX `email_UNIQUE`');
         $this->updateQuery('ALTER TABLE #__acym_configuration CHANGE `name` `name` VARCHAR(190) NOT NULL');
 

@@ -32,6 +32,8 @@ class FileController extends AcymController
         $uploadedFile = acym_getVar('array', 'uploadedFile', [], 'files');
         $selectedFile = '';
         if (!empty($uploadedFile['name'])) {
+            wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
             ob_start();
             $uploaded = acym_importFile($uploadedFile, $uploadPath, false);
             $warnings = ob_get_clean();

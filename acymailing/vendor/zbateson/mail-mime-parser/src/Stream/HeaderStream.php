@@ -1,4 +1,9 @@
 <?php
+/**
+ * This file is part of the ZBateson\MailMimeParser project.
+ *
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ */
 
 namespace ZBateson\MailMimeParser\Stream;
 
@@ -12,11 +17,24 @@ use ZBateson\MailMimeParser\Header\HeaderConsts;
 use ZBateson\MailMimeParser\Message\IMessagePart;
 use ZBateson\MailMimeParser\Message\IMimePart;
 
+/**
+ * Psr7 stream decorator implementation providing a readable stream for a part's
+ * headers.
+ *
+ * HeaderStream is only used by a MimePart parent.  It can accept any
+ * MessagePart - for non-MimeParts, only type headers are generated based on
+ * available information.
+ *
+ * @author Zaahid Bateson
+ */
 #[\AllowDynamicProperties]
 class HeaderStream implements SplObserver, StreamInterface
 {
     use StreamDecoratorTrait;
 
+    /**
+     * @var IMessagePart the part to read from.
+     */
     protected $part;
 
     public function __construct(IMessagePart $part)
@@ -39,6 +57,13 @@ class HeaderStream implements SplObserver, StreamInterface
         }
     }
 
+    /**
+     * Returns a header array for the current part.
+     *
+     * If the part is not a MimePart, Content-Type, Content-Disposition and
+     * Content-Transfer-Encoding headers are generated manually.
+     *
+     */
     private function getPartHeadersIterator() : \Iterator
     {
         if ($this->part instanceof IMimePart) {
@@ -53,6 +78,9 @@ class HeaderStream implements SplObserver, StreamInterface
         return new ArrayIterator();
     }
 
+    /**
+     * Writes out headers for $this->part and follows them with an empty line.
+     */
     public function writePartHeadersTo(StreamInterface $stream) : self
     {
         foreach ($this->getPartHeadersIterator() as $header) {
@@ -62,6 +90,10 @@ class HeaderStream implements SplObserver, StreamInterface
         return $this;
     }
 
+    /**
+     * Creates the underlying stream lazily when required.
+     *
+     */
     protected function createStream() : StreamInterface
     {
         $stream = Psr7\Utils::streamFor();

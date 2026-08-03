@@ -1,9 +1,9 @@
 === AcyMailing - An Ultimate Newsletter Plugin and Marketing Automation Solution for WordPress ===
 Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
-Requires at least: 5.5
+Requires at least: 5.8
 Tested up to: 7.0
-Stable tag: 10.11.1
+Stable tag: 11.0.0
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -76,7 +76,10 @@ There are 3 ways to install this plugin:
 3. Enable the plugin on the admin part of your site
 
 
+
 == Frequently Asked Questions ==
+= Where do I report security bugs found in this plugin? =
+Please report security bugs found in the source code of the AcyMailing plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/9e5fb5a8-5a77-4d2e-baca-dd2a0a0e785d). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
 
 = How to contact us? =
 Feel free to do it via this form: [https://www.acymailing.com/contact/](https://www.acymailing.com/contact/)
@@ -113,7 +116,16 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 10.11.1 - July 9, 2026 =
-* A vulnerability allowing SQL injection has been patched. Updating is strongly recommended.
+= 11.0.0 - August 3, 2026 =
+* We added a new option to handle the pixel tracking according to the new GDPR regulation.
+
+* The code base has been completely reworked to improve security throughout the whole extension.
+
+* We fixed a redirection to a 404 page that occurred after a user deleted their data from the profile page.
+* We fixed an issue where clicking a tracked link in an email could redirect to the unsubscribe URL when a subscriber custom field containing HTML was inserted in the email body.
+* [add-on] The event dates for Events Manager now use the correct timezone.
+* We fixed an issue that caused transactional WordPress emails to be silently blocked and not sent when AcyMailing had already handled another email during the same request.
+* [add-ons] A better timezone management is made for Events Manager events inserted in emails.
+* [add-ons] A conflict has been fixed when multiple Contact Form 7 forms are shown on the same page and use the same field identifiers.
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)

@@ -23,6 +23,7 @@ class BounceHelper extends AcymObject
     const MESSAGE_TYPE_INFO = 1;
     const MESSAGE_TYPE_ERROR = 2;
 
+    // Needed information for the connection
     private string $server;
     private string $username;
     private string $password;
@@ -33,6 +34,7 @@ class BounceHelper extends AcymObject
     private int $timeout;
     private string $oAuthToken;
 
+    // Allowed extensions for uploaded files (attachments)
     private array $allowed_extensions = [];
     protected int $nbMessages = 0;
     public bool $report = false;
@@ -47,9 +49,13 @@ class BounceHelper extends AcymObject
     private string $detectEmail;
     private string $detectEmail2 = '/(([a-z0-9\-]+\.)+[a-z0-9]{2,8})\/([a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*)/i';
     public array $messages = [];
+    //Max execution time minus 4 seconds... we need to stop the process before this date.
     public int $stoptime = 0;
+    //Check apache module "mod_security" to avoid flush issue
     protected bool $mod_security2 = false;
+    //Number of ob_end_flush used in the process...
     public int $obend = 0;
+    // Correspond to mailbox entity in database
     public object $action;
     public array $attachments = [];
 
@@ -169,6 +175,7 @@ class BounceHelper extends AcymObject
 
         $serverName = trim($this->server);
 
+        //We don't add back the ssl:// or tls:// if it's already there
         if (!empty($secure) && !strpos($serverName, '://')) {
             $serverName = $secure.'://'.$serverName;
         }
@@ -193,7 +200,7 @@ class BounceHelper extends AcymObject
         if (empty($login) || isset($login->code)) {
             $warnings = ob_get_clean();
             if ($this->report) {
-                acym_enqueueMessage(acym_translationSprintf('ACYM_ERROR_LOGIN', $this->username.':'.$this->password), 'error');
+                acym_enqueueMessage(acym_translationSprintf('ACYM_ERROR_LOGIN', $this->username), 'error');
             }
             if (!empty($warnings) && $this->report) {
                 acym_display($warnings, 'warning');
@@ -216,6 +223,7 @@ class BounceHelper extends AcymObject
         }
 
         ob_start();
+        //First we reset the buffer or errors and warnings
         $buff = $this->callImapFunction('imap_alerts', []);
         $buff = $this->callImapFunction('imap_errors', []);
 
@@ -244,10 +252,12 @@ class BounceHelper extends AcymObject
             $serverName .= '/imap';
         }
 
+        //Add the secure protocol (TLS or SSL)
         if (!empty($secure)) {
             $serverName .= '/'.$secure;
         }
 
+        // Test if string contains '\'
         $email = trim($this->username);
         if (strpos($email, '\\') !== false) {
             [$user, $authuser] = explode('\\', $email);
@@ -259,6 +269,7 @@ class BounceHelper extends AcymObject
             $serverName .= '/novalidate-cert';
         }
 
+        //Add the method (imap by default) ex : pop3
         if (!empty($protocol) && $this->server !== 'outlook.office365.com') {
             $serverName .= '/service='.$protocol;
         }
@@ -365,7 +376,9 @@ class BounceHelper extends AcymObject
 
                 $segments = explode('--'.$matches[1], $this->_message->html);
                 foreach ($segments as $segment) {
+                    // Find the segment containing the html and text version
                     if (strpos($segment, 'Content-Type: text/plain') !== false) {
+                        // Check if there is another boundary
                         $matches = [];
                         preg_match('#boundary="([^"]+)"#i', $segment, $matches);
 
@@ -378,6 +391,7 @@ class BounceHelper extends AcymObject
                                 if (strpos($onePart, 'Content-Transfer-Encoding') !== false) {
                                     preg_match('#Content-Transfer-Encoding: (.+)#i', $onePart, $encoding);
                                     $encoding = trim($encoding[1]);
+                                    // Someone has an issue when the $encoding is equal to 'Content-Type:' only
                                     if (!empty($encoding) && $encoding !== 'Content-Type:') {
                                         $content = mb_convert_encoding($content, 'UTF-8', $encoding);
                                     }
@@ -408,11 +422,14 @@ class BounceHelper extends AcymObject
 
                         $extension = substr($filename, $extensionPos + 1);
 
+                        // Make sure there is no double extension or space
                         $filename = preg_replace('#[^a-zA-Z0-9]#Uis', '_', substr($filename, 0, $extensionPos));
 
+                        // Get the upload folder and create it if needed
                         $uploadFolder = str_replace(['/', '\\'], DS, acym_getFilesFolder());
                         $pathToUpload = ACYM_ROOT.trim($uploadFolder, DS).DS;
 
+                        // Rename if needed
                         if (file_exists($pathToUpload.$filename.'.'.$extension)) {
                             $fileNumber = 1;
                             while (file_exists($pathToUpload.$filename.'_('.$fileNumber.').'.$extension)) {
@@ -479,7 +496,7 @@ class BounceHelper extends AcymObject
         if (!empty($this->_message->header->sender_email) && preg_match($this->detectEmail, $this->_message->header->sender_email, $results)) {
             $this->_message->header->sender_email = $results[0];
         }
-        $this->_message->header->sender_name = strip_tags(@$this->_message->headerinfo['from'] ?? '');
+        $this->_message->header->sender_name = acym_stripTags(@$this->_message->headerinfo['from'] ?? '');
         $this->_message->header->reply_to_email = $this->_message->header->sender_email;
         $this->_message->header->reply_to_name = $this->_message->header->sender_name;
         $this->_message->header->from_email = $this->_message->header->sender_email;
@@ -501,6 +518,7 @@ class BounceHelper extends AcymObject
         $this->_message->html = '';
         $this->_message->text = '';
 
+        //Multipart message : type == 1
         if ($this->_message->structure->type == 1) {
             $this->_message->contentType = 2;
             if ($this->_message->structure->subtype === 'MIXED') {
@@ -522,6 +540,7 @@ class BounceHelper extends AcymObject
                     $this->_message->text .= $decodedContent."\n\n- - -\n\n";
                 }
 
+                // Only for mailbox actions
                 if (!empty($this->action) && $attachments) {
                     if ((isset($onePart->parameters) && is_array($onePart->parameters)) || (isset($onePart->dparameters) && is_array($onePart->dparameters))) {
                         $this->uploadAttachment($onePart, $num);
@@ -549,6 +568,7 @@ class BounceHelper extends AcymObject
             }
         }
 
+        //Decode the subject
         if (!empty($this->_message->subject)) {
             $this->_message->subject = $this->decodeHeader($this->_message->subject);
         } else {
@@ -565,6 +585,7 @@ class BounceHelper extends AcymObject
 
     private function uploadAttachment($attachment, $num): void
     {
+        // It may be a real attachment, or an inline image
         if (!isset($attachment->disposition) || (strtolower($attachment->disposition) !== 'attachment' && strtolower($attachment->disposition) !== 'inline')) {
             return;
         }
@@ -583,20 +604,25 @@ class BounceHelper extends AcymObject
             }
         }
 
+        // No extension => no upload
         if ($extensionPos === false) {
             return;
         }
 
+        // Upload only allowed extensions in the configuration
         $extension = substr($filename, $extensionPos + 1);
         if (!in_array(strtolower($extension), $this->allowed_extensions)) {
             return;
         }
 
+        // Make sure there is no double extension or space
         $filename = preg_replace('#[^a-zA-Z0-9]#Uis', '_', substr($filename, 0, $extensionPos));
 
+        // Get the upload folder and create it if needed
         $uploadFolder = str_replace(['/', '\\'], DS, acym_getFilesFolder());
         $pathToUpload = ACYM_ROOT.trim($uploadFolder, DS).DS;
 
+        // Rename if needed
         if (file_exists($pathToUpload.$filename.'.'.$extension)) {
             $fileNumber = 1;
             while (file_exists($pathToUpload.$filename.'_('.$fileNumber.').'.$extension)) {
@@ -631,6 +657,7 @@ class BounceHelper extends AcymObject
     public function handleMessages(): void
     {
         $maxMessages = min($this->nbMessages, $this->config->get('bounce_max', 0));
+        //500 messages maximum at once
         if (empty($maxMessages)) {
             $maxMessages = min($this->nbMessages, 500);
         }
@@ -641,7 +668,10 @@ class BounceHelper extends AcymObject
                 $this->mod_security2 = in_array('mod_security2', $modules);
             }
 
+            /*This is to avoid the blank page... and it apparently works! ;) */
+            // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Disabled to prevent blank output pages.
             @ini_set('output_buffering', 'off');
+            // phpcs:ignore Squiz.PHP.DiscouragedFunctions.Discouraged -- Disabled to prevent blank output pages.
             @ini_set('zlib.output_compression', 0);
 
 
@@ -651,15 +681,17 @@ class BounceHelper extends AcymObject
                 }
             }
 
-            $disp = "<div style='position:fixed; top:3px;left:3px;background-color : white;border : 1px solid grey; padding : 3px;font-size:14px'>";
-            $disp .= acym_translation('ACYM_BOUNCE_HANDLING');
-            $disp .= ':  <span id="counter">0</span> / '.$maxMessages;
-            $disp .= '</div>';
-            $disp .= '<script type="text/javascript" language="javascript">';
-            $disp .= 'var mycounter = document.getElementById("counter");';
-            $disp .= 'function setCounter(val){ mycounter.innerHTML=val;}';
-            $disp .= '</script>';
-            echo $disp;
+            ?>
+			<div style="position:fixed; top:3px;left:3px;background-color : white;border : 1px solid grey; padding : 3px;font-size:14px">
+                <?php echo esc_html(acym_translation('ACYM_BOUNCE_HANDLING')); ?>
+				: <span id="counter">0</span> / <?php echo intval($maxMessages); ?>
+			</div>
+			<script type="text/javascript" language="javascript">
+                function setCounter(val) {
+                    document.getElementById('counter').innerHTML = val;
+                }
+			</script>
+            <?php
             if (function_exists('ob_flush')) {
                 @ob_flush();
             }
@@ -668,6 +700,7 @@ class BounceHelper extends AcymObject
             }
         }
 
+        //We load all the published rules
         $rules = $this->ruleClass->getAll();
         $rules = array_filter($rules, function ($rule) {
             return $rule->active;
@@ -677,6 +710,7 @@ class BounceHelper extends AcymObject
         $listClass = new ListClass();
         $this->allLists = $listClass->getAll('id');
 
+        //Exclude some email addresses...
         $replyemail = $this->config->get('reply_email');
         $fromemail = $this->config->get('from_email');
         $bouncemail = $this->config->get('bounce_email');
@@ -694,7 +728,7 @@ class BounceHelper extends AcymObject
 
         while (($msgNB > 0) && ($this->_message = $this->getMessage($msgNB))) {
             if ($this->report) {
-                echo '<script type="text/javascript" language="javascript">setCounter('.($maxMessages - $msgNB + 1).')</script>';
+                echo '<script type="text/javascript" language="javascript">setCounter('.esc_html($maxMessages - $msgNB + 1).')</script>';
                 if (function_exists('ob_flush')) {
                     @ob_flush();
                 }
@@ -705,6 +739,7 @@ class BounceHelper extends AcymObject
             $this->_message->messageNB = $msgNB;
             $msgNB--;
 
+            //We could not retrieve the message... we continue with the next message
             if (!$this->decodeMessage()) {
                 $this->display(acym_translation('ACYM_ERROR_RETRIEVING_MESSAGE'), self::MESSAGE_TYPE_ERROR, $maxMessages - $this->_message->messageNB + 1);
                 continue;
@@ -715,15 +750,17 @@ class BounceHelper extends AcymObject
             }
 
             $this->_message->analyseText = $this->_message->html.' '.$this->_message->text;
+            //We add the from in the list of possible e-mail address to check
             if (!empty($this->_message->header->from_email)) {
                 $this->_message->analyseText .= ' '.$this->_message->header->from_email;
             }
             $this->display(
-                '<b>'.acym_translation('ACYM_EMAIL_SUBJECT').' : '.strip_tags($this->_message->subject).'</b>',
+                '<b>'.acym_translation('ACYM_EMAIL_SUBJECT').' : '.acym_stripTags($this->_message->subject).'</b>',
                 self::MESSAGE_TYPE_SUCCESS,
                 $maxMessages - $this->_message->messageNB + 1
             );
 
+            //Identify the user and the e-mail...
             preg_match('#AC([0-9]+)Y([0-9]+)BA#i', $this->_message->analyseText, $resultsVars);
             if (!empty($resultsVars[1])) {
                 $this->_message->userid = $resultsVars[1];
@@ -733,8 +770,10 @@ class BounceHelper extends AcymObject
             }
 
             if (empty($this->_message->userid)) {
+                //We will need the e-mail itself in that case... :p
                 preg_match_all($this->detectEmail, $this->_message->analyseText, $results);
 
+                //Still no result? We try to find others
                 if (empty($results[0])) {
                     preg_match_all($this->detectEmail2, $this->_message->analyseText, $results2);
                     for ($i = 0; $i < count($results2[0]); $i++) {
@@ -745,8 +784,11 @@ class BounceHelper extends AcymObject
                 if (!empty($results[0])) {
                     $alreadyChecked = [];
                     foreach ($results[0] as $oneEmail) {
+                        //We will find the e-mail if it's not in the list of incorrect e-mail addresses
                         if (!preg_match($removeEmails, $oneEmail)) {
+                            //We will keep this one, so we make sure it's strtolower
                             $this->_message->subemail = strtolower($oneEmail);
+                            //We already checked this e-mail address... no need to try it a second time
                             if (!empty($alreadyChecked[$this->_message->subemail])) {
                                 continue;
                             }
@@ -770,12 +812,14 @@ class BounceHelper extends AcymObject
             }
 
             if (empty($this->_message->mailid) && !empty($this->_message->userid)) {
+                //We can check if we have a user and only one e-mail sent for this user, it's obviously the e-mail we just sent!!
                 $this->_message->mailid = acym_loadResult(
                     'SELECT `mail_id` FROM #__acym_user_stat WHERE `user_id` = '.intval($this->_message->userid).' ORDER BY `send_date` DESC'
                 );
             }
 
             foreach ($rules as $oneRule) {
+                //We stop as soon as we find a good rule...
                 if ($this->handleRule($oneRule)) {
                     break;
                 }
@@ -785,6 +829,7 @@ class BounceHelper extends AcymObject
                 $this->userActions();
             }
 
+            //We don't have time to finish the process? Ok, we stop it now!
             if (!empty($this->stoptime) && time() > $this->stoptime) {
                 break;
             }
@@ -794,6 +839,10 @@ class BounceHelper extends AcymObject
         $this->close();
     }
 
+    /**
+     * Execute actions on the subscriber... and record the statistics
+     * We group them to not have performance issues
+     */
     private function userActions(): void
     {
         if (!empty($this->deletedUsers)) {
@@ -805,6 +854,7 @@ class BounceHelper extends AcymObject
         if (!empty($this->blockedUsers)) {
             acym_arrayToInteger($this->blockedUsers);
             $this->userClass->deactivate($this->blockedUsers);
+            //We delete any other e-mail from the queue as well
             $allUsersId = implode(',', $this->blockedUsers);
             acym_query('DELETE FROM `#__acym_queue` WHERE `user_id` IN ('.$allUsersId.')');
             $this->blockedUsers = [];
@@ -812,6 +862,9 @@ class BounceHelper extends AcymObject
 
         if (!empty($this->bounceMessages)) {
             foreach ($this->bounceMessages as $mailid => $bouncedata) {
+                //Do we have some bounce details to update?
+                //If so, we will load the current bouncedetails and update it properly.
+                //bouncedetails is an array of bounceRule => nbTimes used
 
                 $updateBounceDetails = '';
                 if (!empty($bouncedata['bouncedetails'])) {
@@ -843,6 +896,7 @@ class BounceHelper extends AcymObject
                             $valueInsert
                         ).' ON DUPLICATE KEY UPDATE `bounce` = `bounce` + 1, bounce_rule=VALUES(bounce_rule)'
                     );
+                    //We updated some profiles... let's make sure we really handle only unique bounces then and don't count it twice
                     acym_arrayToInteger($bouncedata['userids']);
                     $realUniqueBounces = acym_loadResult(
                         'SELECT COUNT(*) 
@@ -871,6 +925,7 @@ class BounceHelper extends AcymObject
             return false;
         }
 
+        //Do it based on the config of the rule...
 
         $analyseText = '';
         if (in_array('senderInfo', $oneRule->executed_on)) {
@@ -896,6 +951,7 @@ class BounceHelper extends AcymObject
             }
         }
 
+        //Because it's easier to handle it that way... for multilines.
         $analyseText = str_replace(["\n", "\r", "\t"], ' ', $analyseText);
 
         if (!preg_match('#'.$regex.'#ims', $analyseText)) {
@@ -931,6 +987,7 @@ class BounceHelper extends AcymObject
             return $message;
         }
 
+        //To display nice error messages...
         if (
             in_array('delete_user_subscription', $oneRule->action_user)
             || in_array('unsubscribe_user', $oneRule->action_user)
@@ -974,6 +1031,7 @@ class BounceHelper extends AcymObject
         }
 
 
+        //handle this rule in the stats
         if (!empty($this->_message->mailid)) {
             $mail = $this->mailClass->getOneById($this->_message->mailid);
         } else {
@@ -981,6 +1039,7 @@ class BounceHelper extends AcymObject
         }
 
         if ($oneRule->increment_stats && !empty($this->_message->mailid) && !empty($mail)) {
+            //Init the stats...
             if (empty($this->bounceMessages[$this->_message->mailid])) {
                 $this->bounceMessages[$this->_message->mailid] = [];
                 $this->bounceMessages[$this->_message->mailid]['nbbounces'] = 0;
@@ -989,9 +1048,12 @@ class BounceHelper extends AcymObject
                 $this->bounceMessages[$this->_message->mailid]['ruletriggered'] = [];
             }
 
+            //Increment the global stats...
             $this->bounceMessages[$this->_message->mailid]['nbbounces']++;
 
+            //Increment the detailed stats...
             $ruleName = $oneRule->name.' [ID '.$oneRule->id.'] ';
+            //We add a @ just in case the rule was not already defined...
             if (empty($this->bounceMessages[$this->_message->mailid]['bouncedetails'][$ruleName])) {
                 $this->bounceMessages[$this->_message->mailid]['bouncedetails'][$ruleName] = 1;
             } else {
@@ -1000,6 +1062,7 @@ class BounceHelper extends AcymObject
 
             $user = $this->userClass->getOneById($this->_message->userid);
             if (!empty($this->_message->userid) && !in_array('delete_user', $oneRule->action_user) && !empty($user)) {
+                //Increment the bounce number in the user stat table but only if we don't delete the subscriber
                 $this->bounceMessages[$this->_message->mailid]['userids'][] = intval($this->_message->userid);
                 $this->bounceMessages[$this->_message->mailid]['ruletriggered'][intval($this->_message->userid)] = $oneRule->name.' ['.acym_translation(
                         'ACYM_ID'
@@ -1007,7 +1070,9 @@ class BounceHelper extends AcymObject
             }
         }
 
+        //Make sure we have enough messages to really execute this
         if (!empty($oneRule->execute_action_after) && $oneRule->execute_action_after > 1) {
+            //Let's load the number of bounces the user has and then exit or not...
             if (empty($this->_message->mailid)) {
                 $this->_message->mailid = 0;
             }
@@ -1029,6 +1094,7 @@ class BounceHelper extends AcymObject
             }
         }
 
+        //If we delete the subscriber, it's the last action we execute
         if (in_array('delete_user', $oneRule->action_user)) {
             $message .= ' | '.acym_translationSprintf('ACYM_USER_X_DELETED', $this->_message->subemail);
             $this->deletedUsers[] = intval($this->_message->userid);
@@ -1036,6 +1102,7 @@ class BounceHelper extends AcymObject
             return $message;
         }
 
+        //We will need a default listid after...
         $listId = 0;
         if (in_array('subscribe_user', $oneRule->action_user) && !empty($oneRule->action_user['subscribe_user_list'])) {
             $listId = $oneRule->action_user['subscribe_user_list'];
@@ -1112,26 +1179,33 @@ class BounceHelper extends AcymObject
     {
         $message = '';
 
+        //Fix the rule if needed... when the forwarded user is the same as the bounce e-mail address...
         if (!empty($oneRule->action_message['forward_to'])) {
             if (
                 strtolower($oneRule->action_message['forward_to']) === strtolower($this->config->get('bounce_username'))
                 || strtolower($oneRule->action_message['forward_to']) === strtolower($this->config->get('bounce_email'))
             ) {
+                //We don't forward it
                 $oneRule->action_message['forward_to'] = '';
+                //We don't delete it
                 unset($oneRule->action_message['delete_message']);
                 $message .= ' | '.acym_translation('ACYM_BOUNCE_NOT_FORWARD');
             }
         }
 
+        //Handle actions on the message itself
 
+        // We only delete the message if the forward didn't fail and the save in history succeeded
         $donotdelete = false;
 
         if (in_array('save_message', $oneRule->action_message) && !empty($this->_message->userid) && !in_array('delete_user', $oneRule->action_user)) {
+            //We have a userid, should we save the message in the database?
             $data = [];
             $data[] = 'SUBJECT::'.@htmlentities($this->_message->subject, ENT_COMPAT, 'UTF-8');
             $data[] = 'ACY_RULE::'.$oneRule->id.' '.$oneRule->name;
             $data[] = 'REPLYTO_ADDRESS::'.$this->_message->header->reply_to_name.' ( '.$this->_message->header->reply_to_email.' )';
             $data[] = 'FROM_ADDRESS::'.$this->_message->header->from_name.' ( '.$this->_message->header->from_email.' )';
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r -- Logging information.
             $data[] = @htmlentities(print_r($this->_message->headerinfo, true), ENT_COMPAT, 'UTF-8');
             if (empty($this->_message->mailid)) {
                 $this->_message->mailid = 0;
@@ -1152,7 +1226,9 @@ class BounceHelper extends AcymObject
         }
 
 
+        //We don't forward the message if it's the same mailbox!
         if (!empty($oneRule->action_message['forward_to'])) {
+            //Get the forward address :
             $this->mailer->clearAll();
             $this->mailer->Subject = 'BOUNCE FORWARD : '.$this->_message->subject;
 
@@ -1166,6 +1242,7 @@ class BounceHelper extends AcymObject
                 $this->mailer->AddAddress($this->mailer->cleanText($oneForwardAddress));
             }
 
+            //Add the rule at the top so we know why the message has been forwarded.
             $info = acym_translation('ACYM_BOUNCE_RULE').' ['.acym_translation('ACYM_ID').' '.$oneRule->id.'] '.acym_translation($oneRule->name);
             if (!empty($this->_message->html)) {
                 $this->mailer->isHTML();
@@ -1184,6 +1261,9 @@ class BounceHelper extends AcymObject
                 $this->mailer->Body = $info."\n".$this->_message->text;
             }
 
+            //We add all other extra information just in case of we could use them...
+            //original-rcpt-to ?   http://tools.ietf.org/html/rfc5965
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r -- Logging information.
             $this->mailer->Body .= print_r($this->_message->headerinfo, true);
             $replyAddress = trim(@$this->_message->header->reply_to_email, '<> ');
             if (!empty($replyAddress)) {
@@ -1235,6 +1315,9 @@ class BounceHelper extends AcymObject
         $this->_message->header->$email = $var[0]->mailbox.'@'.@$var[0]->host;
     }
 
+    /**
+     * If num is empty then it's a message otherwise it's a send status
+     */
     protected function display(string $message, int $type = self::MESSAGE_TYPE_SUCCESS, string $num = ''): void
     {
         $this->messages[] = $message;
@@ -1250,12 +1333,12 @@ class BounceHelper extends AcymObject
         }
 
         if (!empty($num)) {
-            echo '<br />'.$num.' : ';
+            echo '<br />'.esc_html($num).' : ';
         } else {
             echo '<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
         }
 
-        echo '<span style="color: '.$color.'">'.$message.'</span>';
+        echo '<span style="color: '.esc_attr($color).'">'.esc_html($message).'</span>';
 
         if (function_exists('ob_flush')) {
             @ob_flush();
@@ -1267,9 +1350,11 @@ class BounceHelper extends AcymObject
 
     public function decodeHeader(string $input): string
     {
+        // Remove white space between encoded-words
         $input = preg_replace('/(=\?[^?]+\?(q|b)\?[^?]*\?=)(\s)+=\?/i', '\1=?', $input);
         $currentCharset = false;
 
+        // For each encoded-word...
         while (preg_match('/(=\?([^?]+)\?(q|b)\?([^?]*)\?=)/i', $input, $matches)) {
             $encoded = $matches[1];
             $charset = $matches[2];
@@ -1293,6 +1378,7 @@ class BounceHelper extends AcymObject
             $input = str_replace($encoded, $text, $input);
         }
 
+        //If we have a charset and we can handle it...
         if (!empty($currentCharset) && in_array($currentCharset, $this->allCharsets)) {
             $input = $this->encodingHelper->change($input, $currentCharset, 'UTF-8');
         }
@@ -1329,24 +1415,33 @@ class BounceHelper extends AcymObject
             return $allParts;
         }
 
+        //counts real content
         $c = 0;
         foreach ($struct->parts as $part) {
             if ($part->type == 1) {
+                //There are more parts....:
                 if ($part->subtype === 'MIXED') {
+                    // refreshing current path
                     $path = $this->incPath($path);
+                    //create a new path-id (ex.:2.0)
                     $newpath = $path.'.0';
+                    //fetch new parts
                     $allParts = array_merge($this->explodeBody($part, $newpath), $allParts);
                 } else {
+                    //Alternativ / rfc / signed
                     $newpath = $this->incPath($path);
                     $path = $this->incPath($path);
                     $allParts = array_merge($this->explodeBody($part, $newpath, true), $allParts);
                 }
             } else {
                 $c++;
+                //creating new tree if this is part of a alternativ or rfc message:
                 if ($c == 1 && $inline) {
                     $path = $path.'.0';
                 }
+                //saving content:
                 $path = $this->incPath($path);
+                //print "<br>  Content ".$path."<br>";        //debug information
                 $allParts[$path] = $part;
             }
         }
@@ -1354,15 +1449,19 @@ class BounceHelper extends AcymObject
         return $allParts;
     }
 
+    //Increases the Path to the parts:
     private function incPath(string $path): string
     {
         $newPath = '';
         $path_elements = explode('.', $path);
         $limit = count($path_elements);
         for ($i = 0; $i < $limit; $i++) {
+            //last element
             if ($i == $limit - 1) {
+                // new Part-Number
                 $newPath .= $path_elements[$i] + 1;
             } else {
+                //rebuild "1.2.2"-Chronology
                 $newPath .= $path_elements[$i].'.';
             }
         }
@@ -1374,6 +1473,7 @@ class BounceHelper extends AcymObject
     {
         $encoding = $structure->encoding;
 
+        //First we decode the content properly
         if ($encoding == 2) {
             $content = imap_binary($content);
         } elseif ($encoding == 3) {
@@ -1382,6 +1482,7 @@ class BounceHelper extends AcymObject
             $content = imap_qprint($content);
         }
 
+        // Now we convert into utf-8! only for distribution lists
         if (!empty($this->action)) {
             $charset = $this->getMailParam($structure);
             if (!empty($charset) && strtoupper($charset) !== 'UTF-8') {
@@ -1391,6 +1492,7 @@ class BounceHelper extends AcymObject
             return $content;
         }
 
+        //It can't be more than 100 000 characters, it's already plenty enough for bounce handling... we avoid embedded pictures or big attachments we could not catch before.
         return substr($content, 0, 100000);
     }
 

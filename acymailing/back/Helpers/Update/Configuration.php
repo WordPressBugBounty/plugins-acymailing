@@ -88,9 +88,14 @@ trait Configuration
         $allPref['uploadfolder'] = str_replace('\\', '/', ACYM_UPLOAD_FOLDER);
         $allPref['last_import'] = '';
         $allPref['security_key'] = acym_generateKey(30);
+        $allPref['api_key'] = acym_generateKey(30);
+        $allPref['cron_security'] = 1;
+        $allPref['cron_key'] = acym_generateKey(30);
         $allPref['export_excelsecurity'] = 1;
         $allPref['gdpr_export'] = 0;
         $allPref['gdpr_delete'] = 0;
+        $allPref['dont_track_by_default'] = 0;
+        $allPref['user_tracking_control'] = 0;
         $allPref['trackingsystem'] = 'acymailing';
         $allPref['trackingsystemexternalwebsite'] = 1;
         $allPref['generate_name'] = 1;
@@ -122,7 +127,7 @@ trait Configuration
         $allPref['Starter'] = ACYM_STARTER;
         $allPref['Essential'] = ACYM_ESSENTIAL;
         $allPref['Enterprise'] = ACYM_ENTERPRISE;
-        $allPref['previous_version'] = '10.11.1';
+        $allPref['previous_version'] = '11.0.0';
 
         $allPref['display_built_by'] = acym_level(ACYM_ESSENTIAL) ? 0 : 1;
         $allPref['php_overrides'] = 0;
@@ -145,7 +150,7 @@ trait Configuration
         }
 
         if ($results === null) {
-            acym_display(isset($e) ? $e->getMessage() : substr(strip_tags(acym_getDBError()), 0, 200).'...', 'error');
+            acym_display(isset($e) ? $e->getMessage() : substr(acym_stripTags(acym_getDBError()), 0, 200).'...', 'error');
 
             return false;
         }
@@ -161,6 +166,7 @@ trait Configuration
         $this->isUpdating = true;
         $this->previousVersion = $results['version']->value;
 
+        //We update the version properly as it's a new one which is now used.
         $query = 'REPLACE INTO `#__acym_configuration` (`name`,`value`) VALUES ("level",'.acym_escapeDB($this->level).')';
         $query .= ',("version",'.acym_escapeDB($this->version).')';
         $query .= ',("installcomplete","0")';

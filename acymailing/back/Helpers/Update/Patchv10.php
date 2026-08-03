@@ -26,7 +26,8 @@ trait Patchv10
 	`trigger_once` TINYINT(1) NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`)
 )
-	ENGINE = InnoDB;';
+	ENGINE = InnoDB
+	/*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;';
 
         $scenarioStepTable = 'CREATE TABLE IF NOT EXISTS `#__acym_scenario_step` (
 	`id` VARCHAR(30) NOT NULL,
@@ -42,7 +43,8 @@ trait Patchv10
     			ON DELETE NO ACTION
     			ON UPDATE NO ACTION
 )
-	ENGINE = InnoDB;';
+	ENGINE = InnoDB
+	/*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;';
 
         $scenarioProcessTable = 'CREATE TABLE IF NOT EXISTS `#__acym_scenario_process` (
 	`id` INT NOT NULL AUTO_INCREMENT,
@@ -62,7 +64,8 @@ trait Patchv10
     			ON DELETE NO ACTION
     			ON UPDATE NO ACTION
 )
-	ENGINE = InnoDB;';
+	ENGINE = InnoDB
+	/*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;';
 
         $scenarioQueueTable = 'CREATE TABLE IF NOT EXISTS `#__acym_scenario_queue` (
 	`id` INT NOT NULL AUTO_INCREMENT,
@@ -76,7 +79,8 @@ trait Patchv10
     			ON DELETE NO ACTION
     			ON UPDATE NO ACTION
 )
-	ENGINE = InnoDB;';
+	ENGINE = InnoDB
+	/*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;';
 
         $scenarioHistoryLineTable = 'CREATE TABLE IF NOT EXISTS `#__acym_scenario_history_line` (
 	`id` INT NOT NULL AUTO_INCREMENT,
@@ -94,7 +98,8 @@ trait Patchv10
     			ON DELETE NO ACTION
     			ON UPDATE NO ACTION
 )
-	ENGINE = InnoDB;';
+	ENGINE = InnoDB
+	/*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci*/;';
 
         $this->updateQuery($scenarioTable);
         $this->updateQuery($scenarioStepTable);

@@ -4,6 +4,9 @@ namespace AcyMailing\Views\Campaigns;
 
 use AcyMailing\Core\AcymView;
 
+/**
+ * Class CampaignsViewLists
+ */
 class CampaignsView extends AcymView
 {
     public $followupSteps;

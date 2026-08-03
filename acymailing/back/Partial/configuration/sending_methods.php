@@ -1,3 +1,7 @@
+<?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- View file, its variables are local to the include scope, not true globals.
+defined('ABSPATH') || die('Restricted Access');
+?>
 <div class="cell grid-x acym__sending__methods__choose acym__selection">
     <?php
     $services = $data['sendingMethods'];
@@ -10,7 +14,7 @@
     ?>
     <?php if (empty($data['isSml'])) { ?>
 		<div class="acym__title acym__title__secondary margin-top-1 medium-12 <?php echo !empty($data['step']) && $data['step'] == 'phpmail' ? 'text-center'
-            : ''; ?>"><?php echo acym_translation('ACYM_SENDING_MEHTODS'); ?></div>
+            : ''; ?>"><?php echo esc_html(acym_translation('ACYM_SENDING_MEHTODS')); ?></div>
     <?php } ?>
 	<div class="cell grid-x grid-margin-x grid-margin-y acym__sending__methods__choose__selection text-center <?php echo !empty($data['step']) && $data['step'] == 'phpmail'
         ? 'align-center'
@@ -24,27 +28,33 @@
             $selected = isset($sendingMethod['selected']) && $sendingMethod['selected'];
             $class = !empty($sendingMethod['recommended']) ? 'acym__sending__methods__one__premium' : '';
             $class .= empty($data['step']) ? ' acym__sending__methods__one__config' : '';
-            $name = !empty($sendingMethod['recommended']) ? $sendingMethod['name'].' <br>('.acym_translation('ACYM_RECOMMENDED').')' : $sendingMethod['name'];
             $idCheckbox = 'acym__sending__methods-'.(empty($data['isSml']) ? 'default' : 'sml').'-'.$key;
             ?>
-			<div class="cell large-3 medium-6 grid-x align-center acym_vcenter acym__sending__methods__one <?php echo $class; ?>">
-				<label for="<?php echo $idCheckbox; ?>" data-acym-method="<?php echo $key; ?>"
-					   class="acym__selection__card cell acym_vcenter align-center <?php echo $selected ? 'acym__selection__card-selected' : ''; ?>">
+			<div class="cell large-3 medium-6 grid-x align-center acym_vcenter acym__sending__methods__one <?php echo esc_attr($class); ?>">
+				<label for="<?php echo esc_attr($idCheckbox); ?>" data-acym-method="<?php echo esc_attr($key); ?>"
+				       class="acym__selection__card cell acym_vcenter align-center <?php echo $selected ? 'acym__selection__card-selected' : ''; ?>">
                     <?php
                     if (!empty($sendingMethod['icon'])) { ?>
-						<i class="cell <?php echo $sendingMethod['icon']; ?> text-center"></i>
+						<i class="cell <?php echo esc_attr($sendingMethod['icon']); ?> text-center"></i>
                     <?php } else { ?>
-						<img src="<?php echo $sendingMethod['image']; ?>"
-							 alt=""
-							 class="cell <?php echo !empty($sendingMethod['image_class']) ? $sendingMethod['image_class'] : ''; ?>">
+						<img src="<?php echo esc_url($sendingMethod['image']); ?>"
+						     alt=""
+						     class="cell <?php echo !empty($sendingMethod['image_class']) ? esc_attr($sendingMethod['image_class']) : ''; ?>">
                     <?php } ?>
 				</label>
-				<span class="cell acym__sending__methods__name"><?php echo $name; ?></span>
+				<span class="cell acym__sending__methods__name">
+					<?php
+                    echo esc_html($sendingMethod['name']);
+                    if (!empty($sendingMethod['recommended'])) {
+                        echo ' <br>('.esc_html(acym_translation('ACYM_RECOMMENDED')).')';
+                    }
+                    ?>
+				</span>
 				<input type="radio"
-					   name="<?php echo !empty($data['isSml']) ? 'sml' : 'config'; ?>[mailer_method]"
-                    <?php echo $selected ? 'checked' : ''; ?>
-					   id="<?php echo $idCheckbox; ?>"
-					   value="<?php echo $key; ?>"
+				       name="<?php echo !empty($data['isSml']) ? 'sml' : 'config'; ?>[mailer_method]"
+                    <?php acym_checked($selected); ?>
+					   id="<?php echo esc_attr($idCheckbox); ?>"
+					   value="<?php echo esc_attr($key); ?>"
 					   style="display: none">
 			</div>
         <?php } ?>
@@ -56,7 +66,7 @@
         echo '<div class="cell medium-1 hide-for-small-only"></div>';
     }
     ?>
-	<div class="cell <?php echo $class; ?> grid-x">
+	<div class="cell <?php echo esc_attr($class); ?> grid-x">
         <?php
         foreach ($data['sendingMethodsHtmlSettings'] as $html) {
             echo $html;

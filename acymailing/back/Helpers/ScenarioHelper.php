@@ -65,6 +65,7 @@ class ScenarioHelper extends AcymObject
                 }
             }
 
+            // For the trigger TimeAutomationTriggers, this way we know if we are triggering a scenario or not
             $scenario->is_scenario = true;
             $scenario->triggers = [$scenario->trigger => 1];
             $execute = false;
@@ -150,6 +151,7 @@ class ScenarioHelper extends AcymObject
         $query->where = ['user.id = '.$userId];
 
         $conditionOptions = $this->formatOptions($step->params['option'], $step->type);
+        // Unused variable
         $number = 0;
         acym_trigger('onAcymProcessCondition_'.$step->params['condition'], [&$query, &$conditionOptions, &$number, &$conditionNotValidCount]);
         $this->scenarioQueueClass->deleteByStepIds([$step->id]);
@@ -302,6 +304,7 @@ class ScenarioHelper extends AcymObject
             $scenario->is_scenario = true;
             $scenario->triggers = [$scenario->trigger => $options];
 
+            // Get the users matching the trigger
             acym_trigger('onAcymExecuteTrigger', [&$scenario, &$execute, &$options]);
 
             if ($nextExecution !== $scenario->next_execution) {
@@ -337,6 +340,7 @@ class ScenarioHelper extends AcymObject
         $scenarioHistoryLine->scenario_process_id = $scenarioProcessId;
         $scenarioHistoryLine->date = acym_date('now', 'Y-m-d H:i:s', false);
         $scenarioHistoryLine->type = $type;
+        //TODO maybe add something more specific
         $scenarioHistoryLine->result = $result;
 
         if (!empty($scenarioStepId)) {

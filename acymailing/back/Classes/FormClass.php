@@ -150,6 +150,7 @@ class FormClass extends AcymClass
                         'description' => 'ACYM_FIELDS_WIDTH_DESC',
                         'type' => 'number',
                         'unit' => '%',
+                        // Set to 65% by default to fit with the default size of the email field
                         'default' => 65,
                     ],
                 ],
@@ -197,6 +198,16 @@ class FormClass extends AcymClass
                         'type' => 'text',
                         'default' => '',
                         'conditional' => ['privacy_type' => 'url'],
+                    ],
+                    'tracking_consent' => [
+                        'label' => 'ACYM_DISPLAY_TRACKING_CONSENT',
+                        'description' => 'ACYM_DISPLAY_TRACKING_CONSENT_DESC',
+                        'type' => 'select',
+                        'options' => [
+                            'no' => acym_translation('ACYM_NO'),
+                            'yes' => acym_translation('ACYM_YES'),
+                        ],
+                        'default' => 'no',
                     ],
                 ],
                 'message' => [
@@ -648,7 +659,9 @@ class FormClass extends AcymClass
 
                 $label = '<label class="cell" for="'.$id.'">'.acym_translation($option['label']);
                 if (!empty($option['description'])) {
-                    $label .= acym_info(['textShownInTooltip' => $option['description']]);
+                    ob_start();
+                    acym_info(['textShownInTooltip' => $option['description']]);
+                    $label .= ob_get_clean();
                 }
                 $label .= '</label>';
 

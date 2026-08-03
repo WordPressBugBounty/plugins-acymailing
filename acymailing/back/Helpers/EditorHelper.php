@@ -32,6 +32,7 @@ class EditorHelper extends AcymObject
     public bool $automation = false;
     public bool $walkThrough = false;
 
+    // Used in the d&d
     public array $data = [];
     private string $defaultTemplate = '';
 
@@ -72,18 +73,24 @@ class EditorHelper extends AcymObject
 
             include acym_getPartial('editor', 'editor_wysid');
         } else {
+            // Outside of the Acy wrapper to prevent foundation from breaking the 100 different editors we could have here
 
+            // Close acym_content div
             if (acym_isLeftMenuNecessary()) echo '</div>';
 
+            // Close acym_wrapper div and open the no foundation div
             echo '</div><div class="acym_no_foundation">';
 
+            // Display the editor
             $dtextType = new DtextType();
             $dtextType->display(['withButton' => false]);
 
             $method = 'displayWordPress';
             $this->$method();
 
+            // The view renderer will close the acym_content div, but since we already closed it, we open a fake one
             if (acym_isLeftMenuNecessary()) echo '<div>';
+            // The view renderer will close the acym_wrapper div, which will be the acym_no_foundation div in this case
         }
     }
 
@@ -112,9 +119,11 @@ class EditorHelper extends AcymObject
         }
         $this->myEditor->initialise();
 
+        // We allow the background parameter on tr,table and td.
         $this->editorConfig['extended_elements'] = 'table[background|cellspacing|cellpadding|width|align|bgcolor|border|style|class|id],tr[background|width|bgcolor|style|class|id|valign],td[background|width|align|bgcolor|valign|colspan|rowspan|height|style|class|id|nowrap]';
 
         if (!empty($this->mailId)) {
+            //Load Css editor
             $cssurl = acym_completeLink((acym_isAdmin() ? '' : 'front').'mails&task=loadCSS&id='.$this->mailId.'&time='.time());
             $classMail = new MailClass();
             $filepath = $classMail->createTemplateFile($this->mailId);
@@ -123,7 +132,9 @@ class EditorHelper extends AcymObject
                 $this->editorConfig['content_css_custom'] = $cssurl.'&local=http';
                 $this->editorConfig['content_css'] = '0';
 
+                // We disable this for Joomla 4 because it might do a fatal due to Joomla 4 TinyMCE params not well formatted
                 if (!ACYM_J40) {
+                    // Joomla broke the custom css feature in the v3.9.21 so we have to do this
                     $access = [];
                     for ($i = 1; $i < 20; $i++) {
                         $access[] = $i;
@@ -141,20 +152,24 @@ class EditorHelper extends AcymObject
                     ];
                 }
             } elseif ($this->editor === 'jckeditor' || $this->editor === 'fckeditor') {
+                //For jckeditor, we need to create a fake template.css file... lets do that on the template/css/folder
                 $this->editorConfig['content_css_custom'] = $filepath;
                 $this->editorConfig['content_css'] = '0';
                 $this->editorConfig['editor_css'] = '0';
             } else {
+                //We still create the file so that the user can link to it manually
                 $fileurl = str_replace(DS, '/', ACYM_MEDIA_FOLDER).'templates/css/template_'.$this->mailId.'.css?time='.time();
                 $this->editorConfig['custom_css_url'] = $cssurl;
                 $this->editorConfig['custom_css_file'] = $fileurl;
                 $this->editorConfig['custom_css_path'] = $filepath;
+                //Can be useful for JCE integration for example.
                 acym_setVar('acycssfile', $fileurl);
             }
         }
 
+        // phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped -- Displaying the CMS editor, cannot be escaped. For Joomla editors.
         if (empty($this->editorContent)) {
-            $this->content = acym_escape($this->content);
+            $this->content = esc_html($this->content);
             ob_start();
 
             echo $this->myEditor->display(
@@ -179,6 +194,7 @@ class EditorHelper extends AcymObject
         }
 
         echo $this->editorContent;
+        // phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     private function displayWordPress(): void
@@ -217,15 +233,14 @@ class EditorHelper extends AcymObject
         static $instance = 0;
         ++$instance;
 
-        $img = '<i class="acymicon-chevrons"></i> ';
-
         printf(
-            '<button type="button" class="button" id="acym__dtext__button" data-editor="%s">%s</button>',
+            '<button type="button" class="button" id="acym__dtext__button" data-editor="%s"><i class="acymicon-chevrons"></i> %s</button>',
             esc_attr($editor_id),
-            $img.acym_translation('ACYM_INSERT_DYNAMIC_TEXT')
+            esc_html(acym_translation('ACYM_INSERT_DYNAMIC_TEXT'))
         );
     }
 
+    // Used in partial editor
     private function getWYSIDSettings(): string
     {
         $ctrl = acym_getVar('string', 'ctrl');
@@ -255,6 +270,7 @@ class EditorHelper extends AcymObject
         return empty($settings) ? '{}' : $settings;
     }
 
+    // Used in partial editor
     private function getWYSIDStylesheet(): string
     {
         $ctrl = acym_getVar('string', 'ctrl');
@@ -297,6 +313,9 @@ class EditorHelper extends AcymObject
         return -1 === $fromId;
     }
 
+    /**
+     * Methods used to add buttons to the WordPress editor
+     */
     private function addButtonAtPosition(array &$buttons, string $newButton, string $after): void
     {
         $position = array_search($after, $buttons);

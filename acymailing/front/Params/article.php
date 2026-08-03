@@ -1,7 +1,9 @@
 <?php
+defined('ABSPATH') || die('Restricted Access');
 
 include_once __DIR__.DIRECTORY_SEPARATOR.'AcymJFormField.php';
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Joomla specific class naming with imposed prefix "JFormField".
 class JFormFieldArticle extends AcymJFormField
 {
     public function __construct($form = null)
@@ -21,6 +23,7 @@ class JFormFieldArticle extends AcymJFormField
             $title = acym_CMSArticleTitle($value);
         }
 
+        // Callback function from the modal to the main window
         acym_addScript(
             true,
             "
@@ -49,7 +52,7 @@ class JFormFieldArticle extends AcymJFormField
         );
 
         $html = '<span class="input-append">';
-        $html .= '<input class="input-medium" id="'.$this->id.'_name" type="text" value="'.acym_escape($title).'" disabled="disabled" size="35" />';
+        $html .= '<input class="input-medium" id="'.$this->id.'_name" type="text" value="'.esc_attr($title).'" disabled="disabled" size="35" />';
         $urlSelect = acym_articleSelectionPage().'&function='.$callback;
         $html .= acym_cmsModal(
             true,

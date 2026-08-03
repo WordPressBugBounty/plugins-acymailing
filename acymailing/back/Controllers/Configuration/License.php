@@ -8,6 +8,8 @@ trait License
 {
     public function unlinkLicense(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $config = acym_getVar('array', 'config', []);
         $licenseKey = empty($config['license_key']) ? $this->config->get('license_key') : $config['license_key'];
 
@@ -22,11 +24,14 @@ trait License
             $this->displayMessage($resultUnlinkLicenseOnUpdateMe['message']);
         }
 
+        //Display the configuration
         $this->listing();
     }
 
     public function attachLicense(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
 
         $config = acym_getVar('array', 'config', []);
         if (empty($config['license_key'])) {
@@ -36,8 +41,10 @@ trait License
             return;
         }
 
+        //We save the license key
         $this->config->saveConfig(['license_key' => $config['license_key']]);
 
+        //We call updateme to attach the website to the license
         $resultAttachLicenseOnUpdateMe = $this->attachLicenseOnUpdateMe();
 
         if ($resultAttachLicenseOnUpdateMe['success'] === false) {
@@ -56,6 +63,7 @@ trait License
     public function attachLicenseOnUpdateMe(?string $licenseKey = null): array
     {
 
+        //We get the license key saved
         if (is_null($licenseKey)) {
             $licenseKey = $this->config->get('license_key', '');
         }
@@ -79,6 +87,8 @@ trait License
 
         $resultAttach = UpdatemeHelper::call('api/websites/attach', 'POST', $data);
 
+        // If it's not the result well formatted => don't save the license key and out
+        // If there is an error when the website has been attached => don't save the license key in the configuration
         if (empty($resultAttach) || !$resultAttach['success']) {
             return $return;
         }
@@ -90,6 +100,7 @@ trait License
 
     private function unlinkLicenseOnUpdateMe(?string $licenseKey = null): array
     {
+        //We get the license key saved
         if (is_null($licenseKey)) {
             $licenseKey = $this->config->get('license_key');
         }
@@ -105,14 +116,17 @@ trait License
             return $return;
         }
 
+        //First let's deactivate the cron
         $this->deactivateCron(false, $licenseKey);
 
         $data = [
             'domain' => ACYM_LIVE,
         ];
 
+        //Call updateme to unlink the license from this website
         $resultUnlink = UpdatemeHelper::call('api/websites/unlink', 'POST', $data);
 
+        //If it's not the result well formated => out
         if (empty($resultUnlink) || !$resultUnlink['success']) {
             return $return;
         }
@@ -124,8 +138,11 @@ trait License
 
     public function activateCron(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
 
         $result = $this->modifyCron('activateCron');
+        //If everything went ok we save config with an active_cron to true
         if (!empty($result) && !empty($this->displayMessage($result['message']))) {
             $this->config->saveConfig(['active_cron' => 1]);
         }
@@ -133,10 +150,17 @@ trait License
         $this->listing();
     }
 
+    //The listing parameter allows us to know if we need to display the listing or not
     public function deactivateCron(bool $listing = true, ?string $licenseKey = null): void
     {
+        // Called as a task (no argument) → require a CSRF token. Internal calls (e.g. unlinkLicense) are already token-checked.
+        if (func_num_args() === 0) {
+            wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+        }
+
 
         $result = $this->modifyCron('deactivateCron', $licenseKey);
+        //If everything went ok we save config with an active_cron to false
         if (!empty($result) && !empty($this->displayMessage($result['message']))) {
             $this->config->saveConfig(['active_cron' => 0]);
         }
@@ -146,6 +170,7 @@ trait License
         }
     }
 
+    //The listing parameter allows us to know if we need to display the listing or not
     public function modifyCron(string $functionToCall, ?string $licenseKey = null): array
     {
         if (is_null($licenseKey)) {
@@ -153,6 +178,7 @@ trait License
             $licenseKey = empty($config['license_key']) ? '' : $config['license_key'];
         }
 
+        //If the license is not set => out
         if (empty($licenseKey)) {
             $this->displayMessage('LICENSE_NOT_FOUND');
 
@@ -168,8 +194,10 @@ trait License
             'security_key' => $this->config->get('cron_key'),
         ];
 
+        //We call updateme to activate/deactivate the cron
         $result = UpdatemeHelper::call('api/crons/modify', 'POST', $data);
 
+        //If it's not the result well formated => out
         if (empty($result['success'])) {
             $this->displayMessage(empty($result['message']) ? 'CRON_NOT_SAVED' : $result['message']);
 
@@ -181,6 +209,8 @@ trait License
 
     public function attachLicenseAcymailer(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $acyMailerLicenseKey = $this->config->get('acymailer_apikey');
         $acyMailingKey = $this->config->get('license_key');
         if (empty($acyMailerLicenseKey) && !empty($acyMailingKey)) {

@@ -1,7 +1,10 @@
+<?php
+defined('ABSPATH') || die('Restricted Access');
+?>
 <div class="cell">
 	<textarea class="cell"
-			  name="<?php echo acym_escape($name); ?>"
-			  v-model="<?php echo acym_escape($vModel); ?>">
-		<?php echo acym_escape($value); ?>
+	          name="<?php echo esc_attr($name); ?>"
+	          v-model="<?php echo esc_attr($vModel); ?>">
+		<?php echo esc_html($value); ?>
 	</textarea>
 </div>

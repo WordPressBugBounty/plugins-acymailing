@@ -6,6 +6,14 @@ namespace GuzzleHttp\Psr7;
 
 final class Header
 {
+    /**
+     * Parse an array of header values containing ";" separated data into an
+     * array of associative arrays representing the header key value pair data
+     * of the header. When a parameter does not contain a value, but just
+     * contains a key, this function will inject a key with a '' string value.
+     *
+     * @param string|array $header Header to parse into components.
+     */
     public static function parse($header): array
     {
         static $trimmed = "\"'  \n\t\r";
@@ -33,6 +41,14 @@ final class Header
         return $params;
     }
 
+    /**
+     * Converts an array of header values that may contain comma separated
+     * headers into an array of headers with no comma separated values.
+     *
+     * @param string|array $header Header to normalize.
+     *
+     * @deprecated Use self::splitList() instead.
+     */
     public static function normalize($header): array
     {
         $result = [];
@@ -45,6 +61,19 @@ final class Header
         return $result;
     }
 
+    /**
+     * Splits a HTTP header defined to contain a comma-separated list into
+     * each individual value. Empty values will be removed.
+     *
+     * Example headers include 'accept', 'cache-control' and 'if-none-match'.
+     *
+     * This method must not be used to parse headers that are not defined as
+     * a list, such as 'user-agent' or 'set-cookie'.
+     *
+     * @param string|string[] $values Header value as returned by MessageInterface::getHeader()
+     *
+     * @return string[]
+     */
     public static function splitList($values): array
     {
         if (!\is_array($values)) {

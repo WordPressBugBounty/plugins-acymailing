@@ -12,8 +12,14 @@ class PluginHelper extends AcymObject
     public string $wrappedText = '';
     public string $contextLanguage;
 
+    /*
+     * Convert an array of elements into a table with multiple columns based on the $parameter variable
+     * $parameter->displaytype = table by default
+     * $parameter->cols = 1 by default
+     */
     public function getFormattedResult(array $elements, object $parameter): string
     {
+        //We do not add an extra table or whatever when there is a single element...
         if (count($elements) < 2) {
             return implode('', $elements);
         }
@@ -110,6 +116,9 @@ class PluginHelper extends AcymObject
         return str_replace(['{equalwidth}'], [$equalwidth], $string);
     }
 
+    /**
+     * This function will apply extra parameters such as part:first, ucfirst, strtolower to the $string
+     */
     public function formatString(&$replaceme, object $mytag): void
     {
         if (!empty($mytag->part)) {
@@ -135,6 +144,7 @@ class PluginHelper extends AcymObject
                 $replaceme = acym_getDate($replaceme, $mytag->format);
             } elseif ($mytag->type == 'diff') {
                 try {
+                    //We have a date? Sure?
                     $date = $replaceme;
                     if (is_numeric($date)) {
                         $date = acym_getDate($replaceme, '%Y-%m-%d %H:%M:%S');
@@ -149,6 +159,7 @@ class PluginHelper extends AcymObject
             }
         }
 
+        //Two possibles keywords for that... we used to have "lower" and "upper" only but I added lowercase and uppercase as well on December 2014
         if (!empty($mytag->lower) || !empty($mytag->lowercase)) {
             $replaceme = function_exists('mb_strtolower') ? mb_strtolower($replaceme, 'UTF-8') : strtolower($replaceme);
         }
@@ -161,6 +172,7 @@ class PluginHelper extends AcymObject
         if (!empty($mytag->ucfirst)) {
             $replaceme = ucfirst($replaceme);
         }
+        //Remove a character at the end of the string...
         if (isset($mytag->rtrim)) {
             $replaceme = empty($mytag->rtrim) ? rtrim($replaceme) : rtrim($replaceme, $mytag->rtrim);
         }
@@ -168,6 +180,7 @@ class PluginHelper extends AcymObject
             $replaceme = urlencode($replaceme);
         }
         if (!empty($mytag->substr)) {
+            //the parameter |substr:4,6 will select the 6 characters after the 4.
             $args = explode(',', $mytag->substr);
             if (isset($args[1])) {
                 $replaceme = substr($replaceme, intval($args[0]), intval($args[1]));
@@ -187,6 +200,7 @@ class PluginHelper extends AcymObject
 
     public function replaceVideos(string &$text): void
     {
+        //Youtube videos
         $text = preg_replace(
             '#\[embed=videolink][^}]*youtube[^=]*=([^"/}]*)[^}]*}\[/embed]#i',
             '<a target="_blank" href="https://www.youtube.com/watch?v=$1"><img src="https://img.youtube.com/vi/$1/0.jpg"/></a>',
@@ -217,9 +231,11 @@ class PluginHelper extends AcymObject
         $text = preg_replace('#{vimeo}(https://vimeo.com/[^{]+){/vimeo}#Uis', '<iframe src="$1"></iframe>', $text);
         $text = preg_replace('#{vimeo}([^{]+){/vimeo}#Uis', '<iframe src="https://player.vimeo.com/video/$1"></iframe>', $text);
 
+        // Vimeo iframes
         if (preg_match_all('#<iframe[^>]*src="[^"]*vimeo[^"]*/(\d+)([&/\?][^"]*)?"[^>]*>[^<]*</iframe>#Uis', $text, $matches)) {
             foreach ($matches[1] as $key => $match) {
                 $hash = acym_fileGetContent('https://vimeo.com/api/v2/video/'.$match.'.php');
+                // @ on purpose, the unserialize returns false if $hash isn't a serialized data, but it also throws a notice...
                 $hash = @unserialize($hash);
                 if (empty($hash)) continue;
 
@@ -235,22 +251,27 @@ class PluginHelper extends AcymObject
 
                 $text = str_replace(
                     $matches[0][$key],
-                    '<a target="_blank" href="'.acym_escape($hash[0]['url']).'"><img class="donotresize" alt="" src="'.acym_escape($thumbnail).'" /></a>',
+                    '<a target="_blank" href="'.esc_attr($hash[0]['url']).'"><img class="donotresize" alt="" src="'.esc_attr($thumbnail).'" /></a>',
                     $text
                 );
             }
         }
 
+        //Other videos
         $text = preg_replace('#\[embed=videolink][^}]*video":"([^"]*)[^}]*}\[/embed]#i', '<a target="_blank" href="$1"><img src="'.ACYM_IMAGES.'/video.png"/></a>', $text);
         $text = preg_replace('#<video[^>]*src="([^"]*)"[^>]*>[^>]*</video>#i', '<a target="_blank" href="$1"><img src="'.ACYM_IMAGES.'/video.png"/></a>', $text);
     }
 
+    /**
+     * Convert pictures base64 code into a real picture
+     */
     private function convertbase64pictures(string &$html): void
     {
         if (!preg_match_all('#<img[^>]*src=("data:image/([^;]{1,5});base64[^"]*")([^>]*)>#Uis', $html, $resultspictures)) {
             return;
         }
 
+        //Just in case of... we will need it
 
 
         $dest = ACYM_MEDIA.'resized'.DS;
@@ -261,6 +282,7 @@ class PluginHelper extends AcymObject
             $pictPath = $dest.$pictname;
             $pictCode = trim($resultspictures[1][$i], '"');
             if (file_exists($pictPath)) {
+                //The picture is already there... lets use it then
                 $html = str_replace($pictCode, $picturl, $html);
                 continue;
             }
@@ -283,6 +305,7 @@ class PluginHelper extends AcymObject
                     break;
             }
 
+            //The function does not exists or we didn't find the right function... we just skip that action
             if (empty($getfunction) || !function_exists($getfunction)) {
                 continue;
             }
@@ -297,6 +320,7 @@ class PluginHelper extends AcymObject
                 imagesavealpha($img, false);
             }
 
+            //We display the result and then save it to avoid the issue with FTP configurations
             ob_start();
             switch ($extension) {
                 case 'gif':
@@ -313,6 +337,7 @@ class PluginHelper extends AcymObject
             $imageContent = ob_get_clean();
             $status = $status && acym_writeFile($pictPath, $imageContent);
 
+            //we could not save or convert the picture, we skip it
             if (!$status) {
                 continue;
             }
@@ -320,26 +345,34 @@ class PluginHelper extends AcymObject
         }
     }
 
+    //This function will remove or replace code we should not have in an html view.
     public function cleanHtml(string &$html): void
     {
         $this->convertbase64pictures($html);
 
+        //add line-height: 0px; in the TR style when there is only images in the cell, not extra text (new issue with gmail)
+        //handle a line-height automatically for <tr> <td> <img...></td></tr>
         $pregreplace = [];
         $pregreplace['#<tr([^>"]*>([^<]*<td[^>]*>[ \n\s]*<img[^>]*>[ \n\s]*</ *td[^>]*>[ \n\s]*)*</ *tr)#Uis'] = '<tr style="line-height: 0px;" $1';
         $pregreplace['#<td(((?!style|>).)*>[ \n\s]*(<a[^>]*>)?[ \n\s]*<img[^>]*>[ \n\s]*(</a[^>]*>)?[ \n\s]*</ *td)#Uis'] = '<td style="line-height: 0px;" $1';
 
+        //No number tab system {tab=...}{/tabs} or {tab }{/tabs} and jcomments system
         $pregreplace['#{tab[ =][^}]*}#is'] = '';
         $pregreplace['#{/tabs}#is'] = '';
         $pregreplace['#{jcomments\s+(on|off|lock)}#is'] = '';
 
+        //Remove the JS...
         $pregreplace["#(onmouseout|onmouseover|onclick|onfocus|onload|onblur) *= *\"(?:(?!\").)*\"#Ui"] = '';
         $pregreplace["#< *script(?:(?!< */ *script *>).)*< */ *script *>#Uis"] = '';
         $pregreplace["#< *iframe(?:(?!< */ *iframe *>).)*< */ *iframe *>#Uis"] = '';
 
+        // May God punish every person using Outlook, or imposing this monstrosity for his employees
         $pregreplace['#(<p style=")([^>]*>\s*<img *[^>]*margin-left: auto; margin-right: auto;[^>]*>\s*</p>)#Uis'] = '$1text-align: center;$2';
+        // Outlook doesn't handle webp images
         $pregreplace['#(<img [^>]*src="[^"]+\.webp"[^>]*>)#Uis'] = '<!--[if !mso]><!-->$1<!--<![endif]-->';
 
         $newbody = preg_replace(array_keys($pregreplace), $pregreplace, $html);
+        //we do it in two steps as this regex can break the page
         if (!empty($newbody)) {
             $html = $newbody;
         }
@@ -355,6 +388,9 @@ class PluginHelper extends AcymObject
         return "src='".str_replace(' ', '%20', $matches[1])."'";
     }
 
+    /*
+     * Replace tags in all the email variables where it is possible, in text version or html version
+     */
     public function replaceTags(object &$email, array $tags, bool $html = false): void
     {
         if (empty($tags)) return;
@@ -415,18 +451,21 @@ class PluginHelper extends AcymObject
                 $safePregValue = str_replace('$', '\$', $value);
 
                 foreach ($codes as $oneCode) {
+                    // Dtext specific syntax
                     $text = preg_replace(
                         '#<span[^>]+'.preg_quote($oneCode, '#').'.+</em>[^<]*</span>#Uis',
                         $safePregValue,
                         $text
                     );
 
+                    // Dcontent specific syntax
                     $text = preg_replace(
                         '#(<tr[^>]+)data-dynamic="'.preg_quote($oneCode, '#').'"([^>]+>[^<]*<td[^>]*>).+</i>[^<]*</td>[^<]*</tr>#Uis',
                         '${1}${2}'.$safePregValue.'</td></tr>',
                         $text
                     );
 
+                    // If the code was inserted directly in the email (in the subject for example, or a copy-paste)
                     $text = str_replace($oneCode, $value, $text);
                 }
             }
@@ -435,11 +474,16 @@ class PluginHelper extends AcymObject
         return $text;
     }
 
+    /**
+     * This function extracts tags from the mail by checking the subject,body and altbody and returns an array of tag objects
+     * tagfamily is "vmproduct" for example to handle tags such as {vmproduct:23|file|price}
+     */
     public function extractTags(object $email, string $tagfamily): array
     {
         $results = [];
 
         $match = '#(?:{|%7B)'.$tagfamily.'(?:%3A|\\:)(.*)(?:}|%7D)#Ui';
+        //If you add a variable there, don't forget to add it in the replaceTags function as well!
         $variables = [
             'subject',
             'AltBody',
@@ -477,10 +521,12 @@ class PluginHelper extends AcymObject
                 }
             } else {
                 $found = preg_match_all($match, $email->$var, $results[$var]) || $found;
+                //we unset the results so that we won't handle it later... it will save some memory and processing
                 if (empty($results[$var][0])) unset($results[$var]);
             }
         }
 
+        //If we didn't find anything...
         if (!$found) {
             return [];
         }
@@ -488,6 +534,7 @@ class PluginHelper extends AcymObject
         $tags = [];
         foreach ($results as $var => $allresults) {
             foreach ($allresults[0] as $i => $oneTag) {
+                //Don't need to process twice a tag we already have!
                 if (isset($tags[$oneTag])) {
                     continue;
                 }
@@ -498,10 +545,13 @@ class PluginHelper extends AcymObject
         return $tags;
     }
 
+    /**
+     * Converts a tag 23|file:myfile|price into an object.
+     */
     public function extractTag(string $oneTag): \stdClass
     {
         $oneTag = str_replace(['[time]+', '[time]-'], [urlencode('[time]+'), urlencode('[time]-')], $oneTag);
-        $arguments = explode('|', strip_tags(urldecode($oneTag)));
+        $arguments = explode('|', acym_stripTags(urldecode($oneTag)));
         $tag = new \stdClass();
         $tag->id = $arguments[0];
         $tag->default = '';
@@ -512,6 +562,7 @@ class PluginHelper extends AcymObject
 
             if (isset($args[1])) {
                 $tag->$arg0 = $args[1];
+                //We may have an extra parameter, especially for date format.
                 if (isset($args[2])) {
                     $tag->{$args[0]} .= ':'.$args[2];
                 }
@@ -523,6 +574,9 @@ class PluginHelper extends AcymObject
         return $tag;
     }
 
+    /**
+     * Wrap the text using the wrapValue
+     */
     public function wrapText(string $text, object $tag): string
     {
         if (empty($tag->wrap)) {
@@ -533,12 +587,12 @@ class PluginHelper extends AcymObject
 
         $newText = str_replace(['&lt', '&gt'], ['<', '>'], $text);
 
-        if (mb_strlen(strip_tags($newText)) <= $tag->wrap) {
+        if (mb_strlen(acym_stripTags($newText)) <= $tag->wrap) {
             return $newText;
         }
 
         if (!class_exists('DOMDocument', false)) {
-            return mb_substr(strip_tags($newText), 0, $tag->wrap).'…';
+            return mb_substr(acym_stripTags($newText), 0, $tag->wrap).'…';
         }
 
         if (function_exists('libxml_use_internal_errors')) {
@@ -562,6 +616,7 @@ class PluginHelper extends AcymObject
         for ($i = 0; $i < $node->childNodes->length; $i++) {
             $child = $node->childNodes->item($i);
 
+            // Text node
             if ($child->nodeType === XML_TEXT_NODE) {
                 $text = $child->nodeValue;
                 $len = mb_strlen($text);
@@ -569,14 +624,18 @@ class PluginHelper extends AcymObject
                 if ($count + $len > $limit) {
                     $remaining = $limit - $count;
 
+                    // Take the max allowed slice
                     $slice = mb_substr($text, 0, $remaining);
 
+                    // Try to cut at a word boundary (spaces or punctuation)
                     if (preg_match('/^(.+?)([\s\p{P}]+)[^\s\p{P}]*$/u', $slice, $m)) {
                         $slice = rtrim($m[1]);
                     }
 
+                    // Final assignment
                     $child->nodeValue = $slice.'…';
 
+                    // Remove remaining siblings
                     while ($child->nextSibling) {
                         $node->removeChild($child->nextSibling);
                     }
@@ -587,6 +646,7 @@ class PluginHelper extends AcymObject
                 $count += $len;
             }
 
+            // Element node → recurse
             if ($child->hasChildNodes() && $this->truncateNode($dom, $child, $limit, $count)) {
                 while ($child->nextSibling) {
                     $node->removeChild($child->nextSibling);
@@ -599,8 +659,21 @@ class PluginHelper extends AcymObject
         return false;
     }
 
+    /**
+     * Returns a formatted version of the passed content
+     *
+     * TOP_LEFT : title on top, image with float left and covering description
+     * TOP_RIGHT : title on top, image with float rigth and covering description
+     * TITLE_IMG : image on title's left on top, description below
+     * TITLE_IMG_RIGHT : image on title's right on top, description below
+     * CENTER_IMG : title on top, image on one line and description below
+     * TOP_IMG : image on top, then title and description
+     * COL_LEFT : image on left column, title and description on right column
+     * COL_RIGHT : image on right column, title and description on left column
+     */
     public function getStandardDisplay(object $format): string
     {
+        // By default, put float left on the picture
         if (empty($format->tag->format)) {
             $format->tag->format = 'TOP_LEFT';
         }
@@ -620,6 +693,7 @@ class PluginHelper extends AcymObject
             $format->tag->format = $invertValues[$format->tag->format];
         }
 
+        // Get the image with float left/right or no style
         $image = '';
         if (!empty($format->imagePath)) {
             $style = '';
@@ -644,13 +718,14 @@ class PluginHelper extends AcymObject
             preg_match('#src="([^"]+)"#Uis', $format->imagePath, $matches);
             if (!empty($matches[1])) $format->imagePath = $matches[1];
             $altImage = !empty($format->altImage) ? $format->altImage : '';
-            $image = '<img class="content_main_image" alt="'.acym_escape($altImage).'" src="'.$format->imagePath.'" '.$style.' />';
+            $image = '<img class="content_main_image" alt="'.esc_attr($altImage).'" src="'.$format->imagePath.'" '.$style.' />';
 
             if (!empty($format->imageCaption) && !in_array($format->tag->format, ['TITLE_IMG', 'TITLE_IMG_RIGHT'])) {
-                $image .= '<p class="content_main_image_caption">'.acym_escape($format->imageCaption).'</p>';
+                $image .= '<p class="content_main_image_caption">'.esc_html($format->imageCaption).'</p>';
             }
         }
 
+        // If TITLE_IMG, add the image to the title
         $result = '';
         if (in_array($format->tag->format, ['TITLE_IMG', 'TITLE_IMG_RIGHT'])) {
             $format->title = $image.$format->title;
@@ -661,11 +736,13 @@ class PluginHelper extends AcymObject
             $image = '<a target="_blank" href="'.$format->link.'" '.$linkStyle.'>'.$image.'</a>';
         }
 
+        // If the image should be displayed before the title, do it
         if ($format->tag->format === 'TOP_IMG' && !empty($image)) {
             $result = $image;
             $image = '';
         }
 
+        // If we want to keep the left/right column for the image, put the whole article in a table
         if (in_array($format->tag->format, ['COL_LEFT', 'COL_RIGHT'])) {
             $maxWidth = empty($format->tag->maxwidth) ? '' : ' width: '.$format->tag->maxwidth.'px;';
             if (empty($image)) {
@@ -679,6 +756,7 @@ class PluginHelper extends AcymObject
             }
         }
 
+        // Display the title
         if (!empty($format->title)) {
             if (!empty($format->link) && !empty($format->tag->clickable)) {
                 if (empty($format->tag->type) || $format->tag->type !== 'title') {
@@ -712,6 +790,7 @@ class PluginHelper extends AcymObject
 
         $rowText = '<div class="acydescription">';
         $endRow = '</div><br />';
+        // Display the main content based on the chosen format
         if (in_array($format->tag->format, ['TOP_LEFT', 'TOP_RIGHT', 'TITLE_IMG', 'TITLE_IMG_RIGHT', 'TOP_IMG'])) {
             if (!empty($image) || !empty($format->description)) {
                 $result .= $rowText.$image.$format->description.$endRow;
@@ -735,6 +814,7 @@ class PluginHelper extends AcymObject
             $result .= '</td></tr></table>';
         }
 
+        // Add the custom fields on 1 or 2 columns, with or without the labels
         if (!empty($format->customFields)) {
             $result .= '<table style="width:100%;" class="customfieldsarea"><tr>';
 
@@ -763,6 +843,7 @@ class PluginHelper extends AcymObject
             $result .= '</tr></table>';
         }
 
+        // Add what should be displayed at the end (share buttons, read more link, etc...)
         if (!empty($format->afterArticle)) {
             $result .= $format->afterArticle;
         }
@@ -770,6 +851,9 @@ class PluginHelper extends AcymObject
         return $result;
     }
 
+    /**
+     * Resizes or removes the pictures according to the parameters
+     */
     public function managePicts(object $tag, string $result): string
     {
         if (!isset($tag->pict)) {
@@ -794,472 +878,649 @@ class PluginHelper extends AcymObject
 
     public function displayOptions(array $options, string $dynamicIdentifier, string $type = 'individual', $defaultValues = null): void
     {
-        $suffix = preg_replace('[^a-zA-Z0-9]', '_', $dynamicIdentifier);
+        $suffix = preg_replace('#[^a-zA-Z0-9]#U', '_', $dynamicIdentifier);
         $updateFunction = 'updateDynamic'.$suffix;
 
-        $outputStructure = [
-            'topOptions' => [],
-            'options' => [],
-        ];
         $jsOptionsMerge = [];
+        $topOptions = [];
+        $sections = [];
 
+        // ---- Phase 1: classify options + collect the JS (in original loop order) ----
         foreach ($options as $option) {
-            $currentLabel = $option['title'];
-            $currentOption = '';
-
             if (isset($defaultValues->{$option['name']})) {
                 $option['default'] = $defaultValues->{$option['name']};
             }
 
-            if ($option['type'] === 'pictures') {
-                $displayedPictures = $option['default'] ?? 'resized';
-                if (isset($defaultValues->pict)) $displayedPictures = $defaultValues->pict;
-                $resizeDisplay = 'resized' === $displayedPictures ? '' : 'style="display: none;"';
-                $maxWidth = $defaultValues->maxwidth ?? 150;
-                $maxHeight = $defaultValues->maxheight ?? 150;
-
-                $valImages = [];
-                $valImages[] = acym_selectOption('1', 'ACYM_YES');
-                $valImages[] = acym_selectOption('resized', 'ACYM_RESIZED');
-                $valImages[] = acym_selectOption('0', 'ACYM_NO');
-                $currentOption .= '<div class="cell large-5 acym_plugin_field">'.acym_translation('ACYM_DISPLAY').'</div>';
-                $currentOption .= '<div class="cell large-7">'.acym_radio(
-                        $valImages,
-                        'pict'.$suffix,
-                        $displayedPictures,
-                        ['onclick' => $updateFunction.'();'],
-                        ['containerClass' => 'dcontent_pictures'],
-                        !acym_isAdmin()
-                    ).'</div>';
-                $currentOption .= '<div id="pictsize'.$suffix.'" class="cell grid-x margin-y margin-top-1" '.$resizeDisplay.'>
-                                <div class="cell large-5 acym_plugin_field">'.acym_translation('ACYM_MAX_WIDTH').'</div>
-                                <div class="cell large-7">
-                                	<input class="intext_input" name="pictwidth'.$suffix.'" type="number" onchange="'.$updateFunction.'();" value="'.intval($maxWidth).'"/>
-                            	</div>
-                                <div class="cell large-5 acym_plugin_field">'.acym_translation('ACYM_MAX_HEIGHT').'</div>
-                                <div class="cell large-7">
-                    				<input class="intext_input" name="pictheight'.$suffix.'" type="number" onchange="'.$updateFunction.'();" value="'.intval($maxHeight).'"/>
-                            	</div>
-                            </div>';
-                if (!empty($option['caption'])) {
-                    $currentOption .= '<div class="cell grid-x margin-top-1">';
-                    $currentOption .= '<label class="cell large-5 acym_plugin_field">'.acym_translation('ACYM_CAPTION').'</label>';
-                    $currentOption .= acym_radio(
-                        [
-                            acym_selectOption('1', 'ACYM_YES'),
-                            acym_selectOption('0', 'ACYM_NO'),
-                        ],
-                        'caption'.$suffix,
-                        $defaultValues->caption ?? '0',
-                        ['onclick' => $updateFunction.'();'],
-                        ['containerClass' => 'cell large-7']
-                    );
-                    $currentOption .= '</div>';
-
-                    $jsOptionsMerge[] = 'otherinfo += "| caption:" + jQuery(\'input[name="caption'.$suffix.'"]:checked\').val();';
-                }
-
-                $jsOptionsMerge[] = '
-                    var _pictVal'.$suffix.' = jQuery(\'input[name="pict'.$suffix.'"]:checked\').val();
-                    otherinfo += "| pict:" + _pictVal'.$suffix.';
-    
-                    if(_pictVal'.$suffix.' == "resized"){
-                        jQuery("#pictsize'.$suffix.'").show();
-                        otherinfo += "| maxwidth:" + jQuery(\'input[name="pictwidth'.$suffix.'"]\').val();
-                        otherinfo += "| maxheight:" + jQuery(\'input[name="pictheight'.$suffix.'"]\').val();
-                    }else{
-                        jQuery("#pictsize'.$suffix.'").hide();
-                    }';
-            } elseif ($option['type'] === 'checkbox') {
-                if (!empty($option['default'])) {
-                    $checkedValues = explode(',', $option['default']);
-                    foreach ($option['options'] as $key => $oneOption) {
-                        $oneOption[1] = in_array($key, $checkedValues);
-                        $option['options'][$key] = $oneOption;
-                    }
-                }
-
-                $currentOption .= '<div class="cell grid-x">';
-                foreach ($option['options'] as $value => $title) {
-                    $currentOption .= '<div class="cell medium-6" '.(empty($title[2]) ? '' : $title[2]).'>
-                                <input type="checkbox" name="'.acym_escape($option['name'].$suffix).'" value="'.acym_escape($value).'" id="'.acym_escape(
-                            $value.$suffix
-                        ).'" onclick="'.$updateFunction.'();" '.($title[1] ? 'checked="checked"' : '').'/>
-                                <label style="margin-left:5px" for="'.acym_escape($value.$suffix).'">'.acym_translation($title[0]).'</label>
-                            </div>';
-                }
-                $currentOption .= '</div>';
-
-                if (empty($option['separator'])) $option['separator'] = ',';
-
-                $jsOptionsMerge[] = 'var _checked'.$option['name'].$suffix.' = [];
-                    jQuery("input:checkbox[name='.$option['name'].$suffix.']:checked").each(function(){
-                        _checked'.$option['name'].$suffix.'.push(jQuery(this).val());
-                    });
-                    if(_checked'.$option['name'].$suffix.'.length) otherinfo += "| '.$option['name'].':" + _checked'.$option['name'].$suffix.'.join("'.$option['separator'].'");';
-            } elseif ($option['type'] === 'boolean') {
-                if ($option['name'] === 'autologin' && $this->config->get('autologin_urls', 0) != 1) {
-                    continue;
-                }
-
-                $currentOption .= acym_boolean(
-                    $option['name'].$suffix,
-                    $option['default'],
-                    $option['name'].$suffix,
-                    ['onclick' => $updateFunction.'();']
-                );
-
-                $jsOptionsMerge[] = 'otherinfo += "| '.$option['name'].':" + jQuery(\'input[name="'.$option['name'].$suffix.'"]:checked\').val();';
-            } elseif ($option['type'] === 'radio') {
-                $radioOptions = [];
-                foreach ($option['options'] as $value => $title) {
-                    $radioOptions[] = acym_selectOption($value, $title);
-                }
-
-                $currentOption .= acym_radio(
-                    $radioOptions,
-                    $option['name'].$suffix,
-                    $option['default'],
-                    ['onclick' => $updateFunction.'();'],
-                    ['pluginMode' => true],
-                    !acym_isAdmin()
-                );
-                $jsOptionsMerge[] = 'otherinfo += "| '.$option['name'].':" + jQuery(\'input[name="'.$option['name'].$suffix.'"]:checked\').val();';
-            } elseif ($option['type'] === 'select') {
-                $selectOptions = [];
-                foreach ($option['options'] as $value => $title) {
-                    if (is_object($title)) {
-                        $selectOptions[] = acym_selectOption($title->value, $title->text);
-                    } else {
-                        $selectOptions[] = acym_selectOption($value, $title);
-                    }
-                }
-
-                $default = empty($option['default']) ? null : $option['default'];
-                if (!empty($default) && strpos($default, ',')) [$default, $defaultOrder] = explode(',', $default);
-
-                $attributes = [
-                    'onchange' => $updateFunction.'();',
-                    'id' => $option['name'].$suffix,
-                ];
-                if ($option['name'] === 'order') {
-                    $attributes['class'] = 'acym__dynamics__ordering__select';
-                }
-                $currentOption .= acym_select(
-                    $selectOptions,
-                    $option['name'].$suffix,
-                    $default,
-                    $attributes
-                );
-
-                if ($option['name'] === 'order') {
-                    $dirs = [
-                        'desc' => acym_translation('ACYM_DESC'),
-                        'asc' => acym_translation('ACYM_ASC'),
-                    ];
-                    if (empty($defaultOrder)) $defaultOrder = empty($option['defaultdir']) ? null : $option['defaultdir'];
-                    $currentOption .= ' '.acym_select(
-                            $dirs,
-                            'orderdir'.$suffix,
-                            $defaultOrder,
-                            [
-                                'onchange' => $updateFunction.'();',
-                                'style' => 'width: 115px;',
-                                'class' => 'acym__dynamics__ordering__select',
-                            ]
-                        );
-
-                    $jsOptionsMerge[] = 'otherinfo += "| '.$option['name'].':" + jQuery(\'[name="'.$option['name'].$suffix.'"]\').val() + "," + jQuery(\'[name="orderdir'.$suffix.'"]\').val();';
-                } else {
-                    $jsOptionsMerge[] = 'otherinfo += "| '.$option['name'].':" + jQuery(\'[name="'.$option['name'].$suffix.'"]\').val();';
-                }
-            } elseif ($option['type'] === 'multiselect') {
-                $selectOptions = [];
-                foreach ($option['options'] as $value => $title) {
-                    $selectOptions[] = acym_selectOption($value, $title);
-                }
-
-
-                if (!isset($option['default'])) $option['default'] = [];
-                if (!is_array($option['default'])) $option['default'] = explode(',', $option['default']);
-
-                $currentOption .= acym_selectMultiple(
-                    $selectOptions,
-                    $option['name'].$suffix,
-                    $option['default'],
-                    ['onchange' => $updateFunction.'();', 'id' => $option['name'].$suffix]
-                );
-
-                $jsOptionsMerge[] = '
-                var theMultiSelect = document.querySelector(\'[name="'.$option['name'].$suffix.'[]"]\');
-                var selectedOptions = [];
-                for(var i = 0 ; i < theMultiSelect.length ; i++){
-                	if(theMultiSelect[i].selected){
-                		selectedOptions.push(theMultiSelect[i].value);
-                	}
-                }
-                otherinfo += "| '.$option['name'].':" + selectedOptions.join(",");';
-            } elseif ($option['type'] === 'text') {
-                if (!isset($option['default'])) $option['default'] = '';
-                $class = empty($option['class']) ? 'acym_plugin_text_field' : $option['class'];
-                $placeholder = empty($option['placeholder']) ? '' : ' placeholder="'.acym_escape($option['placeholder']).'"';
-                $currentOption .= '<input 
-                    type="text" 
-                    name="'.$option['name'].$suffix.'" 
-                    id="'.$option['name'].$suffix.'" 
-                    onchange="'.$updateFunction.'();" 
-                    value="'.acym_escape($option['default']).'" 
-                    class="'.acym_escape($class).'" '.$placeholder.'/>';
-                $jsOptionsMerge[] = 'otherinfo += "| '.$option['name'].':" + jQuery(\'input[name="'.$option['name'].$suffix.'"]\').val();';
-            } elseif ($option['type'] === 'number') {
-                $min = empty($option['min']) ? ' min="0"' : ' min="'.$option['min'].'"';
-                $max = empty($option['max']) ? '' : ' max="'.$option['max'].'"';
-                $class = empty($option['class']) ? 'acym_plugin_text_field' : $option['class'];
-                $currentOption .= '<input type="number"'.$min.$max.' name="'.$option['name'].$suffix.'" id="'.$option['name'].$suffix.'" onchange="'.$updateFunction.'();" value="'.intval(
-                        $option['default']
-                    ).'" class="'.acym_escape($class).'" />';
-                $jsOptionsMerge[] = 'otherinfo += "| '.$option['name'].':" + jQuery(\'input[name="'.$option['name'].$suffix.'"]\').val();';
-            } elseif ($option['type'] === 'intextfield') {
-                $inputType = 'text';
-                if (!empty($option['isNumber']) && $option['isNumber'] === 1) $inputType = 'number';
-                $currentOption .= acym_translationSprintf(
-                    $option['text'],
-                    '<input type="'.$inputType.'" name="'.$option['name'].$suffix.'" id="'.$option['name'].$suffix.'" class="intext_input" value="'.acym_escape(
-                        $option['default']
-                    ).'" onchange="'.$updateFunction.'();"/>'
-                );
-                $jsOptionsMerge[] = 'otherinfo += "| '.$option['name'].':" + jQuery(\'input[name="'.$option['name'].$suffix.'"]\').val();';
-            } elseif ($option['type'] === 'date') {
-                $relativeTime = '-';
-                if (!empty($option['relativeDate'])) $relativeTime = $option['relativeDate'];
-                if (!empty($option['default']) && !is_numeric($option['default']) && false === strpos($option['default'], '[time]')) {
-                    $option['default'] = strtotime($option['default']);
-                }
-                $currentOption .= acym_dateField($option['name'].$suffix, $option['default'], '', ' onchange="'.$updateFunction.'();"', $relativeTime);
-                $jsOptionsMerge[] = 'otherinfo += "| '.$option['name'].':" + jQuery(\'input[name="'.$option['name'].$suffix.'"]\').val();';
-            } elseif ($option['type'] === 'language') {
-                $languageOptions = [];
-                $languageOptions['any'] = acym_translation('ACYM_ANY');
-
-                $languages = acym_getLanguages(true);
-                foreach ($languages as $language) {
-                    $languageOptions[$language->language] = $language->name;
-                }
-
-                if (empty($option['default'])) {
-                    $option['default'] = acym_getVar('string', 'language');
-                    if (acym_isMultilingual() && (empty($option['default']) || $option['default'] === 'main')) {
-                        $option['default'] = $this->config->get('multilingual_default');
-                    }
-                }
-
-                $currentOption .= acym_select(
-                    $languageOptions,
-                    $option['name'].$suffix,
-                    empty($option['default']) ? null : $option['default'],
-                    [
-                        'onchange' => $updateFunction.'();',
-                        'id' => $option['name'].$suffix,
-                    ]
-                );
-
-                $jsOptionsMerge[] = 'otherinfo += "| '.$option['name'].':" + jQuery(\'[name="'.$option['name'].$suffix.'"]\').val();';
-            } elseif ($option['type'] == 'custom') {
-                $currentOption .= $option['output'];
-                $jsOptionsMerge[] = $option['js'];
+            // Preserve the early skip: never rendered, no JS collected.
+            if (
+                $option['type'] === 'boolean'
+                && $option['name'] === 'autologin'
+                && $this->config->get('autologin_urls', 0) != 1
+            ) {
+                continue;
             }
 
-            if (!empty($option['main']) || in_array($option['type'], ['pictures', 'checkbox'])) {
-                $outputStructure['topOptions'][$currentLabel] = $currentOption;
+            $this->appendOptionJs($jsOptionsMerge, $option, $suffix, $type);
 
-                if ($option['type'] === 'checkbox' && $currentLabel === 'ACYM_DISPLAY' && (!isset($option['format']) || $option['format'])) {
-                    $formatOption = '<div class="grid-x">';
-                    $formatOption .= '<div class="cell large-3">'.acym_translation('ACYM_FORMAT').'</div>';
-                    $formatOption .= '<div class="cell large-9 dcontentFormatContainer">';
+            $isTop = !empty($option['main']) || in_array($option['type'], ['pictures', 'checkbox'], true);
 
-                    $default = empty($defaultValues->format) ? 'TOP_LEFT' : $defaultValues->format;
-                    $formats = ['TOP_LEFT', 'TOP_RIGHT', 'TITLE_IMG', 'TITLE_IMG_RIGHT', 'CENTER_IMG', 'TOP_IMG', 'COL_LEFT', 'COL_RIGHT'];
-                    foreach ($formats as $oneFormat) {
-                        $class = 'button-radio';
-                        if ($default === $oneFormat) $class .= ' button-radio-selected';
+            if ($isTop) {
+                $topOptions[$option['title']] = ['kind' => 'field', 'option' => $option];
 
-                        $formatOption .= '<button 
-											class="'.$class.'" 
-											acym-button-radio-group="dcontentFormat'.$suffix.'" 
-											acym-data-type="'.$oneFormat.'"
-											acym-callback="'.$updateFunction.'">
-											<img alt="'.$oneFormat.'" src="'.ACYM_IMAGES.'editor/dcontent_formats/'.strtolower($oneFormat).'.png"/>
-										</button>';
-                    }
-                    $formatOption .= '</div>';
-
-                    if ($type === 'grouped') {
-                        $formatOption .= '<div class="cell large-3">'.acym_translation('ACYM_ALTERNATE').acym_info(['textShownInTooltip' => 'ACYM_ALTERNATE_DESC']).'</div>';
-                        $formatOption .= '<div class="cell large-9">';
-                        $formatOption .= acym_boolean(
-                            'alternate'.$suffix,
-                            !empty($defaultValues->alternate),
-                            'alternate'.$suffix,
-                            ['onclick' => $updateFunction.'();']
-                        );
-                        $formatOption .= '</div>';
-
-                        $jsOptionsMerge[] = 'var alternate = jQuery(\'input[name="alternate'.$suffix.'"]:checked\').val();';
-                        $jsOptionsMerge[] = 'if (!acym_helper.empty(alternate)) otherinfo += "| alternate";';
-                    }
-
-                    $formatOption .= '</div>';
-
-                    $jsOptionsMerge[] = 'var selectedFormatOption = jQuery(\'.button-radio-selected[acym-button-radio-group="dcontentFormat'.$suffix.'"]\')';
-                    $jsOptionsMerge[] = 'if (!acym_helper.empty(selectedFormatOption)) otherinfo += "| format:" + selectedFormatOption.attr("acym-data-type");';
-
-                    $outputStructure['topOptions']['ACYM_FORMAT'] = $formatOption;
+                // The format block is attached right after the "display" checkbox.
+                if (
+                    $option['type'] === 'checkbox'
+                    && $option['title'] === 'ACYM_DISPLAY'
+                    && (!isset($option['format']) || $option['format'])
+                ) {
+                    $topOptions['ACYM_FORMAT'] = ['kind' => 'format', 'option' => $option];
                 }
                 continue;
             }
 
-            if (empty($option['section'])) {
-                $option['section'] = 'ACYM_OTHER_OPTIONS';
-            }
-
-            $currentLabel = acym_translation($currentLabel);
-            if (!empty($option['tooltip'])) {
-                $currentLabel .= '&nbsp;'.acym_info(['textShownInTooltip' => $option['tooltip'], 'classIcon' => 'acym_plugin_field_'.$option['name']]);
-            }
-            $currentLabel = '<label class="cell large-5 acym_plugin_field acym_plugin_field_'.$option['type'].'" for="'.acym_escape(
-                    $option['name'].$suffix
-                ).'">'.$currentLabel.'</label>';
-
-            $outputStructure['options'][$option['section']][$currentLabel] = $currentOption;
+            $section = empty($option['section']) ? 'ACYM_OTHER_OPTIONS' : $option['section'];
+            $sections[$section][$option['name']] = $option;
         }
 
-        if (!empty($outputStructure['options'])) {
-            if (isset($outputStructure['options']['ACYM_OTHER_OPTIONS'])) {
-                $otherOptions = $outputStructure['options']['ACYM_OTHER_OPTIONS'];
-                unset($outputStructure['options']['ACYM_OTHER_OPTIONS']);
-                $outputStructure['options']['ACYM_OTHER_OPTIONS'] = $otherOptions;
+        // "Other Options" is always rendered last.
+        if (isset($sections['ACYM_OTHER_OPTIONS'])) {
+            $otherOptions = $sections['ACYM_OTHER_OPTIONS'];
+            unset($sections['ACYM_OTHER_OPTIONS']);
+            $sections['ACYM_OTHER_OPTIONS'] = $otherOptions;
+        }
+
+        // ---- Phase 2: render (echo directly, in the original visual order) ----
+        foreach ($topOptions as $headerLabel => $entry) {
+            $this->displayPanelHeader($headerLabel);
+            echo '<div class="acym__wysid__right__toolbar__design--show acym__wysid__right__toolbar__design acym__wysid__context__modal__container grid-x">';
+            if ($entry['kind'] === 'format') {
+                $this->displayFormatPanel($suffix, $updateFunction, $type, $defaultValues);
+            } else {
+                $this->displayOptionField($entry['option'], $suffix, $updateFunction, $defaultValues);
             }
+            echo '</div>';
+        }
 
-            foreach ($outputStructure['options'] as $section => $options) {
-                $formattedOptions = '';
-                foreach ($options as $label => $option) {
-                    $formattedOptions .= '<div class="cell grid-x margin-bottom-1">'.$label;
-                    $formattedOptions .= '<div class="cell large-7">'.$option.'</div>';
-                    $formattedOptions .= '</div>';
-                }
-                $outputStructure['topOptions'][$section] = $formattedOptions;
+        foreach ($sections as $sectionName => $sectionOptions) {
+            $this->displayPanelHeader($sectionName);
+            echo '<div class="acym__wysid__right__toolbar__design--show acym__wysid__right__toolbar__design acym__wysid__context__modal__container grid-x">';
+            foreach ($sectionOptions as $option) {
+                echo '<div class="cell grid-x margin-bottom-1">';
+                $this->displayFieldLabel($option, $suffix);
+                echo '<div class="cell large-7">';
+                $this->displayOptionField($option, $suffix, $updateFunction, $defaultValues);
+                echo '</div>';
+                echo '</div>';
             }
+            echo '</div>';
         }
 
-        $output = '';
-        if (!empty($outputStructure['topOptions'])) {
-            foreach ($outputStructure['topOptions'] as $label => $oneOption) {
-                $output .= '<p class="acym__wysid__right__toolbar__p acym__wysid__right__toolbar__p__open acym__title">';
-                $output .= acym_translation($label).'<i class="acymicon-keyboard-arrow-up"></i>';
-                $output .= '</p>';
-                $output .= '<div class="acym__wysid__right__toolbar__design--show acym__wysid__right__toolbar__design acym__wysid__context__modal__container grid-x">';
-                $output .= $oneOption;
-                $output .= '</div>';
-            }
-        }
-
-        $storageVar = 'window._additionalInfo'.$suffix;
-        $output .= '
-            <script type="text/javascript">
-                var _selectedRows'.$suffix.' = [];
-                var _selectedRows = [];
-                '.$storageVar.' = '.$storageVar.' || {};
-                ';
-        if (!empty($defaultValues->id) && (empty($defaultValues->defaultPluginTab) || $dynamicIdentifier === $defaultValues->defaultPluginTab)) {
-            $delimiter = strpos($defaultValues->id, '-') ? '-' : ',';
-            $selected = explode($delimiter, $defaultValues->id);
-
-            foreach ($selected as $value) {
-                if (empty($value)) continue;
-                $output .= '_selectedRows'.$suffix.'['.intval($value).'] = true;
-                ';
-            }
-        }
-
-        $output .= '
-                function applyContent'.$suffix.'(contentid, row){
-                    if(_selectedRows'.$suffix.'[contentid]){
-                        jQuery(row).removeClass("selected_row");
-                        delete _selectedRows'.$suffix.'[contentid];
-                    }else{
-                    ';
-
-        if ('individual' === $type) {
-            $output .= '
-						for(let elementKey in _selectedRows'.$suffix.') {
-							if(!_selectedRows'.$suffix.'.hasOwnProperty(elementKey)) continue;
-							
-							jQuery(\'[data-id="\' + elementKey + \'"]\').removeClass("selected_row");
-                        	delete _selectedRows'.$suffix.'[elementKey];
-						}
-				';
-        }
-
-        $output .= '
-                        jQuery(row).addClass("selected_row");
-                        _selectedRows'.$suffix.'[contentid] = true;
-                    }
-                    '.$updateFunction.'();
-                    
-                    if(typeof _selectedRows !== "undefined"){
-                        _selectedRows = _selectedRows'.$suffix.';
-                    }
-                }
-    
-                function '.$updateFunction.'(){
-                    var tag = "";
-                    var otherinfo = "";
-    
-                    '.implode("\r\n\r\n", $jsOptionsMerge).'
-    
-    				for (let [index, info] of Object.entries('.$storageVar.')){
-    					otherinfo += "| "+index+":"+info;
-    				}
-                    ';
-
-        if ($type == 'individual') {
-            $output .= '
-                    for(var i in _selectedRows'.$suffix.'){
-                        if(!_selectedRows'.$suffix.'.hasOwnProperty(i)) continue;
-                        
-                        tag = tag + "{'.$dynamicIdentifier.':" + i + otherinfo + "}";
-                    }';
-        } elseif ($type == 'grouped') {
-            $output .= '
-                    tag = "{'.$dynamicIdentifier.':";
-                    for(var icat in _selectedRows'.$suffix.'){
-                        if(!_selectedRows'.$suffix.'.hasOwnProperty(icat)) continue;
-                        tag += icat + "-";
-                    }
-                    tag += otherinfo + "}";';
-        } elseif ($type == 'simple') {
-            $output .= '
-                    tag = "{'.$dynamicIdentifier.':" + otherinfo + "}";';
-        }
-
-        $output .= '
-                    acym_editorWysidDynamic.insertDContent(tag);
-                }
-               
-                function addAdditionalInfo'.$suffix.'(index, value){
-                	'.$storageVar.'[index] = value;
-                	'.$updateFunction.'();
-                }
-            </script>';
+        // ---- Phase 3: the inline script + individual extras ----
+        $this->displayDynamicScript($jsOptionsMerge, $suffix, $updateFunction, $dynamicIdentifier, $type, $defaultValues);
 
         if ($type === 'individual') {
-            acym_trigger('displayCustomViewEditor', [&$output], 'plgAcym'.ucfirst($dynamicIdentifier));
-            $output .= '<input type="hidden" id="acym__dynamic__update__function" value="'.$updateFunction.'">';
+            acym_trigger('displayCustomViewEditor', [], 'plgAcym'.ucfirst($dynamicIdentifier));
+            echo '<input type="hidden" id="acym__dynamic__update__function" value="'.esc_attr($updateFunction).'">';
         }
-
-        echo $output;
     }
 
+    private function displayPanelHeader(string $labelKey): void
+    {
+        echo '<p class="acym__wysid__right__toolbar__p acym__wysid__right__toolbar__p__open acym__title">';
+        echo esc_html(acym_translation($labelKey));
+        echo '<i class="acymicon-keyboard-arrow-up"></i>';
+        echo '</p>';
+    }
+
+    private function displayFieldLabel(array $option, string $suffix): void
+    {
+        echo '<label class="cell large-5 acym_plugin_field acym_plugin_field_'.esc_attr($option['type']).'" for="'.esc_attr($option['name'].$suffix).'">';
+        echo esc_html(acym_translation($option['title']));
+        if (!empty($option['tooltip'])) {
+            echo '&nbsp;';
+            acym_info(
+                [
+                    'textShownInTooltip' => $option['tooltip'],
+                    'classIcon' => 'acym_plugin_field_'.$option['name'],
+                ]
+            );
+        }
+        echo '</label>';
+    }
+
+    private function displayOptionField(array $option, string $suffix, string $updateFunction, $defaultValues): void
+    {
+        switch ($option['type']) {
+            case 'pictures':
+                $this->displayPicturesField($option, $suffix, $updateFunction, $defaultValues);
+                break;
+            case 'checkbox':
+                $this->displayCheckboxField($option, $suffix, $updateFunction);
+                break;
+            case 'boolean':
+                acym_boolean($option['name'].$suffix, $option['default'], $option['name'].$suffix, ['onclick' => $updateFunction.'();']);
+                break;
+            case 'radio':
+                $this->displayRadioField($option, $suffix, $updateFunction);
+                break;
+            case 'select':
+                $this->displaySelectField($option, $suffix, $updateFunction);
+                break;
+            case 'multiselect':
+                $this->displayMultiselectField($option, $suffix, $updateFunction);
+                break;
+            case 'text':
+                $default = $option['default'] ?? '';
+                $class = empty($option['class']) ? 'acym_plugin_text_field' : $option['class'];
+                echo '<input type="text" 
+                            name="'.esc_attr($option['name'].$suffix).'" 
+                            id="'.esc_attr($option['name'].$suffix).'" 
+                            onchange="'.esc_attr($updateFunction).'();" 
+                            value="'.esc_attr($default).'" 
+                            class="'.esc_attr($class).'"';
+                if (!empty($option['placeholder'])) {
+                    echo ' placeholder="'.esc_attr($option['placeholder']).'"';
+                }
+                echo '/>';
+                break;
+            case 'number':
+                $class = empty($option['class']) ? 'acym_plugin_text_field' : $option['class'];
+                echo '<input type="number" 
+                            min="'.esc_attr(empty($option['min']) ? '0' : $option['min']).'" 
+                            id="'.esc_attr($option['name'].$suffix).'" 
+                            onchange="'.esc_attr($updateFunction).'();" 
+                            value="'.intval($option['default']).'" 
+                            name="'.esc_attr($option['name'].$suffix).'" 
+                            class="'.esc_attr($class).'" ';
+                if (!empty($option['max'])) {
+                    echo ' max="'.esc_attr($option['max']).'"';
+                }
+                echo ' />';
+                break;
+            case 'intextfield':
+                $inputType = (!empty($option['isNumber']) && $option['isNumber'] === 1) ? 'number' : 'text';
+                echo wp_kses(
+                    acym_translationSprintf(
+                        $option['text'],
+                        '<input type="'.esc_attr($inputType).'"
+                            name="'.esc_attr($option['name'].$suffix).'"
+                            id="'.esc_attr($option['name'].$suffix).'"
+                            class="intext_input"
+                            value="'.esc_attr($option['default']).'"
+                            onchange="'.esc_attr($updateFunction).'();"/>'
+                    ),
+                    [
+                        'input' => [
+                            'type' => true,
+                            'name' => true,
+                            'id' => true,
+                            'class' => true,
+                            'value' => true,
+                            'onchange' => true,
+                        ],
+                    ]
+                );
+                break;
+            case 'date':
+                $relativeTime = empty($option['relativeDate']) ? '-' : $option['relativeDate'];
+                $dateDefault = $option['default'];
+                if (!empty($dateDefault) && !is_numeric($dateDefault) && strpos($dateDefault, '[time]') === false) {
+                    $dateDefault = strtotime($dateDefault);
+                }
+                echo wp_kses(
+                    acym_dateField($option['name'].$suffix, $dateDefault, '', ' onchange="'.esc_attr($updateFunction).'();"', $relativeTime),
+                    SecurityHelper::ALLOWED_HTML_DATE
+                );
+                break;
+            case 'language':
+                $this->displayLanguageField($option, $suffix, $updateFunction);
+                break;
+            case 'custom':
+                echo $option['output'];
+                break;
+        }
+    }
+
+    private function displayPicturesField(array $option, string $suffix, string $updateFunction, $defaultValues): void
+    {
+        $displayedPictures = $option['default'] ?? 'resized';
+        if (isset($defaultValues->pict)) {
+            $displayedPictures = $defaultValues->pict;
+        }
+        $maxWidth = $defaultValues->maxwidth ?? 150;
+        $maxHeight = $defaultValues->maxheight ?? 150;
+
+        $valImages = [
+            acym_selectOption('1', 'ACYM_YES'),
+            acym_selectOption('resized', 'ACYM_RESIZED'),
+            acym_selectOption('0', 'ACYM_NO'),
+        ];
+
+        echo '<div class="cell large-5 acym_plugin_field">';
+        echo esc_html(acym_translation('ACYM_DISPLAY'));
+        echo '</div>';
+        echo '<div class="cell large-7">';
+        acym_radio(
+            $valImages,
+            'pict'.$suffix,
+            $displayedPictures,
+            ['onclick' => $updateFunction.'();'],
+            ['containerClass' => 'dcontent_pictures'],
+            !acym_isAdmin()
+        );
+        echo '</div>';
+
+        echo '<div id="pictsize'.esc_attr($suffix).'" class="cell grid-x margin-y margin-top-1"';
+        if ('resized' !== $displayedPictures) {
+            echo ' style="display: none;"';
+        }
+        echo '>';
+        echo '<div class="cell large-5 acym_plugin_field">';
+        echo esc_html(acym_translation('ACYM_MAX_WIDTH'));
+        echo '</div>';
+        echo '<div class="cell large-7">';
+        echo '<input class="intext_input" 
+                    name="pictwidth'.esc_attr($suffix).'" 
+                    type="number" 
+                    onchange="'.esc_attr($updateFunction).'();" 
+                    value="'.intval($maxWidth).'"/>';
+        echo '</div>';
+        echo '<div class="cell large-5 acym_plugin_field">';
+        echo esc_html(acym_translation('ACYM_MAX_HEIGHT'));
+        echo '</div>';
+        echo '<div class="cell large-7">';
+        echo '<input class="intext_input" 
+                    name="pictheight'.esc_attr($suffix).'" 
+                    type="number" 
+                    onchange="'.esc_attr($updateFunction).'();" 
+                    value="'.intval($maxHeight).'"/>';
+        echo '</div>';
+        echo '</div>';
+
+        if (!empty($option['caption'])) {
+            echo '<div class="cell grid-x margin-top-1">';
+            echo '<label class="cell large-5 acym_plugin_field">';
+            echo esc_html(acym_translation('ACYM_CAPTION'));
+            echo '</label>';
+            acym_radio(
+                [
+                    acym_selectOption('1', 'ACYM_YES'),
+                    acym_selectOption('0', 'ACYM_NO'),
+                ],
+                'caption'.$suffix,
+                $defaultValues->caption ?? '0',
+                ['onclick' => $updateFunction.'();'],
+                ['containerClass' => 'cell large-7']
+            );
+            echo '</div>';
+        }
+    }
+
+    private function displayCheckboxField(array $option, string $suffix, string $updateFunction): void
+    {
+        if (!empty($option['default'])) {
+            $checkedValues = explode(',', $option['default']);
+            foreach ($option['options'] as $key => $oneOption) {
+                $oneOption[1] = in_array($key, $checkedValues);
+                $option['options'][$key] = $oneOption;
+            }
+        }
+
+        echo '<div class="cell grid-x">';
+        foreach ($option['options'] as $value => $title) {
+            echo '<div class="cell medium-6" ';
+            if (!empty($title[2]) && is_array($title[2])) {
+                foreach ($title[2] as $attribute => $value) {
+                    echo esc_attr($attribute).'="'.esc_attr($value).'"';
+                }
+            }
+            echo '>';
+            echo '<input type="checkbox" 
+                        name="'.esc_attr($option['name'].$suffix).'" 
+                        value="'.esc_attr($value).'" 
+                        id="'.esc_attr($value.$suffix).'" 
+                        onclick="'.esc_attr($updateFunction).'();" ';
+            acym_checked((bool)$title[1]);
+            echo ' />';
+            echo '<label style="margin-left:5px" for="'.esc_attr($value.$suffix).'">';
+            echo esc_html(acym_translation($title[0]));
+            echo '</label>';
+            echo '</div>';
+        }
+        echo '</div>';
+    }
+
+    private function displayRadioField(array $option, string $suffix, string $updateFunction): void
+    {
+        $radioOptions = [];
+        foreach ($option['options'] as $value => $title) {
+            $radioOptions[] = acym_selectOption($value, $title);
+        }
+        acym_radio(
+            $radioOptions,
+            $option['name'].$suffix,
+            $option['default'],
+            ['onclick' => $updateFunction.'();'],
+            ['pluginMode' => true],
+            !acym_isAdmin()
+        );
+    }
+
+    private function displaySelectField(array $option, string $suffix, string $updateFunction): void
+    {
+        $selectOptions = [];
+        foreach ($option['options'] as $value => $title) {
+            if (is_object($title)) {
+                $selectOptions[] = acym_selectOption($title->value, $title->text);
+            } else {
+                $selectOptions[] = acym_selectOption($value, $title);
+            }
+        }
+
+        $default = empty($option['default']) ? null : $option['default'];
+        $defaultOrder = null;
+        if (!empty($default) && strpos($default, ',')) {
+            [$default, $defaultOrder] = explode(',', $default);
+        }
+
+        $attributes = [
+            'onchange' => $updateFunction.'();',
+            'id' => $option['name'].$suffix,
+        ];
+        if ($option['name'] === 'order') {
+            $attributes['class'] = 'acym__dynamics__ordering__select';
+        }
+
+        acym_select(
+            $selectOptions,
+            $option['name'].$suffix,
+            $default,
+            $attributes,
+            'value',
+            'text',
+            null,
+            false,
+            true
+        );
+
+        if ($option['name'] === 'order') {
+            $dirs = [
+                'desc' => acym_translation('ACYM_DESC'),
+                'asc' => acym_translation('ACYM_ASC'),
+            ];
+            if (empty($defaultOrder)) {
+                $defaultOrder = empty($option['defaultdir']) ? null : $option['defaultdir'];
+            }
+            echo ' ';
+            acym_select(
+                $dirs,
+                'orderdir'.$suffix,
+                $defaultOrder,
+                [
+                    'onchange' => $updateFunction.'();',
+                    'style' => 'width: 115px;',
+                    'class' => 'acym__dynamics__ordering__select',
+                ],
+                'value',
+                'text',
+                null,
+                false,
+                true
+            );
+        }
+    }
+
+    private function displayMultiselectField(array $option, string $suffix, string $updateFunction): void
+    {
+        $selectOptions = [];
+        foreach ($option['options'] as $value => $title) {
+            $selectOptions[] = acym_selectOption($value, $title);
+        }
+
+        if (!isset($option['default'])) {
+            $option['default'] = [];
+        }
+        if (!is_array($option['default'])) {
+            $option['default'] = explode(',', $option['default']);
+        }
+
+        acym_selectMultiple(
+            $selectOptions,
+            $option['name'].$suffix,
+            $option['default'],
+            ['onchange' => $updateFunction.'();', 'id' => $option['name'].$suffix],
+            'value',
+            'text',
+            true
+        );
+    }
+
+    private function displayLanguageField(array $option, string $suffix, string $updateFunction): void
+    {
+        $languageOptions = ['any' => acym_translation('ACYM_ANY')];
+        foreach (acym_getLanguages(true) as $language) {
+            $languageOptions[$language->language] = $language->name;
+        }
+
+        if (empty($option['default'])) {
+            $option['default'] = acym_getVar('string', 'language');
+            if (acym_isMultilingual() && (empty($option['default']) || $option['default'] === 'main')) {
+                $option['default'] = $this->config->get('multilingual_default');
+            }
+        }
+
+        acym_select(
+            $languageOptions,
+            $option['name'].$suffix,
+            empty($option['default']) ? null : $option['default'],
+            ['onchange' => $updateFunction.'();', 'id' => $option['name'].$suffix],
+            'value',
+            'text',
+            null,
+            false,
+            true
+        );
+    }
+
+    private function displayFormatPanel(string $suffix, string $updateFunction, string $type, $defaultValues): void
+    {
+        echo '<div class="grid-x">';
+        echo '<div class="cell large-3">';
+        echo esc_html(acym_translation('ACYM_FORMAT'));
+        echo '</div>';
+        echo '<div class="cell large-9 dcontentFormatContainer">';
+
+        $default = empty($defaultValues->format) ? 'TOP_LEFT' : $defaultValues->format;
+        $formats = ['TOP_LEFT', 'TOP_RIGHT', 'TITLE_IMG', 'TITLE_IMG_RIGHT', 'CENTER_IMG', 'TOP_IMG', 'COL_LEFT', 'COL_RIGHT'];
+        foreach ($formats as $oneFormat) {
+            $class = 'button-radio';
+            if ($default === $oneFormat) {
+                $class .= ' button-radio-selected';
+            }
+            echo '<button class="'.esc_attr($class).'" 
+                        acym-button-radio-group="dcontentFormat'.esc_attr($suffix).'" 
+                        acym-data-type="'.esc_attr($oneFormat).'" 
+                        acym-callback="'.esc_attr($updateFunction).'">';
+            echo '<img alt="'.esc_attr($oneFormat).'" src="'.esc_url(ACYM_IMAGES.'editor/dcontent_formats/'.strtolower($oneFormat).'.png').'"/>';
+            echo '</button>';
+        }
+        echo '</div>';
+
+        if ($type === 'grouped') {
+            echo '<div class="cell large-3">';
+            echo esc_html(acym_translation('ACYM_ALTERNATE'));
+            acym_info(['textShownInTooltip' => 'ACYM_ALTERNATE_DESC']);
+            echo '</div>';
+            echo '<div class="cell large-9">';
+            acym_boolean(
+                'alternate'.$suffix,
+                !empty($defaultValues->alternate),
+                'alternate'.$suffix,
+                ['onclick' => $updateFunction.'();']
+            );
+            echo '</div>';
+        }
+
+        echo '</div>';
+    }
+
+    private function appendOptionJs(array &$jsOptionsMerge, array $option, string $suffix, string $type): void
+    {
+        switch ($option['type']) {
+            case 'pictures':
+                if (!empty($option['caption'])) {
+                    $jsOptionsMerge[] = 'otherinfo += "| caption:" + jQuery(\'input[name="caption'.esc_attr($suffix).'"]:checked\').val();';
+                }
+                $jsOptionsMerge[] = '
+                var _pictVal'.esc_attr($suffix).' = jQuery(\'input[name="pict'.esc_attr($suffix).'"]:checked\').val();
+                otherinfo += "| pict:" + _pictVal'.esc_attr($suffix).';
+
+                if(_pictVal'.esc_attr($suffix).' == "resized"){
+                    jQuery("#pictsize'.esc_attr($suffix).'").show();
+                    otherinfo += "| maxwidth:" + jQuery(\'input[name="pictwidth'.esc_attr($suffix).'"]\').val();
+                    otherinfo += "| maxheight:" + jQuery(\'input[name="pictheight'.esc_attr($suffix).'"]\').val();
+                }else{
+                    jQuery("#pictsize'.esc_attr($suffix).'").hide();
+                }';
+                break;
+
+            case 'checkbox':
+                $separator = empty($option['separator']) ? ',' : $option['separator'];
+                $jsOptionsMerge[] = 'var _checked'.esc_attr($option['name'].$suffix).' = [];
+                jQuery("input:checkbox[name='.esc_attr($option['name'].$suffix).']:checked").each(function(){
+                    _checked'.esc_attr($option['name'].$suffix).'.push(jQuery(this).val());
+                });
+                if(_checked'.esc_attr($option['name'].$suffix).'.length) otherinfo += "| '.esc_attr($option['name']).':" + _checked'.esc_attr(
+                        $option['name'].$suffix
+                    ).'.join("'.esc_attr($separator).'");';
+
+                if ($option['title'] === 'ACYM_DISPLAY' && (!isset($option['format']) || $option['format'])) {
+                    if ($type === 'grouped') {
+                        $jsOptionsMerge[] = 'var alternate = jQuery(\'input[name="alternate'.esc_attr($suffix).'"]:checked\').val();';
+                        $jsOptionsMerge[] = 'if (!acym_helper.empty(alternate)) otherinfo += "| alternate";';
+                    }
+                    $jsOptionsMerge[] = 'var selectedFormatOption = jQuery(\'.button-radio-selected[acym-button-radio-group="dcontentFormat'.esc_attr($suffix).'"]\')';
+                    $jsOptionsMerge[] = 'if (!acym_helper.empty(selectedFormatOption)) otherinfo += "| format:" + selectedFormatOption.attr("acym-data-type");';
+                }
+                break;
+
+            case 'boolean':
+            case 'radio':
+                $jsOptionsMerge[] = 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'input[name="'.esc_attr($option['name'].$suffix).'"]:checked\').val();';
+                break;
+
+            case 'select':
+                if ($option['name'] === 'order') {
+                    $jsOptionsMerge[] = 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'[name="'.esc_attr(
+                            $option['name'].$suffix
+                        ).'"]\').val() + "," + jQuery(\'[name="orderdir'.esc_attr($suffix).'"]\').val();';
+                } else {
+                    $jsOptionsMerge[] = 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'[name="'.esc_attr($option['name'].$suffix).'"]\').val();';
+                }
+                break;
+
+            case 'language':
+                $jsOptionsMerge[] = 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'[name="'.esc_attr($option['name'].$suffix).'"]\').val();';
+                break;
+
+            case 'multiselect':
+                $jsOptionsMerge[] = '
+                var theMultiSelect = document.querySelector(\'[name="'.esc_attr($option['name'].$suffix).'[]"]\');
+                var selectedOptions = [];
+                for(var i = 0 ; i < theMultiSelect.length ; i++){
+                    if(theMultiSelect[i].selected){
+                        selectedOptions.push(theMultiSelect[i].value);
+                    }
+                }
+                otherinfo += "| '.esc_attr($option['name']).':" + selectedOptions.join(",");';
+                break;
+
+            case 'text':
+            case 'number':
+            case 'intextfield':
+            case 'date':
+                $jsOptionsMerge[] = 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'input[name="'.esc_attr($option['name'].$suffix).'"]\').val();';
+                break;
+
+            case 'custom':
+                //TODO
+                $jsOptionsMerge[] = $option['js'];
+                break;
+        }
+    }
+
+    private function displayDynamicScript(array $jsOptionsMerge, string $suffix, string $updateFunction, string $dynamicIdentifier, string $type, $defaultValues): void
+    {
+        $storageVar = 'window._additionalInfo'.$suffix;
+
+        echo '<script type="text/javascript">';
+        echo 'var _selectedRows'.esc_attr($suffix).' = [];';
+        echo 'var _selectedRows = [];';
+        echo esc_attr($storageVar).' = '.esc_attr($storageVar).' || {};';
+
+        if (!empty($defaultValues->id) && (empty($defaultValues->defaultPluginTab) || $dynamicIdentifier === $defaultValues->defaultPluginTab)) {
+            $delimiter = strpos($defaultValues->id, '-') ? '-' : ',';
+            foreach (explode($delimiter, $defaultValues->id) as $value) {
+                if (empty($value)) {
+                    continue;
+                }
+                echo '_selectedRows'.esc_attr($suffix).'['.intval($value).'] = true;';
+            }
+        }
+
+        echo 'function applyContent'.esc_attr($suffix).'(contentid, row){';
+        echo 'if(_selectedRows'.esc_attr($suffix).'[contentid]){';
+        echo 'jQuery(row).removeClass("selected_row");';
+        echo 'delete _selectedRows'.esc_attr($suffix).'[contentid];';
+        echo '}else{';
+        if ($type === 'individual') {
+            echo 'for(let elementKey in _selectedRows'.esc_attr($suffix).') {';
+            echo 'if(!_selectedRows'.esc_attr($suffix).'.hasOwnProperty(elementKey)) continue;';
+            echo 'jQuery(\'[data-id="\' + elementKey + \'"]\').removeClass("selected_row");';
+            echo 'delete _selectedRows'.esc_attr($suffix).'[elementKey];';
+            echo '}';
+        }
+        echo 'jQuery(row).addClass("selected_row");';
+        echo '_selectedRows'.esc_attr($suffix).'[contentid] = true;';
+        echo '}';
+        echo esc_attr($updateFunction).'();';
+        echo 'if(typeof _selectedRows !== "undefined"){ _selectedRows = _selectedRows'.esc_attr($suffix).'; }';
+        echo '}';
+
+        echo 'function '.esc_attr($updateFunction).'(){';
+        echo 'var tag = ""; var otherinfo = "";';
+        echo implode("\r\n\r\n", $jsOptionsMerge);
+        echo 'for (let [index, info] of Object.entries('.esc_attr($storageVar).')){ otherinfo += "| "+index+":"+info; }';
+
+        if ($type === 'individual') {
+            echo 'for(var i in _selectedRows'.esc_attr($suffix).'){';
+            echo 'if(!_selectedRows'.esc_attr($suffix).'.hasOwnProperty(i)) continue;';
+            echo 'tag = tag + "{'.esc_attr($dynamicIdentifier).':" + i + otherinfo + "}";';
+            echo '}';
+        } elseif ($type === 'grouped') {
+            echo 'tag = "{'.esc_attr($dynamicIdentifier).':";';
+            echo 'for(var icat in _selectedRows'.esc_attr($suffix).'){';
+            echo 'if(!_selectedRows'.esc_attr($suffix).'.hasOwnProperty(icat)) continue;';
+            echo 'tag += icat + "-";';
+            echo '}';
+            echo 'tag += otherinfo + "}";';
+        } elseif ($type === 'simple') {
+            echo 'tag = "{'.esc_attr($dynamicIdentifier).':" + otherinfo + "}";';
+        }
+
+        echo 'acym_editorWysidDynamic.insertDContent(tag);';
+        echo '}';
+
+        echo 'function addAdditionalInfo'.esc_attr($suffix).'(index, value){';
+        echo esc_attr($storageVar).'[index] = value;';
+        echo esc_attr($updateFunction).'();';
+        echo '}';
+        echo '</script>';
+    }
+
+    /**
+     * In Joomla, we can translate elements in extensions using the FaLang extension
+     */
     public function translateItem(object &$item, object &$tag, string $referenceTable, int $referenceId = 0): void
     {
         if (!acym_isExtensionActive('com_falang')) {
@@ -1348,7 +1609,9 @@ class PluginHelper extends AcymObject
         $email->stylesheet = '';
         $email->attachments = '';
 
+        // This is only the dynamic text/content code
         $email->body = $code;
+        // This is the whole editor current content
         $email->previewBody = $previewBody;
 
         return $email;

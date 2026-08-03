@@ -1,6 +1,9 @@
+<?php
+defined('ABSPATH') || die('Restricted Access');
+?>
 <div id="acym__scenario__edit">
-	<form id="acym_form" action="<?php echo acym_completeLink(acym_getVar('cmd', 'ctrl')); ?>" method="post" name="acyForm" data-abide novalidate>
-		<div class="acym__content" id="acym__scenario__edit__container" data-acym-step-ids="<?php echo acym_escape(json_encode($data['allScenarioStepIds'])); ?>">
+	<form id="acym_form" action="<?php echo esc_url(acym_completeLink(acym_getVar('cmd', 'ctrl'))); ?>" method="post" name="acyForm" data-abide novalidate>
+		<div class="acym__content" id="acym__scenario__edit__container" data-acym-step-ids="<?php echo esc_attr(json_encode($data['allScenarioStepIds'])); ?>">
             <?php
             include acym_getView('scenarios', 'scenario_top_actions');
             include acym_getView('scenarios', 'edit_scenario_flow');
@@ -9,23 +12,23 @@
 				<div class="auto cell"></div>
 				<div class="cell shrink grid-x">
 					<button type="button"
-							class="margin-right-1 shrink button button-secondary acy_button_submit"
-							data-task="saveExit"
-							data-before-action="scenario"
+					        class="margin-right-1 shrink button button-secondary acy_button_submit"
+					        data-task="saveExit"
+					        data-before-action="scenario"
 					>
-                        <?php echo acym_translation('ACYM_SAVE_EXIT'); ?>
+                        <?php echo esc_html(acym_translation('ACYM_SAVE_EXIT')); ?>
 					</button>
 					<button
 							type="button"
 							class="shrink button acy_button_submit" data-task="save"
 							data-before-action="scenario"
 					>
-                        <?php echo acym_translation('ACYM_SAVE_CONTINUE'); ?>
+                        <?php echo esc_html(acym_translation('ACYM_SAVE_CONTINUE')); ?>
 					</button>
 				</div>
 			</div>
 		</div>
-		<input type="hidden" name="scenarioId" value="<?php echo empty($data['scenario']->id) ? '' : $data['scenario']->id; ?>">
+		<input type="hidden" name="scenarioId" value="<?php echo empty($data['scenario']->id) ? '' : esc_attr($data['scenario']->id); ?>">
         <?php acym_formOptions(); ?>
 	</form>
 </div>

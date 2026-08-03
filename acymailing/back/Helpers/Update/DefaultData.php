@@ -123,6 +123,7 @@ trait DefaultData
 
         $addNotif = [];
 
+        // Email sent with the cron report
         if (empty($notifications['acy_report'])) {
             $addNotif[] = [
                 'name' => 'acy_report',
@@ -131,6 +132,7 @@ trait DefaultData
             ];
         }
 
+        // Confirmation email for double opt-in
         if (empty($notifications['acy_confirm'])) {
             $addNotif[] = [
                 'name' => 'acy_confirm',
@@ -300,7 +302,7 @@ trait DefaultData
                 $notif->settings = $oneNotif['settings'] ?? '';
                 $notif->drag_editor = $oneNotif['drag_editor'] ?? 1;
                 $notif->creator_id = acym_currentUserId();
-                $notif->creation_date = date('Y-m-d H:i:s', time() - date('Z'));
+                $notif->creation_date = gmdate('Y-m-d H:i:s', time());
                 $notif->name = $oneNotif['name'];
                 $notif->subject = $oneNotif['subject'];
                 $notif->body = $oneNotif['content'];
@@ -356,7 +358,7 @@ trait DefaultData
 
             $mail = new \stdClass();
             $mail->name = $oneOverride['name'];
-            $mail->creation_date = date('Y-m-d H:i:s', time() - date('Z'));
+            $mail->creation_date = gmdate('Y-m-d H:i:s', time());
             $mail->type = MailClass::TYPE_OVERRIDE;
             $mail->subject = $oneOverride['new_subject'];
             $mail->body = $this->getFormatedNotification($oneOverride['new_body']);
@@ -446,7 +448,7 @@ trait DefaultData
         $mailAutomation->type = MailClass::TYPE_AUTOMATION;
         $mailAutomation->drag_editor = 1;
         $mailAutomation->creator_id = acym_currentUserId();
-        $mailAutomation->creation_date = date('Y-m-d H:i:s', time() - date('Z'));
+        $mailAutomation->creation_date = gmdate('Y-m-d H:i:s', time());
         $mailAutomation->name = acym_translation($info[$title]->emailTitle);
         $mailAutomation->subject = acym_translation($info[$title]->emailSubject);
         $mailAutomation->body = $this->getFormatedNotification($info[$title]->emailContent);
@@ -466,7 +468,7 @@ trait DefaultData
 
     private function getDTextDisplay(string $dtext, string $preview): string
     {
-        $display = '<span class="acym_dynamic mceNonEditable" contenteditable="false" data-dynamic="'.acym_escape($dtext).'" data-mce-selected="1">';
+        $display = '<span class="acym_dynamic mceNonEditable" contenteditable="false" data-dynamic="'.esc_attr($dtext).'" data-mce-selected="1">';
         $display .= $preview;
         $display .= '<em class="acym_remove_dynamic acymicon-close">&zwj;</em>';
         $display .= '</span>';

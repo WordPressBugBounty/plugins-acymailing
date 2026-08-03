@@ -1,4 +1,5 @@
 <?php
+defined('ABSPATH') || die('Restricted Access');
 
 use AcyMailing\Core\AcymPlugin;
 

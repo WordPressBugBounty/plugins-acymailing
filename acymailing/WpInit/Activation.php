@@ -2,21 +2,28 @@
 
 namespace AcyMailing\WpInit;
 
+defined('ABSPATH') || die('Restricted Access');
+
 use AcyMailing\Helpers\UpdateHelper;
 
 class Activation
 {
+    // Install DB and sample data
     public function install(): void
     {
         $file_name = rtrim(dirname(__DIR__), DS).DS.'back'.DS.'tables.sql';
-        $handle = fopen($file_name, 'r');
-        $queries = fread($handle, filesize($file_name));
-        fclose($handle);
+        $queries = acym_getInternalFileContents($file_name);
 
+        if ($queries === false) {
+            return;
+        }
+
+        // If it is a network activation (activate on all websites)
         if (is_multisite() && is_network_admin()) {
             $currentBlog = get_current_blog_id();
-            $sites = function_exists('get_sites') ? get_sites() : wp_get_sites();
+            $sites = get_sites();
 
+            // Install on all websites
             foreach ($sites as $site) {
                 if (is_object($site)) {
                     $site = get_object_vars($site);
@@ -25,13 +32,14 @@ class Activation
                 $this->sampledata($queries);
             }
 
+            // Switch back to network main site
             switch_to_blog($currentBlog);
         } else {
             $this->sampledata($queries);
         }
 
         if (file_exists(ACYM_FOLDER.'update.php')) {
-            unlink(ACYM_FOLDER.'update.php');
+            acym_deleteFile(ACYM_FOLDER.'update.php');
         }
     }
 
@@ -48,6 +56,7 @@ class Activation
                 continue;
             }
 
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.NotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter -- DDL schema creation during plugin install, caching and abstraction are not applicable here.
             $wpdb->query('CREATE TABLE IF NOT EXISTS'.$oneTable);
         }
 
@@ -65,6 +74,7 @@ class Activation
             return;
         }
 
+        //First we increase the perfs so that we won't have any surprise.
         acym_increasePerf();
 
         $updateHelper = new UpdateHelper();
@@ -101,6 +111,7 @@ class Activation
 
         $config->saveConfig(['installcomplete' => 1]);
 
+        // Reload conf
         acym_config(true);
     }
 }

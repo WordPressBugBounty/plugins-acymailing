@@ -8,6 +8,8 @@ trait Subscription
 {
     public function resetSubscription(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $userId = acym_getVar('int', 'userId');
 
         if (empty($userId)) {
@@ -32,6 +34,8 @@ trait Subscription
 
     public function unsubscribeUser(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $userId = acym_getVar('int', 'userId');
         if (empty($userId)) {
             $this->listing();
@@ -55,6 +59,8 @@ trait Subscription
 
     public function unsubscribeUserFromAll(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $userId = acym_getVar('int', 'userId');
 
         if (empty($userId)) {
@@ -83,6 +89,8 @@ trait Subscription
 
     public function resubscribeUserToAll(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $userId = acym_getVar('int', 'userId');
         if (empty($userId)) {
             $this->listing();
@@ -110,6 +118,11 @@ trait Subscription
 
     public function subscribeUser(bool $returnOnEdit = true, array $lists = [], bool $frontCreation = false): void
     {
+        // Called as a task (no argument) → require a CSRF token. Internal calls from apply() are already token-checked.
+        if (func_num_args() === 0) {
+            wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+        }
+
         $userId = acym_getVar('int', 'userId');
         if (empty($userId)) {
             $this->listing();
@@ -122,6 +135,7 @@ trait Subscription
             die('Access denied for subscribing this user');
         }
 
+        // Can be called from the user's edition page when re-subscribing to a list
         if (empty($lists)) {
             $lists = json_decode(acym_getVar('string', 'acym__entity_select__selected', '[]'), true);
             if (empty($lists)) {

@@ -201,6 +201,7 @@ class MigrationHelper extends AcymObject
 
     private function migrateConfig(array $params): int
     {
+        //Mail Settings
         $fieldsMatchMailSettings = [
             'add_names' => 'add_names',
             'bounce_email' => 'bounce_email',
@@ -235,6 +236,7 @@ class MigrationHelper extends AcymObject
             'special_chars' => 'special_chars',
         ];
 
+        //Queue Process
         $fieldsMatchQueueProcess = [
             'cron_frequency' => 'cron_frequency',
             'cron_fromip' => 'cron_fromip',
@@ -250,10 +252,12 @@ class MigrationHelper extends AcymObject
             'queue_type' => 'queue_type',
         ];
 
+        //Subscription
         $fieldsMatchSubscription = [
             'require_confirmation' => 'require_confirmation',
         ];
 
+        //Security
         $fieldsMatchSecurity = [
             'allowedfiles' => 'allowed_files',
             'email_checkdomain' => 'email_checkdomain',
@@ -273,6 +277,7 @@ class MigrationHelper extends AcymObject
             'welcome_message' => 'welcome_message',
         ];
 
+        //Bounce handling
         $fieldsMatchBounce = [
             'bounce_email' => 'bounce_email',
             'bounce_server' => 'bounce_server',
@@ -576,6 +581,7 @@ class MigrationHelper extends AcymObject
                     $value = preg_replace('@[^0-9]@', '/', $value);
                 }
                 if ('value' === $columnConnection[$key]) {
+                    //Decode value from v5
                     $allValues = explode("\n", $value);
                     $returnedValues = [];
                     foreach ($allValues as $id => $oneVal) {
@@ -756,14 +762,17 @@ class MigrationHelper extends AcymObject
                     $uploadFolder = str_replace(['/', '\\'], DS, acym_getFilesFolder());
                     $v7Location = $uploadFolder.$fileName;
 
+                    // if the file doesn't exist, don't add it
                     $v5Path = acym_cleanPath(ACYM_ROOT.DS.$oneAttachment->filename);
                     if (!file_exists($v5Path)) continue;
 
+                    // copy the file to the v7 files location
                     $v7Path = acym_cleanPath(ACYM_ROOT.DS.$v7Location);
                     if (!file_exists($v7Path)) {
                         acym_copyFile($v5Path, $v7Path);
                     }
 
+                    // add the attachment to the new mail entry
                     $mail['attachments'][] = (object)[
                         'filename' => $v7Location,
                         'size' => $oneAttachment->size,
@@ -772,6 +781,7 @@ class MigrationHelper extends AcymObject
             }
             $mail['attachments'] = acym_escapeDB(json_encode($mail['attachments']));
 
+            // Create the related campaign
             if ($mailType === MailClass::TYPE_STANDARD) {
                 $stats = acym_loadResult('SELECT COUNT(mailid) FROM #__acymailing_stats WHERE mailid = '.intval($oneMail->mailid));
                 $isSent = !empty($stats);
@@ -789,6 +799,7 @@ class MigrationHelper extends AcymObject
                 $campaignsToInsert[] = '('.implode(', ', $campaign).')';
             }
 
+            // Create the related follow-up
             if ($mailType === MailClass::TYPE_FOLLOWUP) {
                 $v5Campaign = acym_loadObject(
                     'SELECT l.listid, l.published, l.name 
@@ -797,6 +808,7 @@ class MigrationHelper extends AcymObject
                     WHERE mailid = '.intval($oneMail->mailid)
                 );
 
+                // If the followup campaign doesn't exist, create it
                 if (empty($followupsCreated[$v5Campaign->listid])) {
                     $followupListIds = acym_loadResultArray('SELECT listid FROM #__acymailing_listcampaign WHERE campaignid = '.intval($v5Campaign->listid));
                     $followupCampaign = new \stdClass();

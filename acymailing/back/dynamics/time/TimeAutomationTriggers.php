@@ -29,14 +29,14 @@ trait TimeAutomationTriggers
         $triggers['classic']['day']->option .= '<div class="cell medium-shrink">'.acym_select(
                 $hour,
                 '[triggers][classic][day][hour]',
-                empty($defaultValues['day']) ? date('H') : $defaultValues['day']['hour'],
+                empty($defaultValues['day']) ? acym_date('now', 'H') : $defaultValues['day']['hour'],
                 ['data-class' => 'intext_select acym__select']
             ).'</div>';
         $triggers['classic']['day']->option .= '<div class="cell medium-shrink acym_vcenter">:</div>';
         $triggers['classic']['day']->option .= '<div class="cell medium-auto">'.acym_select(
                 $minutes,
                 '[triggers][classic][day][minutes]',
-                empty($defaultValues['day']) ? date('i') : $defaultValues['day']['minutes'],
+                empty($defaultValues['day']) ? acym_date('now', 'i') : $defaultValues['day']['minutes'],
                 ['data-class' => 'intext_select acym__select']
             ).'</div>';
         $triggers['classic']['day']->option .= '</div>';
@@ -157,18 +157,23 @@ trait TimeAutomationTriggers
         $time = $data['time'];
         $triggers = $step->triggers;
 
+        // For each trigger of the automation, we'll calculate the next execution date. In the end we take the closest one
         $nextExecutionDate = [];
 
+        // Get the time the auto tasks should be triggered
         $dailyHour = $this->config->get('daily_hour', '12');
         $dailyMinute = $this->config->get('daily_minute', '00');
 
 
+        // Each time the cron is triggered
         if (!empty($triggers['asap'])) {
             $execute = true;
             $nextExecutionDate[] = $time;
         }
 
+        // Every day at xx:xx
         if (!empty($triggers['day'])) {
+            // The day it is currently based on the timezone specified in the CMS configuration
             $dayBasedOnCMSTimezone = acym_date('now', 'Y-m-d');
 
             $hour = $triggers['day']['hour'];
@@ -177,6 +182,7 @@ trait TimeAutomationTriggers
             if (strlen($hour) < 2) $hour = '0'.$hour;
             if (strlen($minutes) < 2) $minutes = '0'.$minutes;
 
+            // The UTC timestamp of the current day based on the CMS timezone, at the specified hour
             $dayBasedOnCMSTimezoneAtSpecifiedHour = acym_getTimeFromCMSDate($dayBasedOnCMSTimezone.' '.$hour.':'.$minutes);
 
             if ($time < $dayBasedOnCMSTimezoneAtSpecifiedHour) {
@@ -184,10 +190,12 @@ trait TimeAutomationTriggers
             } else {
                 $nextExecutionDate[] = $dayBasedOnCMSTimezoneAtSpecifiedHour + 86400;
 
+                // First trigger: if the hour is passed we execute
                 if (empty($step->last_execution)) $execute = true;
             }
         }
 
+        // Each week on Mondays and Wednesdays for example
         if (!empty($triggers['weeks_on'])) {
             if (isset($triggers['weeks_on']['hour'])) {
                 $hour = $triggers['weeks_on']['hour'];
@@ -201,16 +209,20 @@ trait TimeAutomationTriggers
             if (strlen($minutes) < 2) $minutes = '0'.$minutes;
 
             foreach ($triggers['weeks_on']['day'] as $day) {
+                // The day it is currently based on the timezone specified in the CMS configuration
                 $dayBasedOnCMSTimezone = acym_date('now', 'Y-m-d');
 
+                // The UTC timestamp of the current day based on the CMS timezone, at the specified hour
                 $dayBasedOnCMSTimezoneAtSpecifiedHour = acym_getTimeFromCMSDate($dayBasedOnCMSTimezone.' '.$hour.':'.$minutes);
 
+                // Only store the next Execution date if it's in the future
                 if ($day == strtolower(acym_date('now', 'l', true, false))) {
                     if ($time < $dayBasedOnCMSTimezoneAtSpecifiedHour) {
                         $nextExecutionDate[] = $dayBasedOnCMSTimezoneAtSpecifiedHour;
                     } else {
                         $nextExecutionDate[] = $dayBasedOnCMSTimezoneAtSpecifiedHour + 604800;
 
+                        // Current day is selected, the time is passed, and it's the first trigger
                         $lastExecutionIsNotToday = acym_date($step->last_execution, 'Y-m-d') !== $dayBasedOnCMSTimezone;
                         $nextExecutionIsToday = acym_date($step->next_execution, 'Y-m-d') === $dayBasedOnCMSTimezone;
                         if (empty($step->last_execution) || ($lastExecutionIsNotToday && $nextExecutionIsToday)) $execute = true;
@@ -236,6 +248,7 @@ trait TimeAutomationTriggers
             }
         }
 
+        // On first Friday of the month for example
         if (!empty($triggers['on_day_month'])) {
             if (isset($triggers['on_day_month']['hour'])) {
                 $hour = $triggers['on_day_month']['hour'];
@@ -250,26 +263,35 @@ trait TimeAutomationTriggers
 
             $today = acym_getTime('today '.$hour.':'.$minutes);
 
+            // Get the current month's day
             $execution = acym_getTime($triggers['on_day_month']['number'].' '.$triggers['on_day_month']['day'].' of this month '.$hour.':'.$minutes);
 
+            //If it's before today, get the next date
             if ($execution < $today) {
                 $execution = acym_getTime($triggers['on_day_month']['number'].' '.$triggers['on_day_month']['day'].' of next month '.$hour.':'.$minutes);
             }
 
+            // The next execution date is in the future
             if ($execution > $time) {
                 $nextExecutionDate[] = $execution;
             } else {
+                // The next execution is today and is passed
 
 
+                // If it's the first trigger we execute
                 if (empty($step->last_execution)) {
                     $execute = true;
                 }
 
+                // Set the next execution time: recompute the real "next weekday of next month" occurrence.
                 $nextExecutionDate[] = acym_getTime($triggers['on_day_month']['number'].' '.$triggers['on_day_month']['day'].' of next month '.$hour.':'.$minutes);
             }
         }
 
+        // WARNING : KEEP THIS TRIGGER AT THE END, ACTION PERFORMED IF WE EXECUTE
+        // Every X hours/days/weeks/months
         if (!empty($triggers['every'])) {
+            // First trigger: we execute and set the next execution in X hours/days/weeks/months
             if (empty($step->last_execution)) {
                 $execute = true;
             } else {

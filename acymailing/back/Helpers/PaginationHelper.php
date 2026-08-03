@@ -17,12 +17,12 @@ class PaginationHelper extends AcymObject
         $this->nbPerPage = $nbPerPage;
     }
 
-    public function display(string $page = '', string $suffix = '', bool $dynamics = false): string
+    public function display(string $page = '', string $suffix = '', bool $dynamics = false): void
     {
         $name = empty($page) ? 'pagination_page_ajax' : $page.'_pagination_page';
 
         if (empty($this->nbPerPage)) {
-            return '';
+            return;
         }
 
         $nbPages = ceil($this->totalNbOfElements / $this->nbPerPage);
@@ -41,46 +41,51 @@ class PaginationHelper extends AcymObject
             $classPadding = '';
         }
 
-        $pagination = '<div class="pagination text-center cell grid-x'.$class.'" role="navigation" aria-label="Pagination">
-                        <div class="cell '.$classNavigationContainer.' margin-auto grid-x align-center">
-                            <div class="'.$classNavigation.' pagination_container cell grid-x acym_vcenter align-center">';
+        echo '<div class="pagination text-center cell grid-x'.esc_attr($class).'" role="navigation" aria-label="Pagination">
+                        <div class="cell '.esc_attr($classNavigationContainer).' margin-auto grid-x align-center">
+                            <div class="'.esc_attr($classNavigation).' pagination_container cell grid-x acym_vcenter align-center">';
 
+        // Turbo first button
         if (!$dynamics) {
-            $pagination .= '<div class="cell shrink pagination-turbo-left pagination_one_pagination '.$classPadding;
-            $pagination .= $this->currentPage > 1 ? 'acym__pagination__page'.$suffix.'" page="1' : 'pagination_disabled';
-            $pagination .= '"><i class="acymicon-play-arrow rotate180deg pagination__i"></i><i class="acymicon-play-arrow rotate180deg pagination__i"></i></div>';
-            $pagination .= '<div class="cell shrink pagination_border_left"></div>';
+            echo '<div class="cell shrink pagination-turbo-left pagination_one_pagination '.esc_attr($classPadding);
+            echo $this->currentPage > 1 ? 'acym__pagination__page'.esc_attr($suffix).'" page="1' : 'pagination_disabled';
+            echo '"><i class="acymicon-play-arrow rotate180deg pagination__i"></i><i class="acymicon-play-arrow rotate180deg pagination__i"></i></div>';
+            echo '<div class="cell shrink pagination_border_left"></div>';
         }
 
-        $pagination .= '<div class="cell shrink pagination-previous pagination_one_pagination '.$classPadding;
-        $pagination .= $this->currentPage > 1 ? 'acym__pagination__page'.$suffix.'" page="'.($this->currentPage - 1) : 'pagination_disabled';
-        $pagination .= '"><i class="acymicon-play-arrow rotate180deg pagination__i"></i></div>';
+        // Previous button
+        echo '<div class="cell shrink pagination-previous pagination_one_pagination '.esc_attr($classPadding);
+        echo $this->currentPage > 1 ? 'acym__pagination__page'.esc_attr($suffix).'" page="'.intval($this->currentPage - 1) : 'pagination_disabled';
+        echo '"><i class="acymicon-play-arrow rotate180deg pagination__i"></i></div>';
 
-        $pagination .= '<div class="cell shrink pagination_border_left"></div>';
-        $pagination .= '<input type="number" name="'.$name.'" min="1" max="'.(empty($nbPages) ? 1
-                : $nbPages).'" value="'.$this->currentPage.'" class="cell shrink pagination_input" id="acym_pagination'.$suffix.'">';
-        $pagination .= '<p class="cell shrink pagination_text">'.acym_translation('ACYM_OUT_OF').' '.$nbPages.'</p>';
-        $pagination .= '<div class="cell shrink pagination_border_right"></div>';
+        echo '<div class="cell shrink pagination_border_left"></div>';
+        echo '<input type="number" 
+                    name="'.esc_attr($name).'" 
+                    min="1" 
+                    max="'.intval(empty($nbPages) ? 1 : $nbPages).'" 
+                    value="'.esc_attr($this->currentPage).'" 
+                    class="cell shrink pagination_input" 
+                    id="acym_pagination'.esc_attr($suffix).'">';
+        echo '<p class="cell shrink pagination_text">'.esc_html(acym_translation('ACYM_OUT_OF').' '.$nbPages).'</p>';
+        echo '<div class="cell shrink pagination_border_right"></div>';
 
-        if ($this->currentPage < $nbPages) {
-            $paramsNext = 'acym__pagination__page'.$suffix.'" page="'.($this->currentPage + 1);
-            $paramsTurboNext = 'acym__pagination__page'.$suffix.'" page="'.$nbPages;
-        } else {
-            $paramsNext = 'pagination_disabled';
-            $paramsTurboNext = 'pagination_disabled';
-        }
+        // Next button
+        echo '<div class="cell shrink pagination-next pagination_one_pagination '.esc_attr($classPadding);
+        echo $this->currentPage < $nbPages ? 'acym__pagination__page'.esc_attr($suffix).'" page="'.intval($this->currentPage + 1) : 'pagination_disabled';
+        echo '"><i class="acymicon-play-arrow pagination__i"></i></div>';
 
-        $pagination .= '<div class="cell shrink pagination-next pagination_one_pagination '.$classPadding.$paramsNext.'"><i class="acymicon-play-arrow pagination__i"></i></div>';
-
+        // Turbo last button
         if (!$dynamics) {
-            $pagination .= '<div class="cell shrink pagination_border_right"></div>';
-            $pagination .= '<div class="cell shrink pagination-turbo-right pagination_one_pagination '.$classPadding.$paramsTurboNext.'">
-                                    <i class="acymicon-play-arrow pagination__i"></i>
-                                    <i class="acymicon-play-arrow pagination__i"></i>
-                                </div>';
+            echo '<div class="cell shrink pagination_border_right"></div>';
+            echo '<div class="cell shrink pagination-turbo-right pagination_one_pagination '.esc_attr($classPadding);
+            echo $this->currentPage < $nbPages ? 'acym__pagination__page'.esc_attr($suffix).'" page="'.intval($nbPages) : 'pagination_disabled';
+            echo '">
+                    <i class="acymicon-play-arrow pagination__i"></i>
+                    <i class="acymicon-play-arrow pagination__i"></i>
+                </div>';
         }
 
-        $pagination .= '</div>';
+        echo '</div>';
 
         if (!$dynamics) {
             $nbPagesOptions = [
@@ -93,7 +98,7 @@ class PaginationHelper extends AcymObject
                 '100' => 100,
                 '200' => 200,
             ];
-            $pagination .= '<div class="cell '.$classDisplayNumber.' grid-x acym_vcenter acym__pagination__pagenb">';
+            echo '<div class="cell '.esc_attr($classDisplayNumber).' grid-x acym_vcenter acym__pagination__pagenb">';
 
             $selectValue = $page === 'archive' ? $this->getListLimit($this->nbPerPage) : $this->getListLimit();
             $paginationNumberEntries = '<div class="acym__select__pagination">'.acym_select(
@@ -103,19 +108,36 @@ class PaginationHelper extends AcymObject
                     ['class' => 'acym__select__pagination__dropdown']
                 ).'</div>';
 
-            $pagination .= '<p class="cell shrink">'.acym_translationSprintf('ACYM_DISPLAY_NUMBER_ENTRIES', $paginationNumberEntries).'</p>';
-            $pagination .= '</div>';
+            echo '<p class="cell shrink">'.wp_kses(
+                    acym_translationSprintf('ACYM_DISPLAY_NUMBER_ENTRIES', $paginationNumberEntries),
+                    [
+                        'div' => [
+                            'class' => true,
+                        ],
+                        'select' => [
+                            'class' => true,
+                            'name' => true,
+                            'id' => true,
+                        ],
+                        'option' => [
+                            'value' => true,
+                            'selected' => true,
+                        ],
+                    ]
+                ).'</p>';
+            echo '</div>';
         }
 
-        $pagination .= '</div>';
-        $pagination .= '</div>';
-
-        return $pagination;
+        echo '</div>';
+        echo '</div>';
     }
 
     public function displayAjax(bool $dynamics = false): string
     {
-        return $this->display('', '__ajax', $dynamics);
+        ob_start();
+        $this->display('', '__ajax', $dynamics);
+
+        return ob_get_clean();
     }
 
     public function getListLimit(int $default = 20): int
@@ -130,7 +152,7 @@ class PaginationHelper extends AcymObject
             $currentConfig = $listLimitSelect;
         }
 
-        return $currentConfig ?: $default;
+        return $currentConfig ? : $default;
     }
 
     private function getClosest(int $search, array $arr): string

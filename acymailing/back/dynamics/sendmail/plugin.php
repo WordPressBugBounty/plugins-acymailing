@@ -26,16 +26,16 @@ class plgAcymSendmail extends AcymPlugin
     {
         ob_start();
         ?>
-		<div class="send_settings grid-x cell" id="<?php echo self::SENDING_METHOD_ID; ?>_settings">
+		<div class="send_settings grid-x cell" id="<?php echo esc_attr(self::SENDING_METHOD_ID); ?>_settings">
 			<div class="cell grid-x acym_vcenter acym__sending__methods__one__settings">
-				<label for="<?php echo self::SENDING_METHOD_ID; ?>_path" class="cell">
-                    <?php echo acym_translation('ACYM_SENDMAIL_PATH'); ?>
+				<label for="<?php echo esc_attr(self::SENDING_METHOD_ID); ?>_path" class="cell">
+                    <?php echo esc_html(acym_translation('ACYM_SENDMAIL_PATH')); ?>
 				</label>
-				<input id="<?php echo self::SENDING_METHOD_ID; ?>_path"
-					   class="cell"
-					   type="text"
-					   name="config[<?php echo self::SENDING_METHOD_ID; ?>_path]"
-					   value="<?php echo acym_escape($this->config->get(self::SENDING_METHOD_ID.'_path', '/usr/sbin/sendmail')); ?>">
+				<input id="<?php echo esc_attr(self::SENDING_METHOD_ID); ?>_path"
+				       class="cell"
+				       type="text"
+				       name="config[<?php echo esc_attr(self::SENDING_METHOD_ID); ?>_path]"
+				       value="<?php echo esc_attr($this->config->get(self::SENDING_METHOD_ID.'_path', '/usr/sbin/sendmail')); ?>">
 			</div>
 		</div>
         <?php

@@ -36,6 +36,7 @@ class RuleClass extends AcymClass
 
     private function prepareRule(object $rule): object
     {
+        //We have a rule from the database, let's prepare it to be displayed nicely
         $columns = ['executed_on', 'action_message', 'action_user'];
         foreach ($columns as $oneColumn) {
             if (!empty($rule->$oneColumn)) {

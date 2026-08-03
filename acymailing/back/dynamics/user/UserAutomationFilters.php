@@ -30,7 +30,13 @@ trait UserAutomationFilters
 
         if (ACYM_CMS == 'joomla') {
             $filters['acy_group']->option .= '<div class="cell grid-x medium-3">';
-            $filters['acy_group']->option .= acym_switch('acym_action[filters][__numor__][__numand__][acy_group][subgroup]', 1, acym_translation('ACYM_INCLUDE_SUB_GROUPS'));
+            ob_start();
+            acym_switch([
+                'name' => 'acym_action[filters][__numor__][__numand__][acy_group][subgroup]',
+                'value' => 1,
+                'label' => acym_translation('ACYM_INCLUDE_SUB_GROUPS'),
+            ]);
+            $filters['acy_group']->option .= ob_get_clean();
             $filters['acy_group']->option .= '</div>';
         }
 
@@ -40,6 +46,7 @@ trait UserAutomationFilters
             $cmsFields[$column] = $column;
         }
 
+        // Handle custom fields
         if (ACYM_CMS == 'joomla' && ACYM_J37) {
             $query = 'SELECT id, title 
 						FROM #__fields 

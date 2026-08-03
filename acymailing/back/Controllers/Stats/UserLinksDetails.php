@@ -10,6 +10,8 @@ trait UserLinksDetails
 {
     public function exportUserLinksDetails(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $data = [];
         if (!$this->prepareDefaultPageInfo($data, true)) {
             return;
@@ -84,6 +86,7 @@ trait UserLinksDetails
 
         $this->decode($userClicks['user_links_details']);
 
+        // Prepare the pagination
         $pagination->setStatus((int)$userClicks['total']->total, $page, $detailedStatsPerPage);
 
         $data['pagination'] = $pagination;

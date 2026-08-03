@@ -11,11 +11,12 @@ class LanguageController extends AcymController
 {
     public function saveLanguage(bool $fromShare = false): bool
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $code = acym_getVar('cmd', 'code');
         acym_setVar('code', $code);
 
+        // Get content that can be modified when loading the latest version from our site
         $content = acym_getVar('string', 'content', '', '', ACYM_ALLOWRAW);
         $content = str_replace('</textarea>', '', $content);
 
@@ -25,22 +26,27 @@ class LanguageController extends AcymController
             return true;
         }
 
+        // Get the custom translations
         $customcontent = acym_getVar('string', 'customcontent', '', '', ACYM_ALLOWRAW);
         $customcontent = str_replace('</textarea>', '', $customcontent);
 
+        // We have a code, we have a content... so we can simply save the file!
         $path = acym_getLanguagePath(ACYM_ROOT, $code).DS.$code.'.com_acym.ini';
         $result = acym_writeFile($path, $content);
         if ($result) {
             acym_enqueueMessage(acym_translation('ACYM_SUCCESSFULLY_SAVED'), 'success');
+            //We update the picture from "add" to "edit"
             $js = 'let langIcon = window.top.document.getElementById("image'.$code.'"); langIcon.className = langIcon.className.replace("acymicon-add", "") + " acymicon-edit"';
             acym_addScript(true, $js);
 
+            //Now we will also create a menu language file and save it
             $updateHelper = new UpdateHelper();
             $updateHelper->installBackLanguages($code);
         } else {
             acym_enqueueMessage(acym_translationSprintf('ACYM_FAIL_SAVE_FILE', $path), 'error');
         }
 
+        // Let's save the custom language file now...
         $custompath = acym_getLanguagePath(ACYM_ROOT, $code).DS.$code.'.com_acym_custom.ini';
         $customresult = acym_writeFile($custompath, $customcontent);
         if (!$customresult) {
@@ -51,6 +57,7 @@ class LanguageController extends AcymController
             acym_loadLanguage();
         }
 
+        //We add lang to menu
         $updateHelper = new UpdateHelper();
         $updateHelper->installBackLanguages();
 
@@ -65,7 +72,7 @@ class LanguageController extends AcymController
 
     public function share(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         if ($this->saveLanguage(true)) {
             acym_setVar('layout', 'share');
@@ -81,7 +88,7 @@ class LanguageController extends AcymController
 
     public function send(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $bodyEmail = acym_getVar('string', 'mailbody');
         $code = acym_getVar('cmd', 'code');
@@ -96,6 +103,7 @@ class LanguageController extends AcymController
         $mailerHelper->Body = 'The website '.ACYM_LIVE.' using AcyMailing '.$this->config->get('level').' '.$this->config->get('version').' sent a language file : '.$code;
         $mailerHelper->Body .= "\n\n\n".$bodyEmail;
 
+        //Include the extra language file....
         $file = acym_getLanguagePath(ACYM_ROOT, $code).DS.$code.'.com_acym.ini';
         if (!file_exists($file)) {
             return;
@@ -103,12 +111,14 @@ class LanguageController extends AcymController
 
         $translation = acym_fileGetContent($file);
 
+        // Include the custom translations
         $customFile = acym_getLanguagePath(ACYM_ROOT, $code).DS.$code.'.com_acym_custom.ini';
 
         if (file_exists($customFile)) {
             $customTranslation = acym_fileGetContent($customFile);
 
             if (!empty($customTranslation)) {
+                // Replace translations in the main lang file by the custom ones if they exist
                 $newKeys = [];
                 $customKeys = [];
                 preg_match_all('#([0-9A-Z_]+)="((?:[^"]|"_QQ_")+)"#is', $customTranslation, $customKeys);
@@ -120,8 +130,10 @@ class LanguageController extends AcymController
                     foreach ($customKeys[1] as $index => $oneKey) {
                         $position = array_search($oneKey, $mainKeys[1]);
                         if ($position !== false) {
+                            // Replace the translation in the main file
                             $translation = str_replace($mainKeys[0][$position], $customKeys[0][$index], $translation);
                         } else {
+                            // Add the additional translation to the email body, it may be useful somehow
                             $newKeys[] = $customKeys[0][$index];
                         }
                     }
@@ -133,6 +145,7 @@ class LanguageController extends AcymController
             }
         }
 
+        // Attach the file
         $mailerHelper->addStringAttachment($translation, $code.'.com_acym.ini');
 
         $mailerHelper->AddAddress(acym_currentUserEmail(), acym_currentUserName());
@@ -173,6 +186,7 @@ class LanguageController extends AcymController
                 acym_display(acym_translationSprintf('ACYM_FILE_NOT_FOUND', $path), 'error');
             }
         } else {
+            // Load the default language
             if (ACYM_CMS === 'joomla') {
                 $message = acym_translation('ACYM_LOAD_ENGLISH_1');
                 $message .= '<br />'.acym_translation('ACYM_LOAD_ENGLISH_2');

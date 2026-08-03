@@ -61,6 +61,7 @@ trait Patchv7
             return;
         }
 
+        // Welcome and unsubscribe emails have template = 1 for some reason
         $this->updateQuery(
             'UPDATE #__acym_mail 
             SET `type` = '.acym_escapeDB(MailClass::TYPE_TEMPLATE).' 
@@ -315,6 +316,7 @@ trait Patchv7
         $fieldClass = new FieldClass();
         $dateCustomFields = $fieldClass->getFieldsByType(['date']);
 
+        // Convert the already saved data into the new format
         foreach ($dateCustomFields as $oneField) {
             $oneField->option = json_decode($oneField->option);
 
@@ -329,6 +331,7 @@ trait Patchv7
                 $day = '00';
                 $i = 0;
                 foreach ($formatToDisplay as $one) {
+                    // This is a value stored when the format was "%m%y" for example and the format changed to something else
                     if (!isset($userDate[$i])) continue 2;
 
                     if ($one === 'd') {
@@ -450,7 +453,7 @@ trait Patchv7
             return;
         }
 
-        unlink(ACYM_ADDONS_FOLDER_PATH.'couryeah');
+        acym_deleteFile(ACYM_ADDONS_FOLDER_PATH.'couryeah');
         $this->updateQuery('UPDATE #__acym_configuration SET `name` = "acymailer_domains" WHERE `name` = "couryeah_domains"');
     }
 

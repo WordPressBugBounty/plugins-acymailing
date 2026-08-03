@@ -11,6 +11,8 @@ trait Security
 
     public function checkDBAjax(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $this->checkDB();
 
         if (empty($this->messagesNoHtml)) {
@@ -18,7 +20,7 @@ trait Security
         } else {
             $nbMessages = count($this->messagesNoHtml);
             foreach ($this->messagesNoHtml as $i => $oneMsg) {
-                echo '<span style="color:'.$oneMsg['color'].'">'.$oneMsg['msg'].'</span>';
+                echo '<span style="color:'.esc_attr($oneMsg['color']).'">'.esc_html($oneMsg['msg']).'</span>';
 
                 if ($i < $nbMessages) {
                     echo '<br />';
@@ -29,18 +31,29 @@ trait Security
         exit;
     }
 
+    /**
+     * Check database integrity button in the security tab
+     */
     public function checkDB(bool $fromConfiguration = true): array
     {
+        // Get the structure that the AcyMailing tables should have in the database
         $correctTablesStructure = $this->getCorrectTablesStructure();
+        // Get the current structure of the AcyMailing tables and tries to repair/create them if needed
         $currentTablesStructure = $this->getCurrentTablesStructure($correctTablesStructure);
+        // Adds missing columns in AcyMailing tables and missing indexes / primary keys / constraints on the tables
         $this->fixCurrentStructure($correctTablesStructure, $currentTablesStructure);
 
+        // Clean the duplicates in the acym_url table, caused by a bug before the 12/04/19
         $this->cleanDuplicatedUrls($fromConfiguration);
+        // Fills the key column in the users table when missing
         $this->addMissingUserKeys();
 
         return $this->messagesNoHtml;
     }
 
+    /**
+     * Returns the structure that the AcyMailing tables should have in the database
+     */
     private function getCorrectTablesStructure(): array
     {
         $correctTablesStructure = [
@@ -53,6 +66,7 @@ trait Security
         $queries = file_get_contents(ACYM_BACK.'tables.sql');
         $tables = explode('CREATE TABLE IF NOT EXISTS ', $queries);
 
+        // For each table, get its name, its column names and its indexes / primary key
         foreach ($tables as $oneTable) {
             if (strpos($oneTable, '`#__') !== 0) {
                 continue;
@@ -70,12 +84,14 @@ trait Security
                 }
                 $oneField = rtrim(trim($oneField), ',');
 
+                // Find the column names and remember them
                 if (substr($oneField, 0, 1) === '`') {
                     $columnName = substr($oneField, 1, strpos($oneField, '`', 1) - 1);
                     $correctTablesStructure['structure'][$tableName][$columnName] = trim($oneField, ',');
                     continue;
                 }
 
+                // Remember the primary key and indexes of the table
                 if (strpos($oneField, 'PRIMARY KEY') === 0) {
                     $correctTablesStructure['indexes'][$tableName]['PRIMARY'] = $oneField;
                 } elseif (strpos($oneField, 'INDEX') === 0) {
@@ -103,6 +119,9 @@ trait Security
         return $correctTablesStructure;
     }
 
+    /**
+     * Returns the current structure of the AcyMailing tables and tries to repair/create them if needed
+     */
     private function getCurrentTablesStructure(array $correctTablesStructure): array
     {
         $currentTablesStructure = [];
@@ -121,7 +140,8 @@ trait Security
                 continue;
             }
 
-            $errorMessage = (isset($e) ? $e->getMessage() : substr(strip_tags(acym_getDBError()), 0, 200));
+            // We didn't get the columns, the table crashed or doesn't exist
+            $errorMessage = (isset($e) ? $e->getMessage() : substr(acym_stripTags(acym_getDBError()), 0, 200));
             $this->messagesNoHtml[] = [
                 'error' => false,
                 'color' => 'blue',
@@ -136,7 +156,7 @@ trait Security
                 }
 
                 if ($isError === null) {
-                    $errorMessage = (isset($e) ? $e->getMessage() : substr(strip_tags(acym_getDBError()), 0, 200));
+                    $errorMessage = (isset($e) ? $e->getMessage() : substr(acym_stripTags(acym_getDBError()), 0, 200));
                     $this->messagesNoHtml[] = [
                         'error' => true,
                         'color' => 'red',
@@ -152,13 +172,14 @@ trait Security
                 continue;
             } else {
                 try {
+                    // Create missing table
                     $isError = acym_query($correctTablesStructure['createTable'][$oneTableName]);
                 } catch (\Exception $e) {
                     $isError = null;
                 }
 
                 if ($isError === null) {
-                    $errorMessage = (isset($e) ? $e->getMessage() : substr(strip_tags(acym_getDBError()), 0, 200));
+                    $errorMessage = (isset($e) ? $e->getMessage() : substr(acym_stripTags(acym_getDBError()), 0, 200));
                     $this->messagesNoHtml[] = [
                         'error' => true,
                         'color' => 'red',
@@ -177,6 +198,9 @@ trait Security
         return $currentTablesStructure;
     }
 
+    /**
+     * Adds missing columns in AcyMailing tables and missing indexes / primary keys on the tables
+     */
     private function fixCurrentStructure(array $correctTablesStructure, array $currentTablesStructure): void
     {
         foreach ($correctTablesStructure['tableNames'] as $oneTableName) {
@@ -192,6 +216,9 @@ trait Security
         }
     }
 
+    /**
+     * Add missing columns in an AcyMailing table
+     */
     private function addMissingColumns(array $correctTableColumns, array $currentTableColumnNames, string $oneTableName): void
     {
         $idealColumnNames = array_keys($correctTableColumns);
@@ -215,7 +242,7 @@ trait Security
             }
 
             if ($isError === null) {
-                $errorMessage = (isset($e) ? $e->getMessage() : substr(strip_tags(acym_getDBError()), 0, 200));
+                $errorMessage = (isset($e) ? $e->getMessage() : substr(acym_stripTags(acym_getDBError()), 0, 200));
                 $this->messagesNoHtml[] = [
                     'error' => true,
                     'color' => 'red',
@@ -254,7 +281,7 @@ trait Security
             }
 
             if ($isError === null) {
-                $errorMessage = (isset($e) ? $e->getMessage() : substr(strip_tags(acym_getDBError()), 0, 200));
+                $errorMessage = (isset($e) ? $e->getMessage() : substr(acym_stripTags(acym_getDBError()), 0, 200));
                 $this->messagesNoHtml[] = [
                     'error' => true,
                     'color' => 'red',
@@ -304,6 +331,7 @@ trait Security
             if (strlen($defaultValue) === 0) {
                 continue;
             }
+            // Normalisation of current and expected default values
             $currentDefault = $currentTableColumns[$oneColumn]->COLUMN_DEFAULT;
             if (!empty($currentDefault)) {
                 $currentDefault = trim($currentDefault, "'\"");
@@ -328,6 +356,7 @@ trait Security
                 continue;
             }
 
+            // if current value is surrounded by double quotes, replace them by quotes before comparing
             if (!empty($currentTableColumns[$oneColumn]->COLUMN_DEFAULT) && substr($currentTableColumns[$oneColumn]->COLUMN_DEFAULT, 0, 1) === '"') {
                 $currentTableColumns[$oneColumn]->COLUMN_DEFAULT = '\''.substr($currentTableColumns[$oneColumn]->COLUMN_DEFAULT, 1, -1).'\'';
             }
@@ -351,7 +380,7 @@ trait Security
             }
 
             if ($isError === null) {
-                $errorMessage = (isset($e) ? $e->getMessage() : substr(strip_tags(acym_getDBError()), 0, 200));
+                $errorMessage = (isset($e) ? $e->getMessage() : substr(acym_stripTags(acym_getDBError()), 0, 200));
                 $this->messagesNoHtml[] = [
                     'error' => true,
                     'color' => 'red',
@@ -367,8 +396,12 @@ trait Security
         }
     }
 
+    /**
+     * Adds the missing indexes / primary keys on an AcyMailing table
+     */
     private function addMissingTableKeys(array $correctTableIndexes, string $oneTableName): void
     {
+        // Add missing index and primary keys
         $results = acym_loadObjectList('SHOW INDEX FROM '.$oneTableName, 'Key_name');
         if (empty($results)) {
             $results = [];
@@ -380,6 +413,7 @@ trait Security
                 continue;
             }
 
+            // The index / primary key is missing, add it
 
             $keyName = $name === 'PRIMARY' ? 'primary key' : 'index '.$name;
 
@@ -396,7 +430,7 @@ trait Security
             }
 
             if ($isError === null) {
-                $errorMessage = (isset($e) ? $e->getMessage() : substr(strip_tags(acym_getDBError()), 0, 200));
+                $errorMessage = (isset($e) ? $e->getMessage() : substr(acym_stripTags(acym_getDBError()), 0, 200));
                 $this->messagesNoHtml[] = [
                     'error' => true,
                     'color' => 'red',
@@ -412,6 +446,9 @@ trait Security
         }
     }
 
+    /**
+     * Adds or fixes the table's foreign keys
+     */
     private function addMissingTableConstraints(array $correctTableConstraints, string $oneTableName): void
     {
         if (empty($correctTableConstraints)) {
@@ -444,6 +481,7 @@ trait Security
                 'msg' => acym_translationSprintf('ACYM_CHECKDB_WRONG_FOREIGN_KEY', $constraintName, $oneTableName),
             ];
 
+            // The foreign key exists, but it is incorrect. We remove it then add the correct one
             if (!empty($foreignKeys[$constraintName])) {
                 try {
                     $isError = acym_query('ALTER TABLE `'.$oneTableName.'` DROP FOREIGN KEY `'.$constraintName.'`');
@@ -452,7 +490,7 @@ trait Security
                 }
 
                 if ($isError === null) {
-                    $errorMessage = (isset($e) ? $e->getMessage() : substr(strip_tags(acym_getDBError()), 0, 200));
+                    $errorMessage = (isset($e) ? $e->getMessage() : substr(acym_stripTags(acym_getDBError()), 0, 200));
                     $this->messagesNoHtml[] = [
                         'error' => true,
                         'color' => 'red',
@@ -462,6 +500,7 @@ trait Security
                 }
             }
 
+            // Add the missing foreign key
             try {
                 $isError = acym_query(
                     'ALTER TABLE `'.$oneTableName.'` ADD CONSTRAINT `'.$constraintName.'` FOREIGN KEY (`'.$constraintInfo['column'].'`) REFERENCES `'.$constraintInfo['table'].'` (`'.$constraintInfo['table_column'].'`) ON DELETE NO ACTION ON UPDATE NO ACTION;'
@@ -471,7 +510,7 @@ trait Security
             }
 
             if ($isError === null) {
-                $errorMessage = (isset($e) ? $e->getMessage() : substr(strip_tags(acym_getDBError()), 0, 200));
+                $errorMessage = (isset($e) ? $e->getMessage() : substr(acym_stripTags(acym_getDBError()), 0, 200));
                 $this->messagesNoHtml[] = [
                     'error' => true,
                     'color' => 'red',
@@ -489,6 +528,9 @@ trait Security
         acym_query('SET foreign_key_checks = 1');
     }
 
+    /**
+     * Clean the duplicates in the acym_url table, caused by a bug before the 12/04/19
+     */
     private function cleanDuplicatedUrls(bool $fromConfiguration): void
     {
         if (!$fromConfiguration) {
@@ -511,6 +553,7 @@ trait Security
             'msg' => acym_translation('ACYM_CHECKDB_DUPLICATED_URLS'),
         ];
 
+        // Make sure we don't reach the max execution time
         if (empty($maxExecutionTime) || $maxExecutionTime - 20 < 20) {
             $maxExecutionTime = 20;
         } else {
@@ -544,6 +587,9 @@ trait Security
         }
     }
 
+    /**
+     * Fills the key column in the users table when missing
+     */
     private function addMissingUserKeys(): void
     {
         $userClass = new UserClass();
@@ -560,12 +606,20 @@ trait Security
 
     public function redomigration(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
+        if (!acym_isAllowed('configuration')) {
+            return;
+        }
+
         $this->config->saveConfig(['migration' => 0]);
         acym_redirect(acym_completeLink('dashboard', false, true));
     }
 
     public function scanSiteFiles(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $maliciousFiles = [];
         $siteFiles = acym_getFiles(ACYM_ROOT, '.', true, true);
         foreach ($siteFiles as $oneFilePath) {

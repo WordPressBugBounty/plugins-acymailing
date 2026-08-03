@@ -1,4 +1,6 @@
 <?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- View file, its variables are local to the include scope, not true globals.
+defined('ABSPATH') || die('Restricted Access');
 $widthUnit = 'px';
 $heightUnit = 'px';
 
@@ -9,9 +11,9 @@ if (!empty($option['units'][$form->type])) {
 ?>
 
 <div class="cell grid-x acym_vcenter">
-	<input type="number" class="cell medium-3" v-model="<?php echo acym_escape($vModel); ?>.width">
-	<span class="cell shrink acym__forms__menu__options__style__size__default"><?php echo acym_escape($widthUnit); ?></span>
+	<input type="number" class="cell medium-3" v-model="<?php echo esc_attr($vModel); ?>.width">
+	<span class="cell shrink acym__forms__menu__options__style__size__default"><?php echo esc_html($widthUnit); ?></span>
 	<span class="cell shrink margin-1">x</span>
-	<input type="number" class="cell medium-3" v-model="<?php echo acym_escape($vModel); ?>.height">
-	<span class="cell shrink acym__forms__menu__options__style__size__default"><?php echo acym_escape($heightUnit); ?></span>
+	<input type="number" class="cell medium-3" v-model="<?php echo esc_attr($vModel); ?>.height">
+	<span class="cell shrink acym__forms__menu__options__style__size__default"><?php echo esc_html($heightUnit); ?></span>
 </div>

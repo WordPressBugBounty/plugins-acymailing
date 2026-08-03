@@ -1,4 +1,5 @@
 <?php
+defined('ABSPATH') || die('Restricted Access');
 
 use AcyMailing\Core\AcymParameter;
 use AcyMailing\Core\AcymPlugin;
@@ -30,15 +31,10 @@ define('ACYM_SOCIAL_MEDIA', json_encode(['facebook', 'twitter', 'instagram', 'li
 define('ACYM_ENTERPRISE_PRICE', '7.4');
 define('ACYM_ESSENTIAL_PRICE', '2.4');
 
-if (is_callable('date_default_timezone_set')) {
-    date_default_timezone_set(@date_default_timezone_get());
-}
-
 include_once ACYM_HELPER_GLOBAL.'acl.php';
 include_once ACYM_HELPER_GLOBAL.'addon.php';
 include_once ACYM_HELPER_GLOBAL.'ajax.php';
 include_once ACYM_HELPER_GLOBAL.'chart.php';
-include_once ACYM_HELPER_GLOBAL.'curl.php';
 include_once ACYM_HELPER_GLOBAL.'date.php';
 include_once ACYM_HELPER_GLOBAL.'email.php';
 include_once ACYM_HELPER_GLOBAL.'field.php';
@@ -57,6 +53,7 @@ include_once ACYM_HELPER_GLOBAL.'version.php';
 include_once ACYM_HELPER_GLOBAL.'view.php';
 include_once ACYM_HELPER_GLOBAL.'log.php';
 
+// Load libraries
 include_once ACYM_CORE.'AcymObject.php';
 include_once ACYM_CORE.'AcymClass.php';
 include_once ACYM_CORE.'AcymParameter.php';
@@ -64,8 +61,10 @@ include_once ACYM_CORE.'AcymController.php';
 include_once ACYM_CORE.'AcymView.php';
 include_once ACYM_CORE.'AcymPlugin.php';
 
+// For old plugins compatibility
 class_alias(AcymParameter::class, 'AcyMailing\\Libraries\\acymParameter');
 class_alias(AcymPlugin::class, 'AcyMailing\\Libraries\\acymPlugin');
 class_alias(AcymPlugin::class, 'acymPlugin');
 
+// Load the AcyMailing translations
 acym_loadLanguage();

@@ -1,4 +1,9 @@
 <?php
+/**
+ * This file is part of the ZBateson\MailMimeParser project.
+ *
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ */
 
 namespace ZBateson\MailMimeParser\Message;
 
@@ -6,10 +11,22 @@ use ArrayAccess;
 use InvalidArgumentException;
 use RecursiveIterator;
 
+/**
+ * Container of IMessagePart items for a parent IMultiPart.
+ *
+ * @author Zaahid Bateson
+ */
 class PartChildrenContainer implements ArrayAccess, RecursiveIterator
 {
+    /**
+     * @var IMessagePart[] array of child parts of the IMultiPart object that is
+     *      holding this container.
+     */
     protected $children;
 
+    /**
+     * @var int current key position within $children for iteration.
+     */
     protected $position = 0;
 
     public function __construct(array $children = [])
@@ -17,12 +34,23 @@ class PartChildrenContainer implements ArrayAccess, RecursiveIterator
         $this->children = $children;
     }
 
+    /**
+     * Returns true if the current element is an IMultiPart and doesn't return
+     * null for {@see IMultiPart::getChildIterator()}.  Note that the iterator
+     * may still be empty.
+     */
     public function hasChildren() : bool
     {
         return ($this->current() instanceof IMultiPart
             && $this->current()->getChildIterator() !== null);
     }
 
+    /**
+     * If the current element points to an IMultiPart, its child iterator is
+     * returned by calling {@see IMultiPart::getChildIterator()}.
+     *
+     * @return RecursiveIterator|null the iterator
+     */
     public function getChildren() : ?RecursiveIterator
     {
         if ($this->current() instanceof IMultiPart) {
@@ -57,6 +85,16 @@ class PartChildrenContainer implements ArrayAccess, RecursiveIterator
         return $this->offsetExists($this->position);
     }
 
+    /**
+     * Adds the passed IMessagePart to the container in the passed position.
+     *
+     * If position is not passed or null, the part is added to the end, as the
+     * last child in the container.
+     *
+     * @param IMessagePart $part The part to add
+     * @param int $position An optional index position (0-based) to add the
+     *        child at.
+     */
     public function add(IMessagePart $part, $position = null)
     {
         $index = $position ?? \count($this->children);
@@ -68,6 +106,12 @@ class PartChildrenContainer implements ArrayAccess, RecursiveIterator
         );
     }
 
+    /**
+     * Removes the passed part, and returns the integer position it occupied.
+     *
+     * @param IMessagePart $part The part to remove.
+     * @return int the 0-based position it previously occupied.
+     */
     public function remove(IMessagePart $part) : ?int
     {
         foreach ($this->children as $key => $child) {
@@ -84,6 +128,9 @@ class PartChildrenContainer implements ArrayAccess, RecursiveIterator
         return isset($this->children[$offset]);
     }
 
+    /**
+     * @return mixed
+     */
     #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {

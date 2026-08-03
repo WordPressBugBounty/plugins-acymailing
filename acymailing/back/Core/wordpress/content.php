@@ -1,5 +1,7 @@
 <?php
 
+defined('ABSPATH') || die('Restricted Access');
+
 function acym_cmsModal(
     bool    $isIframe,
     string  $content,
@@ -10,19 +12,22 @@ function acym_cmsModal(
     int     $width = 800,
     int     $height = 400
 ): string {
+    // Use the WP's thickbox library
     add_thickbox();
 
     $class = $isButton ? ' button' : '';
 
     if ($isIframe) {
-        return '<a href="'.$content.'&TB_iframe=true&width='.$width.'&height='.$height.'" class="thickbox'.$class.'">'.acym_translation($buttonText).'</a>';
+        return '<a href="'.$content.'&TB_iframe=true&width='.$width.'&height='.$height.'" class="thickbox'.esc_attr($class).'">'.esc_html(acym_translation($buttonText)).'</a>';
     } else {
         if (empty($identifier)) {
-            $identifier = 'identifier_'.rand(1000, 9000);
+            $identifier = 'identifier_'.acym_rand(1000, 9000);
         }
 
-        return '<div id="'.$identifier.'" style="display:none;">'.$content.'</div>
-                <a href="#TB_inline?width='.$width.'&height='.$height.'&inlineId='.$identifier.'" class="thickbox'.$class.'">'.acym_translation($buttonText).'</a>';
+        return '<div id="'.esc_attr($identifier).'" style="display:none;">'.$content.'</div>
+                <a href="#TB_inline?width='.$width.'&height='.$height.'&inlineId='.esc_attr($identifier).'" class="thickbox'.esc_attr($class).'">'.esc_html(
+                acym_translation($buttonText)
+            ).'</a>';
     }
 }
 
@@ -45,7 +50,7 @@ function acym_getArticleURL(int $id, bool $popup, string $text): string
         $url .= (strpos($url, '?') ? '&' : '?').acym_noTemplate();
         $url = acym_frontModal($url, $text, false);
     } else {
-        $url = '<a title="'.acym_translation($text, true).'" href="'.acym_escape($url).'" target="_blank">'.acym_translation($text).'</a>';
+        $url = '<a title="'.acym_translation($text, true).'" href="'.esc_attr($url).'" target="_blank">'.acym_translation($text).'</a>';
     }
 
     return $url;
@@ -65,6 +70,7 @@ function acym_cmsCleanHtml(string $html): string
 {
     if (strpos($html, '<!-- wp:') === false) return $html;
 
+    // Replace special WP content in inserted posts and pages
     $elementsToRemove = [
         'shortcode',
         'core-embed/.*',
@@ -87,7 +93,9 @@ function acym_cmsCleanHtml(string $html): string
     $cleanText = preg_replace(array_keys($replacements), $replacements, $html);
     if (!empty($cleanText)) $html = $cleanText;
 
+    // Display the WP content correctly
     $html .= '<style type="text/css">
+        /* Handle media-text blocks */
         .wp-block-media-text {
             display: grid;
             grid-template-rows: auto;
@@ -105,6 +113,7 @@ function acym_cmsCleanHtml(string $html): string
             padding: 0 8%;
         }
 
+        /* Handle multi column blocks */
         .wp-block-columns {
             display: flex !important;
             flex-wrap: nowrap;
@@ -114,18 +123,22 @@ function acym_cmsCleanHtml(string $html): string
             flex-grow: 0;
         }
 
+        /* Handle WP tables */
         table.wp-block-table td {
             padding: 1em 1.41575em !important;
         }
 
+        /* Handle preformatted content */
         .wp-block-preformatted, .wp-block-code, .wp-block-verse {
             padding: 1.618em;
         }
 
+        /* Handle download files */
         .wp-block-file {
             margin: 20px 0;
         }
 
+        /* Handle cover blocks */
         .wp-block-cover, .wp-block-cover-image {
             -webkit-box-orient: horizontal;
             -webkit-box-direction: normal;
@@ -163,6 +176,7 @@ function acym_cmsCleanHtml(string $html): string
             z-index: 1;
         }
 
+        /* Handle galleries */
         .wp-block-gallery {
             margin: 0 0 1.41575em;
             display: flex;

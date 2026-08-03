@@ -19,6 +19,9 @@ trait Installed
         $data['plugins'] = $this->getAllPlugins();
         $data['workflowHelper'] = new WorkflowHelper();
 
+        acym_addScript(true, 'window.acymailingAddons = '.json_encode($data['plugins']).';');
+        acym_addScript(true, 'window.acymailingAvailableAddons = '.json_encode(ACYM_AVAILABLE_PLUGINS).';');
+
         parent::display($data);
     }
 
@@ -30,6 +33,8 @@ trait Installed
 
     public function saveSettings(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $pluginFolderName = acym_getVar('string', 'plugin__folder_name', '');
 
         if (empty($pluginFolderName)) {
@@ -85,6 +90,8 @@ trait Installed
 
     public function update(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $this->isLatestAcyMailingVersion();
 
         $plugin = acym_getVar('array', 'plugin');
@@ -100,6 +107,8 @@ trait Installed
 
     public function deletePlugin(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $pluginClass = new PluginClass();
         $id = acym_getVar('int', 'id');
 
@@ -122,6 +131,8 @@ trait Installed
 
     public function toggleActivate(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $pluginClass = new PluginClass();
         $id = acym_getVar('int', 'id');
 
@@ -144,6 +155,8 @@ trait Installed
 
     public function getCustomViewPlugin(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $plugin = $this->getPluginClassAjaxCustomView();
 
         $customLayoutPath = ACYM_CUSTOM_PLUGIN_LAYOUT.$plugin['folderName'].'.html';
@@ -158,6 +171,8 @@ trait Installed
 
     public function saveCustomViewPlugin(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $plugin = $this->getPluginClassAjaxCustomView();
         $pluginCustomView = acym_getVar('string', 'custom_view', '');
         $pluginCustomView = urldecode($pluginCustomView);
@@ -175,6 +190,8 @@ trait Installed
 
     public function deleteCustomViewPlugin(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $plugin = $this->getPluginClassAjaxCustomView();
 
         $customLayoutPath = ACYM_CUSTOM_PLUGIN_LAYOUT.$plugin['folderName'].'.html';

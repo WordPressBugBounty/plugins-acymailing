@@ -33,8 +33,9 @@ trait Condition
         $condition['conditions']['type_condition'] = acym_getVar('string', 'type_condition');
 
         if ($isMassAction) {
-            acym_session();
-            $_SESSION['massAction']['conditions'] = $condition['conditions'];
+            $massAction = acym_getVar('array', 'massAction', [], 'SESSION');
+            $massAction['conditions'] = $condition['conditions'];
+            acym_setSession('massAction', $massAction);
 
             return [];
         }
@@ -47,6 +48,7 @@ trait Condition
             acym_secureDBColumn($column);
         }
 
+        //We need an object to save it so we make a object
         $condition = (object)$condition;
 
         $condition->id = $conditionClass->save($condition);
@@ -60,6 +62,8 @@ trait Condition
 
     public function saveExitConditions(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $this->getSaveConditions();
 
         acym_enqueueMessage(acym_translation('ACYM_SUCCESSFULLY_SAVED'), 'success');
@@ -69,6 +73,8 @@ trait Condition
 
     public function saveConditions(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $ids = $this->getSaveConditions();
 
         acym_setVar('id', $ids['automationId']);

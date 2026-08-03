@@ -20,6 +20,8 @@ trait Summary
 
     public function activeAutomation(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $automationClass = new AutomationClass();
         $automation = $automationClass->getOneById(acym_getVar('int', 'id'));
         $automation->active = 1;

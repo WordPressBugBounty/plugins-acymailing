@@ -61,12 +61,16 @@ class CronHelper extends AcymObject
     private bool $cronTimeLimitReached = false;
     private int $startQueue;
 
+    // Save the main message
     private string $mainMessage = '';
 
+    // Did the cron process anything?
     private bool $processed = false;
 
+    // Is there any error in the process
     private bool $errorDetected = false;
 
+    // If we call the cron just to send a batch of emails
     private bool $externalSendingActivated = false;
     private bool $externalSendingRepeat;
     private bool $externalSendingNotFinished = false;
@@ -149,11 +153,13 @@ class CronHelper extends AcymObject
             $this->detailMessages = $detailMessages;
         }
 
-        $reportPath = str_replace(['{year}', '{month}'], [date('Y'), date('m')], $reportPath);
+        // Prepare the cron file path
+        $reportPath = str_replace(['{year}', '{month}'], [gmdate('Y'), gmdate('m')], $reportPath);
         $reportPath = acym_cleanPath(ACYM_ROOT.trim(html_entity_decode($reportPath)));
         acym_createDir(dirname($reportPath), true, true);
 
         $lr = "\r\n";
+        // Catch warnings
         ob_start();
         file_put_contents(
             $reportPath,
@@ -175,6 +181,9 @@ class CronHelper extends AcymObject
         }
     }
 
+    /**
+     * Sets the types of emails that will be sent by the cron
+     */
     public function setEmailTypes(array $emailTypes): void
     {
         $this->emailTypes = $emailTypes;
@@ -241,6 +250,9 @@ class CronHelper extends AcymObject
         $this->config->saveConfig($newConfig);
     }
 
+    /**
+     * Call made by the API to remove the API key when the user unlinks the website from their account page on our website
+     */
     private function handleUnlinkLicenseCalls(): void
     {
         if (acym_getVar('int', 'unlink', 0) !== 1) {
@@ -257,6 +269,9 @@ class CronHelper extends AcymObject
         exit;
     }
 
+    /**
+     * Displays the message shown on the cron URL page
+     */
     private function triggeredMessage(): void
     {
         $firstMessage = acym_translationSprintf('ACYM_CRON_TRIGGERED', acym_date('now', 'd F Y H:i'));
@@ -264,6 +279,9 @@ class CronHelper extends AcymObject
         acym_display($firstMessage, 'info');
     }
 
+    /**
+     * Checks the cron frequency in the configuration to make sure the call is wanted
+     */
     private function checkCronFrequency(): bool
     {
         if ($this->isSendingCall) {
@@ -276,16 +294,19 @@ class CronHelper extends AcymObject
 
         if ($nextCronTime > $time) {
             if ($nextCronTime > ($time + $cronFrequency)) {
+                // The next cron time is too far in the future, should not happen but we'll handle the case, so we reset the next cron time
                 $this->config->saveConfig(['cron_next' => $time + $cronFrequency]);
             }
 
             $notTimeMessage = acym_translationSprintf('ACYM_CRON_NEXT', acym_date($this->config->get('cron_next'), 'd F Y H:i'));
             $this->messages[] = $notTimeMessage;
+            // We don't need to trigger anything, it's not time yet
             acym_display($notTimeMessage, 'info');
 
             return false;
         }
 
+        // We update the next cron and the last cron dates
         $newConfig = [
             'cron_last' => $time,
             'cron_fromip' => acym_getIP(true),
@@ -301,6 +322,9 @@ class CronHelper extends AcymObject
         return true;
     }
 
+    /**
+     * Adds the scheduled emails to the queue when the date is reached
+     */
     private function queueScheduledCampaigns(): void
     {
         if (in_array(self::STEP_SCHEDULE, $this->skip)) {
@@ -316,6 +340,9 @@ class CronHelper extends AcymObject
         }
     }
 
+    /**
+     * Cleans the emails that are stuck in the queue for too long (disabled/unconfirmed recipients)
+     */
     private function cleanQueue(): void
     {
         if (in_array(self::STEP_CLEAN_QUEUE, $this->skip)) {
@@ -346,6 +373,9 @@ class CronHelper extends AcymObject
         }
     }
 
+    /**
+     * Makes sure the current process doesn't reach the server time limit
+     */
     private function checkTimeRemaining(): void
     {
         $time = time();
@@ -358,6 +388,9 @@ class CronHelper extends AcymObject
         $this->cronTimeLimitReached = true;
     }
 
+    /**
+     * If the configuration is set to send multiple batches of emails at the same time
+     */
     private function handleMultiCron(): void
     {
         $emailsPerBatches = $this->config->get('queue_nbmail_auto', 70);
@@ -430,6 +463,7 @@ class CronHelper extends AcymObject
         } else {
             $bounceErrors = $bounceHelper->getErrors();
             $newConfig['auto_bounce_report'] = implode('<br />', $bounceErrors);
+            //We add "bounce handling" just before the error so the user knows where it comes from...
             if (!empty($bounceErrors[0])) {
                 $bounceErrors[0] = acym_translation('ACYM_BOUNCE_HANDLING').' : '.$bounceErrors[0];
             }
@@ -441,6 +475,9 @@ class CronHelper extends AcymObject
         $this->config->saveConfig($newConfig);
     }
 
+    /**
+     * Triggers the automations based on time frequency
+     */
     private function handleAutomations(): void
     {
         $this->checkTimeRemaining();
@@ -479,6 +516,9 @@ class CronHelper extends AcymObject
         }
     }
 
+    /**
+     * Sends special emails such as birthday or WooCommerce reminders
+     */
     private function handleSpecificEmails(): void
     {
         $this->checkTimeRemaining();
@@ -501,6 +541,9 @@ class CronHelper extends AcymObject
         }
     }
 
+    /**
+     * Sends follow-ups based on time frequency like birthdays
+     */
     private function handleFollowups(): void
     {
         $this->checkTimeRemaining();
@@ -511,9 +554,12 @@ class CronHelper extends AcymObject
         $followupClass = new FollowupClass();
         $followups = $followupClass->getFollowupDailyBases();
 
+        // Only once a day
         $dailyHour = $this->config->get('daily_hour', '12');
         $dailyMinute = $this->config->get('daily_minute', '00');
+        // The day it is currently based on the timezone specified in the CMS configuration
         $dayBasedOnCMSTimezone = acym_date('now', 'Y-m-d');
+        // The UTC timestamp of the current day based on the CMS timezone, at the specified hour
         $dayBasedOnCMSTimezoneAtSpecifiedHour = acym_getTimeFromCMSDate($dayBasedOnCMSTimezone.' '.$dailyHour.':'.$dailyMinute);
         $time = time();
 
@@ -529,6 +575,9 @@ class CronHelper extends AcymObject
         }
     }
 
+    /**
+     * Checks messages received on mailboxes and triggers actions accordingly
+     */
     private function handleMailboxActions(): void
     {
         $this->checkTimeRemaining();
@@ -565,6 +614,7 @@ class CronHelper extends AcymObject
             $mailboxHelper->close();
 
 
+            // Update next trigger
             $oneMailboxAction->nextdate = time() + $oneMailboxAction->frequency;
             unset($oneMailboxAction->conditions);
             unset($oneMailboxAction->actions);
@@ -574,6 +624,7 @@ class CronHelper extends AcymObject
 
     private function cleanData(): void
     {
+        // Clean the history and detailed stats based on the configuration
         if (!in_array(self::STEP_DELETE_HISTORY, $this->skip) && $this->isDailyCron()) {
             $userStatClass = new UserStatClass();
             $userDetailedStatsDeleted = $userStatClass->deleteDetailedStatsPeriod();
@@ -597,10 +648,12 @@ class CronHelper extends AcymObject
             }
         }
 
+        // Clean data on external sending method
         if (!in_array(self::STEP_CLEAN_DATA_EXTERNAL_SENDING_METHOD, $this->skip) && $this->isDailyCron()) {
             acym_trigger('onAcymCleanDataExternalSendingMethod');
         }
 
+        // Clean export changes
         if (!in_array(self::STEP_CLEAN_EXPORT_CHANGES, $this->skip) && $this->isDailyCron()) {
             $exportHelper = new ExportHelper();
             $exportHelper->cleanExportChangesFile();
@@ -614,13 +667,17 @@ class CronHelper extends AcymObject
 
     private function isDailyCron(): bool
     {
+        // Only once a day
         $dailyHour = $this->config->get('daily_hour', '12');
         $dailyMinute = $this->config->get('daily_minute', '00');
+        // The day it is currently based on the timezone specified in the CMS configuration
         $dayBasedOnCMSTimezone = acym_date('now', 'Y-m-d');
+        // The UTC timestamp of the current day based on the CMS timezone, at the specified hour
         $dayBasedOnCMSTimezoneAtSpecifiedHour = acym_getTimeFromCMSDate($dayBasedOnCMSTimezone.' '.$dailyHour.':'.$dailyMinute);
 
         $time = time();
 
+        //If we do not have run the cron we set it to yesterday so it will be trigger
         $lastCronDayBasedOnCMSTimezone = acym_date($this->config->get('cron_last_daily', $time - 86400), 'Y-m-d');
 
         return $time >= $dayBasedOnCMSTimezoneAtSpecifiedHour && $lastCronDayBasedOnCMSTimezone != $dayBasedOnCMSTimezone;
@@ -655,6 +712,9 @@ class CronHelper extends AcymObject
         $scenarioHelper->triggerTimeScenarios();
     }
 
+    /**
+     * We reached the maximum time allowed so the tasks are not finished, we begin a new process to finish it up
+     */
     private function continueCronCall(): void
     {
         if ($this->externalSendingNotFinished) {
@@ -677,6 +737,7 @@ class CronHelper extends AcymObject
             return false;
         }
 
+        // Make sure we are within the sending hours defined in the configuration
         $fromHour = $this->config->get('queue_send_from_hour', '00');
         $fromMinute = $this->config->get('queue_send_from_minute', '00');
         $toHour = $this->config->get('queue_send_to_hour', '23');
@@ -684,13 +745,18 @@ class CronHelper extends AcymObject
         $time = time();
 
         if ($fromHour != '00' || $fromMinute != '00' || $toHour != '23' || $toMinute != '59') {
+            // The day it is currently based on the timezone specified in the CMS configuration
             $dayBasedOnCMSTimezone = acym_date('now', 'Y-m-d');
+            // The UTC timestamp of the current day based on the CMS timezone, at the specified hour
             $fromBasedOnCMSTimezoneAtSpecifiedHour = acym_getTimeFromCMSDate($dayBasedOnCMSTimezone.' '.$fromHour.':'.$fromMinute);
             $toBasedOnCMSTimezoneAtSpecifiedHour = acym_getTimeFromCMSDate($dayBasedOnCMSTimezone.' '.$toHour.':'.$toMinute);
+            // In case we want to send during the night and the FROM is superior to the TO (from 8pm to 4am), we should change the day of ones of the limits
             if ($fromBasedOnCMSTimezoneAtSpecifiedHour > $toBasedOnCMSTimezoneAtSpecifiedHour) {
+                // TO becomes tomorrow as we are not passed midnight
                 if ($time > $fromBasedOnCMSTimezoneAtSpecifiedHour) {
                     $toBasedOnCMSTimezoneAtSpecifiedHour = acym_getTimeFromCMSDate(acym_date('tomorrow', 'Y-m-d').' '.$toHour.':'.$toMinute);
                 } elseif ($time < $toBasedOnCMSTimezoneAtSpecifiedHour) {
+                    // FROM becomes yesterday as we are passed midnight
                     $fromBasedOnCMSTimezoneAtSpecifiedHour = acym_getTimeFromCMSDate(acym_date('yesterday', 'Y-m-d').' '.$fromHour.':'.$fromMinute);
                 }
             }

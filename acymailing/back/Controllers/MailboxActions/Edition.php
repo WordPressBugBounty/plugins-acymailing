@@ -107,6 +107,8 @@ trait Edition
 
     public function storeMailboxAction(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $mailbox = acym_getVar('array', 'mailbox', []);
         $mailboxClass = new MailboxClass();
         $mailboxObject = new \stdClass();
@@ -147,6 +149,8 @@ trait Edition
 
     public function testMailboxAction(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $mailbox = acym_getVar('array', 'mailbox', []);
 
         if (empty($mailbox)) {
@@ -155,18 +159,25 @@ trait Edition
 
         $mailbox = (object)$mailbox;
 
+        // If this is not a new mailbox or if it is not from the configuration menu, we need to get the password from the database
         if (!empty($mailbox->id)) {
             if ($mailbox->id !== 'configuration') {
+                // We check if the password has not changed
                 if (empty(trim($mailbox->password, '*'))) {
                     $mailboxClass = new MailboxClass();
                     $mailboxFromDatabase = $mailboxClass->getOneById($mailbox->id);
-                    $mailbox->password = $mailboxFromDatabase->password;
+                    if (!empty($mailboxFromDatabase) && $this->isSameMailboxHost($mailbox->server ?? '', $mailboxFromDatabase->server)) {
+                        $mailbox->password = $mailboxFromDatabase->password;
+                    }
                 }
             } elseif (empty(trim($mailbox->password, '*'))) {
-                $mailbox->password = $this->config->get('bounce_password');
-                $mailbox->bounce_access_token = str_replace('Bearer ', '', $this->config->get('bounce_access_token', ''));
-                if (empty($mailbox->connection_method)) {
-                    $mailbox->connection_method = $this->config->get('connection_method', 'imap');
+                // If it comes from the configuration menu, we need to get the password from the config table (not the mailbox_action table)
+                if ($this->isSameMailboxHost($mailbox->server ?? '', $this->config->get('bounce_server'))) {
+                    $mailbox->password = $this->config->get('bounce_password');
+                    $mailbox->bounce_access_token = str_replace('Bearer ', '', $this->config->get('bounce_access_token', ''));
+                    if (empty($mailbox->connection_method)) {
+                        $mailbox->connection_method = $this->config->get('connection_method', 'imap');
+                    }
                 }
             }
         }
@@ -183,5 +194,15 @@ trait Edition
         } else {
             acym_sendAjaxResponse(acym_translation('ACYM_CONNECTION_SUCCESSFUL'));
         }
+    }
+
+    private function isSameMailboxHost($submittedServer, $storedServer): bool
+    {
+        $storedServer = trim((string)$storedServer);
+        if ($storedServer === '') {
+            return false;
+        }
+
+        return strcasecmp(trim((string)$submittedServer), $storedServer) === 0;
     }
 }

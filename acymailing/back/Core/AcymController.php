@@ -2,8 +2,6 @@
 
 namespace AcyMailing\Core;
 
-use AcyMailing\Helpers\HeaderHelper;
-
 abstract class AcymController extends AcymObject
 {
     private $currentClass = null;
@@ -46,12 +44,17 @@ abstract class AcymController extends AcymObject
 
     private function initSession(): void
     {
-        acym_session();
-        if (empty($_SESSION[$this->sessionName])) {
-            $_SESSION[$this->sessionName] = [];
+        $controllerSession = acym_getVar('array', $this->sessionName, [], 'SESSION');
+        if (empty($controllerSession)) {
+            acym_setSession($this->sessionName, []);
         }
     }
 
+    /**
+     * @param mixed $default
+     *
+     * @return mixed
+     */
     public function getVarFiltersListing(string $type, string $varName, $default, bool $overrideIfNull = false)
     {
         if ($this->taskCalled === 'clearFilters') {
@@ -61,16 +64,21 @@ abstract class AcymController extends AcymObject
         $this->initSession();
         $returnValue = acym_getVar($type, $varName);
 
-        if (is_null($returnValue) && $overrideIfNull) $returnValue = $default;
+        if (is_null($returnValue) && $overrideIfNull) {
+            $returnValue = $default;
+        }
 
         if (!is_null($returnValue)) {
-            $_SESSION[$this->sessionName][$varName] = $returnValue;
+            $controllerSession = acym_getVar('array', $this->sessionName, [], 'SESSION');
+            $controllerSession[$varName] = $returnValue;
+            acym_setSession($this->sessionName, $controllerSession);
 
             return $returnValue;
         }
 
-        if (!empty($_SESSION[$this->sessionName][$varName])) {
-            return $_SESSION[$this->sessionName][$varName];
+        $filters = acym_getVar('array', $this->sessionName, [], 'SESSION');
+        if (!empty($filters[$varName])) {
+            return $filters[$varName];
         }
 
         return $default;
@@ -80,13 +88,17 @@ abstract class AcymController extends AcymObject
     {
         acym_setVar($varName, $value);
         $this->initSession();
-        $_SESSION[$this->sessionName][$varName] = $value;
+        $controllerSession = acym_getVar('array', $this->sessionName, [], 'SESSION');
+        $controllerSession[$varName] = $value;
+        acym_setSession($this->sessionName, $controllerSession);
     }
 
+    /**
+     * Called using data-task
+     */
     public function clearFilters(): void
     {
-        $this->initSession();
-        $_SESSION[$this->sessionName] = [];
+        acym_setSession($this->sessionName, []);
 
         $taskToCall = acym_getVar('string', 'cleartask', $this->defaulttask);
         if (in_array($taskToCall, ['campaigns_auto', 'welcome', 'unsubscribe', $this->defaulttask])) {
@@ -96,19 +108,24 @@ abstract class AcymController extends AcymObject
 
     public function call(string $task, bool $isFront = false): void
     {
-        if (!in_array($task, $this->publicFrontTasks, true) && !acym_isAllowed($this->name, $task) && $this->name !== 'dashboard') {
+        if (
+            !in_array($task, $this->publicFrontTasks, true)
+            && !acym_isAllowed($this->name, $task)
+        ) {
             acym_enqueueMessage(acym_translation('ACYM_ACCESS_DENIED'), 'warning');
             acym_redirect($isFront ? ACYM_LIVE : acym_completeLink('dashboard'));
 
             return;
         }
 
-        if (!method_exists($this, $task)) {
+        // If task doesn't exist, redirect to default task + add message
+        if (!is_callable([$this, $task])) {
             acym_enqueueMessage(acym_translation('ACYM_NON_EXISTING_PAGE'), 'warning');
             $task = $this->defaulttask;
             acym_setVar('task', $task);
         }
 
+        // Call the task
         $this->$task();
     }
 
@@ -131,6 +148,14 @@ abstract class AcymController extends AcymObject
             acym_addStyle(false, ACYM_CSS.'editorWYSID.min.css?v='.filemtime(ACYM_MEDIA.'css'.DS.'editorWYSID.min.css'));
             acym_addScript(false, ACYM_JS.'editor_wysid_utils.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'editor_wysid_utils.min.js'));
 
+            acym_addScript(
+                true,
+                'const ACYM_UNSPLASH_KEY = "'.addslashes($this->config->get('unsplash_key', '')).'";
+                const ACYM_GIPHY_KEY = "'.addslashes($this->config->get('giphy_key', '')).'";
+                const ACYM_SAVE_THUMBNAIL = '.(acym_isAdmin() ? (int)$this->config->get('save_thumbnail', 0) : 0).';'
+            );
+
+            // Automatically add editor dependencies
             $scripts = array_merge($scripts, ['colorpicker', 'datepicker', 'thumbnail', 'foundation-email', 'parse-css', 'vue-prism-editor', 'masonry']);
 
             if (empty($scripts['vue-applications'])) {
@@ -150,8 +175,13 @@ abstract class AcymController extends AcymObject
         }
 
         if (in_array('datepicker', $scripts)) {
-            acym_addScript(false, ACYM_JS.'libraries/moment.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'libraries'.DS.'moment.min.js'));
-            acym_addScript(false, ACYM_JS.'libraries/rome.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'libraries'.DS.'rome.min.js'));
+            // Must be loaded in the right order
+            if (ACYM_CMS === 'joomla') {
+                acym_addScript(false, ACYM_JS.'libraries/moment.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'libraries'.DS.'moment.min.js'));
+            }
+            acym_addScript(false, ACYM_JS.'libraries/rome.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'libraries'.DS.'rome.min.js'), [
+                'dependencies' => ['moment'],
+            ]);
             acym_addScript(false, ACYM_JS.'libraries/material-datetime-picker.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'libraries'.DS.'material-datetime-picker.min.js'));
             acym_addStyle(false, ACYM_CSS.'libraries/material-datetime-picker.min.css?v='.filemtime(ACYM_MEDIA.'css'.DS.'libraries'.DS.'material-datetime-picker.min.css'));
         }
@@ -179,8 +209,10 @@ abstract class AcymController extends AcymObject
         }
 
         if (!empty($scripts['vue-applications'])) {
+            //vuejs javascript library
             acym_addScript(false, ACYM_JS.'libraries/vuejs.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'libraries'.DS.'vuejs.min.js'));
             acym_addScript(false, ACYM_JS.'libraries/vue-infinite-scroll.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'libraries'.DS.'vue-infinite-scroll.min.js'));
+            //All the component created to use in vue app (ex: select2 component)
             acym_addScript(false, ACYM_JS.'vue/vue_components.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'vue'.DS.'vue_components.min.js'));
             foreach ($scripts['vue-applications'] as $script) {
                 acym_addScript(false, ACYM_JS.'vue/'.$script.'.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'vue'.DS.$script.'.min.js'));
@@ -209,8 +241,7 @@ abstract class AcymController extends AcymObject
     {
         if (acym_isAdmin()) {
             if (!acym_isNoTemplate()) {
-                $header = new HeaderHelper();
-                $data['header'] = $header->display($this->breadcrumb);
+                $data['breadcrumb'] = $this->breadcrumb;
             }
             $viewNamespace = 'AcyMailing\\Views\\';
         } else {
@@ -223,6 +254,9 @@ abstract class AcymController extends AcymObject
         $view->display($this, $data);
     }
 
+    /**
+     * Called using data-task
+     */
     public function cancel(): void
     {
         acym_setVar('layout', 'listing');
@@ -248,6 +282,13 @@ abstract class AcymController extends AcymObject
 
             $this->display();
         } else {
+            if (!is_callable([$this, $nextstep])) {
+                acym_enqueueMessage(acym_translation('ACYM_NON_EXISTING_PAGE'), 'warning');
+                $this->listing();
+
+                return;
+            }
+
             acym_setVar('step', $nextstep);
 
             $this->$nextstep();
@@ -278,7 +319,7 @@ abstract class AcymController extends AcymObject
         if (!empty($step)) {
             $saveMethod = 'save'.ucfirst($step);
             if (!method_exists($this, $saveMethod)) {
-                die('Save method '.acym_escape($saveMethod).' not found');
+                die('Save method '.esc_html($saveMethod).' not found');
             }
 
             $this->$saveMethod();
@@ -295,7 +336,7 @@ abstract class AcymController extends AcymObject
 
     public function delete(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         $ids = acym_getVar('array', 'elements_checked', []);
         $allChecked = acym_getVar('string', 'checkbox_all');
         $currentPage = explode('_', acym_getVar('string', 'page', ''));
@@ -315,7 +356,7 @@ abstract class AcymController extends AcymObject
 
     public function setActive(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         $ids = acym_getVar('array', 'elements_checked', []);
 
         if (!empty($ids) && !empty($this->currentClass)) {
@@ -327,7 +368,7 @@ abstract class AcymController extends AcymObject
 
     public function setInactive(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         $ids = acym_getVar('array', 'elements_checked', []);
 
         if (!empty($ids) && !empty($this->currentClass)) {
@@ -343,6 +384,7 @@ abstract class AcymController extends AcymObject
         $classElement = empty($class) ? $this->currentClass : new $className();
         $matchingElement = $classElement->getMatchingElements($requestData);
 
+        // No result and no search used, we revert to default listing (all)
         if (empty($matchingElement['elements'])) {
             if (!empty($status) && empty($requestData['search']) && empty($requestData['tag'])) {
                 $status = '';
@@ -362,8 +404,12 @@ abstract class AcymController extends AcymObject
         return $matchingElement;
     }
 
+    /**
+     * Used in front/acym.php
+     */
     public function checkTaskFront(string $task = ''): void
     {
+        // For cron tasks created by users on their own server, for Joomla 4
         if ($this->getName() === 'cron') {
             $task = 'cron';
         }
@@ -372,27 +418,32 @@ abstract class AcymController extends AcymObject
             $task = $this->defaulttask;
         }
 
+        // Handle whitelisted tasks
         if (in_array($task, $this->publicFrontTasks)) {
             $this->$task();
 
             return;
         }
 
+        // No front-end management for WordPress users
         if (empty(acym_currentUserId()) || ACYM_CMS !== 'joomla' || !acym_level(ACYM_ENTERPRISE)) {
             acym_redirect(acym_rootURI(), 'Front-end management not available');
         }
 
+        // If there is no menu, someone typed the URL manually
         $currentMenu = acym_getMenu();
         if (empty($currentMenu)) {
             acym_redirect(acym_rootURI(), 'Direct access denied');
         }
 
+        // We whitelist specific routes when having access to specific menus
         if ($this->isTaskAllowed($currentMenu->link, $task)) {
             $this->$task();
 
             return;
         }
 
+        // Blacklist tasks by default
         acym_redirect(acym_rootURI(), 'Unknown route, access denied');
     }
 

@@ -13,6 +13,10 @@ class HistoryClass extends AcymClass
         $this->table = 'history';
     }
 
+    /**
+     * Function insert to insert a line into the history...
+     * User modification, user update, bounces... etc.
+     */
     public function insert(int $userId, string $action, array $data = [], int $mailid = 0, $unsubscribe_reason = null): void
     {
         $currentUserid = acym_currentUserId();
@@ -21,9 +25,10 @@ class HistoryClass extends AcymClass
         }
         $history = new \stdClass();
         $history->user_id = intval($userId);
-        $history->action = strip_tags($action);
+        $history->action = acym_stripTags($action);
         $history->data = implode("\n", $data);
         $history->unsubscribe_reason = $unsubscribe_reason;
+        //Avoid a memory issue when the data is way too big.
         if (strlen($history->data) > 100000) {
             $history->data = substr($history->data, 0, 10000);
         }
@@ -45,11 +50,20 @@ class HistoryClass extends AcymClass
 
         if (!empty($_SERVER)) {
             $source = [];
-            $vars = ['HTTP_REFERER', 'HTTP_USER_AGENT', 'HTTP_HOST', 'SERVER_ADDR', 'REMOTE_ADDR', 'REQUEST_URI', 'QUERY_STRING'];
+            $vars = [
+                'HTTP_REFERER',
+                'HTTP_USER_AGENT',
+                'HTTP_HOST',
+                'SERVER_ADDR',
+                'REMOTE_ADDR',
+                'REQUEST_URI',
+                'QUERY_STRING',
+            ];
 
             foreach ($vars as $oneVar) {
-                if (!empty($_SERVER[$oneVar])) {
-                    $source[] = $oneVar.'::'.strip_tags($_SERVER[$oneVar]);
+                $remoteIp = acym_getVar('string', $oneVar, '', 'SERVER');
+                if (!empty($remoteIp)) {
+                    $source[] = $oneVar.'::'.acym_stripTags($remoteIp);
                 }
             }
             $history->source = implode("\n", $source);
@@ -68,6 +82,9 @@ class HistoryClass extends AcymClass
         return !empty($result);
     }
 
+    /**
+     * Get all history lines for one user order by date descending
+     */
     public function getHistoryOfOneById(int $id): array
     {
         $query = 'SELECT h.*, m.id, m.subject FROM #__acym_'.$this->table.' AS h ';

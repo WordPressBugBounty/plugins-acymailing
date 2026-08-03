@@ -15,6 +15,9 @@ class OverrideClass extends AcymClass
         $this->pkey = 'id';
     }
 
+    /**
+     * Get mails depending on filters (search, ordering, pagination)
+     */
     public function getMatchingElements(array $settings = []): array
     {
         $query = 'SELECT override.*, mail.name, mail.subject FROM #__acym_mail_override AS override JOIN #__acym_mail AS mail ON override.mail_id = mail.id';
@@ -88,6 +91,9 @@ class OverrideClass extends AcymClass
         return acym_loadObjectList($query, $key);
     }
 
+    /**
+     * Returns the override email corresponding to the base email content provided
+     */
     public function getMailByBaseContent(string $subject, string $body): ?object
     {
         $translatepressIsActive = acym_isExtensionActive('translatepress-multilingual/index.php');
@@ -109,6 +115,8 @@ class OverrideClass extends AcymClass
                 $identifier = 'base_'.$part;
                 if (empty($oneOverride->$identifier)) continue;
 
+                // The identifier is the default email's text, for example "User coucou registered to the site https://www.acymailing.com"
+                // We use it to check if the current email matches
                 $decodedValue = json_decode($oneOverride->$identifier, true);
                 if (empty($decodedValue)) continue;
 
@@ -124,6 +132,9 @@ class OverrideClass extends AcymClass
                     }
                 }
 
+                // Replace the %s / %1$s by (.*) to get the params from the email content
+                // So: User %1$s registered to the site %2$s
+                // Becomes: User (.*) registered to the site (.*)
                 $oneOverride->$identifier = preg_replace(
                     [
                         '/%([0-9].?\$)?s/',
@@ -153,8 +164,10 @@ class OverrideClass extends AcymClass
                 }
             }
 
+            // The content didn't match the identifier
             if (!$matches) continue;
 
+            // We found the override
             $mailClass = new MailClass();
             $mail = $mailClass->getOneById($oneOverride->mail_id);
 
@@ -168,6 +181,7 @@ class OverrideClass extends AcymClass
                 $mail->subject = $subjectTranslated;
             }
 
+            // Include the found parameters
             $mail->parameters = $parameters;
 
             if (empty($oneOverride->base_body)) {

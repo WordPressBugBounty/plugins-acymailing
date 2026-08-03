@@ -20,12 +20,12 @@ trait Edition
 
         $tab = acym_getVar('string', 'step', ListsController::LIST_EDITION_TABS_GENERAL);
 
+        // In the front with the SEF activated, the tab is not always set
         if (empty($tab)) {
             $tab = ListsController::LIST_EDITION_TABS_GENERAL;
         }
 
         $data = [];
-        $data['svg'] = acym_loaderLogo(false);
         $data['workflowHelper'] = new WorkflowHelper();
         $data['currentTab'] = $tab;
         $data['tabs'] = [
@@ -65,12 +65,12 @@ trait Edition
             $listInformation->active = 1;
             $listInformation->visible = 1;
             $listInformation->color = '#'.implode('', [
-                    ListClass::COLOR_PARTS[rand(0, 15)],
-                    ListClass::COLOR_PARTS[rand(0, 15)],
-                    ListClass::COLOR_PARTS[rand(0, 15)],
-                    ListClass::COLOR_PARTS[rand(0, 15)],
-                    ListClass::COLOR_PARTS[rand(0, 15)],
-                    ListClass::COLOR_PARTS[rand(0, 15)],
+                    ListClass::COLOR_PARTS[acym_rand(0, 15)],
+                    ListClass::COLOR_PARTS[acym_rand(0, 15)],
+                    ListClass::COLOR_PARTS[acym_rand(0, 15)],
+                    ListClass::COLOR_PARTS[acym_rand(0, 15)],
+                    ListClass::COLOR_PARTS[acym_rand(0, 15)],
+                    ListClass::COLOR_PARTS[acym_rand(0, 15)],
                 ]);
             $listInformation->welcome_id = '';
             $listInformation->unsubscribe_id = '';
@@ -93,7 +93,7 @@ trait Edition
 
             $subscribersCount = $listClass->getSubscribersCountPerStatusByListIds([$listId]);
 
-            $this->breadcrumb[acym_escape($listInformation->name)] = acym_completeLink('lists&task=settings&listId='.$listId);
+            $this->breadcrumb[$listInformation->name] = acym_completeLink('lists&task=settings&listId='.$listId);
 
             $listInformation->access = empty($listInformation->access) ? [] : explode(',', $listInformation->access);
 
@@ -178,23 +178,7 @@ trait Edition
             return;
         }
 
-        $entityHelper = new EntitySelectHelper();
-
-        $data['subscribersEntitySelect'] = acym_modal(
-            acym_translation('ACYM_MANAGE_SUBSCRIBERS'),
-            $entityHelper->entitySelect(
-                'user',
-                ['join' => 'join_list-'.$listId],
-                $entityHelper->getColumnsForUser('userlist.user_id'),
-                ['text' => acym_translation('ACYM_CONFIRM'), 'action' => 'saveSubscribers'],
-                true,
-                '',
-                'subscriber'
-            ),
-            'acym__lists__settings__subscribers__entity__modal',
-            [],
-            ['class' => 'cell medium-6 large-shrink button button-secondary']
-        );
+        $data['subscribersEntitySelect'] = $listId;
     }
 
     private function prepareListStat(array &$data, int $listId): void
@@ -232,7 +216,8 @@ trait Edition
         $subEvolStat = $listClass->getYearSubEvolutionPerList($listId);
         if (empty($subEvolStat['subscribers']) && empty($subEvolStat['unsubscribers'])) return;
 
-        $firstMonth = date('n') + 1;
+        // Init tables ordered by month number starting on month from one year ago
+        $firstMonth = gmdate('n') + 1;
         $zeroReached = false;
         $evolSub = [];
         $evolUnsub = [];
@@ -301,6 +286,8 @@ trait Edition
 
     public function unsetMail(string $type): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $listClass = new ListClass();
         $id = acym_getVar('int', 'listId', 0);
         $list = $listClass->getOneById($id);
@@ -313,7 +300,7 @@ trait Edition
         }
 
         if (!$listClass->hasUserAccess($id)) {
-            die('Access denied for list '.acym_escape($id));
+            die('Access denied for list '.esc_html($id));
         }
 
         $list->$type = null;
@@ -345,7 +332,7 @@ trait Edition
 
     public function save(bool $goToListing = true): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $step = acym_getVar('string', 'step');
         if ($step === self::LIST_EDITION_TABS_GENERAL) {
@@ -373,7 +360,7 @@ trait Edition
             if (acym_isAdmin()) {
                 $listInformation->access = empty($listInformation->access) ? '' : ','.implode(',', $listInformation->access).',';
             } elseif (!empty($formData->id) && !$listClass->hasUserAccess($formData->id)) {
-                die('Cannot save list '.acym_escape($formData->id));
+                die('Cannot save list '.esc_html($formData->id));
             }
 
             $listId = $listClass->save($listInformation);
@@ -432,7 +419,7 @@ trait Edition
 
     public function saveSubscribers(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $this->saveSubscribersTolist();
         $listId = acym_getVar('int', 'listId', 0);

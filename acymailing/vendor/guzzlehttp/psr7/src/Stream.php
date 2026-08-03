@@ -6,19 +6,47 @@ namespace GuzzleHttp\Psr7;
 
 use Psr\Http\Message\StreamInterface;
 
+/**
+ * PHP stream implementation.
+ */
 class Stream implements StreamInterface
 {
+    /**
+     * @see https://www.php.net/manual/en/function.fopen.php
+     * @see https://www.php.net/manual/en/function.gzopen.php
+     */
     private const READABLE_MODES = '/r|a\+|ab\+|w\+|wb\+|x\+|xb\+|c\+|cb\+/';
     private const WRITABLE_MODES = '/a|w|r\+|rb\+|rw|x|c/';
 
+    /** @var resource */
     private $stream;
+    /** @var int|null */
     private $size;
+    /** @var bool */
     private $seekable;
+    /** @var bool */
     private $readable;
+    /** @var bool */
     private $writable;
+    /** @var string|null */
     private $uri;
+    /** @var mixed[] */
     private $customMetadata;
 
+    /**
+     * This constructor accepts an associative array of options.
+     *
+     * - size: (int) If a read stream would otherwise have an indeterminate
+     *   size, but the size is known due to foreknowledge, then you can
+     *   provide that size, in bytes.
+     * - metadata: (array) Any additional metadata to return when the metadata
+     *   of the stream is accessed.
+     *
+     * @param resource                            $stream  Stream resource to wrap.
+     * @param array{size?: int, metadata?: array} $options Associative array of options.
+     *
+     * @throws \InvalidArgumentException if the stream is not a stream resource
+     */
     public function __construct($stream, array $options = [])
     {
         if (!is_resource($stream)) {
@@ -38,6 +66,9 @@ class Stream implements StreamInterface
         $this->uri = $this->getMetadata('uri');
     }
 
+    /**
+     * Closes the stream when the destructed
+     */
     public function __destruct()
     {
         $this->close();
@@ -108,6 +139,7 @@ class Stream implements StreamInterface
             return null;
         }
 
+        // Clear the stat cache if the stream has a URI
         if ($this->uri) {
             clearstatcache(true, $this->uri);
         }
@@ -220,6 +252,7 @@ class Stream implements StreamInterface
             throw new \RuntimeException('Cannot write to a non-writable stream');
         }
 
+        // We can't know the size after writing anything
         $this->size = null;
         $result = fwrite($this->stream, $string);
 
@@ -230,6 +263,9 @@ class Stream implements StreamInterface
         return $result;
     }
 
+    /**
+     * @return mixed
+     */
     public function getMetadata($key = null)
     {
         if (!isset($this->stream)) {

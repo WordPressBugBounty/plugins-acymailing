@@ -1,32 +1,38 @@
 <?php
 
+defined('ABSPATH') || die('Restricted Access');
+
 use AcyMailing\Helpers\UpdatemeHelper;
 
+/**
+ * @param mixed $default
+ *
+ * @return mixed
+ */
 function acym_getVar(string $type, string $name, $default = null, string $source = 'REQUEST', int $mask = 0)
 {
     $source = strtoupper($source);
 
     switch ($source) {
-        case 'GET':
-            $input = &$_GET;
-            break;
-        case 'POST':
-            $input = &$_POST;
-            break;
         case 'FILES':
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is the caller's responsibility for this generic helper.
             $input = &$_FILES;
             break;
         case 'COOKIE':
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is the caller's responsibility for this generic helper.
             $input = &$_COOKIE;
             break;
-        case 'ENV':
-            $input = &$_ENV;
-            break;
         case 'SERVER':
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verification is the caller's responsibility for this generic helper.
             $input = &$_SERVER;
+            break;
+        case 'SESSION':
+            acym_session();
+            $input = &$_SESSION;
             break;
         default:
             $source = 'REQUEST';
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is the caller's responsibility for this generic helper.
             $input = &$_REQUEST;
             break;
     }
@@ -41,6 +47,7 @@ function acym_getVar(string $type, string $name, $default = null, string $source
         $result = (array)$result;
     }
 
+    // WP alters every variable in $_REQUEST... Seriously...
     if (in_array($source, ['POST', 'REQUEST', 'GET', 'COOKIE'])) {
         $result = acym_stripslashes($result);
     }
@@ -107,6 +114,7 @@ function acym_cleanVar($var, $type, $mask)
     }
 
     if (!preg_match('//u', $var)) {
+        // String contains invalid byte sequence, remove it
         $var = htmlspecialchars_decode(htmlspecialchars($var, ENT_IGNORE, 'UTF-8'));
     }
 
@@ -117,48 +125,24 @@ function acym_cleanVar($var, $type, $mask)
     return $var;
 }
 
-function acym_setVar(string $name, $value = null, string $hash = 'REQUEST', bool $overwrite = true): void
+function acym_setVar(string $name, $value): void
 {
-    $hash = strtoupper($hash);
-
-    switch ($hash) {
-        case 'GET':
-            $input = &$_GET;
-            break;
-        case 'POST':
-            $input = &$_POST;
-            break;
-        case 'FILES':
-            $input = &$_FILES;
-            break;
-        case 'COOKIE':
-            $input = &$_COOKIE;
-            break;
-        case 'ENV':
-            $input = &$_ENV;
-            break;
-        case 'SERVER':
-            $input = &$_SERVER;
-            break;
-        default:
-            $input = &$_REQUEST;
-            break;
-    }
-
-    if (!isset($input[$name]) || $overwrite) {
-        $input[$name] = $value;
-    }
+    $_REQUEST[$name] = $value;
 }
 
+/**
+ * Function detecting the context of a request, not related to security checks
+ */
 function acym_isAdmin(): bool
 {
+    // Outside of /wp-admin we are on the front-end, whatever the request parameters say
+    if (!is_admin()) {
+        return false;
+    }
+
     $page = acym_getVar('string', 'page', '');
 
-    if (!empty($page)) {
-        return !in_array($page, [ACYM_COMPONENT.'_front', 'front']);
-    } else {
-        return is_admin();
-    }
+    return !in_array($page, [ACYM_COMPONENT.'_front', 'front'], true);
 }
 
 function acym_cmsLoaded(): void
@@ -173,6 +157,7 @@ function acym_isDebug(): bool
 
 function acym_askLog(bool $current = true, string $message = 'ACYM_NOTALLOWED', string $type = 'error'): void
 {
+    //If the user is not logged in, we just redirect him to the login page....
     $url = acym_rootURI().'wp-login.php';
     if ($current) {
         $url .= '&redirect_to='.base64_encode(acym_currentURL());
@@ -201,9 +186,34 @@ function acym_getDefaultConfigValues(): array
     return $allPref;
 }
 
-function acym_cmsPermission(): string
+function acym_hasAdminPermissions(): bool
 {
-    if (!current_user_can('manage_options')) return '';
+    return current_user_can('manage_options');
+}
+
+/**
+ * May the user reach the AcyMailing back-end at all? Same rule as the menu visibility (Menu::addMenus).
+ */
+function acym_hasBackofficeAccess(): bool
+{
+    $config = acym_config();
+    $allowedGroups = explode(',', $config->get('wp_access', 'administrator'));
+
+    $userGroups = acym_getGroupsByUser();
+    foreach ($userGroups as $oneGroup) {
+        if ($oneGroup == 'administrator' || in_array($oneGroup, $allowedGroups)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function acym_cmsPermission(): void
+{
+    if (!acym_hasAdminPermissions()) {
+        return;
+    }
 
     $config = acym_config();
     $roles = acym_getGroups();
@@ -211,28 +221,32 @@ function acym_cmsPermission(): string
     $selected = explode(',', $config->get('wp_access', 'administrator'));
 
     foreach ($roles as $name => $oneRole) {
-        if ($name === 'administrator') continue;
+        if ($name === 'administrator') {
+            continue;
+        }
         $options[$name] = $oneRole->text;
     }
 
     asort($options);
 
-    $option = '
-		<div class="cell grid-x">
-			<label class="cell large-3 medium-5 small-9">'.acym_translation('ACYM_ACCESS').' '.acym_info(['textShownInTooltip' => 'ACYM_ACCESS_DESC']).'</label>
+    echo '<div class="cell grid-x">
+			<label class="cell large-3 medium-5 small-9">'.esc_html(acym_translation('ACYM_ACCESS')).' ';
+    acym_info(['textShownInTooltip' => 'ACYM_ACCESS_DESC']);
+    echo '</label>
 			<div class="cell auto">';
 
-    $option .= acym_selectMultiple(
+    acym_selectMultiple(
         $options,
         'config[wp_access]',
         $selected,
-        ['class' => 'acym__select']
+        ['class' => 'acym__select'],
+        'value',
+        'text',
+        true,
     );
 
-    $option .= '</div>
+    echo '</div>
 		</div>';
-
-    return $option;
 }
 
 function acym_triggerCmsHook(string $action, array $args = [], bool $isAction = true)
@@ -247,9 +261,8 @@ function acym_getCmsCaptcha(): array
     return [];
 }
 
-function acym_loadCaptcha(string $captchaPluginName, string $id): string
+function acym_loadCaptcha(string $captchaPluginName, string $id): void
 {
-    return '';
 }
 
 function acym_checkCaptcha(string $captchaPluginName, ?string $response = null): bool
@@ -262,11 +275,18 @@ function acym_getSiteSalt(): string
     return wp_salt('auth');
 }
 
-function acym_escapeUrl(string $url): string
+function acym_stripTags(string $text): string
 {
-    if (empty($url)) {
-        return '';
-    }
+    return wp_strip_all_tags($text);
+}
 
-    return esc_url($url);
+function acym_setSession(string $name, $value, bool $remove = false): void
+{
+    acym_session();
+
+    if ($remove) {
+        unset($_SESSION[$name]);
+    } else {
+        $_SESSION[$name] = $value;
+    }
 }

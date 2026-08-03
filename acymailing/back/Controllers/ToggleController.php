@@ -3,6 +3,7 @@
 namespace AcyMailing\Controllers;
 
 use AcyMailing\Classes\ListClass;
+use AcyMailing\Classes\MailClass;
 use AcyMailing\Classes\UserClass;
 use AcyMailing\Core\AcymController;
 
@@ -21,11 +22,13 @@ class ToggleController extends AcymController
 
         $this->defineToggles();
 
+        // Avoid caching issue in Internet Explorer
         acym_noCache();
     }
 
     protected function defineToggles(): void
     {
+        // $this->toggleableColumns[TABLE NAME WITHOUT PREFIX] = array(COLUMN NAME => PRIMARY KEY);
         $this->toggleableColumns['automation'] = ['active' => 'id'];
         $this->toggleableColumns['field'] = [
             'active' => 'id',
@@ -46,6 +49,7 @@ class ToggleController extends AcymController
         $this->toggleableColumns['mailbox_action'] = ['active' => 'id'];
         $this->toggleableColumns['scenario'] = ['active' => 'id'];
 
+        // $this->icons[TABLE NAME WITHOUT PREFIX][COLUMN NAME][VALUE] = ICON CLASS;
         $this->icons['automation']['active'][1] = 'acymicon-check-circle acym__color__green';
         $this->icons['automation']['active'][0] = 'acymicon-times-circle acym__color__red';
         $this->icons['field']['active'][1] = 'acymicon-check-circle acym__color__green';
@@ -98,13 +102,14 @@ class ToggleController extends AcymController
         $this->tooltips['mail_override']['active'][0] = 'ACYM_INACTIVE';
         $this->tooltips['mail_override']['active'][1] = 'ACYM_ACTIVE';
 
+        // $this->deletableRows[] = TABLE NAME WITHOUT PREFIX;
         $this->deletableRows[] = 'mail';
         $this->deletableRows[] = 'queue';
     }
 
     public function toggle(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $table = acym_getVar('word', 'table', '');
         $field = acym_getVar('cmd', 'field', '');
@@ -118,6 +123,9 @@ class ToggleController extends AcymController
             exit;
         }
 
+        // Security (ACL): per-table check — the 'toggle' exception opens this controller to ~10 roles regardless of table.
+        $this->checkToggleAcl($table);
+
         $preciseMethod = $table.ucfirst($field);
         $globalMethod = $table.'Global';
         if (method_exists($this, $preciseMethod)) {
@@ -130,6 +138,7 @@ class ToggleController extends AcymController
 
         acym_trigger('onAcymToggle'.ucfirst($table).ucfirst($field), [&$id, &$newValue]);
 
+        // Return the replacement icon
         if (empty($this->icons[$table][$field][$newValue])) {
             acym_sendAjaxResponse(acym_translation('ACYM_UNAUTHORIZED_ACCESS'), [], false);
         }
@@ -143,6 +152,29 @@ class ToggleController extends AcymController
         }
 
         acym_sendAjaxResponse('', $data);
+    }
+
+    // Each toggle icon is only rendered on the page whose ACL the user already holds, so this per-table check blocks only forged cross-feature requests (the 'toggle' exception opens the controller to ~10 roles); overridden as a no-op by FronttoggleController.
+    protected function checkToggleAcl(string $table): void
+    {
+        $tableAcl = [
+            'user' => 'users',
+            'list' => 'lists',
+            'campaign' => 'campaigns',
+            'followup' => 'campaigns',
+            'automation' => 'automation',
+            'segment' => 'segments',
+            'scenario' => 'scenarios',
+            'form' => 'forms',
+            'field' => 'fields',
+            'mailbox_action' => 'bounces',
+            'rule' => 'bounces',
+            'mail_override' => 'override',
+        ];
+
+        if (empty($tableAcl[$table]) || !acym_isAllowed($tableAcl[$table])) {
+            acym_sendAjaxResponse(acym_translation('ACYM_ACCESS_DENIED'), [], false);
+        }
     }
 
     protected function userActive(int $id, string $table, string $field, int $newValue): void
@@ -167,13 +199,24 @@ class ToggleController extends AcymController
     public function delete(): void
     {
         if (!acym_isAdmin()) exit;
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $table = acym_getVar('word', 'table', '');
         $id = acym_getVar('int', 'id', 0);
 
         if (empty($table) || !in_array($table, $this->deletableRows) || empty($id)) {
             exit;
+        }
+
+        if ($table === 'queue') {
+            $allowed = acym_isAllowed('queue');
+        } else {
+            $mailClass = new MailClass();
+            $allowed = $mailClass->hasUserAccess($id, true);
+        }
+
+        if (!$allowed) {
+            acym_sendAjaxResponse(acym_translation('ACYM_ACCESS_DENIED'), [], false);
         }
 
         $method = $table === 'queue' ? 'deleteQueuedByUserIds' : 'delete';
@@ -207,6 +250,10 @@ class ToggleController extends AcymController
 
     public function subscribeOnClick(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+        // Security (ACL): subscription management is restricted to the 'users' role (backend); no-op on front (ownership).
+        $this->checkToggleAcl('user');
+
         $userIds = acym_getVar('array', 'userid', []);
         $listIds = acym_getVar('array', 'listid', []);
 
@@ -228,6 +275,10 @@ class ToggleController extends AcymController
 
     public function unsubscribeOnClick(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+        // Security (ACL): subscription management is restricted to the 'users' role (backend); no-op on front (ownership).
+        $this->checkToggleAcl('user');
+
         $userIds = acym_getVar('array', 'userid', []);
         $listIds = acym_getVar('array', 'listid', []);
 

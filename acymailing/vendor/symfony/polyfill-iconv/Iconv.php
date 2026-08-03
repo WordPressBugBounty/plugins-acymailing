@@ -1,8 +1,39 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Symfony\Polyfill\Iconv;
 
+/**
+ * iconv implementation in pure PHP, UTF-8 centric.
+ *
+ * Implemented:
+ * - iconv              - Convert string to requested character encoding
+ * - iconv_mime_decode  - Decodes a MIME header field
+ * - iconv_mime_decode_headers - Decodes multiple MIME header fields at once
+ * - iconv_get_encoding - Retrieve internal configuration variables of iconv extension
+ * - iconv_set_encoding - Set current setting for character encoding conversion
+ * - iconv_mime_encode  - Composes a MIME header field
+ * - iconv_strlen       - Returns the character count of string
+ * - iconv_strpos       - Finds position of first occurrence of a needle within a haystack
+ * - iconv_strrpos      - Finds the last occurrence of a needle within a haystack
+ * - iconv_substr       - Cut out part of a string
+ *
+ * Charsets available for conversion are defined by files
+ * in the charset/ directory and by Iconv::$alias below.
+ * You're welcome to send back any addition you make.
+ *
+ * @author Nicolas Grekas <p@tchwork.com>
+ *
+ * @internal
+ */
 final class Iconv
 {
     public const ERROR_ILLEGAL_CHARACTER = 'iconv(): Detected an illegal character in input string';
@@ -101,6 +132,7 @@ final class Iconv
             return '';
         }
 
+        // Prepare for //IGNORE and //TRANSLIT
 
         $translit = $ignore = '';
 
@@ -149,6 +181,7 @@ final class Iconv
             $outCharset = self::$alias[$outCharset];
         }
 
+        // Load charset maps
 
         if (('utf-8' !== $inCharset && !self::loadMap('from.', $inCharset, $inMap))
           || ('utf-8' !== $outCharset && !self::loadMap('to.', $outCharset, $outMap))) {
@@ -158,6 +191,7 @@ final class Iconv
         }
 
         if ('utf-8' !== $inCharset) {
+            // Convert input to UTF-8
             $result = '';
             if (self::mapToUtf8($result, $inMap, $str, $ignore)) {
                 $str = $result;
@@ -175,11 +209,13 @@ final class Iconv
             }
 
             if ('utf-8' === $outCharset) {
+                // UTF-8 validation
                 $str = self::utf8ToUtf8($str, $ignore);
             }
         }
 
         if ('utf-8' !== $outCharset && false !== $str) {
+            // Convert output to UTF-8
             $result = '';
             if (self::mapFromUtf8($result, $outMap, $str, $ignore, $translit)) {
                 return $result;

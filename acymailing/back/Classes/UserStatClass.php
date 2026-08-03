@@ -37,8 +37,8 @@ class UserStatClass extends AcymClass
         $query = 'INSERT INTO #__acym_user_stat ('.implode(',', $column).') VALUE ('.implode(', ', $valueColumn).')';
         $onDuplicate = [];
 
-        if (!empty($userStat['statusSending'])) {
-            $onDuplicate[] = $userStat['statusSending'] == 0 ? 'fail = fail + 1' : 'sent = sent + 1';
+        if (isset($userStat['statusSending'])) {
+            $onDuplicate[] = empty($userStat['statusSending']) ? 'fail = fail + 1' : 'sent = sent + 1';
         }
 
         if ($overrideSendDate && !empty($userStat['send_date'])) {
@@ -184,11 +184,13 @@ class UserStatClass extends AcymClass
             $totalClicksForMails = [];
             $campaignsForMails = [];
             foreach ($mails as $key => $mail) {
+                // Add tracked income amount
                 if (!empty($trackingSales[$mail->mail_id.'-'.$mail->user_id])) {
                     acym_trigger('getCurrency', [&$mails[$key]->currency]);
                     $mails[$key]->sales = $trackingSales[$mail->mail_id.'-'.$mail->user_id]->sale;
                 }
 
+                // Add total clicks
                 if (!isset($totalClicksForMails[$mail->mail_id])) {
                     $totalClicksForMails[$mail->mail_id] = acym_loadObjectList(
                         'SELECT SUM(click) AS nbClicks, user_id
@@ -200,6 +202,7 @@ class UserStatClass extends AcymClass
                 }
                 $mails[$key]->total_click = empty($totalClicksForMails[$mail->mail_id][$mail->user_id]) ? 0 : $totalClicksForMails[$mail->mail_id][$mail->user_id]->nbClicks;
 
+                // Handle multilingual
                 $mainMailId = empty($mail->parent_id) ? $mail->mail_id : $mail->parent_id;
                 if (!isset($campaignsForMails[$mainMailId])) {
                     $campaignsForMails[$mainMailId] = acym_loadObject('SELECT id AS campaign_id, parent_id FROM #__acym_campaign WHERE mail_id = '.intval($mainMailId));
@@ -329,7 +332,7 @@ class UserStatClass extends AcymClass
             7 => [0, 2],
         ];
 
-        $percentage = rand($randoms[$hour][0], $randoms[$hour][1]);
+        $percentage = acym_rand($randoms[$hour][0], $randoms[$hour][1]);
 
         if ($percentageRemaining - $percentage < 0) {
             return 0;
@@ -338,5 +341,17 @@ class UserStatClass extends AcymClass
         $percentageRemaining -= $percentage;
 
         return $percentage;
+    }
+
+    public function hasUserReceivedMail(int $mailId, int $userId): bool
+    {
+        $sentToRecipient = acym_loadResult(
+            'SELECT COUNT(*)
+            FROM #__acym_user_stat AS userStat
+            WHERE userStat.mail_id = '.intval($mailId).'
+                AND userStat.user_id = '.intval($userId)
+        );
+
+        return !empty($sentToRecipient);
     }
 }

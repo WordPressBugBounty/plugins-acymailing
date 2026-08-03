@@ -7,11 +7,17 @@ use AcyMailing\Classes\ListClass;
 
 trait SubscriptionInsertion
 {
+    //Set this variable to true once the list unsubscribe is added so we don't add it twice
     private $addedListUnsubscribe = [];
+    //Keep all lists and IDs for users so we don't do the query twice
     private $lists = [];
+    //Keep all listsowner information so we don't do the query again and again
     private $listsowner = [];
+    //Keep the list information there
     private $listsinfo = [];
+    //Used to know if we should add a List-Unsubscribe header
     private $unsubscribeLink = [];
+    // Used for list-unsubscribe to store the mail's list ids
     private $mailLists = [];
     private $userClass = null;
 
@@ -26,6 +32,7 @@ trait SubscriptionInsertion
         $others['unsubscribe'] = ['name' => acym_translation('ACYM_UNSUBSCRIBE_LINK'), 'default' => 'ACYM_UNSUBSCRIBE'];
         $others['unsubscribeall'] = ['name' => acym_translation('ACYM_UNSUBSCRIBE_ALL_LISTS_LINK'), 'default' => 'ACYM_UNSUBSCRIBE_ALL_LISTS'];
         $others['direct_unsubscribe'] = ['name' => acym_translation('ACYM_DIRECT_UNSUBSCRIBE_LINK'), 'default' => 'ACYM_UNSUBSCRIBE'];
+        $others['disable_tracking'] = ['name' => acym_translation('ACYM_DISABLE_TRACKING_LINK'), 'default' => 'ACYM_DISABLE_TRACKING'];
         $others['confirm'] = ['name' => acym_translation('ACYM_CONFIRM_SUBSCRIPTION_LINK'), 'default' => 'ACYM_CONFIRM_SUBSCRIPTION'];
         $others['subscribe'] = ['name' => acym_translation('ACYM_SUBSCRIBE_LINK'), 'default' => 'ACYM_SUBSCRIBE'];
 
@@ -41,7 +48,7 @@ trait SubscriptionInsertion
                 let defaultText = [];
                 <?php
                 foreach ($others as $tagname => $tag) {
-                    echo 'defaultText["'.$tagname.'"] = "'.acym_translation($tag['default'], true).'";';
+                    echo 'defaultText["'.esc_attr($tagname).'"] = '.json_encode(acym_translation($tag['default'])).';';
                 }
                 ?>
                 jQuery('.selected_row').removeClass('selected_row');
@@ -124,59 +131,65 @@ trait SubscriptionInsertion
             }
 		</script>
         <?php
-        $text = '<div class="acym__popup__listing text-center grid-x">
-                    <h1 class="acym__title acym__title__secondary text-center cell">'.acym_translation('ACYM_SUBSCRIPTION').'</h1>
-                    <div class="grid-x medium-12 cell acym__row__no-listing text-left acym_vcenter">
-                        <div class="grid-x cell medium-5 small-12 acym__listing__title acym__listing__title__dynamics acym__subscription__subscription acym_vcenter">
-                            <label class="small-3 margin-bottom-0" for="acym__popup__subscription__tagtext">'.acym_translation('ACYM_TEXT').': </label>
-                            <input class="small-9" type="text" name="tagtext" id="acym__popup__subscription__tagtext" onchange="setSubscriptionTag();">
-                        </div>
-                        <div class="medium-1"></div>
-                        <div style="display: none;" id="select_lists_zone" class="grid-x cell medium-6 small-12 acym__listing__title acym__listing__title__dynamics">
-                            <p class="shrink" id="acym__popup__subscription__text__list">'.acym_translation('ACYM_LISTS_SELECTED').'</p>
-                            <p class="shrink" id="acym__popup__subscription__listids"></p>
-                        </div>
-                    </div>';
-        $text .= '
-					<div class="cell grid-x">';
+        //Add an area where the user will be able to select another text to add
+        echo '<div class="acym__popup__listing text-center grid-x">
+				<h1 class="acym__title acym__title__secondary text-center cell">'.esc_html(acym_translation('ACYM_SUBSCRIPTION')).'</h1>
+				<div class="grid-x medium-12 cell acym__row__no-listing text-left acym_vcenter">
+					<div class="grid-x cell medium-5 small-12 acym__listing__title acym__listing__title__dynamics acym__subscription__subscription acym_vcenter">
+						<label class="small-3 margin-bottom-0" for="acym__popup__subscription__tagtext">'.esc_html(acym_translation('ACYM_TEXT')).': </label>
+						<input class="small-9" type="text" name="tagtext" id="acym__popup__subscription__tagtext" onchange="setSubscriptionTag();">
+					</div>
+					<div class="medium-1"></div>
+					<div style="display: none;" id="select_lists_zone" class="grid-x cell medium-6 small-12 acym__listing__title acym__listing__title__dynamics">
+						<p class="shrink" id="acym__popup__subscription__text__list">'.esc_html(acym_translation('ACYM_LISTS_SELECTED')).'</p>
+						<p class="shrink" id="acym__popup__subscription__listids"></p>
+					</div>
+				</div>
+				<div class="cell grid-x">';
 
         foreach ($others as $tagname => $tag) {
             $onclick = "changeSubscriptionTag('".$tagname."');";
-            if ($tagname == 'subscribe') {
+            if ($tagname === 'subscribe') {
                 $onclick .= 'displayLists();return false;';
-            } elseif ($tagname == 'direct_unsubscribe') {
+            } elseif ($tagname === 'direct_unsubscribe') {
                 $onclick .= 'displayDirectUnsubscribeRedirect();return false;';
-            } elseif ($tagname == 'unsubscribeall') {
+            } elseif ($tagname === 'unsubscribeall') {
                 $onclick .= 'displayUnsubscribeAllRedirect();return false;';
             }
-            $text .= '<div class="grid-x small-12 cell acym__row__no-listing acym__listing__row__popup text-left"  onclick="'.$onclick.'" id="tr_'.$tagname.'" >';
-            $text .= '<div class="cell small-12 acym__listing__title acym__listing__title__dynamics">'.$tag['name'].'</div>';
-            $text .= '</div>';
+
+            echo '<div class="grid-x small-12 cell acym__row__no-listing acym__listing__row__popup text-left"  onclick="'.esc_attr($onclick).'" id="tr_'.esc_attr(
+                    $tagname
+                ).'" >';
+            echo '<div class="cell small-12 acym__listing__title acym__listing__title__dynamics">'.wp_kses(
+                    $tag['name'],
+                    [
+                        'b' => [],
+                    ]
+                ).'</div>';
+            echo '</div>';
         }
-        $text .= '</div>
-					<div class="medium-1"></div>
-                    <div class="medium-10 text-left">';
-        $text .= acym_modalPaginationLists(
+        echo '</div>
+				<div class="medium-1"></div>
+				<div class="medium-10 text-left">';
+        acym_modalPaginationLists(
             'acym__popup__subscription__change',
             ''
         );
-        $text .= '
-			<div style="display: none;" id="acym__popup__plugin__direct_unsubscribe__modal" class="grid-x cell medium-6 small-12 acym__listing__title acym__listing__title__dynamics">
-				<label>'.acym_translation('ACYM_REDIRECTION_URL').'</label>
+        echo '<div style="display: none;" id="acym__popup__plugin__direct_unsubscribe__modal" class="grid-x cell medium-6 small-12 acym__listing__title acym__listing__title__dynamics">
+				<label>'.esc_html(acym_translation('ACYM_REDIRECTION_URL')).'</label>
 				<input type="text" id="acym__popup__direct_unsubscribe__redirect" placeholder="https://example.com/unsubscribed" />
 				<p id="acym__popup__direct_unsubscribe__preview" class="acym_smalltext text-gray"></p>
-			</div>';
-
-        $text .= '
+			</div>
 			<div style="display: none;" id="acym__popup__plugin__unsubscribeall__modal" class="grid-x cell medium-6 small-12 acym__listing__title acym__listing__title__dynamics">
-				<label>'.acym_translation('ACYM_REDIRECTION_URL').'</label>
-				<input type="text" id="acym__popup__unsubscribeall__redirect" placeholder="https://example.com/all-unsubscribed" />
-    			<p id="acym__popup__unsubscribeall__preview" class="acym_smalltext text-gray"></p>
-			</div>';
-        $text .= '  </div>
-                    <div class="medium-1"></div>
-				</div>';
+					<label>'.esc_html(acym_translation('ACYM_REDIRECTION_URL')).'</label>
+					<input type="text" id="acym__popup__unsubscribeall__redirect" placeholder="https://example.com/all-unsubscribed" />
+					<p id="acym__popup__unsubscribeall__preview" class="acym_smalltext text-gray"></p>
+				</div>
+			</div>
+			<div class="medium-1"></div>
+		</div>';
 
+        // List tags
         $others = [];
         $others['name'] = acym_translation('ACYM_LIST_NAME');
         $others['description'] = acym_translation('ACYM_LIST_DESCRIPTION');
@@ -184,45 +197,60 @@ trait SubscriptionInsertion
         $others['descriptions'] = acym_translation('ACYM_LIST_DESCRIPTIONS');
         $others['id'] = acym_translation('ACYM_LIST_ID', true);
 
-        $text .= '<div class="acym__popup__listing text-center grid-x">
-					<h1 class="acym__title acym__title__secondary text-center cell">'.acym_translation('ACYM_LIST').'</h1>
-					<div class="cell grid-x">';
+        echo '<div class="acym__popup__listing text-center grid-x">
+				<h1 class="acym__title acym__title__secondary text-center cell">'.esc_html(acym_translation('ACYM_LIST')).'</h1>
+				<div class="cell grid-x">';
 
         foreach ($others as $tagname => $tag) {
-            $text .= '<div class="grid-x medium-12 cell acym__row__no-listing acym__listing__row__popup text-left" onclick="changeSubscriptionTag(\'list\');setTag(\'{list:'.$tagname.'}\', jQuery(this));" id="tr_'.$tagname.'">
-                        <div class="cell medium-12 small-12 acym__listing__title acym__listing__title__dynamics">'.$tag.'</div>
-                      </div>';
+            echo '<div class="grid-x medium-12 cell acym__row__no-listing acym__listing__row__popup text-left" onclick="changeSubscriptionTag(\'list\');setTag(\'{list:'.esc_attr(
+                    $tagname
+                ).'}\', jQuery(this));" id="tr_'.esc_attr($tagname).'">
+					<div class="cell medium-12 small-12 acym__listing__title acym__listing__title__dynamics">'.esc_html($tag).'</div>
+				  </div>';
         }
 
-        $text .= '</div></div>';
+        echo '</div></div>';
 
-        $text .= '<div class="acym__popup__listing text-center grid-x">
-					<span class="acym__title acym__title__secondary text-center cell">'.acym_translation('ACYM_CAMPAIGN').'</span>
-					<div class="cell grid-x">';
+        // Newsletter tags
+        echo '<div class="acym__popup__listing text-center grid-x">
+				<span class="acym__title acym__title__secondary text-center cell">'.esc_html(acym_translation('ACYM_CAMPAIGN')).'</span>
+				<div class="cell grid-x">';
         $othersMail = ['campaignid', 'subject'];
 
         foreach ($othersMail as $tag) {
-            $text .= '<div class="grid-x medium-12 cell acym__row__no-listing acym__listing__row__popup text-left" onclick="changeSubscriptionTag(\'mail\');setTag(\'{mail:'.$tag.'}\', jQuery(this));" id="tr_'.$tag.'">
-                        <div class="cell medium-12 small-12 acym__listing__title acym__listing__title__dynamics">'.$tag.'</div>
-                      </div>';
+            echo '<div class="grid-x medium-12 cell acym__row__no-listing acym__listing__row__popup text-left" onclick="changeSubscriptionTag(\'mail\');setTag(\'{mail:'.esc_attr(
+                    $tag
+                ).'}\', jQuery(this));" id="tr_'.esc_attr($tag).'">
+					<div class="cell medium-12 small-12 acym__listing__title acym__listing__title__dynamics">'.esc_html($tag).'</div>
+				  </div>';
         }
-        $text .= '</div></div>';
+        echo '</div></div>';
 
-        $text .= '<div class="acym__popup__listing text-center grid-x">
-					<span class="acym__title acym__title__secondary text-center cell">'.acym_translation('ACYM_AUTO').' '.acym_translation('ACYM_CAMPAIGNS').'</span>
-					<div class="cell grid-x">';
-        $autoMail = ['number_generated' => ['name' => acym_translation('ACYM_ISSUE_NB'), 'default' => '#1']];
+        // Smart newsletter tags
+        echo '<div class="acym__popup__listing text-center grid-x">
+				<span class="acym__title acym__title__secondary text-center cell">'.esc_html(acym_translation('ACYM_AUTO').' '.acym_translation('ACYM_CAMPAIGNS')).'</span>
+				<div class="cell grid-x">';
+
+        $autoMail = [
+            'number_generated' => [
+                'name' => acym_translation('ACYM_ISSUE_NB'),
+                'default' => '#1',
+            ],
+        ];
 
         foreach ($autoMail as $tag => $oneTag) {
             $tagInserted = $tag;
-            if (!empty($oneTag['default'])) $tagInserted = $tag.'|default:'.$oneTag['default'];
-            $text .= '<div class="grid-x medium-12 cell acym__row__no-listing acym__listing__row__popup text-left" onclick="changeSubscriptionTag(\'automail\');setTag(\'{automail:'.$tagInserted.'}\', jQuery(this));" id="tr_'.$tag.'">
-                        <div class="cell medium-12 small-12 acym__listing__title acym__listing__title__dynamics">'.$oneTag['name'].'</div>
-                      </div>';
-        }
-        $text .= '</div></div>';
+            if (!empty($oneTag['default'])) {
+                $tagInserted = $tag.'|default:'.$oneTag['default'];
+            }
 
-        echo $text;
+            echo '<div class="grid-x medium-12 cell acym__row__no-listing acym__listing__row__popup text-left" onclick="changeSubscriptionTag(\'automail\');setTag(\'{automail:'.esc_attr(
+                    $tagInserted
+                ).'}\', jQuery(this));" id="tr_'.esc_attr($tag).'">
+					<div class="cell medium-12 small-12 acym__listing__title acym__listing__title__dynamics">'.esc_html($oneTag['name']).'</div>
+				  </div>';
+        }
+        echo '</div></div>';
     }
 
     public function replaceUserInformation(object &$email, ?object &$user, bool $send = true): void
@@ -232,12 +260,14 @@ trait SubscriptionInsertion
         }
         $this->replacelisttags($email, $user, $send);
 
+        // Check if we should add the List-Unsubscribe header
         if (empty($user->id) || !empty($this->addedListUnsubscribe[$email->id][$user->id])) return;
         if (empty($this->unsubscribeLink[$email->id]) || !method_exists($email, 'addCustomHeader')) return;
 
 
         $this->addedListUnsubscribe[$email->id][$user->id] = true;
 
+        // Prepare the mailto parameters for the header
         $mailto = '';
         if ($this->config->get('auto_bounce', 0)) {
             $mailto = $this->config->get('bounce_email');
@@ -246,6 +276,7 @@ trait SubscriptionInsertion
             $mailto = empty($email->replyemail) ? $this->config->get('replyto_email') : $email->replyemail;
         }
 
+        // No bounce address, no reply-to address on the email or the configuration
         if (empty($mailto)) {
             return;
         }
@@ -258,6 +289,7 @@ trait SubscriptionInsertion
             $this->mailLists[$email->id] = empty($lists) ? null : array_keys($lists);
         }
 
+        // Make sure we unsubscribe from the correct lists and not all the lists
         if (!empty($this->mailLists[$email->id])) {
             $userClass = $this->getUserClass();
             $userLists = $userClass->getSubscriptionStatus($user->id, [], UserClass::STATUS_SUBSCRIBED);
@@ -325,6 +357,7 @@ trait SubscriptionInsertion
         }
     }
 
+    // Available tags: {automail:number_generated}
     private function replaceAutomailTags(&$email)
     {
         $result = $this->pluginHelper->extractTags($email, 'automail');
@@ -352,6 +385,7 @@ trait SubscriptionInsertion
         $this->pluginHelper->replaceTags($email, $tags);
     }
 
+    //Available tags: {list:name} , {list:count} , {list:count|listid:0} (to count all users), {list:members}, {list:owner}
     private function replacelisttags(&$email, &$user, $send)
     {
         $tags = $this->pluginHelper->extractTags($email, 'list');
@@ -405,6 +439,7 @@ trait SubscriptionInsertion
             }
         }
 
+        //We could not find a list id there... maybe there is no subscription in which case we take the first one...
         if (!empty($mailLists)) {
             $this->lists[$mailid][$subid] = array_shift($mailLists);
 
@@ -412,6 +447,7 @@ trait SubscriptionInsertion
         }
 
         if (!empty($subid) && !empty($email->type) && $email->type === MailClass::TYPE_WELCOME) {
+            //Last list the user subscribed to...
             $listid = acym_loadResult(
                 'SELECT list.id 
 				FROM #__acym_list AS list 
@@ -427,6 +463,7 @@ trait SubscriptionInsertion
         }
 
         if (!empty($subid) && !empty($email->type) && $email->type === MailClass::TYPE_UNSUBSCRIBE) {
+            //Last list the user unsubscribed from...
             $listid = acym_loadResult(
                 'SELECT list.id 
 				FROM #__acym_list AS list 
@@ -441,6 +478,7 @@ trait SubscriptionInsertion
             }
         }
 
+        //Still no list? well, lets load the first list the user is subscribed to then
         if (!empty($userLists)) {
             $listIds = array_keys($userLists);
             $this->lists[$mailid][$subid] = array_shift($listIds);
@@ -470,6 +508,10 @@ trait SubscriptionInsertion
         return implode(isset($parameter->separator) ? $parameter->separator : ', ', $lists);
     }
 
+    /**
+     * Replace data about the list owner
+     * Use the tag:  {list:owner|field:name} or {list:owner|field:username} or {list:owner|field:email}
+     */
     private function listowner(&$email, &$user, &$parameter)
     {
         if (empty($user->id)) {
@@ -575,7 +617,7 @@ trait SubscriptionInsertion
 
     private function replaceSubscriptionTags(&$email)
     {
-        $match = '#(?:{|%7B)(confirm|unsubscribe(?:\|[^}]+)*|unsubscribeall(?:\|[^}]+)*|direct_unsubscribe(?:\|[^}]+)*|subscribe(?:\|[^}]+)*)(?:}|%7D)(.*)(?:{|%7B)/(confirm|unsubscribe|direct_unsubscribe|unsubscribeall|subscribe)(?:}|%7D)#Uis';
+        $match = '#(?:{|%7B)(confirm|unsubscribe(?:\|[^}]+)*|unsubscribeall(?:\|[^}]+)*|direct_unsubscribe(?:\|[^}]+)*|disable_tracking(?:\|[^}]+)*|subscribe(?:\|[^}]+)*)(?:}|%7D)(.*)(?:{|%7B)/(confirm|unsubscribe|direct_unsubscribe|unsubscribeall|disable_tracking|subscribe)(?:}|%7D)#Uis';
         $variables = ['subject', 'body'];
         $found = false;
         $results = [];
@@ -583,15 +625,18 @@ trait SubscriptionInsertion
             if (empty($email->$var)) continue;
 
             $found = preg_match_all($match, $email->$var, $results[$var]) || $found;
+            //we unset the results so that we won't handle it later... it will save some memory and processing
             if (empty($results[$var][0])) unset($results[$var]);
         }
 
+        //If we didn't find anything...
         if (!$found) return;
 
         $tags = [];
         $this->addedListUnsubscribe[$email->id] = [];
         foreach ($results as $var => $allresults) {
             foreach ($allresults[0] as $i => $oneTag) {
+                //Don't need to process twice a tag we already have!
                 if (isset($tags[$oneTag])) continue;
 
                 $tags[$oneTag] = $this->replaceSubscriptionTag($allresults, $i, $email);
@@ -608,6 +653,7 @@ trait SubscriptionInsertion
         $lang = $this->getLanguage($email->links_language);
 
         if ($parameters->id === 'confirm') {
+            // subscription confirmation link
             $myLink = acym_frontendLink('frontusers&task=confirm&userId={subscriber:id}&userKey={subscriber:key|urlencode}'.$lang);
             if (empty($allresults[2][$i])) {
                 return $myLink;
@@ -615,6 +661,7 @@ trait SubscriptionInsertion
 
             return '<a target="_blank" href="'.$myLink.'"><span class="acym_confirm acym_link">'.$allresults[2][$i].'</span></a>';
         } elseif ($parameters->id === 'subscribe') {
+            // direct subscription link
             if (empty($parameters->lists)) {
                 return acym_translation('ACYM_EXPORT_SELECT_LIST');
             }
@@ -648,6 +695,20 @@ trait SubscriptionInsertion
             }
 
             return '<a style="text-decoration:none;" target="_blank" href="'.$myLink.'"><span class="acym_unsubscribe_direct acym_link">'.$allresults[2][$i].'</span></a>';
+        } elseif ($parameters->id === 'disable_tracking') {
+            $myLink = acym_frontendLink(
+                'frontusers&task=disableTracking'
+                .'&userId={subscriber:id}'
+                .'&userKey={subscriber:key|urlencode}'
+                .'&mail_id='.$email->id
+                .$lang
+            );
+
+            if (empty($allresults[2][$i])) {
+                return $myLink;
+            }
+
+            return '<a style="text-decoration:none;" target="_blank" href="'.$myLink.'"><span class="acym_disable_tracking acym_link">'.$allresults[2][$i].'</span></a>';
         } else {
             $baseLink = 'frontusers'.$lang.'&mail_id='.$email->id;
             if ($parameters->id === 'unsubscribe') {

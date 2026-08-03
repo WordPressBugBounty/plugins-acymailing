@@ -4,6 +4,9 @@ namespace AcyMailing\Views\Stats;
 
 use AcyMailing\Core\AcymView;
 
+/**
+ * Class UsersViewUsers
+ */
 class StatsView extends AcymView
 {
     public function __construct()
@@ -18,6 +21,7 @@ class StatsView extends AcymView
     public function isMailSelected($mailId, $clickMap)
     {
 
+        // We track the fact that he checked the mail stats once for the beginner's steps
         $this->config->saveConfig(['mail_stats_checked_once' => 1]);
     }
 }

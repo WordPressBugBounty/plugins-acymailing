@@ -138,6 +138,7 @@ class AcymPunycode
 
     public function emailToUTF8($input, $one_time_encoding = false)
     {
+        // Optionally set
         if ($one_time_encoding) {
             switch ($one_time_encoding) {
                 case 'utf8':
@@ -153,6 +154,7 @@ class AcymPunycode
         $input = trim($input);
 
         if (strpos($input, '@')) { // Maybe it is an email address
+            // No no in strict mode
             if ($this->_strict_mode) {
                 return false;
             }
@@ -178,7 +180,7 @@ class AcymPunycode
             if ($this->_strict_mode) {
                 return false;
             }
-            $parsed = parse_url($input);
+            $parsed = acym_parseUrl($input);
             if (isset($parsed['host'])) {
                 $arr = explode('.', $parsed['host']);
                 foreach ($arr as $k => $v) {
@@ -298,6 +300,7 @@ class AcymPunycode
                 case 0xFF0E:
                 case 0xFF61:
                     $decoded[$k] = 0x2E;
+                // normal I guess
                 case 0x2E:
                 case 0x2F:
                 case 0x3A:

@@ -7,14 +7,18 @@ use AcyMailing\Core\AcymObject;
 class ImageHelper extends AcymObject
 {
     public string $error = '';
+    // New Height the picture should be
     public int $maxHeight;
+    // New Width the picture should be
     public int $maxWidth;
+    // Folder where pictures should be stored
     public string $destination;
 
     public function removePictures(string $text): string
     {
         $return = preg_replace('#< *img((?!content_main_image)[^>])*>#Ui', '', $text);
 
+        // Clean JCE caption
         return preg_replace('#< *div[^>]*class="jce_caption"[^>]*>[^<]*(< *div[^>]*>[^<]*<\/div>)*[^<]*<\/div>#Ui', '', $return);
     }
 
@@ -39,12 +43,14 @@ class ImageHelper extends AcymObject
         return true;
     }
 
+    //This function will check all images from the input and return an output with the pictures transformed with the right size
     public function resizePictures(string $input): string
     {
         $this->destination = ACYM_MEDIA.'resized'.DS;
         acym_createDir($this->destination);
         $content = acym_absoluteURL($input);
 
+        //regex take all images:
         preg_match_all('#<img([^>]*)>#Ui', $content, $results);
         if (empty($results[1])) {
             return $input;
@@ -53,23 +59,29 @@ class ImageHelper extends AcymObject
         $replace = [];
 
         foreach ($results[1] as $onepicture) {
+            //Check if there the "donotresize" element inside, we don't resize it.
+            //It can be either in the class or in the filename itself
             if (strpos($onepicture, 'donotresize') !== false) {
                 continue;
             }
 
+            //Take the path
             if (!preg_match('#src="([^"]*)"#Ui', $onepicture, $path)) {
                 continue;
             }
             $imageUrl = $path[1];
 
+            //images paths on joomla 4 have some content like : #joomlaImage... , we delete it to get and resize the image without errors
             $imageUrl = preg_replace('/#joomlaImage.*/', '', $imageUrl);
 
+            //We are nice guys... sometimes users use www. or not... so we convert both, same thing for httpS or http
             $imageUrl = acym_internalUrlToPath($imageUrl);
 
             $newPicture = $this->generateThumbnail($imageUrl);
 
             $newDimension = 'max-width:'.$this->maxWidth.'px;max-height:'.$this->maxHeight.'px;';
 
+            //Maybe we don't need to resize anything...
             if (empty($newPicture)) {
                 if (strpos($onepicture, 'style="') !== false) {
                     $replace[$onepicture] = preg_replace('#style="([^"]*)"#Uis', 'style="'.$newDimension.'$1"', $onepicture);
@@ -79,10 +91,13 @@ class ImageHelper extends AcymObject
                 continue;
             }
 
+            //Because the ACYM_ROOT may be empty, we only make sure to replace the first instance found.
             $newPicture['file'] = preg_replace('#^'.preg_quote(ACYM_ROOT, '#').'#i', ACYM_LIVE, $newPicture['file']);
             $newPicture['file'] = str_replace(DS, '/', $newPicture['file']);
+            //replace the image url now with the new one...
             $replaceImage = [];
             $replaceImage[$path[1]] = $newPicture['file'];
+            //replace information if we had some (height,width...)
             if (preg_match_all('#(width|height)(:|=) *"?([0-9]+)#i', $onepicture, $resultsSize)) {
                 foreach ($resultsSize[0] as $i => $oneArg) {
                     $newVal = (strtolower($resultsSize[1][$i]) == 'width') ? $newPicture['width'] : $newPicture['height'];
@@ -95,6 +110,7 @@ class ImageHelper extends AcymObject
 
             $replace[$onepicture] = str_replace(array_keys($replaceImage), $replaceImage, $onepicture);
 
+            // Make sure that we resized the image
             if (strpos($replace[$onepicture], 'width') === false) {
                 if (strpos($onepicture, 'style="') !== false) {
                     $replace[$onepicture] = preg_replace('#style="([^"]*)"#Uis', 'style="'.$newDimension.'$1"', $replace[$onepicture]);
@@ -136,6 +152,7 @@ class ImageHelper extends AcymObject
         }
 
         if (substr($picturePath, 0, 10) == 'data:image') {
+            //It's a picture in base64 encoding... we will apply an extension name and name based on the content...
             preg_match('#data:image/([^;]{1,5});#', $picturePath, $resultextension);
             if (empty($resultextension[1])) {
                 return [];
@@ -145,6 +162,8 @@ class ImageHelper extends AcymObject
         } else {
             $extension = strtolower(substr($filename, strrpos($filename, '.') + 1));
             $name = strtolower(substr($filename, 0, strrpos($filename, '.')));
+            //We add the creation date of the file so if the file is modified, we will generate a new thumbnail
+            //No need to use the full date, the last 4 characters will be enough!
             $name .= substr(@filemtime($picturePath), -4);
         }
 
@@ -155,6 +174,7 @@ class ImageHelper extends AcymObject
             $newFile = $this->destination.$newImage;
         }
 
+        //The new file already exists, we don't have to create a new one
         if (file_exists($newFile)) {
             return [
                 'file' => $newFile,
@@ -163,6 +183,7 @@ class ImageHelper extends AcymObject
             ];
         }
 
+        // Checks the real file type as it can be renamed, but not available on all servers
         if (function_exists('exif_imagetype')) {
             $imageRealType = exif_imagetype($picturePath);
         } else {
@@ -236,6 +257,7 @@ class ImageHelper extends AcymObject
         imagedestroy($thumb);
         imagedestroy($img);
 
+        //We could not create the picture... so let's resize it anyway
         if (!$status) {
             $newFile = $picturePath;
         }

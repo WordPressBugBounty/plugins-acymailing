@@ -2,6 +2,8 @@
 
 namespace AcyMailing\WpInit;
 
+defined('ABSPATH') || die('Restricted Access');
+
 use AcyMailing\Controllers\ConfigurationController;
 use AcyMailing\Helpers\CronHelper;
 
@@ -26,17 +28,21 @@ class Cron
     public function triggerAutomatedTasks()
     {
 
+        // Starter versions shouldn't have access to the cron
         if (!acym_level(ACYM_ESSENTIAL)) {
             acym_deleteScheduledTask(['name' => ConfigurationController::CRON_TASK_NAME]);
 
             return;
         }
 
-        if (!acym_isLicenseValidWeekly() && (empty($_SERVER['HTTP_REFERER']) || strpos($_SERVER['HTTP_REFERER'], 'api.acymailing.com') === false)) {
+        //removeIf(development)
+        $httpReferer = acym_getVar('string', 'HTTP_REFERER', '', 'SERVER');
+        if (!acym_isLicenseValidWeekly() && (empty($httpReferer) || strpos($httpReferer, 'api.acymailing.com') === false)) {
             acym_deleteScheduledTask(['name' => ConfigurationController::CRON_TASK_NAME]);
 
             return;
         }
+        //endRemoveIf(development)
 
         $cronHelper = new CronHelper();
         $cronHelper->cron();

@@ -28,10 +28,12 @@ trait Campaigns
             }
         }
 
+        // Get filters data
         $searchFilter = $this->getVarFiltersListing('string', 'cqueue_search', '');
         $tagFilter = $this->getVarFiltersListing('string', 'cqueue_tag', '');
         $status = $this->getVarFiltersListing('string', 'cqueue_status', '');
 
+        // Get pagination data
         $pagination = new PaginationHelper();
         $campaignsPerPage = $pagination->getListLimit();
         $page = $this->getVarFiltersListing('int', 'cqueue_pagination_page', 1);
@@ -47,6 +49,7 @@ trait Campaigns
             ]
         );
 
+        // Prepare the pagination
         $pagination->setStatus((int)$matchingElements['total']->total, $page, $campaignsPerPage);
         $tagClass = new TagClass();
 
@@ -81,19 +84,20 @@ trait Campaigns
             ],
             'close'
         );
-        $otherContent = acym_modal(
-            '<i class="acymicon-paper-plane"></i>'.acym_translation('ACYM_SEND_MAILS_MANUALLY'),
-            '',
-            null,
-            ['data-reveal-larger' => true],
+        $toolbarHelper->addModalButton(
             [
-                'class' => 'cell medium-6 large-shrink button',
-                'data-reload' => 'true',
-                'data-ajax' => 'true',
-                'data-iframe' => '&ctrl=queue&task=continuesend&id=0&totalsend=0',
+                'button' => '<i class="acymicon-paper-plane"></i>'.esc_html(acym_translation('ACYM_SEND_MAILS_MANUALLY')),
+                'attributesModal' => [
+                    'data-reveal-larger' => true,
+                ],
+                'attributesButton' => [
+                    'class' => 'cell medium-6 large-shrink button',
+                    'data-reload' => 'true',
+                    'data-ajax' => 'true',
+                    'data-iframe' => '&ctrl=queue&task=continuesend&id=0&totalsend=0',
+                ],
             ]
         );
-        $toolbarHelper->addOtherContent($otherContent);
         $toolbarHelper->addFilterByTag($data, 'cqueue_tag', 'acym__queue__filter__tags acym__select');
 
         $data['toolbar'] = $toolbarHelper;
@@ -106,6 +110,8 @@ trait Campaigns
 
     public function cancelSending(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $mailId = acym_getVar('int', 'acym__queue__cancel__mail_id');
 
         if (!empty($mailId)) {
@@ -131,6 +137,8 @@ trait Campaigns
 
     public function playPauseSending(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $active = acym_getVar('int', 'acym__queue__play_pause__active__new_value');
         $campaignId = acym_getVar('int', 'acym__queue__play_pause__campaign_id');
 
@@ -150,7 +158,7 @@ trait Campaigns
 
     public function emptyQueue(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $queueClass = new QueueClass();
         $deleted = $queueClass->emptyQueue();

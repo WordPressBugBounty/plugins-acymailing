@@ -2,6 +2,8 @@
 
 namespace AcyMailing\WpInit;
 
+defined('ABSPATH') || die('Restricted Access');
+
 use AcyMailing\Classes\UserClass;
 use AcyMailing\Classes\ListClass;
 
@@ -19,6 +21,8 @@ class ElementorForm extends \ElementorPro\Modules\Forms\Classes\Action_Base
 
     public function register_settings_section($widget)
     {
+        // Check if an id is provided because this function is called many times sometimes there is no id (and not the rest: settings, form_fields,...)
+        // So when we try to access fields data that is not currently existing a fatal error appears
         if ($widget->get_id()) {
             $fields = ['' => ''];
             foreach ($widget->get_data('settings')['form_fields'] as $field) {
@@ -97,7 +101,7 @@ class ElementorForm extends \ElementorPro\Modules\Forms\Classes\Action_Base
 
         $newUser->name = $data[$settings['acym_nameField']];
         $newUser->email = $data[$settings['acym_emailField']];
-        $newUser->creation_date = date('Y-m-d H:i:s');
+        $newUser->creation_date = gmdate('Y-m-d H:i:s');
         $newUser->confirmed = $settings['acym_confirmUsers'] === 'yes';
 
         $user = $userClass->getOneByEmail($newUser->email);
@@ -105,6 +109,7 @@ class ElementorForm extends \ElementorPro\Modules\Forms\Classes\Action_Base
             $newUser->id = $user->id;
         }
 
+        // We do that because Elementor submit the form via ajax and in ajax mode WordPress always return true to the function is_admin()
         $config = acym_config();
         if ($config->get('require_confirmation', 1) == 1) {
             $userClass->forceConfAdmin = true;

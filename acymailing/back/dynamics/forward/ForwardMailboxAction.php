@@ -36,7 +36,9 @@ trait ForwardMailboxAction
                 'name'
             ).'</div>'
         );
-        $actions['forward_specific']->option .= acym_info(['textShownInTooltip' => 'ACYM_INCLUDE_IN_TEMPLATE_DESC']);
+        ob_start();
+        acym_info(['textShownInTooltip' => 'ACYM_INCLUDE_IN_TEMPLATE_DESC']);
+        $actions['forward_specific']->option .= ob_get_clean();
 
         $actions['forward_list'] = new stdClass();
         $actions['forward_list']->name = acym_translation('ACYM_FORWARD_TO_A_LIST');
@@ -59,7 +61,9 @@ trait ForwardMailboxAction
                 'name'
             ).'</div>'
         );
-        $actions['forward_list']->option .= acym_info(['textShownInTooltip' => 'ACYM_INCLUDE_IN_TEMPLATE_DESC']);
+        ob_start();
+        acym_info(['textShownInTooltip' => 'ACYM_INCLUDE_IN_TEMPLATE_DESC']);
+        $actions['forward_list']->option .= ob_get_clean();
     }
 
     public function onAcymMailboxActionSummaryListing(&$action, &$result)
@@ -107,12 +111,12 @@ trait ForwardMailboxAction
         foreach ($receivers as $oneReceiver) {
             if ($mailerHelper->sendOne($newMail->id, $oneReceiver)) {
                 $report[] = [
-                    'message' => acym_translationSprintf('ACYM_SEND_SUCCESS', $mailInfo, acym_escape($oneReceiver)),
+                    'message' => acym_translationSprintf('ACYM_SEND_SUCCESS', $mailInfo, esc_attr($oneReceiver)),
                     'success' => true,
                 ];
             } else {
                 $report[] = [
-                    'message' => acym_translationSprintf('ACYM_SEND_ERROR', $mailInfo, acym_escape($oneReceiver)),
+                    'message' => acym_translationSprintf('ACYM_SEND_ERROR', $mailInfo, esc_attr($oneReceiver)),
                     'success' => false,
                 ];
             }
@@ -147,9 +151,10 @@ trait ForwardMailboxAction
         }
 
         if (!empty($mailboxHelper->_message->Date)) {
-            $newMail->body = str_replace('{mailheader:date}', date('d.m.Y H:i', strtotime($mailboxHelper->_message->Date)), $newMail->body);
+            $newMail->body = str_replace('{mailheader:date}', acym_date(strtotime($mailboxHelper->_message->Date), 'd.m.Y H:i'), $newMail->body);
         }
 
+        // Clean tags if we couldn't replace them
         $newMail->body = str_replace(
             [
                 '{mailheader:from}',
@@ -222,10 +227,12 @@ trait ForwardMailboxAction
             return false;
         }
 
+        // We're going to forward the email, save its attachments and embed images
         $mailboxHelper->decodeMessage(true);
 
         $subject = $mailboxHelper->_message->subject;
 
+        //If the option remove subject is set
         if (!empty($mailboxHelper->action->conditions['subject_remove'])) {
             if (!empty($mailboxHelper->action->conditions['subject_text'])) {
                 $subject = str_replace($mailboxHelper->action->conditions['subject_text'], '', $mailboxHelper->_message->subject);
@@ -263,12 +270,12 @@ trait ForwardMailboxAction
 
         if (!empty($mailboxHelper->action->senderfrom)) {
             $newMail->from_email = $mailboxHelper->decodeHeader($mailboxHelper->_message->header->from_email);
-            $newMail->from_name = strip_tags($mailboxHelper->decodeHeader($mailboxHelper->_message->header->from_name));
+            $newMail->from_name = acym_stripTags($mailboxHelper->decodeHeader($mailboxHelper->_message->header->from_name));
         }
 
         if (!empty($mailboxHelper->action->senderto)) {
             $newMail->reply_to_email = $mailboxHelper->decodeHeader($mailboxHelper->_message->header->from_email);
-            $newMail->reply_to_name = strip_tags($mailboxHelper->decodeHeader($mailboxHelper->_message->header->from_name));
+            $newMail->reply_to_name = acym_stripTags($mailboxHelper->decodeHeader($mailboxHelper->_message->header->from_name));
         }
 
         if (!empty($mailboxHelper->attachments)) {

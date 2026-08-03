@@ -47,11 +47,13 @@ class OverrideController extends AcymController
 
     protected function prepareEmailsOverrideListing(array &$data): void
     {
+        // Prepare the pagination
         $emailsOverridePerPage = $data['pagination']->getListLimit();
         $page = $this->getVarFiltersListing('int', 'override_pagination_page', 1);
 
         $this->installOverrideEmails();
 
+        // Get the matching lists
         $matchingEmailsOverride = $this->getMatchingElementsFromData(
             [
                 'search' => $data['search'],
@@ -85,6 +87,8 @@ class OverrideController extends AcymController
 
     public function reInstallOverrideEmails(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $overrideClass = new OverrideClass();
         $overrideClass->cleanEmailsOverride();
         $this->installOverrideEmails();

@@ -5,6 +5,7 @@ trait UserInsertion
     private $customFields;
     private $usergroups;
 
+    //Keep the sender information to not load them every time
     private $sendervalues = [];
 
     public function dynamicText(?int $mailId): ?object
@@ -52,7 +53,7 @@ trait UserInsertion
             $typeinfo[] = acym_selectOption('current', 'ACYM_USER_TRIGGERING_AUTOMATION');
         }
 
-        echo acym_radio(
+        acym_radio(
             $typeinfo,
             'typeInfoUser',
             'receiver',
@@ -69,30 +70,37 @@ trait UserInsertion
         ];
 
         foreach ($fields as $fieldname => $description) {
-            echo '<div class="grid-x medium-12 cell acym__row__no-listing acym__listing__row__popup text-left" id="'.$fieldname.'option" onclick="changeUserTag(\''.$fieldname.'\');" >
-					<div class="cell medium-6 small-12 acym__listing__title acym__listing__title__dynamics">'.acym_escape($fieldname).'</div>
-					<div class="cell medium-6 small-12 acym__listing__title acym__listing__title__dynamics">'.acym_escape(acym_translation($description)).'</div>
+            echo '<div class="grid-x medium-12 cell acym__row__no-listing acym__listing__row__popup text-left" id="'.esc_attr(
+                    $fieldname
+                ).'option" onclick="changeUserTag(\''.esc_attr($fieldname).'\');" >
+					<div class="cell medium-6 small-12 acym__listing__title acym__listing__title__dynamics">'.esc_html($fieldname).'</div>
+					<div class="cell medium-6 small-12 acym__listing__title acym__listing__title__dynamics">'.esc_html(acym_translation($description)).'</div>
 				 </div>';
         }
 
+        // Handle joomla custom fields
         if (ACYM_CMS == 'joomla' && ACYM_J37) {
+            // Load field groups
             $groups = acym_loadObjectList('SELECT id, title FROM #__fields_groups WHERE context = "com_users.user" AND state = 1 ORDER BY title ASC');
             $defaultGroup = new stdClass();
             $defaultGroup->id = 0;
             $defaultGroup->title = acym_translation('ACYM_NO_GROUP');
             array_unshift($groups, $defaultGroup);
 
+            // Load custom fields
             $customFields = acym_loadObjectList('SELECT id, title, group_id FROM #__fields WHERE context = "com_users.user" AND state = 1 ORDER BY title ASC');
             if (!empty($customFields)) {
-                echo '<h1 class="acym__title acym__title__secondary text-center cell" style="margin-top: 20px;">'.acym_translation('ACYM_CUSTOM_FIELDS').'</h1>';
+                echo '<h1 class="acym__title acym__title__secondary text-center cell" style="margin-top: 20px;">'.esc_html(acym_translation('ACYM_CUSTOM_FIELDS')).'</h1>';
 
                 foreach ($groups as $oneGroup) {
                     foreach ($customFields as $oneCF) {
                         if ($oneCF->group_id != $oneGroup->id) {
                             continue;
                         }
-                        echo '<div class="grid-x medium-12 cell acym__row__no-listing acym__listing__row__popup text-left" id="'.$oneCF->id.'customoption" onclick="changeUserTag(\''.$oneCF->id.'custom\');" >
-								<div class="cell medium-6 small-12 acym__listing__title acym__listing__title__dynamics">'.acym_escape($oneCF->title).'</div>
+                        echo '<div class="grid-x medium-12 cell acym__row__no-listing acym__listing__row__popup text-left" id="'.esc_attr(
+                                $oneCF->id
+                            ).'customoption" onclick="changeUserTag(\''.esc_attr($oneCF->id).'custom\');" >
+								<div class="cell medium-6 small-12 acym__listing__title acym__listing__title__dynamics">'.esc_html($oneCF->title).'</div>
 							 </div>';
                     }
                 }
@@ -128,17 +136,21 @@ trait UserInsertion
 
             $values = new stdClass();
             $idused = 0;
+            //Should we keep
             $save = false;
 
+            //Sender information
             if (!empty($mytag->info) && $mytag->info == 'sender' && !empty($email->creator_id)) {
                 $idused = $email->creator_id;
                 $save = true;
             }
 
+            //Current user information
             if (!empty($mytag->info) && $mytag->info == 'current') {
                 continue;
             }
 
+            //Receiver information
             if ((empty($mytag->info) || $mytag->info == 'receiver') && !empty($user->cms_id)) {
                 $idused = $user->cms_id;
             }
@@ -147,6 +159,7 @@ trait UserInsertion
                 global $acymCmsUserVars;
                 $receivervalues[$idused] = acym_loadObject('SELECT * FROM '.$acymCmsUserVars->table.' WHERE '.$acymCmsUserVars->id.' = '.intval($idused));
 
+                //If we save the value in the object as we may reuse it...
                 if ($save) {
                     $this->sendervalues[$idused] = $receivervalues[$idused];
                 }

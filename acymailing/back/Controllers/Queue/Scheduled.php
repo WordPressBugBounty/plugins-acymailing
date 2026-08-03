@@ -15,9 +15,11 @@ trait Scheduled
     {
         acym_setVar('layout', 'scheduled');
 
+        // Get filters data
         $searchFilter = $this->getVarFiltersListing('string', 'squeue_search', '');
         $tagFilter = $this->getVarFiltersListing('string', 'squeue_tag', '');
 
+        // Get pagination data
         $pagination = new PaginationHelper();
         $campaignsPerPage = $pagination->getListLimit();
         $page = $this->getVarFiltersListing('int', 'squeue_pagination_page', 1);
@@ -32,6 +34,7 @@ trait Scheduled
             ]
         );
 
+        // Prepare the pagination
         $pagination->setStatus((int)$matchingElements['total']->total, $page, $campaignsPerPage);
         $tagClass = new TagClass();
 

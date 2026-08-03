@@ -36,15 +36,9 @@ class FrontstatsController extends AcymController
         $statsPicture = ACYM_MEDIA_RELATIVE.'images/editor/statpicture.png';
         $statsPicture = ACYM_ROOT.ltrim(str_replace(['\\', '/'], DS, $statsPicture), DS);
 
-        $handle = fopen($statsPicture, 'r');
-        if (!$handle) {
-            exit;
-        }
-
         acym_header('Content-type: image/png');
-        $contents = fread($handle, filesize($statsPicture));
-        fclose($handle);
-        echo $contents;
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- Efficient and less memory usage.
+        readfile($statsPicture);
         exit;
     }
 
@@ -53,6 +47,7 @@ class FrontstatsController extends AcymController
         $userStatClass = new UserStatClass();
         $userStat = $userStatClass->getOneByMailAndUserId($mailId, $userId);
 
+        // Ignore opens within X seconds following the email sending to prevent bots from impacting statistics
         $delay = $this->config->get('tracking_delay', 0);
         if (empty($userStat) || acym_isRobot() || (!empty($delay) && acym_getTimeFromUTCDate($userStat->send_date) > time() - $delay)) {
             return;
@@ -74,9 +69,10 @@ class FrontstatsController extends AcymController
         $userStatToInsert->device = '';
         $userStatToInsert->opened_with = '';
 
-        if (isset($_SERVER['HTTP_USER_AGENT'])) {
+        $userAgent = acym_getVar('string', 'HTTP_USER_AGENT', null, 'SERVER');
+        if (!empty($userAgent)) {
             $browserDetection = new BrowserDetection();
-            $openingInformation = $browserDetection->getAll($_SERVER['HTTP_USER_AGENT']);
+            $openingInformation = $browserDetection->getAll($userAgent);
 
             $userStatToInsert->device = $openingInformation['os_name'] === 'unknown' ? '' : $openingInformation['os_name'];
             $userStatToInsert->opened_with = $openingInformation['browser_name'] === 'unknown' ? '' : $openingInformation['browser_name'];

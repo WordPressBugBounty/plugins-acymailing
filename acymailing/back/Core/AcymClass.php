@@ -4,7 +4,9 @@ namespace AcyMailing\Core;
 
 abstract class AcymClass extends AcymObject
 {
+    // Handle errors
     public array $errors = [];
+    // Information messages, mainly for the cron report
     public array $messages = [];
 
     protected string $table;
@@ -13,6 +15,10 @@ abstract class AcymClass extends AcymObject
     protected array $intColumns = [];
     protected array $jsonColumns = [];
 
+    /**
+     * Returns an array containing "elements[]" which are all the requested elements and "total" which is the number of elements.
+     * Can also contain "status[]", containing the status of elements. Optional.
+     */
     public function getMatchingElements(array $settings = []): array
     {
         if (!empty($this->table) && !empty($this->pkey)) {
@@ -81,9 +87,11 @@ abstract class AcymClass extends AcymObject
     public function save(object $element): ?int
     {
         $tableColumns = acym_getColumns($this->table);
+        // We clone the element because we don't want to modify it for later in the code
         $cloneElement = clone $element;
         foreach ($cloneElement as $column => $value) {
             if (!in_array($column, $tableColumns)) {
+                // Unset variables that don't exist in the table
                 unset($cloneElement->$column);
                 continue;
             }
@@ -103,7 +111,7 @@ abstract class AcymClass extends AcymObject
         }
 
         if (empty($status)) {
-            $dbError = strip_tags(isset($e) ? $e->getMessage() : acym_getDBError());
+            $dbError = acym_stripTags(isset($e) ? $e->getMessage() : acym_getDBError());
             if (!empty($dbError)) {
                 if (strlen($dbError) > 203) $dbError = substr($dbError, 0, 200).'...';
                 $this->errors[] = $dbError;
@@ -161,6 +169,9 @@ abstract class AcymClass extends AcymObject
         acym_query('UPDATE '.acym_secureDBColumn('#__acym_'.$this->table).' SET active = 0 WHERE `'.acym_secureDBColumn($this->pkey).'` IN ('.implode(',', $elements).')');
     }
 
+    /**
+     * Joomla/WordPress can return ints as strings or ints depending on their versions
+     */
     protected function fixTypes(object $element): void
     {
         foreach ($this->intColumns as $intColumn) {

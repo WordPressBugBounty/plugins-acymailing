@@ -1,5 +1,8 @@
-<?php if (empty($data['allForms'])) { ?>
-	<h1 class="cell acym__listing__empty__search__title text-center"><?php echo acym_translation('ACYM_NO_RESULTS_FOUND'); ?></h1>
+<?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- View file, its variables are local to the include scope, not true globals.
+defined('ABSPATH') || die('Restricted Access');
+if (empty($data['allForms'])) { ?>
+	<h1 class="cell acym__listing__empty__search__title text-center"><?php echo esc_html(acym_translation('ACYM_NO_RESULTS_FOUND')); ?></h1>
 <?php } else { ?>
 	<div class="cell grid-x margin-top-1">
 		<div class="grid-x acym__listing__actions cell margin-bottom-1">
@@ -9,7 +12,7 @@
                 'setInactive' => acym_translation('ACYM_DISABLE'),
                 'delete' => acym_translation('ACYM_DELETE'),
             ];
-            echo acym_listingActions($actions);
+            acym_listingActions($actions);
             ?>
 		</div>
 		<div class="grid-x cell align-justify">
@@ -20,11 +23,11 @@
                     'active' => ['ACYM_ACTIVE', $data['formsNumberPerStatus']['active']],
                     'inactive' => ['ACYM_INACTIVE', $data['formsNumberPerStatus']['inactive']],
                 ];
-                echo acym_filterStatus($options, $data['status'], 'forms_status');
+                acym_filterStatus($options, $data['status'], 'forms_status');
                 ?>
 			</div>
 			<div class="cell large-shrink acym_listing_sort-by">
-                <?php echo acym_sortBy(
+                <?php acym_sortBy(
                     [
                         'id' => acym_strtolower(acym_translation('ACYM_ID')),
                         'name' => acym_translation('ACYM_NAME'),
@@ -45,41 +48,41 @@
 			</div>
 			<div class="grid-x medium-auto small-11 cell acym__listing__header__title__container">
 				<div class="large-4 medium-4 cell acym__listing__header__title">
-                    <?php echo acym_translation('ACYM_NAME'); ?>
+                    <?php echo esc_html(acym_translation('ACYM_NAME')); ?>
 				</div>
 				<div class="large-2 medium-2 hide-for-small-only cell acym__listing__header__title">
-                    <?php echo acym_translation('ACYM_DATE_CREATED'); ?>
+                    <?php echo esc_html(acym_translation('ACYM_DATE_CREATED')); ?>
 				</div>
 				<div class="auto hide-for-small-only cell acym__listing__header__title">
-                    <?php echo acym_translation('ACYM_TYPE'); ?>
+                    <?php echo esc_html(acym_translation('ACYM_TYPE')); ?>
 				</div>
                 <?php if (ACYM_CMS == 'wordpress') { ?>
 					<div class="large-2 medium-2 hide-for-small-only cell acym__listing__header__title">
-                        <?php echo acym_translation('ACYM_SHORTCODE'); ?>
+                        <?php echo esc_html(acym_translation('ACYM_SHORTCODE')); ?>
 					</div>
                 <?php } ?>
 				<div class="large-1 medium-1 text-center hide-for-small-only cell acym__listing__header__title">
-                    <?php echo acym_translation('ACYM_ACTIVE'); ?>
+                    <?php echo esc_html(acym_translation('ACYM_ACTIVE')); ?>
 				</div>
 				<div class="large-1 medium-1 text-center hide-for-small-only cell acym__listing__header__title">
-                    <?php echo acym_translation('ACYM_ID'); ?>
+                    <?php echo esc_html(acym_translation('ACYM_ID')); ?>
 				</div>
 			</div>
 		</div>
         <?php foreach ($data['allForms'] as $form) { ?>
-			<div data-acy-elementid="<?php echo acym_escape($form->id); ?>" class="grid-x cell align-middle acym__listing__row">
+			<div data-acy-elementid="<?php echo esc_attr($form->id); ?>" class="grid-x cell align-middle acym__listing__row">
 				<div class="medium-shrink small-1 cell">
-					<input id="checkbox_<?php echo acym_escape($form->id); ?>" type="checkbox" name="elements_checked[]" value="<?php echo acym_escape($form->id); ?>">
+					<input id="checkbox_<?php echo esc_attr($form->id); ?>" type="checkbox" name="elements_checked[]" value="<?php echo esc_attr($form->id); ?>">
 				</div>
 				<div class="grid-x medium-auto small-11 cell acym__listing__title__container">
 					<div class="grid-x large-4 medium-4 small-11 cell acym__listing__title">
-						<a class="cell" href="<?php echo acym_completeLink('forms&task=edit&step=info&id='.intval($form->id)); ?>">
-							<h6 class="acym__listing__title__important"><?php echo acym_escape($form->name); ?></h6>
+						<a class="cell" href="<?php echo esc_url(acym_completeLink('forms&task=edit&step=info&id='.intval($form->id))); ?>">
+							<h6 class="acym__listing__title__important"><?php echo esc_html($form->name); ?></h6>
 						</a>
 					</div>
 					<div class="cell large-2 medium-2 hide-for-small-only">
                         <?php
-                        echo acym_tooltip(
+                        acym_tooltip(
                             [
                                 'hoveredText' => acym_date(
                                     $form->creation_date,
@@ -92,26 +95,30 @@
                         ?>
 					</div>
 					<div class="cell auto hide-for-small-only">
-                        <?php echo acym_escape(array_key_exists($form->type, $data['formTypes']) ? $data['formTypes'][$form->type] : $form->type); ?>
+                        <?php echo esc_html(array_key_exists($form->type, $data['formTypes']) ? $data['formTypes'][$form->type] : $form->type); ?>
 					</div>
                     <?php if (ACYM_CMS === 'wordpress') { ?>
 						<div class="cell medium-2 hide-for-small-only">
-                            <?php echo $form->type === $data['formClass']::SUB_FORM_TYPE_SHORTCODE ? '[acymailing_form_shortcode id="'.$form->id.'"]' : '-'; ?>
+                            <?php echo $form->type === $data['formClass']::SUB_FORM_TYPE_SHORTCODE ? '[acymailing_form_shortcode id="'.esc_html($form->id).'"]' : '-'; ?>
 						</div>
                     <?php } ?>
 					<div class="cell small-1 acym__listing__controls text-center">
                         <?php
-                        $class = $form->active == 1 ? 'acymicon-check-circle acym__color__green" data-acy-newvalue="0'
-                            : 'acymicon-times-circle acym__color__red" data-acy-newvalue="1';
-                        echo '<i data-acy-table="form" data-acy-field="active" data-acy-elementid="'.acym_escape($form->id).'" class="acym_toggleable '.$class.'"></i>';
+                        $class = $form->active == 1 ? 'acymicon-check-circle acym__color__green' : 'acymicon-times-circle acym__color__red';
+                        $newvalue = $form->active == 1 ? 0 : 1;
+                        echo '<i data-acy-table="form"
+                        		data-acy-field="active"
+                        		data-acy-elementid="'.esc_attr($form->id).'"
+                        		data-acy-newvalue="'.esc_attr($newvalue).'"
+                        		class="acym_toggleable '.esc_attr($class).'"></i>';
                         ?>
 					</div>
 					<div class="cell medium-1 hide-for-small-only text-center">
-                        <?php echo acym_escape($form->id); ?>
+                        <?php echo esc_html($form->id); ?>
 					</div>
 				</div>
 			</div>
         <?php } ?>
-        <?php echo $data['pagination']->display('form'); ?>
+        <?php $data['pagination']->display('form'); ?>
 	</div>
 <?php } ?>

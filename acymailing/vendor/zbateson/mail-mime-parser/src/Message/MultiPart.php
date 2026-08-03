@@ -1,4 +1,9 @@
 <?php
+/**
+ * This file is part of the ZBateson\MailMimeParser project.
+ *
+ * @license http://opensource.org/licenses/bsd-license.php BSD
+ */
 
 namespace ZBateson\MailMimeParser\Message;
 
@@ -8,8 +13,16 @@ use Iterator;
 use RecursiveIteratorIterator;
 use ZBateson\MailMimeParser\MailMimeParser;
 
+/**
+ * A message part that contains children.
+ *
+ * @author Zaahid Bateson
+ */
 abstract class MultiPart extends MessagePart implements IMultiPart
 {
+    /**
+     * @var PartChildrenContainer child part container
+     */
     protected $partChildrenContainer;
 
     public function __construct(

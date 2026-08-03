@@ -110,6 +110,7 @@ class plgAcymSendinblue extends AcymPlugin
 
         $result = $this->users->addUserToList($receiverEmail, $mailId, $warnings);
         if ($result) {
+            // The API returns null every time so we have no clue if this went well
             $this->users->addAttributeToUser($receiverEmail, $subjectContent, $htmlContent, $mailId);
         }
     }

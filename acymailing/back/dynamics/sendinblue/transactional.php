@@ -4,6 +4,7 @@ class SendinblueTransactional extends SendinblueClass
 {
     public function sendTransactionalEmail(&$response, $sendingMethod, $to, $subject, $from, $reply_to, $body, $bcc = [], $attachments = [])
     {
+        //https://developers.brevo.com/docs/send-a-transactional-email
         if ($sendingMethod != plgAcymSendinblue::SENDING_METHOD_ID) return;
         $data = [
             'sender' => $from,

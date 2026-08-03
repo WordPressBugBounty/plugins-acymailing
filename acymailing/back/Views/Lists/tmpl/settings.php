@@ -1,16 +1,20 @@
+<?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- View file, its variables are local to the include scope, not true globals.
+defined('ABSPATH') || die('Restricted Access');
+?>
 <div id="acym__list__settings">
-	<form id="acym_form" action="<?php echo acym_completeLink(acym_getVar('cmd', 'ctrl')); ?>" method="post" name="acyForm" data-abide novalidate>
+	<form id="acym_form" action="<?php echo esc_url(acym_completeLink(acym_getVar('cmd', 'ctrl'))); ?>" method="post" name="acyForm" data-abide novalidate>
 		<div class="cell grid-x text-right grid-margin-x margin-left-0 margin-right-0 margin-bottom-0 margin-y acym__content" id="acym__list__settings__actions">
             <?php include acym_getView('lists', 'settings_actions'); ?>
 		</div>
 		<div class="acym__content margin-top-1">
             <?php
             $workflow = $data['workflowHelper'];
-            echo $workflow->displayTabs(
+            $workflow->displayTabs(
                 $this->tabs,
                 $data['currentTab'],
                 [
-                    'query' => '&listId='.acym_escape($data['listInformation']->id).'&task=settings&step=',
+                    'query' => '&listId='.esc_attr($data['listInformation']->id).'&task=settings&step=',
                     'disableTabs' => empty($data['listInformation']->id) ? $this->disableTabs : [],
                 ]
             ); ?>
@@ -38,10 +42,10 @@
             ?>
 		</div>
 
-		<input type="hidden" name="listId" value="<?php echo acym_escape($data['listInformation']->id); ?>">
-		<input type="hidden" name="list[welcome_id]" value="<?php echo acym_escape($data['listInformation']->welcome_id); ?>">
-		<input type="hidden" name="list[unsubscribe_id]" value="<?php echo acym_escape($data['listInformation']->unsubscribe_id); ?>">
-		<input type="hidden" name="step" value="<?php echo acym_escape($data['currentTab']); ?>">
+		<input type="hidden" name="listId" value="<?php echo esc_attr($data['listInformation']->id ?? ''); ?>">
+		<input type="hidden" name="list[welcome_id]" value="<?php echo esc_attr($data['listInformation']->welcome_id ?? ''); ?>">
+		<input type="hidden" name="list[unsubscribe_id]" value="<?php echo esc_attr($data['listInformation']->unsubscribe_id ?? ''); ?>">
+		<input type="hidden" name="step" value="<?php echo esc_attr($data['currentTab'] ?? ''); ?>">
         <?php acym_formOptions(true, 'settings'); ?>
 	</form>
 </div>

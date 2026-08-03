@@ -15,12 +15,14 @@ trait Listing
     {
         acym_setVar('layout', 'listing');
 
+        // Get filters data
         $searchFilter = $this->getVarFiltersListing('string', 'mails_search', '');
         $tagFilter = $this->getVarFiltersListing('string', 'mails_tag', '');
         $ordering = $this->getVarFiltersListing('string', 'mails_ordering', 'creation_date');
         $orderingSortOrder = $this->getVarFiltersListing('cmd', 'mails_ordering_sort_order', 'desc');
 
         $pagination = new PaginationHelper();
+        // Get pagination data
         $mailsPerPage = $pagination->getListLimit();
         $page = $this->getVarFiltersListing('int', 'mails_pagination_page', 1);
         $mailClass = new MailClass();
@@ -48,6 +50,7 @@ trait Listing
             return;
         }
 
+        // Prepare the pagination
         $pagination->setStatus($matchingMails['total']->total, $page, $mailsPerPage);
 
         ob_start();
@@ -86,42 +89,44 @@ trait Listing
         $toolbarHelper->addSearchBar($data['search'], 'mails_search', 'ACYM_SEARCH');
         $toolbarHelper->addFilterByTag($data, 'mails_tag', 'acym__templates__filter__tags acym__select');
         $toolbarHelper->addButton(acym_translation('ACYM_ADD_DEFAULT_TMPL'), ['data-task' => 'installDefaultTmpl', 'id' => 'acym__mail__install-default'], 'content_copy');
-        $otherContent = acym_modal(
-            '<i class="acymicon-download"></i>'.acym_translation('ACYM_IMPORT'),
-            $data['templateImportView'],
-            'acym__template__import__reveal',
-            [],
+
+        $toolbarHelper->addModalButton(
             [
-                'class' => 'button button-secondary cell medium-6 large-shrink',
-                'data-reload' => 'true',
-                'data-ajax' => 'false',
+                'button' => '<i class="acymicon-download"></i>'.esc_html(acym_translation('ACYM_IMPORT')),
+                'modalContent' => $data['templateImportView'],
+                'id' => 'acym__template__import__reveal',
+                'attributesButton' => [
+                    'class' => 'button button-secondary cell medium-6 large-shrink',
+                    'data-reload' => 'true',
+                    'data-ajax' => 'false',
+                ],
             ]
         );
 
-        $otherContent .= acym_modal(
-            '<i class="acymicon-add"></i>'.acym_translation('ACYM_CREATE'),
-            '<div class="cell grid-x grid-margin-x">
-                <button type="button" data-task="edit" data-editor="html" class="acym__create__template button cell large-auto small-6 margin-top-1 button-secondary">'.acym_translation(
-                'ACYM_HTML_EDITOR'
-            ).'</button>
-                <button type="button" data-task="edit" data-editor="acyEditor" class="acym__create__template button cell medium-auto margin-top-1">'.acym_translation(
-                'ACYM_DD_EDITOR'
-            ).'</button>
+        $toolbarHelper->addModalButton(
+            [
+                'button' => '<i class="acymicon-add"></i>'.esc_html(acym_translation('ACYM_CREATE')),
+                'modalContent' => '<div class="cell grid-x grid-margin-x">
+                <button type="button" data-task="edit" data-editor="html" class="acym__create__template button cell large-auto small-6 margin-top-1 button-secondary">'.esc_html(
+                        acym_translation('ACYM_HTML_EDITOR')
+                    ).'</button>
+                <button type="button" data-task="edit" data-editor="acyEditor" class="acym__create__template button cell medium-auto margin-top-1">'.esc_html(
+                        acym_translation('ACYM_DD_EDITOR')
+                    ).'</button>
             </div>',
-            '',
-            [],
-            ['class' => 'acym_vcenter button cell medium-6 large-shrink'],
-            true,
-            false
+                'attributesButton' => [
+                    'class' => 'acym_vcenter button cell medium-6 large-shrink',
+                ],
+                'isLarge' => false,
+            ]
         );
-        $toolbarHelper->addOtherContent($otherContent);
 
         $data['toolbar'] = $toolbarHelper;
     }
 
     public function doUploadTemplate(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         if (!acym_isAdmin() || !acym_isAllowed('mails')) {
             die('Access denied');
@@ -135,8 +140,9 @@ trait Listing
 
     public function export(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
+        // Get passed data and check if we have everything we need
         $templateId = acym_getVar('int', 'templateId', 0);
 
         if (empty($templateId)) {
@@ -146,6 +152,7 @@ trait Listing
         $mailClass = new MailClass();
         $template = $mailClass->getOneById($templateId);
 
+        // We have all we need for the export, prepare the headers for the download
         $exportHelper = new ExportHelper();
         $exportHelper->exportTemplate($template);
 
@@ -154,6 +161,8 @@ trait Listing
 
     public function installDefaultTmpl(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $updateHelper = new UpdateHelper();
         $updateHelper->installTemplates();
 
@@ -162,6 +171,8 @@ trait Listing
 
     public function favorite(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $templateId = acym_getVar('int', 'templateId', 0);
 
         if (empty($templateId)) {
@@ -179,6 +190,8 @@ trait Listing
 
     public function massDuplicate(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $ids = acym_getVar('array', 'elements_checked', []);
         if (!empty($ids)) {
             $this->duplicate($ids);
@@ -188,6 +201,8 @@ trait Listing
 
     public function oneDuplicate(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $templateId = acym_getVar('int', 'templateId', 0);
 
         if (empty($templateId)) {
@@ -245,7 +260,7 @@ trait Listing
 
     public function getMailByIdAjax(): void
     {
-        acym_checkToken();
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
         $mailId = acym_getVar('int', 'id', 0);
         if (empty($mailId)) {
             acym_sendAjaxResponse(acym_translation('ACYM_COULD_NOT_FIND_MAIL'), [], false);

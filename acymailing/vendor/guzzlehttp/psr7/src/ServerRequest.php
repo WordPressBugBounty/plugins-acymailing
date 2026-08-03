@@ -10,20 +10,60 @@ use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
 
+/**
+ * Server-side HTTP request
+ *
+ * Extends the Request definition to add methods for accessing incoming data,
+ * specifically server parameters, cookies, matched path parameters, query
+ * string arguments, body parameters, and upload file information.
+ *
+ * "Attributes" are discovered via decomposing the request (and usually
+ * specifically the URI path), and typically will be injected by the application.
+ *
+ * Requests are considered immutable; all methods that might change state are
+ * implemented such that they retain the internal state of the current
+ * message and return a new instance that contains the changed state.
+ */
 class ServerRequest extends Request implements ServerRequestInterface
 {
+    /**
+     * @var array
+     */
     private $attributes = [];
 
+    /**
+     * @var array
+     */
     private $cookieParams = [];
 
+    /**
+     * @var array|object|null
+     */
     private $parsedBody;
 
+    /**
+     * @var array
+     */
     private $queryParams = [];
 
+    /**
+     * @var array
+     */
     private $serverParams;
 
+    /**
+     * @var array
+     */
     private $uploadedFiles = [];
 
+    /**
+     * @param string                               $method       HTTP method
+     * @param string|UriInterface                  $uri          URI
+     * @param (string|string[])[]                  $headers      Request headers
+     * @param string|resource|StreamInterface|null $body         Request body
+     * @param string                               $version      Protocol version
+     * @param array                                $serverParams Typically the $_SERVER superglobal
+     */
     public function __construct(
         string $method,
         $uri,
@@ -37,6 +77,13 @@ class ServerRequest extends Request implements ServerRequestInterface
         parent::__construct($method, $uri, $headers, $body, $version);
     }
 
+    /**
+     * Return an UploadedFile instance array.
+     *
+     * @param array $files An array which respect $_FILES structure
+     *
+     * @throws InvalidArgumentException for unrecognized values
+     */
     public static function normalizeFiles(array $files): array
     {
         $normalized = [];
@@ -57,6 +104,16 @@ class ServerRequest extends Request implements ServerRequestInterface
         return $normalized;
     }
 
+    /**
+     * Create and return an UploadedFile instance from a $_FILES specification.
+     *
+     * If the specification represents an array of values, this method will
+     * delegate to normalizeNestedFileSpec() and return that return value.
+     *
+     * @param array $value $_FILES struct
+     *
+     * @return UploadedFileInterface|UploadedFileInterface[]
+     */
     private static function createUploadedFileFromSpec(array $value)
     {
         if (is_array($value['tmp_name'])) {
@@ -72,6 +129,14 @@ class ServerRequest extends Request implements ServerRequestInterface
         );
     }
 
+    /**
+     * Normalize an array of file specifications.
+     *
+     * Loops through all nested files and returns a normalized array of
+     * UploadedFileInterface instances.
+     *
+     * @return UploadedFileInterface[]
+     */
     private static function normalizeNestedFileSpec(array $files = []): array
     {
         $normalizedFiles = [];
@@ -90,6 +155,14 @@ class ServerRequest extends Request implements ServerRequestInterface
         return $normalizedFiles;
     }
 
+    /**
+     * Return a ServerRequest populated with superglobals:
+     * $_GET
+     * $_POST
+     * $_COOKIE
+     * $_FILES
+     * $_SERVER
+     */
     public static function fromGlobals(): ServerRequestInterface
     {
         $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -121,6 +194,9 @@ class ServerRequest extends Request implements ServerRequestInterface
         return [$host, $port];
     }
 
+    /**
+     * Get a Uri populated with values from $_SERVER.
+     */
     public static function getUriFromGlobals(): UriInterface
     {
         $uri = new Uri('');
@@ -209,6 +285,9 @@ class ServerRequest extends Request implements ServerRequestInterface
         return $new;
     }
 
+    /**
+     * @return array|object|null
+     */
     public function getParsedBody()
     {
         return $this->parsedBody;
@@ -227,6 +306,9 @@ class ServerRequest extends Request implements ServerRequestInterface
         return $this->attributes;
     }
 
+    /**
+     * @return mixed
+     */
     public function getAttribute($attribute, $default = null)
     {
         if (false === array_key_exists($attribute, $this->attributes)) {

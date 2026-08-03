@@ -17,6 +17,12 @@ use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Http\Message\UriInterface;
 
+/**
+ * Implements all of the PSR-17 interfaces.
+ *
+ * Note: in consuming code it is recommended to require the implemented interfaces
+ * and inject the instance of this class multiple times.
+ */
 final class HttpFactory implements RequestFactoryInterface, ResponseFactoryInterface, ServerRequestFactoryInterface, StreamFactoryInterface, UploadedFileFactoryInterface, UriFactoryInterface
 {
     public function createUploadedFile(

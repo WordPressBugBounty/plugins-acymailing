@@ -81,6 +81,8 @@ trait Mail
 
     public function synchronizeExistingUsers(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $sendingMethod = acym_getVar('string', 'sendingMethod', '');
 
         if (empty($sendingMethod)) {
@@ -129,8 +131,11 @@ trait Mail
 
         acym_createArchive($filename, $zipFiles);
 
-        if (ACYM_CMS === 'wordpress') @ob_get_clean();
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
         $exportHelper->setDownloadHeaders($filenameToSearch, 'zip');
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- Downloading a file, better than WP functions for memory handling.
         readfile($filename.'.zip');
         acym_deleteFile($filename.'.zip');
 
@@ -149,6 +154,8 @@ trait Mail
 
     public function logoutForOAuth2Smtp(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         acym_trigger('onAcymOauthRevoke');
 
         $this->listing();
@@ -156,6 +163,8 @@ trait Mail
 
     public function logoutForOAuth2Bounce(): void
     {
+        wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
+
         $this->config->saveConfig(
             [
                 'bounce_refresh_token' => '',

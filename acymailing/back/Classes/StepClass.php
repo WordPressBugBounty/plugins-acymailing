@@ -19,9 +19,10 @@ class StepClass extends AcymClass
         foreach ($step as $oneAttribute => $value) {
             if (empty($value)) continue;
 
-            $step->$oneAttribute = is_array($value) ? json_encode($value) : strip_tags($value);
+            $step->$oneAttribute = is_array($value) ? json_encode($value) : acym_stripTags($value);
         }
 
+        //Some of the database need a name for the column name, they add an index and the name need to be unique
         if (empty($step->name)) {
             $step->name = 'step_'.time();
         }

@@ -6,13 +6,27 @@ namespace GuzzleHttp\Psr7;
 
 use Psr\Http\Message\StreamInterface;
 
+/**
+ * Stream decorator trait
+ *
+ * @property StreamInterface $stream
+ */
 trait StreamDecoratorTrait
 {
+    /**
+     * @param StreamInterface $stream Stream to decorate
+     */
     public function __construct(StreamInterface $stream)
     {
         $this->stream = $stream;
     }
 
+    /**
+     * Magic method used to create a new stream if streams are not added in
+     * the constructor of a decorator (e.g., LazyOpenStream).
+     *
+     * @return StreamInterface
+     */
     public function __get(string $name)
     {
         if ($name === 'stream') {
@@ -47,11 +61,18 @@ trait StreamDecoratorTrait
         return Utils::copyToString($this);
     }
 
+    /**
+     * Allow decorators to implement custom methods
+     *
+     * @return mixed
+     */
     public function __call(string $method, array $args)
     {
+        /** @var callable $callable */
         $callable = [$this->stream, $method];
         $result = ($callable)(...$args);
 
+        // Always return the wrapped object if the result is a return $this
         return $result === $this->stream ? $this : $result;
     }
 
@@ -60,6 +81,9 @@ trait StreamDecoratorTrait
         $this->stream->close();
     }
 
+    /**
+     * @return mixed
+     */
     public function getMetadata($key = null)
     {
         return $this->stream->getMetadata($key);
@@ -120,6 +144,11 @@ trait StreamDecoratorTrait
         return $this->stream->write($string);
     }
 
+    /**
+     * Implement in subclasses to dynamically create streams when requested.
+     *
+     * @throws \BadMethodCallException
+     */
     protected function createStream(): StreamInterface
     {
         throw new \BadMethodCallException('Not implemented');

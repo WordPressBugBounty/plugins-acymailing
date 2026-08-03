@@ -41,6 +41,7 @@ class MailClass extends AcymClass
         self::TYPE_SCENARIO,
     ];
 
+    // Used by some sending methods to know the priority of a sent email (transactional => reset password / account confirmation...)
     const TYPES_TRANSACTIONAL = [
         self::TYPE_NOTIFICATION,
         self::TYPE_OVERRIDE,
@@ -50,6 +51,7 @@ class MailClass extends AcymClass
         self::TYPE_SCENARIO,
     ];
 
+    // Types on which the click statistics are active
     const TYPES_WITH_STATS = [
         self::TYPE_STANDARD,
         self::TYPE_AUTOMATION,
@@ -60,6 +62,7 @@ class MailClass extends AcymClass
         self::TYPE_SCENARIO,
     ];
 
+    // Types that don't let the user modify the name
     const TYPES_NO_NAME = [
         self::TYPE_NOTIFICATION,
         self::TYPE_OVERRIDE,
@@ -89,6 +92,9 @@ class MailClass extends AcymClass
         $this->pkey = 'id';
     }
 
+    /**
+     * Get mails depending on filters (search, ordering, pagination)
+     */
     public function getMatchingElements(array $settings = []): array
     {
         $query = 'SELECT mail.* FROM #__acym_mail AS mail';
@@ -97,6 +103,7 @@ class MailClass extends AcymClass
         $filters = [];
         $tagJoin = '';
 
+        // Tag filter
         if (!empty($settings['tag'])) {
             $tagJoin = ' JOIN #__acym_tag AS tag ON mail.id = tag.id_element ';
             $filters[] = 'tag.name = '.acym_escapeDB($settings['tag']);
@@ -303,6 +310,9 @@ class MailClass extends AcymClass
         return $mail;
     }
 
+    /**
+     * Get mails depending on their type (standard, welcome, unsubscribe, notification)
+     */
     public function getMailsByType(?string $typeMail, array $settings): array
     {
         if (empty($settings['key'])) {
@@ -319,11 +329,13 @@ class MailClass extends AcymClass
         $query = 'SELECT * FROM #__acym_mail AS mail';
         $queryCount = 'SELECT count(*) FROM #__acym_mail AS mail';
 
+        // Mail type filtering
         $filters = [];
         if (!empty($typeMail)) {
             $filters[] = 'mail.type = '.acym_escapeDB($typeMail);
         }
 
+        // Search filter
         if (!empty($search)) {
             $filters[] = 'mail.name LIKE '.acym_escapeDB('%'.$search.'%');
         }
@@ -364,6 +376,7 @@ class MailClass extends AcymClass
                     WHERE mailLists.mail_id IN ('.implode(',', $ids).')
                     GROUP BY mailLists.list_id, mailLists.mail_id';
 
+        //This line if for guys with big database to not break the page
         acym_query('SET SQL_BIG_SELECTS=1');
 
         return acym_loadObjectList($query);
@@ -436,9 +449,12 @@ class MailClass extends AcymClass
 
         $mail = $this->encode($mail);
 
+        // Clean autosave value
         $mail->autosave = null;
 
 
+        // At this point $mail->thumbnail should be only a filename, so we don't want to override it with an empty string or an encoded image
+        // But we need to reset the thumbnail sometimes by setting the thumbnail to null
         if (isset($mail->thumbnail) && ((empty($mail->thumbnail) && !is_null($mail->thumbnail)) || strpos($mail->thumbnail, 'data:image/png;base64') !== false)) {
             unset($mail->thumbnail);
         }
@@ -465,9 +481,10 @@ class MailClass extends AcymClass
                 $mail->$oneAttribute = preg_replace('#<input[^>]*value="[^"]*"[^>]*>#Uis', '', $mail->$oneAttribute);
                 $mail->$oneAttribute = preg_replace('#<script.*</script>#Uis', '', $mail->$oneAttribute);
 
+                //Remove tinyMce content edit
                 $mail->$oneAttribute = str_replace(' contenteditable="true"', '', $mail->$oneAttribute);
             } else {
-                $mail->$oneAttribute = strip_tags($mail->$oneAttribute);
+                $mail->$oneAttribute = acym_stripTags($mail->$oneAttribute);
             }
         }
 
@@ -581,11 +598,12 @@ class MailClass extends AcymClass
         $thumbnailToDelete = array_diff($thumbnails, $stillUsedThumbnails);
         foreach ($thumbnailToDelete as $one) {
             if (!empty($one) && file_exists(ACYM_UPLOAD_FOLDER_THUMBNAIL.$one)) {
-                unlink(ACYM_UPLOAD_FOLDER_THUMBNAIL.$one);
+                acym_deleteFile(ACYM_UPLOAD_FOLDER_THUMBNAIL.$one);
             }
         }
     }
 
+    // Delete one attachment from a newsletter
     public function deleteOneAttachment(int $mailId, int $idAttachment): bool
     {
         if (empty($mailId)) {
@@ -649,7 +667,9 @@ class MailClass extends AcymClass
 
         if (preg_match_all('#@import[^;]*;#is', $stylesheet, $results)) {
             foreach ($results[0] as $oneResult) {
+                //We add the @import CSS at the very beginning for the CSS stylesheet otherwise it does not work
                 $inline .= trim($oneResult)."\n";
+                //We also remove it from the stylesheet to avoid having a duplicate.
                 $stylesheet = str_replace($oneResult, '', $stylesheet);
             }
         }
@@ -716,9 +736,9 @@ class MailClass extends AcymClass
 
         $uploadPath = acym_cleanPath(ACYM_ROOT.ACYM_MEDIA_FOLDER.'templates');
 
-        if (!is_writable($uploadPath)) {
-            @chmod($uploadPath, '0755');
-            if (!is_writable($uploadPath)) {
+        if (!acym_isWritable($uploadPath)) {
+            acym_chmod($uploadPath, 0755);
+            if (!acym_isWritable($uploadPath)) {
                 acym_enqueueMessage(acym_translationSprintf('ACYM_WRITABLE_FOLDER', $uploadPath), 'warning');
             }
         }
@@ -837,12 +857,14 @@ class MailClass extends AcymClass
     {
         $allFiles = acym_getFiles($folder);
         if (!empty($allFiles)) {
+            // Search and install template.html file first
             $keyTmpl = array_search('template.html', $allFiles);
             if ($keyTmpl !== false) {
                 if ($this->installTemplate($folder.DS.$allFiles[$keyTmpl])) {
                     return true;
                 }
             }
+            // Try to install first html file found
             foreach ($allFiles as $oneFile) {
                 if (preg_match('#^.*(html|htm)$#i', $oneFile)) {
                     if ($this->installTemplate($folder.DS.$oneFile)) {
@@ -1080,6 +1102,7 @@ class MailClass extends AcymClass
             return 0;
         }
 
+        // Get the current user values
         $mailerHelper = new MailerHelper();
         $pluginHelper = new PluginHelper();
         $extractedTags = $pluginHelper->extractTags($mail, 'subscriber');
@@ -1108,6 +1131,7 @@ class MailClass extends AcymClass
         $userFields = $userClass->getAllUserFields($user);
         foreach ($userFields as $map => $value) {
             $mailerHelper->addParam('subscriber:'.$map.'|info:current', $value);
+            // Might not be used anymore
             $mailerHelper->addParam('user:'.$map, $value);
         }
 
@@ -1162,6 +1186,9 @@ class MailClass extends AcymClass
         return $isArray ? $decodedMails : $decodedMails[0];
     }
 
+    /**
+     * Decode one mail from UTF8. (decode only attributes defined in $fieldsToDecode)
+     */
     protected function utf8Decode($mail)
     {
         if (!empty($mail)) {
@@ -1191,6 +1218,7 @@ class MailClass extends AcymClass
             return $mail;
         }
 
+        //If we don't display the powered by we remove it
         if ($this->config->get('display_built_by', 0) != 1) {
             if (strpos($mail->body, 'acym__powered_by_acymailing') !== false) {
                 $mailBodyDom = new \DOMDocument();
@@ -1252,6 +1280,7 @@ class MailClass extends AcymClass
 </table>';
 
             $mailBodyDom = new \DOMDocument();
+            //Some inserted content add specific tags that shows warnings
             @$mailBodyDom->loadHTML('<?xml encoding="utf-8" ?>'.$mail->body);
 
             $htmlToAddDom = new \DOMDocument();
@@ -1284,6 +1313,13 @@ class MailClass extends AcymClass
         return $mail;
     }
 
+    /**
+     * Encode one mail in UTF8 for handling specific characters as emoji. (encode only attributes defined in $fieldsToEncode)
+     *
+     * @param $mail
+     *
+     * @return mixed
+     */
     protected function utf8Encode($mail)
     {
         if (!empty($mail)) {
@@ -1348,6 +1384,9 @@ class MailClass extends AcymClass
         );
     }
 
+    /**
+     * Get all multilingual mails linked to a parent mail, also get the parent mail
+     */
     public function getMultilingualMails(int $parentId): array
     {
         $mails = $this->decode(
@@ -1498,24 +1537,56 @@ class MailClass extends AcymClass
         );
     }
 
-    public function hasUserAccess(int $mailId): bool
+    public function hasUserAccess(int $mailId, bool $write = false): bool
     {
         $userId = acym_currentUserId();
         if (empty($userId)) {
             return false;
         }
 
+        $mail = acym_loadObject('SELECT `creator_id`, `type` FROM #__acym_mail WHERE id = '.intval($mailId));
+        if (empty($mail)) {
+            return false;
+        }
+
         if (acym_isAdmin()) {
+            return $this->isTypeAllowed($mail->type);
+        }
+
+        if ($mail->creator_id == $userId) {
             return true;
         }
 
-        return acym_loadResult(
-                'SELECT COUNT(*) 
-                FROM #__acym_mail 
-                WHERE id = '.intval($mailId).' 
-                AND (creator_id = '.intval($userId).' 
-                    OR type = '.acym_escapeDB(self::TYPE_TEMPLATE).')'
-            ) > 0;
+        return !$write && $mail->type === self::TYPE_TEMPLATE;
+    }
+
+    private function isTypeAllowed(?string $type): bool
+    {
+        $aclByType = [
+            self::TYPE_NOTIFICATION => ['configuration'],
+            self::TYPE_OVERRIDE => ['override'],
+            self::TYPE_MAILBOX_ACTION => ['bounces'],
+            self::TYPE_AUTOMATION => ['automation'],
+            self::TYPE_SCENARIO => ['scenarios'],
+            self::TYPE_STANDARD => ['campaigns'],
+            self::TYPE_FOLLOWUP => ['campaigns'],
+            self::TYPE_WELCOME => ['lists', 'campaigns'],
+            self::TYPE_UNSUBSCRIBE => ['lists', 'campaigns'],
+            self::TYPE_TEMPLATE => ['mails', 'campaigns'],
+        ];
+
+        // An add-on type is not mapped to a feature, don't lock it
+        if (empty($aclByType[$type])) {
+            return true;
+        }
+
+        foreach ($aclByType[$type] as $oneAcl) {
+            if (acym_isAllowed($oneAcl)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function getVersionsById(int $mailId, bool $includeParent = false): array
@@ -1532,6 +1603,9 @@ class MailClass extends AcymClass
         );
     }
 
+    /**
+     * Get all abtest mails linked to a parent mail, also get the parent mail
+     */
     public function getParentAndChildMails(int $parentId): array
     {
         return $this->decode(
@@ -1597,6 +1671,21 @@ class MailClass extends AcymClass
 
     public function getMailType(int $mailId): string
     {
-        return acym_loadResult('SELECT type FROM #__acym_mail WHERE id = '.intval($mailId));
+        return (string)acym_loadResult('SELECT type FROM #__acym_mail WHERE id = '.intval($mailId));
+    }
+
+    public function isPublicArchive(int $mailId): bool
+    {
+        $publicCampaign = acym_loadResult(
+            'SELECT COUNT(campaign.id)
+            FROM #__acym_campaign AS campaign
+            JOIN #__acym_mail AS mail ON campaign.mail_id = mail.id
+            WHERE campaign.mail_id = '.intval($mailId).'
+                AND campaign.active = 1
+                AND campaign.sent = 1
+                AND mail.type = '.acym_escapeDB(MailClass::TYPE_STANDARD)
+        );
+
+        return !empty($publicCampaign);
     }
 }

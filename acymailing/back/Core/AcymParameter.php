@@ -7,6 +7,9 @@ class AcymParameter
     private array $params = [];
     private object $paramObject;
 
+    /**
+     * @param null $params We expect a json encoded object, but it could directly be an object with protected data in Joomla 3
+     */
     public function __construct($params = null)
     {
         if (is_string($params)) {
@@ -18,6 +21,11 @@ class AcymParameter
         }
     }
 
+    /**
+     * @param mixed $default
+     *
+     * @return mixed
+     */
     public function get(string $path, $default = null)
     {
         if (empty($this->paramObject)) {
@@ -27,6 +35,7 @@ class AcymParameter
 
             return $this->params[$path];
         } else {
+            // Handle the object based parameters
             $value = $this->paramObject->get($path, 'noval');
             if ($value === 'noval') {
                 $value = $this->paramObject->get('data.'.$path, $default);

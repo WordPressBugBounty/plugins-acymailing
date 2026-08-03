@@ -1,4 +1,5 @@
 <?php
+defined('ABSPATH') || die('Restricted Access');
 
 use AcyMailing\Core\AcymPlugin;
 use AcyMailing\Classes\FieldClass;
@@ -22,6 +23,7 @@ class plgAcymBirthday extends AcymPlugin
         $fieldClass = new FieldClass();
         $birthdayField = $fieldClass->getOneById((int)$options['field']);
         if (empty($birthdayField)) {
+            // Prevent the campaign from being sent to everyone
             $query->where[] = '0 = 1';
 
             return;
