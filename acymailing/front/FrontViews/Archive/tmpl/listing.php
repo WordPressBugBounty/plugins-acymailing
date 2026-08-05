@@ -2,10 +2,10 @@
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- View file, its variables are local to the include scope, not true globals.
 defined('ABSPATH') || die('Restricted Access');
 ?>
-<div class="acym_front_page <?php echo esc_attr($data['paramsCMS']['suffix']); ?>">
+<div class="acym_front_page <?php echo esc_attr($data['paramsCMS']['suffix'] ?? ''); ?>">
     <?php
     if (!empty($data['paramsCMS']['show_page_heading'])) {
-        echo '<h1 class="contentheading '.esc_attr($data['paramsCMS']['suffix']).'">'.esc_html($data['paramsCMS']['page_heading']).'</h1>';
+        echo '<h1 class="contentheading '.esc_attr($data['paramsCMS']['suffix'] ?? '').'">'.esc_html($data['paramsCMS']['page_heading'] ?? '').'</h1>';
     }
     ?>
 	<div class="acym__front__archive">

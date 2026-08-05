@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -11,7 +11,7 @@ use Psr\Http\Message\UriInterface;
  *
  * @author Tobias Schultze
  *
- * @see https://datatracker.ietf.org/doc/html/rfc3986#section-6
+ * @see    https://datatracker.ietf.org/doc/html/rfc3986#section-6
  */
 final class UriNormalizer
 {
@@ -178,7 +178,7 @@ final class UriNormalizer
      */
     public static function isEquivalent(UriInterface $uri1, UriInterface $uri2, int $normalizations = self::PRESERVING_NORMALIZATIONS): bool
     {
-        return (string) self::normalize($uri1, $normalizations) === (string) self::normalize($uri2, $normalizations);
+        return (string)self::normalize($uri1, $normalizations) === (string)self::normalize($uri2, $normalizations);
     }
 
     private static function capitalizePercentEncoding(UriInterface $uri): UriInterface

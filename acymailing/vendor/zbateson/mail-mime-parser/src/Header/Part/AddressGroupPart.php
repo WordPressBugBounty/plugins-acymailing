@@ -43,7 +43,7 @@ class AddressGroupPart extends MimeLiteralPart
      *
      * @return AddressPart[] An array of address parts.
      */
-    public function getAddresses() : array
+    public function getAddresses(): array
     {
         return $this->addresses;
     }
@@ -52,6 +52,7 @@ class AddressGroupPart extends MimeLiteralPart
      * Returns the AddressPart at the passed index or null.
      *
      * @param int $index The 0-based index.
+     *
      * @return AddressPart|null The address.
      */
     public function getAddress(int $index)
@@ -59,6 +60,7 @@ class AddressGroupPart extends MimeLiteralPart
         if (!isset($this->addresses[$index])) {
             return null;
         }
+
         return $this->addresses[$index];
     }
 
@@ -67,7 +69,7 @@ class AddressGroupPart extends MimeLiteralPart
      *
      * @return string The name
      */
-    public function getName() : string
+    public function getName(): string
     {
         return $this->value;
     }

@@ -59,10 +59,10 @@ class CharsetStream implements StreamInterface
     private $stream;
 
     /**
-     * @param StreamInterface $stream Stream to decorate
-     * @param string $streamCharset The underlying stream's charset
-     * @param string $stringCharset The charset to encode strings to (or
-     *        expected for write)
+     * @param StreamInterface $stream        Stream to decorate
+     * @param string          $streamCharset The underlying stream's charset
+     * @param string          $stringCharset The charset to encode strings to (or
+     *                                       expected for write)
      */
     public function __construct(StreamInterface $stream, string $streamCharset = 'ISO-8859-1', string $stringCharset = 'UTF-8')
     {
@@ -75,7 +75,7 @@ class CharsetStream implements StreamInterface
     /**
      * Overridden to return the position in the target encoding.
      */
-    public function tell() : int
+    public function tell(): int
     {
         return $this->position;
     }
@@ -85,7 +85,7 @@ class CharsetStream implements StreamInterface
      *
      * @return null
      */
-    public function getSize() : ?int
+    public function getSize(): ?int
     {
         return null;
     }
@@ -95,9 +95,10 @@ class CharsetStream implements StreamInterface
      *
      * @param int $offset
      * @param int $whence
+     *
      * @throws RuntimeException
      */
-    public function seek($offset, $whence = SEEK_SET) : void
+    public function seek($offset, $whence = SEEK_SET): void
     {
         throw new RuntimeException('Cannot seek a CharsetStream');
     }
@@ -105,7 +106,7 @@ class CharsetStream implements StreamInterface
     /**
      * Overridden to return false
      */
-    public function isSeekable() : bool
+    public function isSeekable(): bool
     {
         return false;
     }
@@ -118,9 +119,9 @@ class CharsetStream implements StreamInterface
      * streams and pass testReadUtf16LeToEof, although the buffered string
      * should've solved that on its own.
      */
-    private function readRawCharsIntoBuffer(int $length) : void
+    private function readRawCharsIntoBuffer(int $length): void
     {
-        $n = (int) \ceil(($length + 32) / 4.0) * 4;
+        $n = (int)\ceil(($length + 32) / 4.0) * 4;
         while ($this->bufferLength < $n) {
             $raw = $this->stream->read($n + 512);
             if ($raw === '') {
@@ -134,7 +135,7 @@ class CharsetStream implements StreamInterface
     /**
      * Returns true if the end of stream has been reached.
      */
-    public function eof() : bool
+    public function eof(): bool
     {
         return ($this->bufferLength === 0 && $this->stream->eof());
     }
@@ -144,9 +145,10 @@ class CharsetStream implements StreamInterface
      * them after converting to the target string charset.
      *
      * @param int $length
+     *
      * @return string
      */
-    public function read($length) : string
+    public function read($length): string
     {
         // let Guzzle decide what to do.
         if ($length <= 0 || $this->eof()) {
@@ -168,13 +170,15 @@ class CharsetStream implements StreamInterface
      * the target stream encoding.
      *
      * @param string $string
+     *
      * @return int the number of bytes written
      */
-    public function write($string) : int
+    public function write($string): int
     {
         $converted = $this->converter->convert($string, $this->stringCharset, $this->streamCharset);
         $written = $this->converter->getLength($converted, $this->streamCharset);
         $this->position += $written;
+
         return $this->stream->write($converted);
     }
 }

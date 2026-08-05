@@ -162,7 +162,7 @@ defined('ABSPATH') || die('Restricted Access');
 				</fieldset>
                 <?php acym_formOptions(); ?>
 				<input type="hidden" name="user_id" value="<?php echo esc_attr($data['user']->id); ?>">
-				<input type="hidden" name="user_key" value="<?php echo esc_attr($data['user']->key); ?>">
+				<input type="hidden" name="user_key" value="<?php echo esc_attr($data['user']->key ?? ''); ?>">
 				<input type="hidden" name="mail_id" value="<?php echo esc_attr($data['mail_id']); ?>">
 				<input type="hidden" name="displayed_checked_lists" id="displayed_checked_lists">
 			</form>

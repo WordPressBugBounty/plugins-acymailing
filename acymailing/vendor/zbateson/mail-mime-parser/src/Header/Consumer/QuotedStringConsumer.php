@@ -31,7 +31,7 @@ class QuotedStringConsumer extends GenericConsumer
      * an empty array.
      *
      */
-    public function getSubConsumers() : array
+    public function getSubConsumers(): array
     {
         return [];
     }
@@ -39,7 +39,7 @@ class QuotedStringConsumer extends GenericConsumer
     /**
      * Returns true if the token is a double quote.
      */
-    protected function isStartToken(string $token) : bool
+    protected function isStartToken(string $token): bool
     {
         return ($token === '"');
     }
@@ -47,7 +47,7 @@ class QuotedStringConsumer extends GenericConsumer
     /**
      * Returns true if the token is a double quote.
      */
-    protected function isEndToken(string $token) : bool
+    protected function isEndToken(string $token): bool
     {
         return ($token === '"');
     }
@@ -57,7 +57,7 @@ class QuotedStringConsumer extends GenericConsumer
      *
      * @return string[]
      */
-    protected function getTokenSeparators() : array
+    protected function getTokenSeparators(): array
     {
         return ['\"'];
     }
@@ -67,7 +67,7 @@ class QuotedStringConsumer extends GenericConsumer
      * as-is.
      *
      */
-    protected function filterIgnoredSpaces(array $parts) : array
+    protected function filterIgnoredSpaces(array $parts): array
     {
         return $parts;
     }
@@ -76,7 +76,8 @@ class QuotedStringConsumer extends GenericConsumer
      * Constructs a LiteralPart and returns it.
      *
      * @param bool $isLiteral not used - everything in a quoted string is a
-     *        literal
+     *                        literal
+     *
      * @return \ZBateson\MailMimeParser\Header\IHeaderPart|null
      */
     protected function getPartForToken(string $token, bool $isLiteral)

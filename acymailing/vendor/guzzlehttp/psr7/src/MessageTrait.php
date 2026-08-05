@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -148,7 +148,7 @@ trait MessageTrait
         $this->headerNames = $this->headers = [];
         foreach ($headers as $header => $value) {
             // Numeric array keys are converted to int by PHP.
-            $header = (string) $header;
+            $header = (string)$header;
 
             $this->assertHeader($header);
             $value = $this->normalizeHeaderValue($value);
@@ -199,13 +199,15 @@ trait MessageTrait
     {
         return array_map(function ($value) {
             if (!is_scalar($value) && null !== $value) {
-                throw new \InvalidArgumentException(sprintf(
-                    'Header value must be scalar or null but %s provided.',
-                    is_object($value) ? get_class($value) : gettype($value)
-                ));
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Header value must be scalar or null but %s provided.',
+                        is_object($value) ? get_class($value) : gettype($value)
+                    )
+                );
             }
 
-            $trimmed = trim((string) $value, " \t");
+            $trimmed = trim((string)$value, " \t");
             $this->assertValue($trimmed);
 
             return $trimmed;
@@ -220,10 +222,12 @@ trait MessageTrait
     private function assertHeader($header): void
     {
         if (!is_string($header)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Header name must be a string but %s provided.',
-                is_object($header) ? get_class($header) : gettype($header)
-            ));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Header name must be a string but %s provided.',
+                    is_object($header) ? get_class($header) : gettype($header)
+                )
+            );
         }
 
         if (!preg_match('/^[a-zA-Z0-9\'`#$%&*+.^_|~!-]+$/D', $header)) {

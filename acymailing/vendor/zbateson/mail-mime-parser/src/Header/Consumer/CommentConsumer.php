@@ -39,7 +39,7 @@ class CommentConsumer extends GenericConsumer
      *
      * @return string[] the patterns
      */
-    protected function getTokenSeparators() : array
+    protected function getTokenSeparators(): array
     {
         return ['\(', '\)'];
     }
@@ -47,7 +47,7 @@ class CommentConsumer extends GenericConsumer
     /**
      * Returns true if the token is an open parenthesis character, '('.
      */
-    protected function isStartToken(string $token) : bool
+    protected function isStartToken(string $token): bool
     {
         return ($token === '(');
     }
@@ -55,7 +55,7 @@ class CommentConsumer extends GenericConsumer
     /**
      * Returns true if the token is a close parenthesis character, ')'.
      */
-    protected function isEndToken(string $token) : bool
+    protected function isEndToken(string $token): bool
     {
         return ($token === ')');
     }
@@ -85,6 +85,7 @@ class CommentConsumer extends GenericConsumer
     protected function advanceToNextToken(Iterator $tokens, bool $isStartToken)
     {
         $tokens->next();
+
         return $this;
     }
 
@@ -94,21 +95,23 @@ class CommentConsumer extends GenericConsumer
      * array.
      *
      * @param \ZBateson\MailMimeParser\Header\IHeaderPart[] $parts
+     *
      * @return \ZBateson\MailMimeParser\Header\IHeaderPart[]|array
      */
-    protected function processParts(array $parts) : array
+    protected function processParts(array $parts): array
     {
         $comment = '';
         foreach ($parts as $part) {
             // order is important here - CommentPart extends LiteralPart
             if ($part instanceof CommentPart) {
-                $comment .= '(' . $part->getComment() . ')';
+                $comment .= '('.$part->getComment().')';
             } elseif ($part instanceof LiteralPart) {
-                $comment .= '"' . \str_replace('(["\\])', '\$1', $part->getValue()) . '"';
+                $comment .= '"'.\str_replace('(["\\])', '\$1', $part->getValue()).'"';
             } else {
                 $comment .= $part->getValue();
             }
         }
+
         return [$this->partFactory->newCommentPart($comment)];
     }
 }

@@ -57,6 +57,7 @@ class ParserUUEncodedPartProxyFactory extends ParserPartProxyFactory
 
         $streamContainer->setStream($this->streamFactory->newMessagePartStream($part));
         $part->attach($streamContainer);
+
         return $parserProxy;
     }
 }

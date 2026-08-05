@@ -50,7 +50,7 @@ class HeaderStream implements SplObserver, StreamInterface
         }
     }
 
-    public function update(SplSubject $subject) : void
+    public function update(SplSubject $subject): void
     {
         if ($this->stream !== null) {
             $this->stream = $this->createStream();
@@ -64,7 +64,7 @@ class HeaderStream implements SplObserver, StreamInterface
      * Content-Transfer-Encoding headers are generated manually.
      *
      */
-    private function getPartHeadersIterator() : \Iterator
+    private function getPartHeadersIterator(): \Iterator
     {
         if ($this->part instanceof IMimePart) {
             return $this->part->getRawHeaderIterator();
@@ -72,21 +72,23 @@ class HeaderStream implements SplObserver, StreamInterface
             return new ArrayIterator([
                 [HeaderConsts::CONTENT_TYPE, $this->part->getContentType()],
                 [HeaderConsts::CONTENT_DISPOSITION, $this->part->getContentDisposition()],
-                [HeaderConsts::CONTENT_TRANSFER_ENCODING, $this->part->getContentTransferEncoding()]
+                [HeaderConsts::CONTENT_TRANSFER_ENCODING, $this->part->getContentTransferEncoding()],
             ]);
         }
+
         return new ArrayIterator();
     }
 
     /**
      * Writes out headers for $this->part and follows them with an empty line.
      */
-    public function writePartHeadersTo(StreamInterface $stream) : self
+    public function writePartHeadersTo(StreamInterface $stream): self
     {
         foreach ($this->getPartHeadersIterator() as $header) {
             $stream->write("{$header[0]}: {$header[1]}\r\n");
         }
         $stream->write("\r\n");
+
         return $this;
     }
 
@@ -94,11 +96,12 @@ class HeaderStream implements SplObserver, StreamInterface
      * Creates the underlying stream lazily when required.
      *
      */
-    protected function createStream() : StreamInterface
+    protected function createStream(): StreamInterface
     {
         $stream = Psr7\Utils::streamFor();
         $this->writePartHeadersTo($stream);
         $stream->rewind();
+
         return $stream;
     }
 }

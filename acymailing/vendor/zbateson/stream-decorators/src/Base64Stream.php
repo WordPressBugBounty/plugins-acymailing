@@ -74,7 +74,7 @@ class Base64Stream implements StreamInterface
     /**
      * Returns the current position of the file read/write pointer
      */
-    public function tell() : int
+    public function tell(): int
     {
         return $this->position;
     }
@@ -84,7 +84,7 @@ class Base64Stream implements StreamInterface
      *
      * @return null
      */
-    public function getSize() : ?int
+    public function getSize(): ?int
     {
         return null;
     }
@@ -96,9 +96,10 @@ class Base64Stream implements StreamInterface
      *
      * @param int $offset
      * @param int $whence
+     *
      * @throws RuntimeException
      */
-    public function seek($offset, $whence = SEEK_SET) : void
+    public function seek($offset, $whence = SEEK_SET): void
     {
         throw new RuntimeException('Cannot seek a Base64Stream');
     }
@@ -106,7 +107,7 @@ class Base64Stream implements StreamInterface
     /**
      * Overridden to return false
      */
-    public function isSeekable() : bool
+    public function isSeekable(): bool
     {
         return false;
     }
@@ -114,7 +115,7 @@ class Base64Stream implements StreamInterface
     /**
      * Returns true if the end of stream has been reached.
      */
-    public function eof() : bool
+    public function eof(): bool
     {
         return ($this->buffer->eof() && $this->stream->eof());
     }
@@ -127,7 +128,7 @@ class Base64Stream implements StreamInterface
      * base64 characters (normally the stream should be wrapped in a
      * PregReplaceFilterStream to filter out non-base64 characters).
      */
-    private function fillBuffer(int $length) : void
+    private function fillBuffer(int $length): void
     {
         $fill = 8192;
         while ($this->buffer->getSize() < $length) {
@@ -146,9 +147,10 @@ class Base64Stream implements StreamInterface
      * encoded data and is not supported.
      *
      * @param int $length
+     *
      * @return string
      */
-    public function read($length) : string
+    public function read($length): string
     {
         // let Guzzle decide what to do.
         if ($length <= 0 || $this->eof()) {
@@ -157,6 +159,7 @@ class Base64Stream implements StreamInterface
         $this->fillBuffer($length);
         $ret = $this->buffer->read($length);
         $this->position += \strlen($ret);
+
         return $ret;
     }
 
@@ -172,11 +175,12 @@ class Base64Stream implements StreamInterface
      * encoded data and is not supported.
      *
      * @param string $string
+     *
      * @return int the number of bytes written
      */
-    public function write($string) : int
+    public function write($string): int
     {
-        $bytes = $this->remainder . $string;
+        $bytes = $this->remainder.$string;
         $len = \strlen($bytes);
         if (($len % 3) !== 0) {
             $this->remainder = \substr($bytes, -($len % 3));
@@ -187,13 +191,14 @@ class Base64Stream implements StreamInterface
         $this->stream->write(\base64_encode($bytes));
         $written = \strlen($string);
         $this->position += $len;
+
         return $written;
     }
 
     /**
      * Writes out any remaining bytes at the end of the stream and closes.
      */
-    private function beforeClose() : void
+    private function beforeClose(): void
     {
         if ($this->isWritable() && $this->remainder !== '') {
             $this->stream->write(\base64_encode($this->remainder));
@@ -204,7 +209,7 @@ class Base64Stream implements StreamInterface
     /**
      * @inheritDoc
      */
-    public function close() : void
+    public function close(): void
     {
         $this->beforeClose();
         $this->stream->close();

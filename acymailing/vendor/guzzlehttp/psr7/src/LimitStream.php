@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -31,8 +31,8 @@ final class LimitStream implements StreamInterface
      */
     public function __construct(
         StreamInterface $stream,
-        int $limit = -1,
-        int $offset = 0
+        int             $limit = -1,
+        int             $offset = 0
     ) {
         $this->stream = $stream;
         $this->setLimit($limit);
@@ -74,11 +74,13 @@ final class LimitStream implements StreamInterface
     public function seek($offset, $whence = SEEK_SET): void
     {
         if ($whence !== SEEK_SET || $offset < 0) {
-            throw new \RuntimeException(sprintf(
-                'Cannot seek to offset %s with whence %s',
-                $offset,
-                $whence
-            ));
+            throw new \RuntimeException(
+                sprintf(
+                    'Cannot seek to offset %s with whence %s',
+                    $offset,
+                    $whence
+                )
+            );
         }
 
         $offset += $this->offset;

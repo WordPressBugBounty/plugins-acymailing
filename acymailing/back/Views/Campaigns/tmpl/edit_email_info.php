@@ -6,7 +6,7 @@ defined('ABSPATH') || die('Restricted Access');
 	<div class="cell large-6">
 		<label>
             <?php echo esc_html(acym_translation('ACYM_CAMPAIGN_NAME')); ?>
-			<input name="mail[name]" type="text" value="<?php echo esc_attr($data['mailInformation']->name); ?>">
+			<input name="mail[name]" type="text" value="<?php echo esc_attr($data['mailInformation']->name ?? ''); ?>">
 		</label>
 	</div>
 	<div class="cell large-6">

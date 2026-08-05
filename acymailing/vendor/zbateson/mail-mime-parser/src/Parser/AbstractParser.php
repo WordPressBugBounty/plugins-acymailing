@@ -50,7 +50,7 @@ abstract class AbstractParser implements IParser
     public function __construct(
         ParserPartProxyFactory $parserMessageProxyFactory,
         ParserPartProxyFactory $parserPartProxyFactory,
-        PartBuilderFactory $partBuilderFactory
+        PartBuilderFactory     $partBuilderFactory
     ) {
         $this->parserMessageProxyFactory = $parserMessageProxyFactory;
         $this->parserPartProxyFactory = $parserPartProxyFactory;
@@ -63,6 +63,7 @@ abstract class AbstractParser implements IParser
     public function setParserManager(ParserManager $pm)
     {
         $this->parserManager = $pm;
+
         return $this;
     }
 

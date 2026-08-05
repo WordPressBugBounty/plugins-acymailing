@@ -33,7 +33,7 @@ class AddressGroupConsumer extends AddressBaseConsumer
      *
      * @return string[] the patterns
      */
-    public function getTokenSeparators() : array
+    public function getTokenSeparators(): array
     {
         return [':', ';'];
     }
@@ -41,7 +41,7 @@ class AddressGroupConsumer extends AddressBaseConsumer
     /**
      * AddressGroupConsumer returns true if the passed token is a semi-colon.
      */
-    protected function isEndToken(string $token) : bool
+    protected function isEndToken(string $token): bool
     {
         return ($token === ';');
     }
@@ -49,7 +49,7 @@ class AddressGroupConsumer extends AddressBaseConsumer
     /**
      * AddressGroupConsumer returns true if the passed token is a colon.
      */
-    protected function isStartToken(string $token) : bool
+    protected function isStartToken(string $token): bool
     {
         return ($token === ':');
     }
@@ -61,9 +61,10 @@ class AddressGroupConsumer extends AddressBaseConsumer
      * element with all email addresses from this and any sub-groups.
      *
      * @param \ZBateson\MailMimeParser\Header\IHeaderPart[] $parts
+     *
      * @return AddressGroupPart[]|array
      */
-    protected function processParts(array $parts) : array
+    protected function processParts(array $parts): array
     {
         $emails = [];
         foreach ($parts as $part) {
@@ -74,6 +75,7 @@ class AddressGroupConsumer extends AddressBaseConsumer
             $emails[] = $part;
         }
         $group = $this->partFactory->newAddressGroupPart($emails);
+
         return [$group];
     }
 }

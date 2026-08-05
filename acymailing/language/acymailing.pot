@@ -1,13 +1,55 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 10.11.1\n"
+"Project-Id-Version: AcyMailing 11.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-09\n"
+"POT-Creation-Date: 2026-08-05\n"
 "X-Domain: acymailing\n"
 
+
+msgid "Do not track new subscribers by default"
+msgstr ""
+
+msgid "When enabled, new subscribers are created with tracking disabled (no open/click pixel) unless they explicitly consent. Existing subscribers are not affected."
+msgstr ""
+
+msgid "Allow subscribers to manage their tracking from their profile page"
+msgstr ""
+
+msgid "I allow my activity (email opens and clicks) to be tracked"
+msgstr ""
+
+msgid "Display a tracking consent checkbox"
+msgstr ""
+
+msgid "Adds an unchecked opt-in checkbox to the subscription form. New subscribers are only tracked if they tick it."
+msgstr ""
+
+msgid "I agree to have my activity (email opens and clicks) tracked"
+msgstr ""
+
+msgid "Insert a <b>stop tracking</b> link in your email"
+msgstr ""
+
+msgid "Stop tracking me"
+msgstr ""
+
+msgid "Your activity will no longer be tracked."
+msgstr ""
+
+msgid "API key"
+msgstr ""
+
+msgid "Secret key sent in the Api-Key header to authenticate REST API calls. Change this value to rotate the key. For backward compatibility the license key is still accepted, but switching your integrations to this dedicated key is recommended."
+msgstr ""
+
+msgid "You don't have any open data/click data yet"
+msgstr ""
+
+msgid "Your data has been successfully deleted."
+msgstr ""
 
 msgid "IP address collection"
 msgstr ""
@@ -813,10 +855,10 @@ msgstr ""
 msgid "%s contacts integration"
 msgstr ""
 
-msgid "%s: %s"
+msgid "%1$s: %2$s"
 msgstr ""
 
-msgid "This is an inquiry email via %s from:\n%s <%s>\n\n%s"
+msgid "This is an inquiry email via %1$s from:\n%2$s <%3$s>\n\n%4$s"
 msgstr ""
 
 msgid "This is an enquiry email via {URL} from:\n{NAME} <{EMAIL}>\n\n{BODY}"
@@ -3609,9 +3651,6 @@ msgstr ""
 msgid "The custom field %s does not exist"
 msgstr ""
 
-msgid "<b>You don't have any open data/click data yet</b>"
-msgstr ""
-
 msgid "Number of receivers: %s"
 msgstr ""
 
@@ -5529,9 +5568,6 @@ msgstr ""
 msgid "Download"
 msgstr ""
 
-msgid "Could not load all information"
-msgstr ""
-
 msgid "You don't have the right AcyMailing edition to download this add-on, you need at least AcyMailing "
 msgstr ""
 
@@ -5667,7 +5703,7 @@ msgstr ""
 msgid "%s campaign(s) generated"
 msgstr ""
 
-msgid "Campaign [%s] not generated: %s"
+msgid "Campaign [%1$s] not generated: %2$s"
 msgstr ""
 
 msgid "The initial automatic campaign has been deleted"
@@ -5736,7 +5772,7 @@ msgstr ""
 msgid "The automation will be triggered every year based on the \"Field\" provided"
 msgstr ""
 
-msgid "Trigger %s day(s) before the date at %s&nbsp;:&nbsp;%s"
+msgid "Trigger %1$s day(s) before the date at %2$s&nbsp;:&nbsp;%3$s"
 msgstr ""
 
 msgid "Field"
@@ -6864,9 +6900,6 @@ msgstr ""
 msgid "Could not find source file, check permissions: %s"
 msgstr ""
 
-msgid "Failed to delete %s"
-msgstr ""
-
 msgid "Copy file %s failed, check permissions"
 msgstr ""
 
@@ -6883,9 +6916,6 @@ msgid "Folder %s does not exist"
 msgstr ""
 
 msgid "%s is not a folder"
-msgstr ""
-
-msgid "%s is not a file"
 msgstr ""
 
 msgid "Could not delete folder %s"
@@ -7798,9 +7828,6 @@ msgid "The port %1$s is not opened on your server: %2$s"
 msgstr ""
 
 msgid "fsockopen is not enabled, please contact your hosting company to enable it"
-msgstr ""
-
-msgid "API key"
 msgstr ""
 
 msgid "REST API"
