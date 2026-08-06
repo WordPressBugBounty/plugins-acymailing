@@ -29,17 +29,16 @@ class Container extends PimpleContainer
      * Null is returned for built-in types.
      *
      */
-    private function getParameterClass(ReflectionParameter $param): ?string
+    private function getParameterClass(ReflectionParameter $param) : ?string
     {
         if (\method_exists($param, 'getType')) {
             $type = $param->getType();
             if ($type && !$type->isBuiltin()) {
-                return \method_exists($type, 'getName') ? $type->getName() : (string)$type;
+                return \method_exists($type, 'getName') ? $type->getName() : (string) $type;
             }
         } elseif ($param->getClass() !== null) {
             return $param->getClass()->getName();
         }
-
         return null;
     }
 
@@ -49,9 +48,9 @@ class Container extends PimpleContainer
      * The returned factory method looks up arguments and uses pimple to get an
      * instance of those types to pass them during construction.
      */
-    public function autoRegister($class): ?string
+    public function autoRegister($class) : ?string
     {
-        $fn = function ($c) use ($class) {
+        $fn = function($c) use ($class) {
             $ref = new ReflectionClass($class);
             $cargs = ($ref->getConstructor() !== null) ? $ref->getConstructor()->getParameters() : [];
             $ap = [];
@@ -67,11 +66,9 @@ class Container extends PimpleContainer
                 }
             }
             $ret = $ref->newInstanceArgs($ap);
-
             return $ret;
         };
         $this[$class] = $fn;
-
         return null;
     }
 
@@ -79,15 +76,13 @@ class Container extends PimpleContainer
      * Overridden to see if the class can be auto-registered and return true if
      * it can.
      */
-    public function offsetExists($id): bool
+    public function offsetExists($id) : bool
     {
         $exists = parent::offsetExists($id);
         if (!$exists && \class_exists($id)) {
             $this->autoRegister($id);
-
             return true;
         }
-
         return $exists;
     }
 
@@ -109,7 +104,6 @@ class Container extends PimpleContainer
         } catch (UnknownIdentifierException $e) {
             if (\class_exists($id)) {
                 $this->autoRegister($id);
-
                 return parent::offsetGet($id);
             }
             throw $e;
@@ -120,15 +114,13 @@ class Container extends PimpleContainer
      * Overridden to see if the class can be auto-registered first before
      * calling Pimple\Container::extend
      *
-     * @param string   $id
+     * @param string $id
      * @param callable $callable
-     *
      * @return callable the wrapped $callable
      */
     public function extend($id, $callable)
     {
         $this->offsetExists($id);
-
         return parent::extend($id, $callable);
     }
 }

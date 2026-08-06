@@ -31,7 +31,6 @@ class IUUEncodedPartFactory extends IMessagePartFactory
             $streamContainer
         );
         $streamContainer->setStream($this->streamFactory->newMessagePartStream($part));
-
         return $part;
     }
 }

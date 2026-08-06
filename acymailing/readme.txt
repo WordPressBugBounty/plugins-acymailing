@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.8
 Tested up to: 7.0
-Stable tag: 11.0.1
+Stable tag: 11.0.2
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -116,13 +116,8 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 11.0.1 - August 5, 2026 =
-* The tracking consent option is now also shown in the subscription forms edition page preview.
-* We added back the pot file to allow custom translations with Loco Translate.
-
-* The online version of an email can now be seen by users who received a test when the campaign has not been sent to the list yet.
-* A false-warning has been fixed in the spam-test report for invisible characters.
-* We fixed the sorting of the items in listings.
-* We fixed multiple php errors that could cause some pages not to load.
+= 11.0.2 - August 6, 2026 =
+* We fixed an issue that was breaking the display of some fields in the automations
+* We fixed an issue that was blocking the followup creation
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)

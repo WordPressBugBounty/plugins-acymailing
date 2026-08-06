@@ -28,13 +28,12 @@ abstract class PartFilter
      */
     public static function fromAttachmentFilter()
     {
-        return function (IMessagePart $part) {
+        return function(IMessagePart $part) {
             $type = $part->getContentType();
             $disp = $part->getContentDisposition();
             if (\in_array($type, ['text/plain', 'text/html']) && $disp !== null && \strcasecmp($disp, 'inline') === 0) {
                 return false;
             }
-
             return !(($part instanceof IMimePart)
                 && ($part->isMultiPart() || $part->isSignaturePart()));
         };
@@ -47,24 +46,21 @@ abstract class PartFilter
      * By default signed parts are excluded. Pass FALSE to the third parameter
      * to include them.
      *
-     * @param string $name               The header name to look up
-     * @param string $value              The value to match
-     * @param bool   $excludeSignedParts Optional signed parts exclusion (defaults
-     *                                   to true).
-     *
+     * @param string $name The header name to look up
+     * @param string $value The value to match
+     * @param bool $excludeSignedParts Optional signed parts exclusion (defaults
+     *        to true).
      * @return callable
      */
     public static function fromHeaderValue($name, $value, $excludeSignedParts = true)
     {
-        return function (IMessagePart $part) use ($name, $value, $excludeSignedParts) {
+        return function(IMessagePart $part) use ($name, $value, $excludeSignedParts) {
             if ($part instanceof IMimePart) {
                 if ($excludeSignedParts && $part->isSignaturePart()) {
                     return false;
                 }
-
                 return (\strcasecmp($part->getHeaderValue($name, ''), $value) === 0);
             }
-
             return false;
         };
     }
@@ -74,13 +70,12 @@ abstract class PartFilter
      * of a call to 'getContentType()'.
      *
      * @param string $mimeType Mime type of parts to find.
-     *
      * @return callable
      */
     public static function fromContentType($mimeType)
     {
-        return function (IMessagePart $part) use ($mimeType) {
-            return \strcasecmp($part->getContentType() ? : '', $mimeType) === 0;
+        return function(IMessagePart $part) use ($mimeType) {
+            return \strcasecmp($part->getContentType() ?: '', $mimeType) === 0;
         };
     }
 
@@ -89,16 +84,14 @@ abstract class PartFilter
      * set to 'attachment'.
      *
      * @param string $mimeType Mime type of parts to find.
-     *
      * @return callable
      */
     public static function fromInlineContentType($mimeType)
     {
-        return function (IMessagePart $part) use ($mimeType) {
+        return function(IMessagePart $part) use ($mimeType) {
             $disp = $part->getContentDisposition();
-
-            return (\strcasecmp($part->getContentType() ? : '', $mimeType) === 0) && ($disp === null
-                    || \strcasecmp($disp, 'attachment') !== 0);
+            return (\strcasecmp($part->getContentType() ?: '', $mimeType) === 0) && ($disp === null
+                || \strcasecmp($disp, 'attachment') !== 0);
         };
     }
 
@@ -107,22 +100,20 @@ abstract class PartFilter
      * IMessagePart::getContentDisposition()), optionally including
      * multipart parts and signed parts.
      *
-     * @param string $disposition        The disposition to find.
-     * @param bool   $includeMultipart   Optionally include multipart parts by
-     *                                   passing true (defaults to false).
-     * @param bool   $includeSignedParts Optionally include signed parts (defaults
-     *                                   to false).
-     *
+     * @param string $disposition The disposition to find.
+     * @param bool $includeMultipart Optionally include multipart parts by
+     *        passing true (defaults to false).
+     * @param bool $includeSignedParts Optionally include signed parts (defaults
+     *        to false).
      * @return callable
      */
     public static function fromDisposition($disposition, $includeMultipart = false, $includeSignedParts = false)
     {
-        return function (IMessagePart $part) use ($disposition, $includeMultipart, $includeSignedParts) {
+        return function(IMessagePart $part) use ($disposition, $includeMultipart, $includeSignedParts) {
             if (($part instanceof IMimePart) && ((!$includeMultipart && $part->isMultiPart()) || (!$includeSignedParts && $part->isSignaturePart()))) {
                 return false;
             }
             $disp = $part->getContentDisposition();
-
             return ($disp !== null && \strcasecmp($disp, $disposition) === 0);
         };
     }

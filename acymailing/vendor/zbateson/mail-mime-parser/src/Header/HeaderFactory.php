@@ -85,11 +85,11 @@ class HeaderFactory
             'messageid',
             'contentid',
             'inreplyto',
-            'references',
+            'references'
         ],
         \ZBateson\MailMimeParser\Header\ReceivedHeader::class => [
-            'received',
-        ],
+            'received'
+        ]
     ];
 
     /**
@@ -113,10 +113,9 @@ class HeaderFactory
      * stripped out.
      *
      * @param string $header The header name
-     *
      * @return string The normalized header name
      */
-    public function getNormalizedHeaderName(string $header): string
+    public function getNormalizedHeaderName(string $header) : string
     {
         return \preg_replace('/[^a-z0-9]/', '', \strtolower($header));
     }
@@ -125,10 +124,9 @@ class HeaderFactory
      * Returns the name of an IHeader class for the passed header name.
      *
      * @param string $name The header name.
-     *
      * @return string The Fully Qualified class name.
      */
-    private function getClassFor(string $name): string
+    private function getClassFor(string $name) : string
     {
         $test = $this->getNormalizedHeaderName($name);
         foreach ($this->types as $class => $matchers) {
@@ -138,7 +136,6 @@ class HeaderFactory
                 }
             }
         }
-
         return $this->genericType;
     }
 
@@ -146,15 +143,13 @@ class HeaderFactory
      * Creates an IHeader instance for the passed header name and value, and
      * returns it.
      *
-     * @param string $name  The header name.
+     * @param string $name The header name.
      * @param string $value The header value.
-     *
      * @return IHeader The created header object.
      */
     public function newInstance(string $name, string $value)
     {
         $class = $this->getClassFor($name);
-
         return $this->newInstanceOf($name, $value, $class);
     }
 
@@ -162,12 +157,11 @@ class HeaderFactory
      * Creates an IHeader instance for the passed header name and value, and
      * returns it.
      *
-     * @param string $name  The header name.
+     * @param string $name The header name.
      * @param string $value The header value.
-     *
      * @return IHeader The created header object.
      */
-    public function newInstanceOf(string $name, string $value, string $iHeaderClass): IHeader
+    public function newInstanceOf(string $name, string $value, string $iHeaderClass) : IHeader
     {
         if (\is_a($iHeaderClass, 'ZBateson\MailMimeParser\Header\MimeEncodedHeader', true)) {
             return new $iHeaderClass(
@@ -177,7 +171,6 @@ class HeaderFactory
                 $value
             );
         }
-
         return new $iHeaderClass($this->consumerService, $name, $value);
     }
 }

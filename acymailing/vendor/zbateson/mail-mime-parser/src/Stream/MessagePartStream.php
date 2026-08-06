@@ -58,7 +58,7 @@ class MessagePartStream implements SplObserver, StreamInterface
         }
     }
 
-    public function update(SplSubject $subject): void
+    public function update(SplSubject $subject) : void
     {
         if ($this->appendStream !== null) {
             // unset forces recreation in StreamDecoratorTrait with a call to __get
@@ -74,7 +74,7 @@ class MessagePartStream implements SplObserver, StreamInterface
      * is returned as-is.
      *
      */
-    private function getCharsetDecoratorForStream(StreamInterface $stream): StreamInterface
+    private function getCharsetDecoratorForStream(StreamInterface $stream) : StreamInterface
     {
         $charset = $this->part->getCharset();
         if (!empty($charset)) {
@@ -84,7 +84,6 @@ class MessagePartStream implements SplObserver, StreamInterface
                 MailMimeParser::DEFAULT_CHARSET
             );
         }
-
         return $stream;
     }
 
@@ -101,7 +100,7 @@ class MessagePartStream implements SplObserver, StreamInterface
      * o UUStream
      *
      */
-    private function getTransferEncodingDecoratorForStream(StreamInterface $stream): StreamInterface
+    private function getTransferEncodingDecoratorForStream(StreamInterface $stream) : StreamInterface
     {
         $encoding = $this->part->getContentTransferEncoding();
         $decorator = null;
@@ -121,7 +120,6 @@ class MessagePartStream implements SplObserver, StreamInterface
             default:
                 return $stream;
         }
-
         return $decorator;
     }
 
@@ -129,7 +127,7 @@ class MessagePartStream implements SplObserver, StreamInterface
      * Writes out the content portion of the attached mime part to the passed
      * $stream.
      */
-    private function writePartContentTo(StreamInterface $stream): self
+    private function writePartContentTo(StreamInterface $stream) : self
     {
         $contentStream = $this->part->getContentStream();
         if ($contentStream !== null) {
@@ -139,7 +137,6 @@ class MessagePartStream implements SplObserver, StreamInterface
             Psr7\Utils::copyToStream($contentStream, $cs);
             $cs->close();
         }
-
         return $this;
     }
 
@@ -148,16 +145,15 @@ class MessagePartStream implements SplObserver, StreamInterface
      * and child streams.
      *
      * @param IMimePart $part passed in because $this->part is declared
-     *                        as IMessagePart
-     *
+     *        as IMessagePart
      * @return StreamInterface[]
      */
-    protected function getBoundaryAndChildStreams(IMimePart $part): array
+    protected function getBoundaryAndChildStreams(IMimePart $part) : array
     {
         $boundary = $part->getHeaderParameter(HeaderConsts::CONTENT_TYPE, 'boundary');
         if ($boundary === null) {
             return \array_map(
-                function ($child) {
+                function($child) {
                     return $child->getStream();
                 },
                 $part->getChildParts()
@@ -182,7 +178,7 @@ class MessagePartStream implements SplObserver, StreamInterface
      *
      * @return StreamInterface[]
      */
-    protected function getStreamsArray(): array
+    protected function getStreamsArray() : array
     {
         $content = Psr7\Utils::streamFor();
         $this->writePartContentTo($content);
@@ -200,12 +196,11 @@ class MessagePartStream implements SplObserver, StreamInterface
      * Creates the underlying stream lazily when required.
      *
      */
-    protected function createStream(): StreamInterface
+    protected function createStream() : StreamInterface
     {
         if ($this->appendStream === null) {
             $this->appendStream = new AppendStream($this->getStreamsArray());
         }
-
         return $this->appendStream;
     }
 }

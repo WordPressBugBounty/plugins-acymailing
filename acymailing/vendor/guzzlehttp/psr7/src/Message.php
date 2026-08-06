@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -18,10 +18,8 @@ final class Message
     public static function toString(MessageInterface $message): string
     {
         if ($message instanceof RequestInterface) {
-            $msg = trim(
-                    $message->getMethod().' '
-                    .$message->getRequestTarget()
-                )
+            $msg = trim($message->getMethod().' '
+                    .$message->getRequestTarget())
                 .' HTTP/'.$message->getProtocolVersion();
             if (!$message->hasHeader('host')) {
                 $msg .= "\r\nHost: ".$message->getUri()->getHost();
@@ -179,7 +177,7 @@ final class Message
     {
         $hostKey = array_filter(array_keys($headers), function ($k) {
             // Numeric array keys are converted to int by PHP.
-            $k = (string)$k;
+            $k = (string) $k;
 
             return strtolower($k) === 'host';
         });
@@ -238,7 +236,7 @@ final class Message
         $parts = explode(' ', $data['start-line'], 3);
 
         return new Response(
-            (int)$parts[1],
+            (int) $parts[1],
             $data['headers'],
             $data['body'],
             explode('/', $parts[0])[1],

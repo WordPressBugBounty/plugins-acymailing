@@ -67,7 +67,7 @@ class PartStreamContainer
      */
     private $encoding = [
         'type' => null,
-        'filter' => null,
+        'filter' => null
     ];
 
     /**
@@ -76,7 +76,7 @@ class PartStreamContainer
     private $charset = [
         'from' => null,
         'to' => null,
-        'filter' => null,
+        'filter' => null
     ];
 
     public function __construct(StreamFactory $streamFactory)
@@ -105,7 +105,6 @@ class PartStreamContainer
         // error out if called before setStream, getStream should never return
         // null.
         $this->stream->rewind();
-
         return $this->stream;
     }
 
@@ -113,7 +112,7 @@ class PartStreamContainer
      * Returns true if there's a content stream associated with the part.
      *
      */
-    public function hasContent(): bool
+    public function hasContent() : bool
     {
         return ($this->contentStream !== null);
     }
@@ -147,7 +146,7 @@ class PartStreamContainer
      *
      * @param string $transferEncoding
      */
-    private function isTransferEncodingFilterChanged(?string $transferEncoding): bool
+    private function isTransferEncodingFilterChanged(?string $transferEncoding) : bool
     {
         return ($transferEncoding !== $this->encoding['type']);
     }
@@ -158,7 +157,7 @@ class PartStreamContainer
      * arguments.
      *
      */
-    private function isCharsetFilterChanged(string $fromCharset, string $toCharset): bool
+    private function isCharsetFilterChanged(string $fromCharset, string $toCharset) : bool
     {
         return ($fromCharset !== $this->charset['from']
             || $toCharset !== $this->charset['to']);
@@ -170,7 +169,7 @@ class PartStreamContainer
      *
      * @param string $transferEncoding
      */
-    protected function attachTransferEncodingFilter(?string $transferEncoding): self
+    protected function attachTransferEncodingFilter(?string $transferEncoding) : self
     {
         if ($this->decodedStream !== null) {
             $this->encoding['type'] = $transferEncoding;
@@ -190,7 +189,6 @@ class PartStreamContainer
                 $this->decodedStream = new CachingStream($assign);
             }
         }
-
         return $this;
     }
 
@@ -199,38 +197,34 @@ class PartStreamContainer
      * the passed arguments.
      *
      * @param string $fromCharset the character set the content is encoded in
-     * @param string $toCharset   the target encoding to return
+     * @param string $toCharset the target encoding to return
      */
-    protected function attachCharsetFilter(string $fromCharset, string $toCharset): self
+    protected function attachCharsetFilter(string $fromCharset, string $toCharset) : self
     {
         if ($this->charsetStream !== null) {
-            $this->charsetStream = new CachingStream(
-                $this->streamFactory->newCharsetStream(
-                    $this->charsetStream,
-                    $fromCharset,
-                    $toCharset
-                )
-            );
+            $this->charsetStream = new CachingStream($this->streamFactory->newCharsetStream(
+                $this->charsetStream,
+                $fromCharset,
+                $toCharset
+            ));
             $this->charset['from'] = $fromCharset;
             $this->charset['to'] = $toCharset;
         }
-
         return $this;
     }
 
     /**
      * Resets just the charset stream, and rewinds the decodedStream.
      */
-    private function resetCharsetStream(): self
+    private function resetCharsetStream() : self
     {
         $this->charset = [
             'from' => null,
             'to' => null,
-            'filter' => null,
+            'filter' => null
         ];
         $this->decodedStream->rewind();
         $this->charsetStream = $this->decodedStream;
-
         return $this;
     }
 
@@ -241,12 +235,12 @@ class PartStreamContainer
     {
         $this->encoding = [
             'type' => null,
-            'filter' => null,
+            'filter' => null
         ];
         $this->charset = [
             'from' => null,
             'to' => null,
-            'filter' => null,
+            'filter' => null
         ];
         $this->contentStream->rewind();
         $this->decodedStream = $this->contentStream;
@@ -259,9 +253,8 @@ class PartStreamContainer
      * them if the requested arguments differ from the currently assigned ones.
      *
      * @param string $transferEncoding the transfer encoding
-     * @param string $fromCharset      the character set the content is encoded in
-     * @param string $toCharset        the target encoding to return
-     *
+     * @param string $fromCharset the character set the content is encoded in
+     * @param string $toCharset the target encoding to return
      * @return ?StreamInterface
      */
     public function getContentStream(?string $transferEncoding, ?string $fromCharset, ?string $toCharset)
@@ -284,7 +277,6 @@ class PartStreamContainer
             $this->attachCharsetFilter($fromCharset, $toCharset);
         }
         $this->charsetStream->rewind();
-
         return $this->charsetStream;
     }
 
@@ -293,10 +285,9 @@ class PartStreamContainer
      * underlying stream, and resets it if the requested arguments differ.
      *
      * @param string $transferEncoding
-     *
      * @return StreamInterface
      */
-    public function getBinaryContentStream(?string $transferEncoding = null): ?StreamInterface
+    public function getBinaryContentStream(?string $transferEncoding = null) : ?StreamInterface
     {
         if ($this->contentStream === null) {
             return null;
@@ -307,7 +298,6 @@ class PartStreamContainer
             $this->attachTransferEncodingFilter($transferEncoding);
         }
         $this->decodedStream->rewind();
-
         return $this->decodedStream;
     }
 }

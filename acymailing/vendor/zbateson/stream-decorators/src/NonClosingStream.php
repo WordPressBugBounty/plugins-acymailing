@@ -49,7 +49,7 @@ class NonClosingStream implements StreamInterface
     /**
      * @inheritDoc
      */
-    public function close(): void
+    public function close() : void
     {
         $this->stream = null;
     }

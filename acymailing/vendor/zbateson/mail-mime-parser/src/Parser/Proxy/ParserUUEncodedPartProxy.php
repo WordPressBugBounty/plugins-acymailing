@@ -25,7 +25,7 @@ class ParserUUEncodedPartProxy extends ParserPartProxy
      *
      * @return int|null The start position or null
      */
-    public function getNextPartStart(): ?int
+    public function getNextPartStart() : ?int
     {
         return $this->getParent()->getNextPartStart();
     }
@@ -40,7 +40,7 @@ class ParserUUEncodedPartProxy extends ParserPartProxy
      *
      * @return int|null The file mode or null
      */
-    public function getNextPartMode(): ?int
+    public function getNextPartMode() : ?int
     {
         return $this->getParent()->getNextPartMode();
     }
@@ -55,7 +55,7 @@ class ParserUUEncodedPartProxy extends ParserPartProxy
      *
      * @return ?string The file name or null
      */
-    public function getNextPartFilename(): ?string
+    public function getNextPartFilename() : ?string
     {
         return $this->getParent()->getNextPartFilename();
     }
@@ -67,10 +67,9 @@ class ParserUUEncodedPartProxy extends ParserPartProxy
      * setNextPartStart() on its parent (a ParserNonMimeMessageProxy, which
      * stores/returns this information).
      */
-    public function setNextPartStart(int $nextPartStart): self
+    public function setNextPartStart(int $nextPartStart) : self
     {
         $this->getParent()->setNextPartStart($nextPartStart);
-
         return $this;
     }
 
@@ -81,10 +80,9 @@ class ParserUUEncodedPartProxy extends ParserPartProxy
      * setNextPartMode() on its parent (a ParserNonMimeMessageProxy, which
      * stores/returns this information).
      */
-    public function setNextPartMode(int $nextPartMode): self
+    public function setNextPartMode(int $nextPartMode) : self
     {
         $this->getParent()->setNextPartMode($nextPartMode);
-
         return $this;
     }
 
@@ -95,10 +93,9 @@ class ParserUUEncodedPartProxy extends ParserPartProxy
      * setNextPartFilename() on its parent (a ParserNonMimeMessageProxy, which
      * stores/returns this information).
      */
-    public function setNextPartFilename(string $nextPartFilename): self
+    public function setNextPartFilename(string $nextPartFilename) : self
     {
         $this->getParent()->setNextPartFilename($nextPartFilename);
-
         return $this;
     }
 
@@ -106,7 +103,7 @@ class ParserUUEncodedPartProxy extends ParserPartProxy
      * Returns the file mode included in the uuencoded 'begin' line for this
      * part.
      */
-    public function getUnixFileMode(): ?int
+    public function getUnixFileMode() : ?int
     {
         return $this->getHeaderContainer()->getUnixFileMode();
     }
@@ -115,7 +112,7 @@ class ParserUUEncodedPartProxy extends ParserPartProxy
      * Returns the filename included in the uuencoded 'begin' line for this
      * part.
      */
-    public function getFilename(): ?string
+    public function getFilename() : ?string
     {
         return $this->getHeaderContainer()->getFilename();
     }

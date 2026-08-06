@@ -22,7 +22,7 @@ composer require zbateson/stream-decorators
 
 ## Requirements
 
-StreamDecorators requires PHP 7.2 or newer. Tested on PHP 7.2, 7.3, 7.4, 8.0, 8.1 and 8.2.
+StreamDecorators requires PHP 7.2 or newer.  Tested on PHP 7.2, 7.3, 7.4, 8.0, 8.1 and 8.2.
 
 ## Usage
 
@@ -37,14 +37,13 @@ while (($line = GuzzleHttp\Psr7\Utils::readLine()) !== false) {
 
 ```
 
-Note that CharsetStream, depending on the target encoding, may return multiple bytes when a single 'char' is read. If using php's 'fread', this will result in a warning:
+Note that CharsetStream, depending on the target encoding, may return multiple bytes when a single 'char' is read.  If using php's 'fread', this will result in a warning:
 
 'read x bytes more data than requested (xxxx read, xxxx max) - excess data will be lost
 
-This is because the parameter to 'fread' is bytes, and so when CharsetStream returns, say, 4 bytes representing a single UTF-32 character, fread will truncate to the first byte when requesting '1' byte. It is recommended to **not** convert to a stream handle (with StreamWrapper) for this reason when using CharsetStream.
+This is because the parameter to 'fread' is bytes, and so when CharsetStream returns, say, 4 bytes representing a single UTF-32 character, fread will truncate to the first byte when requesting '1' byte.  It is recommended to **not** convert to a stream handle (with StreamWrapper) for this reason when using CharsetStream.
 
 The library consists of the following Psr\Http\Message\StreamInterface implementations:
-
 * ZBateson\StreamDecorators\QuotedPrintableStream - decodes on read and encodes on write to quoted-printable
 * ZBateson\StreamDecorators\Base64Stream - decodes on read and encodes on write to base64
 * ZBateson\StreamDecorators\UUStream - decodes on read, encodes on write to uu-encoded
@@ -57,7 +56,7 @@ The library consists of the following Psr\Http\Message\StreamInterface implement
 QuotedPrintableStream, Base64Stream and UUStream's constructors take a single argument of a StreamInterface.
 CharsetStreams's constructor also takes $streamCharset and $stringCharset as arguments respectively, ChunkSplitStream
 optionally takes a $lineLength argument (defaults to 76) and a $lineEnding argument (defaults to CRLF).
-PregReplaceFilterStream takes a $pattern argument and a $replacement argument. SeekingLimitStream takes optional
+PregReplaceFilterStream takes a $pattern argument and a $replacement argument.  SeekingLimitStream takes optional
 $limit and $offset parameters, similar to GuzzleHttp's LimitStream.
 
 ## License

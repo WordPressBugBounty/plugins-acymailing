@@ -27,10 +27,10 @@ class AddressBaseConsumer extends AbstractConsumer
      *
      * @return AbstractConsumer[] the sub-consumers
      */
-    protected function getSubConsumers(): array
+    protected function getSubConsumers() : array
     {
         return [
-            $this->consumerService->getAddressConsumer(),
+            $this->consumerService->getAddressConsumer()
         ];
     }
 
@@ -39,7 +39,7 @@ class AddressBaseConsumer extends AbstractConsumer
      *
      * @return string[] an array of regex pattern matchers
      */
-    protected function getTokenSeparators(): array
+    protected function getTokenSeparators() : array
     {
         return [];
     }
@@ -58,7 +58,6 @@ class AddressBaseConsumer extends AbstractConsumer
             return $this;
         }
         parent::advanceToNextToken($tokens, $isStartToken);
-
         return $this;
     }
 
@@ -68,7 +67,7 @@ class AddressBaseConsumer extends AbstractConsumer
      *
      * @return false
      */
-    protected function isEndToken(string $token): bool
+    protected function isEndToken(string $token) : bool
     {
         return false;
     }
@@ -80,7 +79,7 @@ class AddressBaseConsumer extends AbstractConsumer
      * @codeCoverageIgnore
      * @return false
      */
-    protected function isStartToken(string $token): bool
+    protected function isStartToken(string $token) : bool
     {
         return false;
     }
@@ -91,7 +90,7 @@ class AddressBaseConsumer extends AbstractConsumer
      *
      * @return \ZBateson\MailMimeParser\Header\IHeaderPart[]|array
      */
-    protected function getTokenParts(Iterator $tokens): array
+    protected function getTokenParts(Iterator $tokens) : array
     {
         return $this->getConsumerTokenParts($tokens);
     }
@@ -101,11 +100,9 @@ class AddressBaseConsumer extends AbstractConsumer
      * AbstractConsumer.
      *
      * @codeCoverageIgnore
-     *
-     * @param string $token     the token
-     * @param bool   $isLiteral set to true if the token represents a literal -
-     *                          e.g. an escaped token
-     *
+     * @param string $token the token
+     * @param bool $isLiteral set to true if the token represents a literal -
+     *        e.g. an escaped token
      * @return ?\ZBateson\MailMimeParser\Header\Part\HeaderPart the constructed
      *         header part or null if the token should be ignored
      */

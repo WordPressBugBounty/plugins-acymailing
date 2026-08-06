@@ -99,7 +99,7 @@ trait Listing
     {
         wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
-        $automationIds = acym_getVar('int', 'elements_checked');
+        $automationIds = acym_getVar('array', 'elements_checked', []);
 
         if (empty($automationIds)) {
             $this->listing();

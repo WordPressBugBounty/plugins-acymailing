@@ -58,17 +58,17 @@ abstract class MessagePart implements IMessagePart
         $this->observers = new SplObjectStorage();
     }
 
-    public function attach(SplObserver $observer): void
+    public function attach(SplObserver $observer) : void
     {
         $this->observers->attach($observer);
     }
 
-    public function detach(SplObserver $observer): void
+    public function detach(SplObserver $observer) : void
     {
         $this->observers->detach($observer);
     }
 
-    public function notify(): void
+    public function notify() : void
     {
         foreach ($this->observers as $observer) {
             $observer->update($this);
@@ -83,12 +83,12 @@ abstract class MessagePart implements IMessagePart
         return $this->parent;
     }
 
-    public function hasContent(): bool
+    public function hasContent() : bool
     {
         return $this->partStreamContainer->hasContent();
     }
 
-    public function getFilename(): ?string
+    public function getFilename() : ?string
     {
         return null;
     }
@@ -101,7 +101,6 @@ abstract class MessagePart implements IMessagePart
         if (!$onlyIfNoCharset || $this->getCharset() === null) {
             $this->charsetOverride = $charsetOverride;
         }
-
         return $this;
     }
 
@@ -110,14 +109,12 @@ abstract class MessagePart implements IMessagePart
         if ($this->hasContent()) {
             $tr = ($this->ignoreTransferEncoding) ? '' : $this->getContentTransferEncoding();
             $ch = $this->charsetOverride ?? $this->getCharset();
-
             return $this->partStreamContainer->getContentStream(
                 $tr,
                 $ch,
                 $charset
             );
         }
-
         return null;
     }
 
@@ -125,10 +122,8 @@ abstract class MessagePart implements IMessagePart
     {
         if ($this->hasContent()) {
             $tr = ($this->ignoreTransferEncoding) ? '' : $this->getContentTransferEncoding();
-
             return $this->partStreamContainer->getBinaryContentStream($tr);
         }
-
         return null;
     }
 
@@ -138,11 +133,10 @@ abstract class MessagePart implements IMessagePart
         if ($stream !== null) {
             return StreamWrapper::getResource($stream);
         }
-
         return null;
     }
 
-    public function saveContent($filenameResourceOrStream): self
+    public function saveContent($filenameResourceOrStream) : self
     {
         $resourceOrStream = $filenameResourceOrStream;
         if (\is_string($filenameResourceOrStream)) {
@@ -158,17 +152,15 @@ abstract class MessagePart implements IMessagePart
             // fopen call can be properly closed if it was
             $stream->detach();
         }
-
         return $this;
     }
 
-    public function getContent(string $charset = MailMimeParser::DEFAULT_CHARSET): ?string
+    public function getContent(string $charset = MailMimeParser::DEFAULT_CHARSET) : ?string
     {
         $stream = $this->getContentStream($charset);
         if ($stream !== null) {
             return $stream->getContents();
         }
-
         return null;
     }
 
@@ -184,7 +176,6 @@ abstract class MessagePart implements IMessagePart
         $this->ignoreTransferEncoding = true;
         $this->partStreamContainer->setContentStream($stream);
         $this->notify();
-
         return $this;
     }
 
@@ -195,7 +186,6 @@ abstract class MessagePart implements IMessagePart
     {
         $this->partStreamContainer->setContentStream(null);
         $this->notify();
-
         return $this;
     }
 
@@ -206,7 +196,6 @@ abstract class MessagePart implements IMessagePart
     {
         $stream = Utils::streamFor($resource);
         $this->attachContentStream($stream, $charset);
-
         // this->notify() called in attachContentStream
         return $this;
     }
@@ -242,11 +231,10 @@ abstract class MessagePart implements IMessagePart
             // fopen call can be properly closed if it was
             $stream->detach();
         }
-
         return $this;
     }
 
-    public function __toString(): string
+    public function __toString() : string
     {
         return $this->getStream()->getContents();
     }

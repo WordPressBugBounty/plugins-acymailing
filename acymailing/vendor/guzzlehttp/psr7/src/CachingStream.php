@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -32,11 +32,11 @@ final class CachingStream implements StreamInterface
      * @param StreamInterface $target Optionally specify where data is cached
      */
     public function __construct(
-        StreamInterface  $stream,
+        StreamInterface $stream,
         ?StreamInterface $target = null
     ) {
         $this->remoteStream = $stream;
-        $this->stream = $target ? : new Stream(Utils::tryFopen('php://temp', 'r+'));
+        $this->stream = $target ?: new Stream(Utils::tryFopen('php://temp', 'r+'));
     }
 
     public function getSize(): ?int

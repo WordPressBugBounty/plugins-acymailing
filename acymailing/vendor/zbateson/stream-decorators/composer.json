@@ -1,17 +1,7 @@
 {
     "name": "zbateson/stream-decorators",
     "description": "PHP psr7 stream decorators for mime message part streams",
-    "keywords": [
-        "psr7",
-        "stream",
-        "decorators",
-        "mail",
-        "mime",
-        "base64",
-        "quoted-printable",
-        "uuencode",
-        "charset"
-    ],
+    "keywords": ["psr7", "stream", "decorators", "mail", "mime", "base64", "quoted-printable", "uuencode", "charset"],
     "license": "BSD-2-Clause",
     "authors": [
         {

@@ -16,12 +16,13 @@ class UpdateHelper extends AcymObject
     use Update\Patchv8;
     use Update\Patchv9;
     use Update\Patchv10;
+    use Update\Patchv11;
 
     const FIRST_EMAIL_NAME_KEY = 'ACYM_FIRST_EMAIL_NAME';
     const BOUNCE_VERSION = 9;
 
     private string $level = 'starter';
-    private string $version = '11.0.1';
+    private string $version = '11.0.2';
     private string $previousVersion;
     private bool $isUpdating = false;
 

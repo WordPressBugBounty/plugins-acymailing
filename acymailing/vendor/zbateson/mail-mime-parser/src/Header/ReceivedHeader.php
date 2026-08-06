@@ -116,7 +116,6 @@ class ReceivedHeader extends ParameterHeader
                 $this->date = $part->getDateTime();
             }
         }
-
         return $this;
     }
 
@@ -124,7 +123,7 @@ class ReceivedHeader extends ParameterHeader
      * Returns the raw, unparsed header value, same as {@see
      * ReceivedHeader::getRawValue()}.
      */
-    public function getValue(): ?string
+    public function getValue() : ?string
     {
         return $this->rawValue;
     }

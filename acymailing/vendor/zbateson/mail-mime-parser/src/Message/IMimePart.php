@@ -44,11 +44,6 @@ interface IMimePart extends IMultiPart
      * If a header with the given $name and $offset doesn't exist, null is
      * returned.
      *
-     * @param string $name   The name of the header to retrieve.
-     * @param int    $offset Optional offset if there are multiple headers with the
-     *                       given name.
-     *
-     * @return \ZBateson\MailMimeParser\Header\IHeader|null the header object
      * @see IMimePart::getHeaderAs() to parse a header into a provided IHeader
      *      type and return it.
      * @see IMimePart::getHeaderValue() to get the string value portion of a
@@ -63,6 +58,10 @@ interface IMimePart extends IMultiPart
      *      array of raw headers in this part.
      * @see IMimePart::getRawHeaderIterator() to retrieve an iterator traversing
      *      a two-dimensional string[] array of raw headers.
+     * @param string $name The name of the header to retrieve.
+     * @param int $offset Optional offset if there are multiple headers with the
+     *        given name.
+     * @return \ZBateson\MailMimeParser\Header\IHeader|null the header object
      */
     public function getHeader($name, $offset = 0);
 
@@ -78,12 +77,6 @@ interface IMimePart extends IMultiPart
      * If a header with the given $name and $offset doesn't exist, null is
      * returned.
      *
-     * @param string $name   The name of the header to retrieve.
-     * @param
-     * @param int    $offset Optional offset if there are multiple headers with the
-     *                       given name.
-     *
-     * @return ?IHeader the header object
      * @see IMimePart::getHeaderValue() to get the string value portion of a
      *      specific header only.
      * @see IMimePart::getHeaderParameter() to get the string value portion of a
@@ -96,14 +89,18 @@ interface IMimePart extends IMultiPart
      *      array of raw headers in this part.
      * @see IMimePart::getRawHeaderIterator() to retrieve an iterator traversing
      *      a two-dimensional string[] array of raw headers.
+     * @param string $name The name of the header to retrieve.
+     * @param
+     * @param int $offset Optional offset if there are multiple headers with the
+     *        given name.
+     * @return ?IHeader the header object
      */
-    public function getHeaderAs(string $name, string $iHeaderClass, int $offset = 0): ?IHeader;
+    public function getHeaderAs(string $name, string $iHeaderClass, int $offset = 0) : ?IHeader;
 
     /**
      * Returns an array of all headers in this part.
      *
-     * @return \ZBateson\MailMimeParser\Header\IHeader[] an array of header
-     *         objects
+     * @see IMimePart::getHeader() to retrieve a single header object.
      * @see IMimePart::getHeaderValue() to get the string value portion of a
      *      specific header only.
      * @see IMimePart::getHeaderParameter() to get the string value portion of a
@@ -114,17 +111,17 @@ interface IMimePart extends IMultiPart
      *      array of raw headers in this part.
      * @see IMimePart::getRawHeaderIterator() to retrieve an iterator traversing
      *      a two-dimensional string[] array of raw headers.
-     * @see IMimePart::getHeader() to retrieve a single header object.
+     * @return \ZBateson\MailMimeParser\Header\IHeader[] an array of header
+     *         objects
      */
     public function getAllHeaders();
 
     /**
      * Returns an array of headers that match the passed name.
      *
-     * @param string $name
-     *
-     * @return \ZBateson\MailMimeParser\Header\IHeader[] an array of header
-     *         objects
+     * @see IMimePart::getHeader() to retrieve a single header object.
+     * @see IMimePart::getHeaderValue() to get the string value portion of a
+     *      specific header only.
      * @see IMimePart::getHeaderParameter() to get the string value portion of a
      *      specific header's parameter only.
      * @see IMimePart::getAllHeaders() to retrieve an array of all header
@@ -133,9 +130,9 @@ interface IMimePart extends IMultiPart
      *      array of raw headers in this part.
      * @see IMimePart::getRawHeaderIterator() to retrieve an iterator traversing
      *      a two-dimensional string[] array of raw headers.
-     * @see IMimePart::getHeader() to retrieve a single header object.
-     * @see IMimePart::getHeaderValue() to get the string value portion of a
-     *      specific header only.
+     * @param string $name
+     * @return \ZBateson\MailMimeParser\Header\IHeader[] an array of header
+     *         objects
      */
     public function getAllHeadersByName($name);
 
@@ -147,7 +144,7 @@ interface IMimePart extends IMultiPart
      * [ [ '1st-Header-Name', 'Header Value' ], [ '2nd-Header-Name', 'Header Value' ] ]
      *
      *
-     * @return string[][] an array of raw headers
+     * @see IMimePart::getHeader() to retrieve a single header object.
      * @see IMimePart::getHeaderValue() to get the string value portion of a
      *      specific header only.
      * @see IMimePart::getHeaderParameter() to get the string value portion of a
@@ -158,7 +155,7 @@ interface IMimePart extends IMultiPart
      *      with a certain name.
      * @see IMimePart::getRawHeaderIterator() to retrieve an iterator instead of
      *      the returned two-dimensional array
-     * @see IMimePart::getHeader() to retrieve a single header object.
+     * @return string[][] an array of raw headers
      */
     public function getRawHeaders();
 
@@ -169,7 +166,7 @@ interface IMimePart extends IMultiPart
      *
      * [ 'Header-Name', 'Header Value' ]
      *
-     * @return \Iterator an iterator for raw headers
+     * @see IMimePart::getHeader() to retrieve a single header object.
      * @see IMimePart::getHeaderValue() to get the string value portion of a
      *      specific header only.
      * @see IMimePart::getHeaderParameter() to get the string value portion of a
@@ -180,7 +177,7 @@ interface IMimePart extends IMultiPart
      *      with a certain name.
      * @see IMimePart::getRawHeaders() to retrieve the array the returned
      *      iterator iterates over.
-     * @see IMimePart::getHeader() to retrieve a single header object.
+     * @return \Iterator an iterator for raw headers
      */
     public function getRawHeaderIterator();
 
@@ -190,22 +187,21 @@ interface IMimePart extends IMultiPart
      *
      * Note that mime headers aren't case sensitive.
      *
-     * @param string $name         The name of the header
-     * @param string $defaultValue Optional default value to return if the
-     *                             header doesn't exist on this part.
-     *
-     * @return string|null the value of the header
+     * @see IMimePart::getHeader() to retrieve a single header object.
+     * @see IMimePart::getHeaderParameter() to get the string value portion of a
+     *      specific header's parameter only.
+     * @see IMimePart::getAllHeaders() to retrieve an array of all header
+     *      objects for this part.
      * @see IMimePart::getAllHeadersByName() to retrieve an array of all headers
      *      with a certain name.
      * @see IMimePart::getRawHeaders() to retrieve the array the returned
      *      iterator iterates over.
      * @see IMimePart::getRawHeaderIterator() to retrieve an iterator instead of
      *      the returned two-dimensional array
-     * @see IMimePart::getHeader() to retrieve a single header object.
-     * @see IMimePart::getHeaderParameter() to get the string value portion of a
-     *      specific header's parameter only.
-     * @see IMimePart::getAllHeaders() to retrieve an array of all header
-     *      objects for this part.
+     * @param string $name The name of the header
+     * @param string $defaultValue Optional default value to return if the
+     *        header doesn't exist on this part.
+     * @return string|null the value of the header
      */
     public function getHeaderValue($name, $defaultValue = null);
 
@@ -219,12 +215,6 @@ interface IMimePart extends IMultiPart
      * Content-Type and Content-Disposition are examples of headers with
      * parameters. "Charset" is a common parameter of Content-Type.
      *
-     * @param string $header       The name of the header.
-     * @param string $param        The name of the parameter.
-     * @param string $defaultValue Optional default value to return if the
-     *                             parameter doesn't exist.
-     *
-     * @return string|null The value of the parameter.
      * @see IMimePart::getHeader() to retrieve a single header object.
      * @see IMimePart::getHeaderValue() to get the string value portion of a
      *      specific header only.
@@ -236,6 +226,11 @@ interface IMimePart extends IMultiPart
      *      iterator iterates over.
      * @see IMimePart::getRawHeaderIterator() to retrieve an iterator instead of
      *      the returned two-dimensional array
+     * @param string $header The name of the header.
+     * @param string $param The name of the parameter.
+     * @param string $defaultValue Optional default value to return if the
+     *        parameter doesn't exist.
+     * @return string|null The value of the parameter.
      */
     public function getHeaderParameter($header, $param, $defaultValue = null);
 
@@ -265,17 +260,16 @@ interface IMimePart extends IMultiPart
      * keep lines under 998 characters in length, and to follow any special
      * formatting required for the type of header.
      *
-     * @param string  $name   The name of the new header, e.g. 'Content-Type'.
-     * @param ?string $value  The raw value of the new header.
-     * @param int     $offset An optional offset, defaulting to '0' and therefore
-     *                        overriding the first header of the given $name if one exists.
-     *
      * @see IMimePart::addRawHeader() Adds a header to the part regardless of
      *      whether or not a header with that name already exists.
      * @see IMimePart::removeHeader() Removes all headers on this part with the
      *      passed name
      * @see IMimePart::removeSingleHeader() Removes a single header if more than
      *      one with the passed name exists.
+     * @param string $name The name of the new header, e.g. 'Content-Type'.
+     * @param ?string $value The raw value of the new header.
+     * @param int $offset An optional offset, defaulting to '0' and therefore
+     *        overriding the first header of the given $name if one exists.
      */
     public function setRawHeader(string $name, ?string $value, int $offset = 0);
 
@@ -294,29 +288,27 @@ interface IMimePart extends IMultiPart
      * keep lines under 998 characters in length, and to follow any special
      * formatting required for the type of header.
      *
-     * @param string $name  The name of the header
-     * @param string $value The raw value of the header.
-     *
-     * @see IMimePart::removeSingleHeader() Removes a single header if more than
-     *      one with the passed name exists.
      * @see IMimePart::setRawHeader() Sets a header, potentially overwriting one
      *      if it already exists.
      * @see IMimePart::removeHeader() Removes all headers on this part with the
      *      passed name
+     * @see IMimePart::removeSingleHeader() Removes a single header if more than
+     *      one with the passed name exists.
+     * @param string $name The name of the header
+     * @param string $value The raw value of the header.
      */
     public function addRawHeader(string $name, string $value);
 
     /**
      * Removes all headers from this part with the passed name.
      *
-     * @param string $name The name of the header(s) to remove.
-     *
+     * @see IMimePart::addRawHeader() Adds a header to the part regardless of
+     *      whether or not a header with that name already exists.
      * @see IMimePart::setRawHeader() Sets a header, potentially overwriting one
      *      if it already exists.
      * @see IMimePart::removeSingleHeader() Removes a single header if more than
      *      one with the passed name exists.
-     * @see IMimePart::addRawHeader() Adds a header to the part regardless of
-     *      whether or not a header with that name already exists.
+     * @param string $name The name of the header(s) to remove.
      */
     public function removeHeader(string $name);
 
@@ -324,16 +316,15 @@ interface IMimePart extends IMultiPart
      * Removes a single header with the passed name (in cases where more than
      * one may exist, and others should be preserved).
      *
-     * @param string $name   The name of the header to remove
-     * @param int    $offset Optional offset of the header to remove (defaults to
-     *                       0 -- the first header).
-     *
-     * @see IMimePart::removeHeader() Removes all headers on this part with the
-     *      passed name
      * @see IMimePart::addRawHeader() Adds a header to the part regardless of
      *      whether or not a header with that name already exists.
      * @see IMimePart::setRawHeader() Sets a header, potentially overwriting one
      *      if it already exists.
+     * @see IMimePart::removeHeader() Removes all headers on this part with the
+     *      passed name
+     * @param string $name The name of the header to remove
+     * @param int $offset Optional offset of the header to remove (defaults to
+     *        0 -- the first header).
      */
     public function removeSingleHeader(string $name, int $offset = 0);
 }

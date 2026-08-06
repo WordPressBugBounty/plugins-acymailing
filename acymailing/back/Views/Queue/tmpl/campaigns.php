@@ -71,7 +71,7 @@ defined('ABSPATH') || die('Restricted Access');
                                     $afterName = empty($afterName) ? '' : ' - '.$afterName
                                     ?>
 									<h6 class="acym__listing__title__primary acym_text_ellipsis"><?php echo esc_html($row->name.$afterName); ?></h6>
-									<span class="acym__listing__title__secondary acym_text_ellipsis"><?php echo esc_html($row->subject); ?></span>
+									<span class="acym__listing__title__secondary acym_text_ellipsis"><?php echo esc_html($row->subject ?? ''); ?></span>
 									<p class="acym__listing__title__secondary">
                                         <?php echo esc_html(acym_date($row->sending_date, acym_getDateTimeFormat())); ?>
 									</p>

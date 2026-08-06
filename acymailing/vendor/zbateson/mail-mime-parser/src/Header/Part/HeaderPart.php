@@ -24,7 +24,7 @@ abstract class HeaderPart implements IHeaderPart
 
     /**
      * @var MbWrapper $charsetConverter the charset converter used for
-     *                                  converting strings in HeaderPart::convertEncoding
+     *      converting strings in HeaderPart::convertEncoding
      */
     protected $charsetConverter;
 
@@ -42,7 +42,7 @@ abstract class HeaderPart implements IHeaderPart
      *
      * @return ?string the value of the part
      */
-    public function getValue(): ?string
+    public function getValue() : ?string
     {
         return $this->value;
     }
@@ -52,7 +52,7 @@ abstract class HeaderPart implements IHeaderPart
      *
      * @return string the value
      */
-    public function __toString(): string
+    public function __toString() : string
     {
         return $this->value;
     }
@@ -63,7 +63,7 @@ abstract class HeaderPart implements IHeaderPart
      * Tokens if the Token's value is a single space, and for CommentParts.
      *
      */
-    public function ignoreSpacesBefore(): bool
+    public function ignoreSpacesBefore() : bool
     {
         return false;
     }
@@ -74,7 +74,7 @@ abstract class HeaderPart implements IHeaderPart
      * Tokens if the Token's value is a single space, and for CommentParts.
      *
      */
-    public function ignoreSpacesAfter(): bool
+    public function ignoreSpacesAfter() : bool
     {
         return false;
     }
@@ -88,7 +88,7 @@ abstract class HeaderPart implements IHeaderPart
      *
      * @return string utf-8 string
      */
-    protected function convertEncoding(string $str, string $from = 'ISO-8859-1', bool $force = false): string
+    protected function convertEncoding(string $str, string $from = 'ISO-8859-1', bool $force = false) : string
     {
         if ($from !== 'UTF-8') {
             // mime header part decoding will force it.  This is necessary for
@@ -97,7 +97,6 @@ abstract class HeaderPart implements IHeaderPart
                 return $this->charsetConverter->convert($str, $from, 'UTF-8');
             }
         }
-
         return $str;
     }
 }

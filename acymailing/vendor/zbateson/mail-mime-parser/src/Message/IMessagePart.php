@@ -36,72 +36,69 @@ interface IMessagePart extends SplSubject
      * Returns true if the part contains a 'body' (content).
      *
      */
-    public function hasContent(): bool;
+    public function hasContent() : bool;
 
     /**
      * Returns true if the content of this part is plain text.
      *
      */
-    public function isTextPart(): bool;
+    public function isTextPart() : bool;
 
     /**
      * Returns the mime type of the content, or $default if one is not set.
      *
      * @param string $default Optional override for the default return value of
-     *                        'text/plain.
-     *
+     *        'text/plain.
      * @return string the mime type
      */
-    public function getContentType(string $default = 'text/plain'): ?string;
+    public function getContentType(string $default = 'text/plain') : ?string;
 
     /**
      * Returns the charset of the content, or null if not applicable/defined.
      *
      * @return string|null the charset
      */
-    public function getCharset(): ?string;
+    public function getCharset() : ?string;
 
     /**
      * Returns the content's disposition, or returns the value of $default if
      * not defined.
      *
      * @param string $default Optional default value to return if not
-     *                        applicable/defined
-     *
+     *        applicable/defined
      * @return string|null the disposition.
      */
-    public function getContentDisposition(?string $default = null): ?string;
+    public function getContentDisposition(?string $default = null) : ?string;
 
     /**
      * Returns the content transfer encoding used to encode the content on this
      * part, or the value of $default if not defined.
      *
      * @param $default Optional default value to return if not
-     *                 applicable/defined
-     *
+     *        applicable/defined
      * @return string|null the transfer encoding defined for the part.
      */
-    public function getContentTransferEncoding(?string $default = null): ?string;
+    public function getContentTransferEncoding(?string $default = null) : ?string;
 
     /**
      * Returns the Content ID of the part, or null if not defined.
      *
      * @return string|null the content ID.
      */
-    public function getContentId(): ?string;
+    public function getContentId() : ?string;
 
     /**
      * Returns a filename for the part if one is defined, or null otherwise.
      *
      * @return string|null the file name
      */
-    public function getFilename(): ?string;
+    public function getFilename() : ?string;
 
     /**
      * Returns true if the current part is a mime part.
      *
      */
-    public function isMime(): bool;
+    public function isMime() : bool;
 
     /**
      * Overrides the default character set used for reading content from content
@@ -119,11 +116,10 @@ interface IMessagePart extends SplSubject
      * Instead, {@see \ZBateson\MailMimeParser\IMessage::getTextPart()} should
      * be called, and setCharsetOverride called on the returned IMessagePart.
      *
-     * @param string $charsetOverride the actual charset of the content.
-     * @param bool   $onlyIfNoCharset if true, $charsetOverride is used only if
-     *                                getCharset returns null.
-     *
      * @see IMessagePart::getContentStream() to get the content stream.
+     * @param string $charsetOverride the actual charset of the content.
+     * @param bool $onlyIfNoCharset if true, $charsetOverride is used only if
+     *        getCharset returns null.
      */
     public function setCharsetOverride(string $charsetOverride, bool $onlyIfNoCharset = false);
 
@@ -161,15 +157,14 @@ interface IMessagePart extends SplSubject
      * In this case the Stream was rewound, and $stream's second call to read 4
      * bytes reads the same first 4.
      *
-     * @param string $charset Optional charset for the returned stream.
-     *
-     * @return StreamInterface|null the stream
-     * @see IMessagePart::setCharsetOverride() to override the charset of the
-     *      content and ignore the charset returned from calling
-     *      IMessagePart::getCharset() when reading.
      * @see IMessagePart::getBinaryContentStream() to get the content stream
      *      without any charset conversions.
      * @see IMessagePart::saveContent() to save the binary contents to file.
+     * @see IMessagePart::setCharsetOverride() to override the charset of the
+     *      content and ignore the charset returned from calling
+     *      IMessagePart::getCharset() when reading.
+     * @param string $charset Optional charset for the returned stream.
+     * @return StreamInterface|null the stream
      */
     public function getContentStream(string $charset = MailMimeParser::DEFAULT_CHARSET);
 
@@ -189,12 +184,12 @@ interface IMessagePart extends SplSubject
      *   save it to file or allow a user to download it as-is (in a download
      *   link for example).
      *
-     * @return StreamInterface|null the stream
+     * @see IMessagePart::getContentStream() to get the content stream with
+     *      charset conversions applied.
      * @see IMessagePart::getBinaryContentResourceHandle() to get a resource
      *      handle instead.
      * @see IMessagePart::saveContent() to save the binary contents to file.
-     * @see IMessagePart::getContentStream() to get the content stream with
-     *      charset conversions applied.
+     * @return StreamInterface|null the stream
      */
     public function getBinaryContentStream();
 
@@ -205,9 +200,9 @@ interface IMessagePart extends SplSubject
      * The method wraps a call to {@see IMessagePart::getBinaryContentStream()}
      * and returns a resource handle for the returned Stream.
      *
-     * @return resource|null the resource
-     * @see IMessagePart::saveContent() to save the binary contents to file.
      * @see IMessagePart::getBinaryContentStream() to get a stream instead.
+     * @see IMessagePart::saveContent() to save the binary contents to file.
+     * @return resource|null the resource
      */
     public function getBinaryContentResourceHandle();
 
@@ -227,14 +222,13 @@ interface IMessagePart extends SplSubject
      * When passing a resource or Psr7 Stream, the resource is not closed, nor
      * rewound.
      *
-     * @param string|resource|StreamInterface $filenameResourceOrStream
-     *
+     * @see IMessagePart::getContentStream() to get the content stream with
+     *      charset conversions applied.
      * @see IMessagePart::getBinaryContentStream() to get the content as a
      *      binary stream.
      * @see IMessagePart::getBinaryContentResourceHandle() to get the content as
      *      a resource handle.
-     * @see IMessagePart::getContentStream() to get the content stream with
-     *      charset conversions applied.
+     * @param string|resource|StreamInterface $filenameResourceOrStream
      */
     public function saveContent($filenameResourceOrStream);
 
@@ -244,24 +238,22 @@ interface IMessagePart extends SplSubject
      *
      * The returned string is encoded to the passed $charset character encoding.
      *
-     * @param string $charset the target charset for the returned string
-     *
-     * @return string|null the content
      * @see IMessagePart::getContentStream()
+     * @param string $charset the target charset for the returned string
+     * @return string|null the content
      */
-    public function getContent(string $charset = MailMimeParser::DEFAULT_CHARSET): ?string;
+    public function getContent(string $charset = MailMimeParser::DEFAULT_CHARSET) : ?string;
 
     /**
      * Attaches the stream or resource handle for the part's content.  The
      * stream is closed when another stream is attached, or the MimePart is
      * destroyed.
      *
-     * @param StreamInterface $stream        the content
-     * @param string          $streamCharset the charset of $stream
-     *
-     * @see IMessagePart::detachContentStream() to detach the content stream.
      * @see IMessagePart::setContent() to pass a string as the content.
      * @see IMessagePart::getContentStream() to get the content stream.
+     * @see IMessagePart::detachContentStream() to detach the content stream.
+     * @param StreamInterface $stream the content
+     * @param string $streamCharset the charset of $stream
      */
     public function attachContentStream(StreamInterface $stream, string $streamCharset = MailMimeParser::DEFAULT_CHARSET);
 
@@ -276,12 +268,11 @@ interface IMessagePart extends SplSubject
     /**
      * Sets the content of the part to the passed string, resource, or stream.
      *
-     * @param string|resource|StreamInterface $resource        the content.
-     * @param string                          $resourceCharset the charset of the passed $resource.
-     *
-     * @see IMessagePart::detachContentStream() to detach the content stream.
      * @see IMessagePart::getContentStream() to get the content stream.
      * @see IMessagePart::attachContentStream() to attach a content stream.
+     * @see IMessagePart::detachContentStream() to detach the content stream.
+     * @param string|resource|StreamInterface $resource the content.
+     * @param string $resourceCharset the charset of the passed $resource.
      */
     public function setContent($resource, string $resourceCharset = MailMimeParser::DEFAULT_CHARSET);
 
@@ -305,13 +296,13 @@ interface IMessagePart extends SplSubject
      *    header from the original email or part may not be compliant.
      *  - A user may set headers in a non-compliant format.
      *
-     * @return resource the resource handle containing the part.
+     * @see IMessagePart::getStream() to get a Psr7 StreamInterface instead of a
+     *      resource handle.
      * @see IMessagePart::__toString() to write the part to a string and return
      *      it.
      * @see IMessage::save() to write the part to a file, resource handle or
      *      Psr7 stream.
-     * @see IMessagePart::getStream() to get a Psr7 StreamInterface instead of a
-     *      resource handle.
+     * @return resource the resource handle containing the part.
      */
     public function getResourceHandle();
 
@@ -334,12 +325,12 @@ interface IMessagePart extends SplSubject
      *    header from the original email or part may not be compliant.
      *  - A user may set headers in a non-compliant format.
      *
-     * @return StreamInterface the stream containing the part.
+     * @see IMessagePart::getResourceHandle() to get a resource handle.
      * @see IMessagePart::__toString() to write the part to a string and return
      *      it.
      * @see IMessage::save() to write the part to a file, resource handle or
      *      Psr7 stream.
-     * @see IMessagePart::getResourceHandle() to get a resource handle.
+     * @return StreamInterface the stream containing the part.
      */
     public function getStream();
 
@@ -368,15 +359,14 @@ interface IMessagePart extends SplSubject
      * When passing a resource or Psr7 Stream, the resource is not closed, nor
      * rewound after being written to.
      *
-     * @param string|resource|StreamInterface $filenameResourceOrStream the
-     *                                                                  file, resource, or stream to write to.
-     * @param string                          $filemode                 Optional filemode to open a file in (if
-     *                                                                  $filenameResourceOrStream is a string)
-     *
-     * @see IMessage::save() to write the part to a file, resource handle or
-     *      Psr7 stream.
      * @see IMessagePart::getResourceHandle() to get a resource handle.
      * @see IMessagePart::__toString() to get the part in a string.
+     * @see IMessage::save() to write the part to a file, resource handle or
+     *      Psr7 stream.
+     * @param string|resource|StreamInterface $filenameResourceOrStream the
+     *        file, resource, or stream to write to.
+     * @param string $filemode Optional filemode to open a file in (if
+     *        $filenameResourceOrStream is a string)
      */
     public function save($filenameResourceOrStream, string $filemode = 'w+');
 
@@ -393,5 +383,5 @@ interface IMessagePart extends SplSubject
      * @see IMessage::save() to write the part to a file, resource handle or
      *      Psr7 stream.
      */
-    public function __toString(): string;
+    public function __toString() : string;
 }

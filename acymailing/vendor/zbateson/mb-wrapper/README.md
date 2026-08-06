@@ -22,20 +22,19 @@ composer require zbateson/mb-wrapper
 
 ## Requirements
 
-mb-wrapper requires PHP 7.1 or newer. Tested on PHP 7.1, 7.2, 7.3, 7.4, 8.0, 8.1, and 8.2 on GitHub Actions.
+mb-wrapper requires PHP 7.1 or newer.  Tested on PHP 7.1, 7.2, 7.3, 7.4, 8.0, 8.1, and 8.2 on GitHub Actions.
 
 ## Description
 
-MbWrapper is intended for use wherever mb_* or iconv_* is used. It scans supported charsets returned by mb_list_encodings(), and prefers mb_* functions, but will fallback to iconv if a charset isn't supported.
+MbWrapper is intended for use wherever mb_* or iconv_* is used.  It scans supported charsets returned by mb_list_encodings(), and prefers mb_* functions, but will fallback to iconv if a charset isn't supported.
 
-A list of aliased charsets is maintained for both mb_* and iconv, where a supported charset exists for an alias. This is useful for mail and http parsing as other systems may report encodings not recognized by mb_* or iconv.
+A list of aliased charsets is maintained for both mb_* and iconv, where a supported charset exists for an alias.  This is useful for mail and http parsing as other systems may report encodings not recognized by mb_* or iconv.
 
 Charset lookup is done by removing non-alphanumeric characters as well, so UTF8 will always be matched to UTF-8, etc...
 
 ## Usage
 
 The following wrapper methods are exposed:
-
 * mb_convert_encoding, iconv with MbWrapper::convert
 * mb_substr, iconv_substr with MbWrapper::getSubstr
 * mb_strlen, iconv_strlen with MbWrapper::getLength

@@ -27,7 +27,7 @@ class ReceivedConsumer extends AbstractConsumer
      *
      * @return string[] an array of regex pattern matchers
      */
-    protected function getTokenSeparators(): array
+    protected function getTokenSeparators() : array
     {
         return [];
     }
@@ -36,7 +36,7 @@ class ReceivedConsumer extends AbstractConsumer
      * ReceivedConsumer doesn't have an end token, and so this just returns
      * false.
      */
-    protected function isEndToken(string $token): bool
+    protected function isEndToken(string $token) : bool
     {
         return false;
     }
@@ -47,7 +47,7 @@ class ReceivedConsumer extends AbstractConsumer
      *
      * @codeCoverageIgnore
      */
-    protected function isStartToken(string $token): bool
+    protected function isStartToken(string $token) : bool
     {
         return false;
     }
@@ -64,7 +64,7 @@ class ReceivedConsumer extends AbstractConsumer
      *
      * @return AbstractConsumer[] the sub-consumers
      */
-    protected function getSubConsumers(): array
+    protected function getSubConsumers() : array
     {
         return [
             $this->consumerService->getSubReceivedConsumer('from'),
@@ -74,7 +74,7 @@ class ReceivedConsumer extends AbstractConsumer
             $this->consumerService->getSubReceivedConsumer('id'),
             $this->consumerService->getSubReceivedConsumer('for'),
             $this->consumerService->getSubReceivedConsumer('date'),
-            $this->consumerService->getCommentConsumer(),
+            $this->consumerService->getCommentConsumer()
         ];
     }
 
@@ -84,11 +84,10 @@ class ReceivedConsumer extends AbstractConsumer
      *
      * @return string the regex pattern
      */
-    protected function getTokenSplitPattern(): string
+    protected function getTokenSplitPattern() : string
     {
         $sChars = \implode('|', $this->getAllTokenSeparators());
-
-        return '~('.$sChars.')~';
+        return '~(' . $sChars . ')~';
     }
 
     /**
@@ -109,7 +108,6 @@ class ReceivedConsumer extends AbstractConsumer
             }
             $tokens->next();
         }
-
         return $this;
     }
 
@@ -118,10 +116,9 @@ class ReceivedConsumer extends AbstractConsumer
      * as an array with a single element.
      *
      * @param \ZBateson\MailMimeParser\Header\IHeaderPart[] $parts
-     *
      * @return \ZBateson\MailMimeParser\Header\IHeaderPart[]
      */
-    protected function processParts(array $parts): array
+    protected function processParts(array $parts) : array
     {
         $ret = [];
         foreach ($parts as $part) {
@@ -130,7 +127,6 @@ class ReceivedConsumer extends AbstractConsumer
             }
             $ret[] = $part;
         }
-
         return $ret;
     }
 }

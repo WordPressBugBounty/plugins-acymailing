@@ -33,7 +33,7 @@ class SubjectConsumer extends GenericConsumer
      *
      * @return AbstractConsumer[] the sub-consumers
      */
-    protected function getSubConsumers(): array
+    protected function getSubConsumers() : array
     {
         return [];
     }
@@ -46,10 +46,9 @@ class SubjectConsumer extends GenericConsumer
      * whitespace is discarded, and a single space ' ' character is used in its
      * place.
      *
-     * @param string $token     the token
-     * @param bool   $isLiteral set to true if the token represents a literal -
-     *                          e.g. an escaped token
-     *
+     * @param string $token the token
+     * @param bool $isLiteral set to true if the token represents a literal -
+     *        e.g. an escaped token
      * @return \ZBateson\MailMimeParser\Header\Part\HeaderPart|null the
      *         constructed header part or null if the token should be ignored
      */
@@ -61,10 +60,8 @@ class SubjectConsumer extends GenericConsumer
             if (\preg_match('/^[\r\n]/', $token)) {
                 return $this->partFactory->newToken(' ');
             }
-
             return $this->partFactory->newToken($token);
         }
-
         return $this->partFactory->newInstance($token);
     }
 
@@ -78,7 +75,7 @@ class SubjectConsumer extends GenericConsumer
      *
      * @return \ZBateson\MailMimeParser\Header\Part\HeaderPart[]|array
      */
-    protected function getTokenParts(Iterator $tokens): array
+    protected function getTokenParts(Iterator $tokens) : array
     {
         return $this->getConsumerTokenParts($tokens);
     }
@@ -89,10 +86,9 @@ class SubjectConsumer extends GenericConsumer
      *
      * @return string the regex pattern
      */
-    protected function getTokenSplitPattern(): string
+    protected function getTokenSplitPattern() : string
     {
         $sChars = \implode('|', $this->getAllTokenSeparators());
-
-        return '~('.$sChars.')~';
+        return '~(' . $sChars . ')~';
     }
 }

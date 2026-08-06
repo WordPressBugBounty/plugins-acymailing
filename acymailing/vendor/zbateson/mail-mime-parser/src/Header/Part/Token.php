@@ -47,7 +47,7 @@ class Token extends HeaderPart
      * Returns true if the value is a space.
      *
      */
-    public function ignoreSpacesBefore(): bool
+    public function ignoreSpacesBefore() : bool
     {
         return $this->isSpace();
     }
@@ -56,7 +56,7 @@ class Token extends HeaderPart
      * Returns true if the value is a space.
      *
      */
-    public function ignoreSpacesAfter(): bool
+    public function ignoreSpacesAfter() : bool
     {
         return $this->isSpace();
     }

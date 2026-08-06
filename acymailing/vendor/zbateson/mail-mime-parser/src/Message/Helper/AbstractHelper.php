@@ -28,7 +28,7 @@ abstract class AbstractHelper
     protected $uuEncodedPartFactory;
 
     public function __construct(
-        IMimePartFactory      $mimePartFactory,
+        IMimePartFactory $mimePartFactory,
         IUUEncodedPartFactory $uuEncodedPartFactory
     ) {
         $this->mimePartFactory = $mimePartFactory;

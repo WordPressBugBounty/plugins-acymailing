@@ -8,13 +8,13 @@ return $config
     ->setLineEnding("\n")
     ->setRules([
         // Each line of multi-line DocComments must have an asterisk [PSR-5] and must be aligned with the first one.
-        'align_multiline_comment' => ['comment_type' => 'all_multiline'],
+        'align_multiline_comment' => ['comment_type'=>'all_multiline'],
         // Each element of an array must be indented exactly once.
         'array_indentation' => true,
         // Converts simple usages of `array_push($x, $y);` to `$x[] = $y;`.
         'array_push' => true,
         // PHP arrays should be declared using the configured syntax.
-        'array_syntax' => ['syntax' => 'short'],
+        'array_syntax' => ['syntax'=>'short'],
         // Converts backtick operators to `shell_exec` calls.
         'backtick_to_shell_exec' => true,
         // Binary operators should be surrounded by space as configured.
@@ -26,7 +26,7 @@ return $config
         // An empty line feed must precede any configured statement.
         'blank_line_before_statement' => false,
         // A single space or none should be between cast and variable.
-        'cast_spaces' => ['space' => 'single'],
+        'cast_spaces' => ['space'=>'single'],
         // Class, trait and interface elements must be separated with one or none blank line.
         'class_attributes_separation' => true,
         // Whitespace around the keywords of a class, trait or interfaces definition should be one space.
@@ -44,11 +44,11 @@ return $config
         // Remove extra spaces in a nullable typehint.
         'compact_nullable_typehint' => true,
         // Concatenation should be spaced according configuration.
-        'concat_space' => ['spacing' => 'one'],
+        'concat_space' => ['spacing'=>'one'],
         // The PHP constants `true`, `false`, and `null` MUST be written using the correct casing.
         'constant_case' => true,
         // Equal sign in declare statement should be surrounded by spaces or not following configuration.
-        'declare_equal_normalize' => ['space' => 'single'],
+        'declare_equal_normalize' => ['space'=>'single'],
         // Replaces `dirname(__FILE__)` expression with equivalent `__DIR__` constant.
         'dir_constant' => true,
         // The keyword `elseif` should be used instead of `else if` so that all control keywords look like single words.
@@ -66,7 +66,7 @@ return $config
         // PHP code must use the long `<?php` tags or short-echo `<?=` tags and not other tag variations.
         'full_opening_tag' => true,
         // Spaces should be properly placed in a function declaration.
-        'function_declaration' => ['closure_function_spacing' => 'none'],
+        'function_declaration' => ['closure_function_spacing'=>'none'],
         // Replace core functions calls returning constants with the constants.
         'function_to_constant' => true,
         // Ensure single space between function's argument and its typehint.
@@ -110,7 +110,7 @@ return $config
         // Function defined by PHP should be called using the correct casing.
         'native_function_casing' => true,
         // Add leading `\` before function invocation to speed up resolving.
-        'native_function_invocation' => ['include' => ['@all', 'trans']],
+        'native_function_invocation' => ['include'=>['@all','trans']],
         // Native type hints for functions should use the correct case.
         'native_function_type_declaration_casing' => true,
         // All instances created with new keyword must be followed by braces.
@@ -124,7 +124,7 @@ return $config
         // There should not be blank lines between docblock and the documented element.
         'no_blank_lines_after_phpdoc' => true,
         // There must be a comment when fall-through is intentional in a non-empty case body.
-        'no_break_comment' => ['comment_text' => 'Intentionally fall through'],
+        'no_break_comment' => ['comment_text'=>'Intentionally fall through'],
         // The closing `? >` tag MUST be omitted from files containing only PHP.
         'no_closing_tag' => true,
         // There should not be any empty comments.
@@ -182,7 +182,7 @@ return $config
         // Remove trailing whitespace at the end of blank lines.
         'no_whitespace_in_blank_line' => true,
         // Remove Zero-width space (ZWSP), Non-breaking space (NBSP) and other invisible unicode symbols.
-        'non_printable_character' => ['use_escape_sequences_in_strings' => true],
+        'non_printable_character' => ['use_escape_sequences_in_strings'=>true],
         // Array index should always be written by using square braces.
         'normalize_index_brace' => true,
         // Logical NOT operators (`!`) should have one trailing whitespace.
@@ -192,17 +192,7 @@ return $config
         // There should not be space before or after object operators `->` and `?->`.
         'object_operator_without_whitespace' => true,
         // Orders the elements of classes/interfaces/traits.
-        'ordered_class_elements' => [
-            'order' => [
-                'use_trait',
-                'constant_public',
-                'constant_protected',
-                'constant_private',
-                'property_public',
-                'property_protected',
-                'property_private',
-            ],
-        ],
+        'ordered_class_elements' => ['order'=>['use_trait','constant_public','constant_protected','constant_private','property_public','property_protected','property_private']],
         // Ordering `use` statements.
         'ordered_imports' => true,
         // Orders the interfaces in an `implements` or `interface extends` clause.
@@ -224,7 +214,7 @@ return $config
         // Classes must be in a path that matches their namespace, be at least one namespace deep and the class name should match the file name.
         'psr_autoloading' => true,
         // There should be one or no space before colon, and one space after it in return type declarations, according to configuration.
-        'return_type_declaration' => ['space_before' => 'one'],
+        'return_type_declaration' => ['space_before'=>'one'],
         // Instructions must be terminated with a semicolon.
         'semicolon_after_instruction' => true,
         // Cast shall be used, not `settype`.
@@ -278,7 +268,7 @@ return $config
         // Visibility MUST be declared on all properties and methods; `abstract` and `final` MUST be declared before the visibility; `static` MUST be declared after the visibility.
         'visibility_required' => true,
         // Add `void` return type to functions with missing or empty return statements, but priority is given to `@return` annotations. Requires PHP >= 7.1.
-        //        'void_return' => true,
+//        'void_return' => true,
         // In array declaration, there MUST be a whitespace after each comma.
         'whitespace_after_comma_in_array' => true,
         // Write conditions in Yoda style (`true`), non-Yoda style (`['equal' => false, 'identical' => false, 'less_and_greater' => false]`) or ignore those conditions (`null`) based on configuration.

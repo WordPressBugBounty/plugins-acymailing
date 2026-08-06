@@ -57,12 +57,11 @@ class ParserMimePartProxy extends ParserPartProxy
      * Ensures that the last child added to this part is fully parsed (content
      * and children).
      */
-    protected function ensureLastChildParsed(): self
+    protected function ensureLastChildParsed() : self
     {
         if ($this->lastAddedChild !== null) {
             $this->lastAddedChild->parseAll();
         }
-
         return $this;
     }
 
@@ -70,7 +69,7 @@ class ParserMimePartProxy extends ParserPartProxy
      * Parses the next child of this part and adds it to the 'stack' of
      * children.
      */
-    protected function parseNextChild(): self
+    protected function parseNextChild() : self
     {
         if ($this->allChildrenParsed) {
             return $this;
@@ -84,7 +83,6 @@ class ParserMimePartProxy extends ParserPartProxy
         } else {
             $this->allChildrenParsed = true;
         }
-
         return $this;
     }
 
@@ -101,7 +99,6 @@ class ParserMimePartProxy extends ParserPartProxy
             $this->parseNextChild();
         }
         $proxy = \array_shift($this->children);
-
         return ($proxy !== null) ? $proxy->getPart() : null;
     }
 
@@ -115,7 +112,6 @@ class ParserMimePartProxy extends ParserPartProxy
         while (!$this->allChildrenParsed) {
             $this->parseNextChild();
         }
-
         return $this;
     }
 
@@ -145,7 +141,6 @@ class ParserMimePartProxy extends ParserPartProxy
                 $this->mimeBoundary = $contentType->getValueFor('boundary');
             }
         }
-
         return $this->mimeBoundary;
     }
 
@@ -163,18 +158,15 @@ class ParserMimePartProxy extends ParserPartProxy
         $boundary = $this->getMimeBoundary();
         if ($this->getParent() !== null && $this->getParent()->setEndBoundaryFound($line)) {
             $this->parentBoundaryFound = true;
-
             return true;
         } elseif ($boundary !== null) {
             if ($line === "--$boundary--") {
                 $this->endBoundaryFound = true;
-
                 return true;
             } elseif ($line === "--$boundary") {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -184,7 +176,7 @@ class ParserMimePartProxy extends ParserPartProxy
      * new part under its parent.
      *
      */
-    public function isParentBoundaryFound(): bool
+    public function isParentBoundaryFound() : bool
     {
         return ($this->parentBoundaryFound);
     }
@@ -193,7 +185,7 @@ class ParserMimePartProxy extends ParserPartProxy
      * Returns true if an end boundary was found for this part.
      *
      */
-    public function isEndBoundaryFound(): bool
+    public function isEndBoundaryFound() : bool
     {
         return ($this->endBoundaryFound);
     }
@@ -205,13 +197,12 @@ class ParserMimePartProxy extends ParserPartProxy
      *
      * @return static
      */
-    public function setEof(): self
+    public function setEof() : self
     {
         $this->parentBoundaryFound = true;
         if ($this->getParent() !== null) {
             $this->getParent()->setEof();
         }
-
         return $this;
     }
 
@@ -232,7 +223,6 @@ class ParserMimePartProxy extends ParserPartProxy
         } else {
             parent::setStreamPartAndContentEndPos($streamContentEndPos);
         }
-
         return $this;
     }
 
@@ -250,7 +240,6 @@ class ParserMimePartProxy extends ParserPartProxy
     public function setLastLineEndingLength(int $length)
     {
         $this->getParent()->setLastLineEndingLength($length);
-
         return $this;
     }
 
@@ -265,7 +254,7 @@ class ParserMimePartProxy extends ParserPartProxy
      *
      * @return int the length of the last line ending read
      */
-    public function getLastLineEndingLength(): int
+    public function getLastLineEndingLength() : int
     {
         return $this->getParent()->getLastLineEndingLength();
     }

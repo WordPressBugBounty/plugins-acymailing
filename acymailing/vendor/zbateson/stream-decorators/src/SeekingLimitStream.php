@@ -61,7 +61,7 @@ class SeekingLimitStream implements StreamInterface
     /**
      * Returns the current relative read position of this stream subset.
      */
-    public function tell(): int
+    public function tell() : int
     {
         return $this->position;
     }
@@ -70,7 +70,7 @@ class SeekingLimitStream implements StreamInterface
      * Returns the size of the limited subset of data, or null if the wrapped
      * stream returns null for getSize.
      */
-    public function getSize(): ?int
+    public function getSize() : ?int
     {
         $size = $this->stream->getSize();
         if ($size === null) {
@@ -91,13 +91,12 @@ class SeekingLimitStream implements StreamInterface
      * Returns true if the current read position is at the end of the limited
      * stream
      */
-    public function eof(): bool
+    public function eof() : bool
     {
         $size = $this->limit;
         if ($size === -1) {
             $size = $this->getSize();
         }
-
         return ($this->position >= $size);
     }
 
@@ -105,7 +104,7 @@ class SeekingLimitStream implements StreamInterface
      * Ensures the seek position specified is within the stream's bounds, and
      * sets the internal position pointer (doesn't actually seek).
      */
-    private function doSeek(int $pos): void
+    private function doSeek(int $pos) : void
     {
         if ($this->limit !== -1) {
             $pos = \min([$pos, $this->limit]);
@@ -124,7 +123,7 @@ class SeekingLimitStream implements StreamInterface
      * @param int $offset
      * @param int $whence
      */
-    public function seek($offset, $whence = SEEK_SET): void
+    public function seek($offset, $whence = SEEK_SET) : void
     {
         $pos = $offset;
         switch ($whence) {
@@ -143,7 +142,7 @@ class SeekingLimitStream implements StreamInterface
     /**
      * Sets the offset to start reading from the wrapped stream.
      */
-    public function setOffset(int $offset): void
+    public function setOffset(int $offset) : void
     {
         $this->offset = $offset;
         $this->position = 0;
@@ -152,7 +151,7 @@ class SeekingLimitStream implements StreamInterface
     /**
      * Sets the length of the stream to the passed $limit.
      */
-    public function setLimit(int $limit): void
+    public function setLimit(int $limit) : void
     {
         $this->limit = $limit;
     }
@@ -161,7 +160,7 @@ class SeekingLimitStream implements StreamInterface
      * Seeks to the current position and reads up to $length bytes, or less if
      * it would result in reading past $this->limit
      */
-    public function seekAndRead(int $length): string
+    public function seekAndRead(int $length) : string
     {
         $this->stream->seek($this->offset + $this->position);
         if ($this->limit !== -1) {
@@ -170,7 +169,6 @@ class SeekingLimitStream implements StreamInterface
                 return '';
             }
         }
-
         return $this->stream->read($length);
     }
 
@@ -180,10 +178,9 @@ class SeekingLimitStream implements StreamInterface
      * 'seeked' back to its position prior to the call to read().
      *
      * @param int $length
-     *
      * @return string
      */
-    public function read($length): string
+    public function read($length) : string
     {
         $pos = $this->stream->tell();
         $ret = $this->seekAndRead($length);
@@ -193,7 +190,6 @@ class SeekingLimitStream implements StreamInterface
             $ret = \substr($ret, 0, -($this->position - $this->limit));
             $this->position = $this->limit;
         }
-
         return $ret;
     }
 }

@@ -1,16 +1,7 @@
 {
     "name": "zbateson/mail-mime-parser",
     "description": "MIME email message parser",
-    "keywords": [
-        "mail",
-        "mime",
-        "parser",
-        "email",
-        "php-imap",
-        "mailparse",
-        "mimeparse",
-        "MimeMailParser"
-    ],
+    "keywords": ["mail", "mime", "parser", "email", "php-imap", "mailparse", "mimeparse", "MimeMailParser"],
     "homepage": "https://mail-mime-parser.org",
     "license": "BSD-2-Clause",
     "authors": [
@@ -45,13 +36,9 @@
         "ext-iconv": "For best support/performance"
     },
     "autoload": {
-        "psr-4": {
-            "ZBateson\\MailMimeParser\\": "src/"
-        }
+        "psr-4": {"ZBateson\\MailMimeParser\\": "src/"}
     },
     "autoload-dev": {
-        "psr-4": {
-            "ZBateson\\MailMimeParser\\": "tests/MailMimeParser"
-        }
+        "psr-4": {"ZBateson\\MailMimeParser\\": "tests/MailMimeParser"}
     }
 }

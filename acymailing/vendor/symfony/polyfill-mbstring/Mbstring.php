@@ -76,7 +76,7 @@ final class Mbstring
 
     private const SIMPLE_CASE_FOLD = [
         ['µ', 'ſ', "\xCD\x85", 'ς', "\xCF\x90", "\xCF\x91", "\xCF\x95", "\xCF\x96", "\xCF\xB0", "\xCF\xB1", "\xCF\xB5", "\xE1\xBA\x9B", "\xE1\xBE\xBE"],
-        ['μ', 's', 'ι', 'σ', 'β', 'θ', 'φ', 'π', 'κ', 'ρ', 'ε', "\xE1\xB9\xA1", 'ι'],
+        ['μ', 's', 'ι',        'σ', 'β',        'θ',        'φ',        'π',        'κ',        'ρ',        'ε',        "\xE1\xB9\xA1", 'ι'],
     ];
 
     private static $encodingList = ['ASCII', 'UTF-8'];
@@ -170,7 +170,7 @@ final class Mbstring
             return '';  // Instead of null (cf. mb_encode_numericentity).
         }
 
-        $s = (string)$s;
+        $s = (string) $s;
         if ('' === $s) {
             return '';
         }
@@ -195,7 +195,7 @@ final class Mbstring
         }
 
         $s = preg_replace_callback('/&#(?:0*([0-9]+)|x0*([0-9a-fA-F]+))(?!&);?/', function (array $m) use ($cnt, $convmap) {
-            $c = isset($m[2]) ? (int)hexdec($m[2]) : $m[1];
+            $c = isset($m[2]) ? (int) hexdec($m[2]) : $m[1];
             for ($i = 0; $i < $cnt; $i += 4) {
                 if ($c >= $convmap[$i] && $c <= $convmap[$i + 1]) {
                     return self::mb_chr($c - $convmap[$i + 2]);
@@ -236,7 +236,7 @@ final class Mbstring
             return null;
         }
 
-        $s = (string)$s;
+        $s = (string) $s;
         if ('' === $s) {
             return '';
         }
@@ -284,7 +284,7 @@ final class Mbstring
 
     public static function mb_convert_case($s, $mode, $encoding = null)
     {
-        $s = (string)$s;
+        $s = (string) $s;
         if ('' === $s) {
             return '';
         }
@@ -500,7 +500,7 @@ final class Mbstring
                     if (strncmp($enc, 'ISO-8859-', 9)) {
                         return false;
                     }
-                // no break
+                    // no break
                 case 'ASCII':
                 case 'UTF8':
                 case 'UTF-8':
@@ -529,7 +529,7 @@ final class Mbstring
             return strpos($haystack, $needle, $offset);
         }
 
-        $needle = (string)$needle;
+        $needle = (string) $needle;
         if ('' === $needle) {
             if (80000 > \PHP_VERSION_ID) {
                 trigger_error(__METHOD__.': Empty delimiter', \E_USER_WARNING);
@@ -550,9 +550,9 @@ final class Mbstring
             return strrpos($haystack, $needle, $offset);
         }
 
-        if ($offset != (int)$offset) {
+        if ($offset != (int) $offset) {
             $offset = 0;
-        } elseif ($offset = (int)$offset) {
+        } elseif ($offset = (int) $offset) {
             if ($offset < 0) {
                 if (0 > $offset += self::mb_strlen($needle)) {
                     $haystack = self::mb_substr($haystack, 0, $offset, $encoding);
@@ -578,7 +578,7 @@ final class Mbstring
             return null;
         }
 
-        if (1 > $split_length = (int)$split_length) {
+        if (1 > $split_length = (int) $split_length) {
             if (80000 > \PHP_VERSION_ID) {
                 trigger_error('The length of each segment must be greater than zero', \E_USER_WARNING);
 
@@ -645,7 +645,7 @@ final class Mbstring
     {
         $encoding = self::getEncoding($encoding);
         if ('CP850' === $encoding || 'ASCII' === $encoding) {
-            return (string)substr($s, $start, null === $length ? 2147483647 : $length);
+            return (string) substr($s, $start, null === $length ? 2147483647 : $length);
         }
 
         if ($start < 0) {
@@ -664,7 +664,7 @@ final class Mbstring
             }
         }
 
-        return (string)iconv_substr($s, $start, $length, $encoding);
+        return (string) iconv_substr($s, $start, $length, $encoding);
     }
 
     public static function mb_stripos($haystack, $needle, $offset = 0, $encoding = null)
@@ -776,13 +776,7 @@ final class Mbstring
             $s = iconv($encoding, 'UTF-8//IGNORE', $s);
         }
 
-        $s = preg_replace(
-            '/[\x{1100}-\x{115F}\x{2329}\x{232A}\x{2E80}-\x{303E}\x{3040}-\x{A4CF}\x{AC00}-\x{D7A3}\x{F900}-\x{FAFF}\x{FE10}-\x{FE19}\x{FE30}-\x{FE6F}\x{FF00}-\x{FF60}\x{FFE0}-\x{FFE6}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}]/u',
-            '',
-            $s,
-            -1,
-            $wide
-        );
+        $s = preg_replace('/[\x{1100}-\x{115F}\x{2329}\x{232A}\x{2E80}-\x{303E}\x{3040}-\x{A4CF}\x{AC00}-\x{D7A3}\x{F900}-\x{FAFF}\x{FE10}-\x{FE19}\x{FE30}-\x{FE6F}\x{FF00}-\x{FF60}\x{FFE0}-\x{FFE6}\x{20000}-\x{2FFFD}\x{30000}-\x{3FFFD}]/u', '', $s, -1, $wide);
 
         return ($wide << 1) + iconv_strlen($s, 'UTF-8');
     }
@@ -871,12 +865,7 @@ final class Mbstring
                 $leftPaddingLength = floor($paddingRequired / 2);
                 $rightPaddingLength = $paddingRequired - $leftPaddingLength;
 
-                return self::mb_substr(str_repeat($pad_string, $leftPaddingLength), 0, $leftPaddingLength, $encoding).$string.self::mb_substr(
-                        str_repeat($pad_string, $rightPaddingLength),
-                        0,
-                        $rightPaddingLength,
-                        $encoding
-                    );
+                return self::mb_substr(str_repeat($pad_string, $leftPaddingLength), 0, $leftPaddingLength, $encoding).$string.self::mb_substr(str_repeat($pad_string, $rightPaddingLength), 0, $rightPaddingLength, $encoding);
         }
     }
 

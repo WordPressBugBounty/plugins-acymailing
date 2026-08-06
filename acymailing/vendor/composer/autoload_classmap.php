@@ -195,6 +195,7 @@ return array(
     'AcyMailing\\Helpers\\Update\\Configuration' => $baseDir . '/back/Helpers/Update/Configuration.php',
     'AcyMailing\\Helpers\\Update\\DefaultData' => $baseDir . '/back/Helpers/Update/DefaultData.php',
     'AcyMailing\\Helpers\\Update\\Patchv10' => $baseDir . '/back/Helpers/Update/Patchv10.php',
+    'AcyMailing\\Helpers\\Update\\Patchv11' => $baseDir . '/back/Helpers/Update/Patchv11.php',
     'AcyMailing\\Helpers\\Update\\Patchv6' => $baseDir . '/back/Helpers/Update/Patchv6.php',
     'AcyMailing\\Helpers\\Update\\Patchv7' => $baseDir . '/back/Helpers/Update/Patchv7.php',
     'AcyMailing\\Helpers\\Update\\Patchv8' => $baseDir . '/back/Helpers/Update/Patchv8.php',

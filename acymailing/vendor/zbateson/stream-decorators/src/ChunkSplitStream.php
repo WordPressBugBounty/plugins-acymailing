@@ -60,19 +60,18 @@ class ChunkSplitStream implements StreamInterface
      * the passed string, making sure previously written bytes are taken into
      * account.
      */
-    private function getChunkedString(string $string): string
+    private function getChunkedString(string $string) : string
     {
         $firstLine = '';
         if ($this->tell() !== 0) {
             $next = $this->lineLength - ($this->position % ($this->lineLength + $this->lineEndingLength));
             if (\strlen($string) > $next) {
-                $firstLine = \substr($string, 0, $next).$this->lineEnding;
+                $firstLine = \substr($string, 0, $next) . $this->lineEnding;
                 $string = \substr($string, $next);
             }
         }
         // chunk_split always ends with the passed line ending
-        $chunked = $firstLine.\chunk_split($string, $this->lineLength, $this->lineEnding);
-
+        $chunked = $firstLine . \chunk_split($string, $this->lineLength, $this->lineEnding);
         return \substr($chunked, 0, \strlen($chunked) - $this->lineEndingLength);
     }
 
@@ -81,21 +80,19 @@ class ChunkSplitStream implements StreamInterface
      * are inserted every "line length" characters in the string.
      *
      * @param string $string
-     *
      * @return int number of bytes written
      */
-    public function write($string): int
+    public function write($string) : int
     {
         $chunked = $this->getChunkedString($string);
         $this->position += \strlen($chunked);
-
         return $this->stream->write($chunked);
     }
 
     /**
      * Inserts a final line ending character.
      */
-    private function beforeClose(): void
+    private function beforeClose() : void
     {
         if ($this->position !== 0) {
             $this->stream->write($this->lineEnding);
@@ -105,7 +102,7 @@ class ChunkSplitStream implements StreamInterface
     /**
      * @inheritDoc
      */
-    public function close(): void
+    public function close() : void
     {
         $this->beforeClose();
         $this->stream->close();

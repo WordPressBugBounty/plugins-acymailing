@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -19,10 +19,10 @@ final class Header
         static $trimmed = "\"'  \n\t\r";
         $params = $matches = [];
 
-        foreach ((array)$header as $value) {
+        foreach ((array) $header as $value) {
             foreach (self::splitList($value) as $val) {
                 $part = [];
-                foreach (preg_split('/;(?=([^"]*"[^"]*")*[^"]*$)/', $val) ? : [] as $kvp) {
+                foreach (preg_split('/;(?=([^"]*"[^"]*")*[^"]*$)/', $val) ?: [] as $kvp) {
                     if (preg_match_all('/<[^>]+>|[^=]+/', $kvp, $matches)) {
                         $m = $matches[0];
                         if (isset($m[1])) {
@@ -52,7 +52,7 @@ final class Header
     public static function normalize($header): array
     {
         $result = [];
-        foreach ((array)$header as $value) {
+        foreach ((array) $header as $value) {
             foreach (self::splitList($value) as $parsed) {
                 $result[] = $parsed;
             }

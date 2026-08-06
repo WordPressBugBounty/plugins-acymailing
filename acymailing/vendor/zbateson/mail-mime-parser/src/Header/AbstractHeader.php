@@ -43,8 +43,8 @@ abstract class AbstractHeader implements IHeader
      * setParseHeaderValue to extract a parsed value.
      *
      * @param ConsumerService $consumerService For parsing the value.
-     * @param string          $name            Name of the header.
-     * @param string          $value           Value of the header.
+     * @param string $name Name of the header.
+     * @param string $value Value of the header.
      */
     public function __construct(ConsumerService $consumerService, string $name, string $value)
     {
@@ -72,38 +72,36 @@ abstract class AbstractHeader implements IHeader
     protected function setParseHeaderValue(AbstractConsumer $consumer)
     {
         $this->parts = $consumer($this->rawValue);
-
         return $this;
     }
 
     /**
      * @return IHeaderPart[]
      */
-    public function getParts(): array
+    public function getParts() : array
     {
         return $this->parts;
     }
 
-    public function getValue(): ?string
+    public function getValue() : ?string
     {
         if (!empty($this->parts)) {
             return $this->parts[0]->getValue();
         }
-
         return null;
     }
 
-    public function getRawValue(): string
+    public function getRawValue() : string
     {
         return $this->rawValue;
     }
 
-    public function getName(): string
+    public function getName() : string
     {
         return $this->name;
     }
 
-    public function __toString(): string
+    public function __toString() : string
     {
         return "{$this->name}: {$this->rawValue}";
     }
