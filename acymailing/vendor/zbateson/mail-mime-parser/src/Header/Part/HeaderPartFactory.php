@@ -19,7 +19,7 @@ class HeaderPartFactory
 {
     /**
      * @var MbWrapper $charsetConverter passed to IHeaderPart constructors
-     *      for converting strings in IHeaderPart::convertEncoding
+     *                                  for converting strings in IHeaderPart::convertEncoding
      */
     protected $charsetConverter;
 
@@ -59,6 +59,7 @@ class HeaderPartFactory
      * Instantiates and returns a SplitParameterToken with the given name.
      *
      * @param string $name
+     *
      * @return SplitParameterToken
      */
     public function newSplitParameterToken($name)
@@ -70,6 +71,7 @@ class HeaderPartFactory
      * Initializes and returns a new LiteralPart.
      *
      * @param string $value
+     *
      * @return LiteralPart
      */
     public function newLiteralPart($value)
@@ -81,6 +83,7 @@ class HeaderPartFactory
      * Initializes and returns a new MimeLiteralPart.
      *
      * @param string $value
+     *
      * @return MimeLiteralPart
      */
     public function newMimeLiteralPart($value)
@@ -92,6 +95,7 @@ class HeaderPartFactory
      * Initializes and returns a new CommentPart.
      *
      * @param string $value
+     *
      * @return CommentPart
      */
     public function newCommentPart($value)
@@ -104,6 +108,7 @@ class HeaderPartFactory
      *
      * @param string $name
      * @param string $email
+     *
      * @return AddressPart
      */
     public function newAddressPart($name, $email)
@@ -115,6 +120,7 @@ class HeaderPartFactory
      * Initializes and returns a new AddressGroupPart
      *
      * @param string $name
+     *
      * @return AddressGroupPart
      */
     public function newAddressGroupPart(array $addresses, $name = '')
@@ -126,6 +132,7 @@ class HeaderPartFactory
      * Initializes and returns a new DatePart
      *
      * @param string $value
+     *
      * @return DatePart
      */
     public function newDatePart($value)
@@ -139,6 +146,7 @@ class HeaderPartFactory
      * @param string $name
      * @param string $value
      * @param string $language
+     *
      * @return ParameterPart
      */
     public function newParameterPart($name, $value, $language = null)
@@ -151,6 +159,7 @@ class HeaderPartFactory
      *
      * @param string $name
      * @param string $value
+     *
      * @return ReceivedPart
      */
     public function newReceivedPart($name, $value)
@@ -166,6 +175,7 @@ class HeaderPartFactory
      * @param string $ehloName
      * @param string $hostName
      * @param string $hostAddress
+     *
      * @return ReceivedDomainPart
      */
     public function newReceivedDomainPart(

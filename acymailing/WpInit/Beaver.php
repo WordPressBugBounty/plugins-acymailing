@@ -27,7 +27,7 @@ class Beaver
             [
                 'jquery',
             ],
-            '11.0.2',
+            '11.0.3',
             [
                 'in_footer' => false,
             ]
@@ -39,7 +39,7 @@ class Beaver
                 'jquery',
                 'select2lib',
             ],
-            '11.0.2',
+            '11.0.3',
             [
                 'in_footer' => true,
             ]

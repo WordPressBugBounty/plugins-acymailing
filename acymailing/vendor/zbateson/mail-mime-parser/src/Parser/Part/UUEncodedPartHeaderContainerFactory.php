@@ -41,6 +41,7 @@ class UUEncodedPartHeaderContainerFactory
         $container = new UUEncodedPartHeaderContainer($this->headerFactory);
         $container->setUnixFileMode($mode);
         $container->setFilename($filename);
+
         return $container;
     }
 }

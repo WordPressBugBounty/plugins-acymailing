@@ -1,6 +1,9 @@
 <?php
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- View file, its variables are local to the include scope, not true globals.
 defined('ABSPATH') || die('Restricted Access');
+
+use AcyMailing\Helpers\SecurityHelper;
+
 $formName = acym_getModuleFormName();
 ?>
 <div id="acym_fulldiv_<?php echo esc_attr($formName); ?>" class="acym_front_page <?php echo empty($data['suffix']) ? '' : esc_attr($data['suffix']); ?>">
@@ -10,7 +13,10 @@ $formName = acym_getModuleFormName();
     }
 
     if (!empty($data['introtext'])) {
-        echo '<span class="acym_introtext">'.esc_html($data['introtext']).'</span>';
+        echo '<span class="acym_introtext">'.wp_kses(
+                $data['introtext'],
+                SecurityHelper::ALLOWED_HTML_INTRO
+            ).'</span>';
     }
     ?>
 
@@ -21,7 +27,16 @@ $formName = acym_getModuleFormName();
 	      id="<?php echo esc_attr($formName); ?>"
 	      onsubmit="this.querySelector('input[type=submit]').click(); return false;" novalidate>
 		<fieldset class="adminform acy_user_info">
-			<legend><span><?php echo esc_html(acym_translation('ACYM_USER_INFORMATION')); ?></span></legend>
+			<legend>
+				<span>
+					<?php
+                    echo wp_kses(
+                        acym_translation('ACYM_USER_INFORMATION'),
+                        SecurityHelper::ALLOWED_HTML_INTRO
+                    );
+                    ?>
+				</span>
+			</legend>
 			<div id="acyuserinfo">
                 <?php
                 foreach ($data['fields'] as $field) {
@@ -63,7 +78,9 @@ $formName = acym_getModuleFormName();
                 echo '<div class="onefield fieldacytracking" id="field_tracking_'.esc_attr($formName).'">';
                 echo '<label for="mailingdata_tracking_'.esc_attr($formName).'">';
                 echo '<input type="hidden" name="user[tracking]" value="0"/>';
-                echo '<input id="mailingdata_tracking_'.esc_attr($formName).'" class="checkbox" type="checkbox" name="user[tracking]" value="1" '.((int)$data['user']->tracking === 1 ? 'checked="checked"' : '').'/> '.esc_html(
+                echo '<input id="mailingdata_tracking_'.esc_attr(
+                        $formName
+                    ).'" class="checkbox" type="checkbox" name="user[tracking]" value="1" '.((int)$data['user']->tracking === 1 ? 'checked="checked"' : '').'/> '.esc_html(
                         acym_translation('ACYM_ALLOW_TRACKING')
                     );
                 echo '</label>';
@@ -216,6 +233,9 @@ $formName = acym_getModuleFormName();
 		</p>
 	</form>
     <?php if (!empty($data['posttext'])) {
-        echo '<span class="acym_posttext">'.esc_html($data['posttext']).'</span>';
+        echo '<span class="acym_posttext">'.wp_kses(
+                $data['posttext'],
+                SecurityHelper::ALLOWED_HTML_INTRO
+            ).'</span>';
     } ?>
 </div>

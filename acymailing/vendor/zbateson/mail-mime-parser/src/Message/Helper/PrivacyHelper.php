@@ -31,10 +31,10 @@ class PrivacyHelper extends AbstractHelper
     private $multipartHelper;
 
     public function __construct(
-        IMimePartFactory $mimePartFactory,
+        IMimePartFactory      $mimePartFactory,
         IUUEncodedPartFactory $uuEncodedPartFactory,
-        GenericHelper $genericHelper,
-        MultipartHelper $multipartHelper
+        GenericHelper         $genericHelper,
+        MultipartHelper       $multipartHelper
     ) {
         parent::__construct($mimePartFactory, $uuEncodedPartFactory);
         $this->genericHelper = $genericHelper;
@@ -97,16 +97,18 @@ class PrivacyHelper extends AbstractHelper
      */
     public function overwrite8bitContentEncoding(IMessage $message)
     {
-        $parts = $message->getAllParts(function(IMessagePart $part) {
+        $parts = $message->getAllParts(function (IMessagePart $part) {
             return \strcasecmp($part->getContentTransferEncoding(), '8bit') === 0;
         });
         foreach ($parts as $part) {
             $contentType = \strtolower($part->getContentType());
             $part->setRawHeader(
                 HeaderConsts::CONTENT_TRANSFER_ENCODING,
-                ($contentType === 'text/plain' || $contentType === 'text/html') ?
-                'quoted-printable' :
-                'base64'
+                ($contentType === 'text/plain' || $contentType === 'text/html')
+                    ?
+                    'quoted-printable'
+                    :
+                    'base64'
             );
         }
     }
@@ -131,6 +133,7 @@ class PrivacyHelper extends AbstractHelper
         if ($child !== null) {
             return $child->getStream();
         }
+
         return null;
     }
 
@@ -152,6 +155,7 @@ class PrivacyHelper extends AbstractHelper
                 $stream->getContents()
             );
         }
+
         return null;
     }
 }

@@ -342,7 +342,7 @@ class PimpleTest extends TestCase
     }
 
     /**
-     * @group legacy
+     * @group        legacy
      * @dataProvider badServiceDefinitionProvider
      */
     public function testLegacyFactoryFailsForInvalidServiceDefinitions($service)
@@ -367,7 +367,7 @@ class PimpleTest extends TestCase
     }
 
     /**
-     * @group legacy
+     * @group        legacy
      * @dataProvider badServiceDefinitionProvider
      */
     public function testLegacyProtectFailsForInvalidServiceDefinitions($service)
@@ -394,7 +394,7 @@ class PimpleTest extends TestCase
     }
 
     /**
-     * @group legacy
+     * @group        legacy
      * @dataProvider badServiceDefinitionProvider
      */
     public function testLegacyExtendFailsForKeysNotContainingServiceDefinitions($service)
@@ -409,7 +409,7 @@ class PimpleTest extends TestCase
     }
 
     /**
-     * @group legacy
+     * @group               legacy
      * @expectedDeprecation How Pimple behaves when extending protected closures will be fixed in Pimple 4. Are you sure "foo" should be protected?
      */
     public function testExtendingProtectedClosureDeprecation()
@@ -441,7 +441,7 @@ class PimpleTest extends TestCase
     }
 
     /**
-     * @group legacy
+     * @group        legacy
      * @dataProvider badServiceDefinitionProvider
      */
     public function testLegacyExtendFailsForInvalidServiceDefinitions($service)
@@ -491,8 +491,8 @@ class PimpleTest extends TestCase
     public function badServiceDefinitionProvider()
     {
         return [
-          [123],
-          [new Fixtures\NonInvokable()],
+            [123],
+            [new Fixtures\NonInvokable()],
         ];
     }
 
@@ -502,12 +502,14 @@ class PimpleTest extends TestCase
     public function serviceDefinitionProvider()
     {
         return [
-            [function ($value) {
-                $service = new Fixtures\Service();
-                $service->value = $value;
+            [
+                function ($value) {
+                    $service = new Fixtures\Service();
+                    $service->value = $value;
 
-                return $service;
-            }],
+                    return $service;
+                },
+            ],
             [new Fixtures\Invokable()],
         ];
     }

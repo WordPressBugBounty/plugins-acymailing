@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -344,7 +344,7 @@ class Uri implements UriInterface, \JsonSerializable
         $result = self::getFilteredQueryString($uri, array_keys($keyValueArray));
 
         foreach ($keyValueArray as $key => $value) {
-            $result[] = self::generateQueryString((string) $key, $value !== null ? (string) $value : null);
+            $result[] = self::generateQueryString((string)$key, $value !== null ? (string)$value : null);
         }
 
         return $uri->withQuery(implode('&', $result));
@@ -627,7 +627,7 @@ class Uri implements UriInterface, \JsonSerializable
             return null;
         }
 
-        $port = (int) $port;
+        $port = (int)$port;
         if (0 > $port || 0xFFFF < $port) {
             throw new \InvalidArgumentException(
                 sprintf('Invalid port: %d. Must be between 0 and 65535', $port)
@@ -651,7 +651,7 @@ class Uri implements UriInterface, \JsonSerializable
         }
 
         $decodedKeys = array_map(function ($k): string {
-            return rawurldecode((string) $k);
+            return rawurldecode((string)$k);
         }, $keys);
 
         return array_filter(explode('&', $current), function ($part) use ($decodedKeys) {

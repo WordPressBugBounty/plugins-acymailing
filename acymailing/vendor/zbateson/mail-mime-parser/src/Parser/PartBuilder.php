@@ -123,8 +123,10 @@ class PartBuilder
      */
     public function getStream()
     {
-        return ($this->parent !== null) ?
-            $this->parent->getStream() :
+        return ($this->parent !== null)
+            ?
+            $this->parent->getStream()
+            :
             $this->messageStream;
     }
 
@@ -136,8 +138,10 @@ class PartBuilder
      */
     public function getMessageResourceHandle()
     {
-        return ($this->parent !== null) ?
-            $this->parent->getMessageResourceHandle() :
+        return ($this->parent !== null)
+            ?
+            $this->parent->getMessageResourceHandle()
+            :
             $this->messageHandle;
     }
 
@@ -145,7 +149,7 @@ class PartBuilder
      * Shortcut for calling ftell($partBuilder->getMessageResourceHandle()).
      *
      */
-    public function getMessageResourceHandlePos() : int
+    public function getMessageResourceHandlePos(): int
     {
         return \ftell($this->getMessageResourceHandle());
     }
@@ -154,7 +158,7 @@ class PartBuilder
      * Returns the byte offset start position for this part within the message
      * stream if it's been set, or null otherwise.
      */
-    public function getStreamPartStartPos() : ?int
+    public function getStreamPartStartPos(): ?int
     {
         return $this->streamPartStartPos;
     }
@@ -167,7 +171,7 @@ class PartBuilder
      * being set and are still null.
      *
      */
-    public function getStreamPartLength() : int
+    public function getStreamPartLength(): int
     {
         return $this->streamPartEndPos - $this->streamPartStartPos;
     }
@@ -177,7 +181,7 @@ class PartBuilder
      * the main raw message stream, or null if not set.
      *
      */
-    public function getStreamContentStartPos() : ?int
+    public function getStreamContentStartPos(): ?int
     {
         return $this->streamContentStartPos;
     }
@@ -190,7 +194,7 @@ class PartBuilder
      * before being set and are still null.
      *
      */
-    public function getStreamContentLength() : int
+    public function getStreamContentLength(): int
     {
         return $this->streamContentEndPos - $this->streamContentStartPos;
     }
@@ -204,6 +208,7 @@ class PartBuilder
     public function setStreamPartStartPos(int $streamPartStartPos)
     {
         $this->streamPartStartPos = $streamPartStartPos;
+
         return $this;
     }
 
@@ -220,6 +225,7 @@ class PartBuilder
         if ($this->parent !== null) {
             $this->parent->setStreamPartEndPos($streamPartEndPos);
         }
+
         return $this;
     }
 
@@ -232,6 +238,7 @@ class PartBuilder
     public function setStreamContentStartPos(int $streamContentStartPos)
     {
         $this->streamContentStartPos = $streamContentStartPos;
+
         return $this;
     }
 
@@ -245,6 +252,7 @@ class PartBuilder
     {
         $this->streamContentEndPos = $streamContentEndPos;
         $this->setStreamPartEndPos($streamContentEndPos);
+
         return $this;
     }
 
@@ -254,7 +262,7 @@ class PartBuilder
      *
      * @return ?bool true if set.
      */
-    public function isContentParsed() : ?bool
+    public function isContentParsed(): ?bool
     {
         return ($this->streamContentEndPos !== null);
     }
@@ -265,11 +273,12 @@ class PartBuilder
      *
      * @return bool true if it's a mime message or child of a mime message.
      */
-    public function isMime() : bool
+    public function isMime(): bool
     {
         if ($this->getParent() !== null) {
             return $this->getParent()->isMime();
         }
+
         return ($this->headerContainer->exists(HeaderConsts::CONTENT_TYPE) ||
             $this->headerContainer->exists(HeaderConsts::MIME_VERSION));
     }

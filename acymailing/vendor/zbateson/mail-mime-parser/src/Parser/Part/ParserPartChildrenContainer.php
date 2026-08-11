@@ -36,7 +36,7 @@ class ParserPartChildrenContainer extends PartChildrenContainer
         $this->parserProxy = $parserProxy;
     }
 
-    public function offsetExists($offset) : bool
+    public function offsetExists($offset): bool
     {
         $exists = parent::offsetExists($offset);
         while (!$exists && !$this->allParsed) {
@@ -48,6 +48,7 @@ class ParserPartChildrenContainer extends PartChildrenContainer
             }
             $exists = parent::offsetExists($offset);
         }
+
         return $exists;
     }
 }

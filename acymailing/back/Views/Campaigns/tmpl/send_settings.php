@@ -11,7 +11,7 @@ defined('ABSPATH') || die('Restricted Access');
 	      data-abide>
 		<input type="hidden" value="<?php echo esc_attr($data['currentCampaign']->id); ?>" name="campaignId">
 		<input type="hidden" value="<?php echo esc_attr($data['from'] ?? ''); ?>" name="from">
-		<input type="hidden" name="sending_type" value="<?php echo esc_attr($data['currentCampaign']->sending_type); ?>">
+		<input type="hidden" name="sending_type" value="<?php echo esc_attr($data['currentCampaign']->sending_type ?? ''); ?>">
 		<div class="large-auto"></div>
 		<div id="acym__campaigns" class="cell <?php echo esc_attr($data['containerClass']); ?> grid-x grid-margin-x acym__content">
 

@@ -37,7 +37,7 @@ interface IUUEncodedPart extends IMessagePart
      * Returns the file mode included in the uuencoded 'begin' line for this
      * part.
      */
-    public function getUnixFileMode() : ?int;
+    public function getUnixFileMode(): ?int;
 
     /**
      * Sets the unix file mode for the uuencoded 'begin' line.

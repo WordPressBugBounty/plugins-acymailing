@@ -29,23 +29,24 @@ interface IMessage extends IMimePart
      * If there are no inline text/plain parts in this message, null is
      * returned.
      *
-     * @see IMessage::getTextPartCount() to get a count of text parts.
-     * @see IMessage::getTextStream() to get the text content stream directly.
+     * @param int $index Optional index of part to return.
+     *
+     * @return \ZBateson\MailMimeParser\Message\IMessagePart|null
      * @see IMessage::getTextContent() to get the text content in a string.
      * @see IMessage::getHtmlPart() to get the HTML part(s).
      * @see IMessage::getHtmlPartCount() to get a count of html parts.
-     * @param int $index Optional index of part to return.
-     * @return \ZBateson\MailMimeParser\Message\IMessagePart|null
+     * @see IMessage::getTextPartCount() to get a count of text parts.
+     * @see IMessage::getTextStream() to get the text content stream directly.
      */
     public function getTextPart($index = 0);
 
     /**
      * Returns the number of inline text/plain parts this message contains.
      *
-     * @see IMessage::getTextPart() to get the text part(s).
+     * @return int
      * @see IMessage::getHtmlPart() to get the HTML part(s).
      * @see IMessage::getHtmlPartCount() to get a count of html parts.
-     * @return int
+     * @see IMessage::getTextPart() to get the text part(s).
      */
     public function getTextPartCount();
 
@@ -59,23 +60,24 @@ interface IMessage extends IMimePart
      * If there are no inline text/plain parts in this message, null is
      * returned.
      *
-     * @see IMessage::getHtmlStream() to get the html content stream directly.
-     * @see IMessage::getHtmlStream() to get the html content in a string.
+     * @param int $index Optional index of part to return.
+     *
+     * @return \ZBateson\MailMimeParser\Message\IMessagePart|null
      * @see IMessage::getTextPart() to get the text part(s).
      * @see IMessage::getTextPartCount() to get a count of text parts.
      * @see IMessage::getHtmlPartCount() to get a count of html parts.
-     * @param int $index Optional index of part to return.
-     * @return \ZBateson\MailMimeParser\Message\IMessagePart|null
+     * @see IMessage::getHtmlStream() to get the html content stream directly.
+     * @see IMessage::getHtmlStream() to get the html content in a string.
      */
     public function getHtmlPart($index = 0);
 
     /**
      * Returns the number of inline text/html parts this message contains.
      *
-     * @see IMessage::getTextPart() to get the text part(s).
+     * @return int
      * @see IMessage::getTextPartCount() to get a count of text parts.
      * @see IMessage::getHtmlPart() to get the HTML part(s).
-     * @return int
+     * @see IMessage::getTextPart() to get the text part(s).
      */
     public function getHtmlPartCount();
 
@@ -88,11 +90,12 @@ interface IMessage extends IMimePart
      *
      * If a part at the passed index doesn't exist, null is returned.
      *
-     * @see IMessage::getTextPart() to get the text part(s).
-     * @see IMessage::getTextContent() to get the text content in a string.
-     * @param int $index Optional 0-based index of inline text part stream.
+     * @param int    $index   Optional 0-based index of inline text part stream.
      * @param string $charset Optional charset to encode the stream with.
+     *
      * @return \Psr\Http\Message\StreamInterface|null
+     * @see IMessage::getTextContent() to get the text content in a string.
+     * @see IMessage::getTextPart() to get the text part(s).
      */
     public function getTextStream($index = 0, $charset = MailMimeParser::DEFAULT_CHARSET);
 
@@ -105,12 +108,13 @@ interface IMessage extends IMimePart
      *
      * If a part at the passed index doesn't exist, null is returned.
      *
-     * @see IMessage::getTextPart() to get the text part(s).
-     * @see IMessage::getTextStream() to get the text content stream directly.
-     * @param int $index Optional 0-based index of inline text part content.
+     * @param int    $index   Optional 0-based index of inline text part content.
      * @param string $charset Optional charset for the returned string to be
-     *        encoded in.
+     *                        encoded in.
+     *
      * @return string|null
+     * @see IMessage::getTextStream() to get the text content stream directly.
+     * @see IMessage::getTextPart() to get the text part(s).
      */
     public function getTextContent($index = 0, $charset = MailMimeParser::DEFAULT_CHARSET);
 
@@ -123,11 +127,12 @@ interface IMessage extends IMimePart
      *
      * If a part at the passed index doesn't exist, null is returned.
      *
-     * @see IMessage::getHtmlPart() to get the html part(s).
-     * @see IMessage::getHtmlContent() to get the html content in a string.
-     * @param int $index Optional 0-based index of inline html part stream.
+     * @param int    $index   Optional 0-based index of inline html part stream.
      * @param string $charset Optional charset to encode the stream with.
+     *
      * @return \Psr\Http\Message\StreamInterface|null
+     * @see IMessage::getHtmlContent() to get the html content in a string.
+     * @see IMessage::getHtmlPart() to get the html part(s).
      */
     public function getHtmlStream($index = 0, $charset = MailMimeParser::DEFAULT_CHARSET);
 
@@ -140,12 +145,13 @@ interface IMessage extends IMimePart
      *
      * If a part at the passed index doesn't exist, null is returned.
      *
-     * @see IMessage::getHtmlPart() to get the html part(s).
-     * @see IMessage::getHtmlStream() to get the html content stream directly.
-     * @param int $index Optional 0-based index of inline html part content.
+     * @param int    $index   Optional 0-based index of inline html part content.
      * @param string $charset Optional charset for the returned string to be
-     *        encoded in.
+     *                        encoded in.
+     *
      * @return string|null
+     * @see IMessage::getHtmlStream() to get the html content stream directly.
+     * @see IMessage::getHtmlPart() to get the html part(s).
      */
     public function getHtmlContent($index = 0, $charset = MailMimeParser::DEFAULT_CHARSET);
 
@@ -158,13 +164,14 @@ interface IMessage extends IMimePart
      * text/plain part's Content-Type, not the charset of the passed $resource.
      * $resource must be encoded in UTF-8 regardless of the target charset.
      *
+     * @param string|resource|\Psr\Http\Message\StreamInterface $resource           UTF-8
+     *                                                                              encoded content.
+     * @param string                                            $contentTypeCharset the charset to use as the text/plain
+     *                                                                              part's content-type header charset value.
+     *
+     * @see IMessage::removeAllTextParts() to remove all text parts
      * @see IMessage::setHtmlPart() to set the html part
      * @see IMessage::removeTextPart() to remove a text part
-     * @see IMessage::removeAllTextParts() to remove all text parts
-     * @param string|resource|\Psr\Http\Message\StreamInterface $resource UTF-8
-     *        encoded content.
-     * @param string $contentTypeCharset the charset to use as the text/plain
-     *        part's content-type header charset value.
      */
     public function setTextPart($resource, string $contentTypeCharset = 'UTF-8');
 
@@ -177,13 +184,14 @@ interface IMessage extends IMimePart
      * text/html part's Content-Type, not the charset of the passed $resource.
      * $resource must be encoded in UTF-8 regardless of the target charset.
      *
+     * @param string|resource|\Psr\Http\Message\StreamInterface $resource           UTF-8
+     *                                                                              encoded content.
+     * @param string                                            $contentTypeCharset the charset to use as the text/html
+     *                                                                              part's content-type header charset value.
+     *
+     * @see IMessage::removeAllHtmlParts() to remove all html parts
      * @see IMessage::setTextPart() to set the text part
      * @see IMessage::removeHtmlPart() to remove an html part
-     * @see IMessage::removeAllHtmlParts() to remove all html parts
-     * @param string|resource|\Psr\Http\Message\StreamInterface $resource UTF-8
-     *        encoded content.
-     * @param string $contentTypeCharset the charset to use as the text/html
-     *        part's content-type header charset value.
      */
     public function setHtmlPart($resource, string $contentTypeCharset = 'UTF-8');
 
@@ -193,13 +201,14 @@ interface IMessage extends IMimePart
      *
      * Returns true if a part exists at the passed index and has been removed.
      *
+     * @param int $index Optional 0-based index of inline text part to remove.
+     *
+     * @return bool true on success
+     * @see IMessage::removeAllTextParts() to remove all text parts
      * @see IMessage::setTextPart() to set the text part
      * @see IMessage::removeHtmlPart() to remove an html part
-     * @see IMessage::removeAllTextParts() to remove all text parts
-     * @param int $index Optional 0-based index of inline text part to remove.
-     * @return bool true on success
      */
-    public function removeTextPart(int $index = 0) : bool;
+    public function removeTextPart(int $index = 0): bool;
 
     /**
      * Removes all text/plain inline parts in this message.
@@ -220,14 +229,15 @@ interface IMessage extends IMimePart
      * {@see \ZBateson\MailMimeParser\Message\IMessagePart::removePart()} with
      * parts you wish to remove.
      *
+     * @param bool $moveRelatedPartsBelowMessage Optionally pass false to remove
+     *                                           related parts.
+     *
+     * @return bool true on success
+     * @see IMessage::removeAllHtmlParts() to remove all html parts
      * @see IMessage::setTextPart() to set the text part
      * @see IMessage::removeTextPart() to remove a text part
-     * @see IMessage::removeAllHtmlParts() to remove all html parts
-     * @param bool $moveRelatedPartsBelowMessage Optionally pass false to remove
-     *        related parts.
-     * @return bool true on success
      */
-    public function removeAllTextParts(bool $moveRelatedPartsBelowMessage = true) : bool;
+    public function removeAllTextParts(bool $moveRelatedPartsBelowMessage = true): bool;
 
     /**
      * Removes the text/html part of the message at the passed index if one
@@ -235,13 +245,14 @@ interface IMessage extends IMimePart
      *
      * Returns true if a part exists at the passed index and has been removed.
      *
+     * @param int $index Optional 0-based index of inline html part to remove.
+     *
+     * @return bool true on success
+     * @see IMessage::removeAllHtmlParts() to remove all html parts
      * @see IMessage::setHtmlPart() to set the html part
      * @see IMessage::removeTextPart() to remove a text part
-     * @see IMessage::removeAllHtmlParts() to remove all html parts
-     * @param int $index Optional 0-based index of inline html part to remove.
-     * @return bool true on success
      */
-    public function removeHtmlPart(int $index = 0) : bool;
+    public function removeHtmlPart(int $index = 0): bool;
 
     /**
      * Removes all text/html inline parts in this message.
@@ -262,14 +273,15 @@ interface IMessage extends IMimePart
      * {@see \ZBateson\MailMimeParser\Message\IMessagePart::removePart()} with
      * parts you wish to remove.
      *
+     * @param bool $moveRelatedPartsBelowMessage Optionally pass false to remove
+     *                                           related parts.
+     *
+     * @return bool true on success
+     * @see IMessage::removeAllTextParts() to remove all html parts
      * @see IMessage::setHtmlPart() to set the html part
      * @see IMessage::removeHtmlPart() to remove an html part
-     * @see IMessage::removeAllTextParts() to remove all html parts
-     * @param bool $moveRelatedPartsBelowMessage Optionally pass false to remove
-     *        related parts.
-     * @return bool true on success
      */
-    public function removeAllHtmlParts(bool $moveRelatedPartsBelowMessage = true) : bool;
+    public function removeAllHtmlParts(bool $moveRelatedPartsBelowMessage = true): bool;
 
     /**
      * Returns the attachment part at the given 0-based index, or null if none
@@ -282,10 +294,11 @@ interface IMessage extends IMimePart
      *  - all multipart/* parts
      *  - any signature part
      *
+     * @param int $index the 0-based index of the attachment part to return.
+     *
+     * @return \ZBateson\MailMimeParser\Message\IMessagePart|null
      * @see IMessage::getAllAttachmentParts() to get an array of all parts.
      * @see IMessage::getAttachmentCount() to get the number of attachments.
-     * @param int $index the 0-based index of the attachment part to return.
-     * @return \ZBateson\MailMimeParser\Message\IMessagePart|null
      */
     public function getAttachmentPart(int $index);
 
@@ -299,18 +312,18 @@ interface IMessage extends IMimePart
      *  - all multipart/* parts
      *  - any signature part
      *
-     * @see IMessage::getAllAttachmentPart() to get a single attachment.
-     * @see IMessage::getAttachmentCount() to get the number of attachments.
      * @return \ZBateson\MailMimeParser\Message\IMessagePart[]
+     * @see IMessage::getAttachmentCount() to get the number of attachments.
+     * @see IMessage::getAllAttachmentPart() to get a single attachment.
      */
     public function getAllAttachmentParts();
 
     /**
      * Returns the number of attachments available.
      *
-     * @see IMessage::getAllAttachmentPart() to get a single attachment.
-     * @see IMessage::getAllAttachmentParts() to get an array of all parts.
      * @return int
+     * @see IMessage::getAllAttachmentParts() to get an array of all parts.
+     * @see IMessage::getAllAttachmentPart() to get a single attachment.
      */
     public function getAttachmentCount();
 
@@ -321,13 +334,13 @@ interface IMessage extends IMimePart
      * Note that $disposition must be one of 'inline' or 'attachment', and will
      * default to 'attachment' if a different value is passed.
      *
-     * @param string|resource|\Psr\Http\Message\StreamInterface $resource the
-     *        part's content
-     * @param string $mimeType the mime-type of the attachment
-     * @param string $filename Optional filename (to set relevant header params)
-     * @param string $disposition Optional Content-Disposition value.
-     * @param string $encoding defaults to 'base64', only applied for a mime
-     *        email
+     * @param string|resource|\Psr\Http\Message\StreamInterface $resource    the
+     *                                                                       part's content
+     * @param string                                            $mimeType    the mime-type of the attachment
+     * @param string                                            $filename    Optional filename (to set relevant header params)
+     * @param string                                            $disposition Optional Content-Disposition value.
+     * @param string                                            $encoding    defaults to 'base64', only applied for a mime
+     *                                                                       email
      */
     public function addAttachmentPart($resource, string $mimeType, ?string $filename = null, string $disposition = 'attachment', string $encoding = 'base64');
 
@@ -340,12 +353,12 @@ interface IMessage extends IMimePart
      * Note that $disposition must be one of 'inline' or 'attachment', and will
      * default to 'attachment' if a different value is passed.
      *
-     * @param string $filePath file to attach
-     * @param string $mimeType the mime-type of the attachment
-     * @param string $filename Optional filename (to set relevant header params)
+     * @param string $filePath    file to attach
+     * @param string $mimeType    the mime-type of the attachment
+     * @param string $filename    Optional filename (to set relevant header params)
      * @param string $disposition Optional Content-Disposition value.
-     * @param string $encoding defaults to 'base64', only applied for a mime
-     *        email
+     * @param string $encoding    defaults to 'base64', only applied for a mime
+     *                            email
      */
     public function addAttachmentPartFromFile($filePath, string $mimeType, ?string $filename = null, string $disposition = 'attachment', string $encoding = 'base64');
 
@@ -374,10 +387,10 @@ interface IMessage extends IMimePart
      * replace new lines, and before calculating a signature, LFs not preceded
      * by CR should be replaced with CRLFs.
      *
-     * @see IMessage::getSignedMessageAsString to get a string with CRLFs
-     *      normalized
      * @return \Psr\Http\Message\StreamInterface or null if the message doesn't
      *         have any children
+     * @see IMessage::getSignedMessageAsString to get a string with CRLFs
+     *      normalized
      */
     public function getSignedMessageStream();
 
@@ -387,9 +400,9 @@ interface IMessage extends IMimePart
      *
      * Non-CRLF new lines are replaced to always be CRLF.
      *
+     * @return string or null if the message doesn't have any children
      * @see IMessage::setAsMultipartSigned to make the message a
      *      multipart/signed message.
-     * @return string or null if the message doesn't have any children
      */
     public function getSignedMessageAsString();
 
@@ -416,9 +429,10 @@ interface IMessage extends IMimePart
      * get the normalized string content to be used for calculated the message's
      * hash.
      *
-     * @see IMessage::getSignedMessageAsString
-     * @param string $micalg The Message Integrity Check algorithm being used
+     * @param string $micalg   The Message Integrity Check algorithm being used
      * @param string $protocol The mime-type of the signature body
+     *
+     * @see IMessage::getSignedMessageAsString
      */
     public function setAsMultipartSigned(string $micalg, string $protocol);
 

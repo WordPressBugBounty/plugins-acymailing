@@ -18,7 +18,7 @@ abstract class NonMimePart extends MessagePart
      * Returns true.
      *
      */
-    public function isTextPart() : bool
+    public function isTextPart(): bool
     {
         return true;
     }
@@ -28,7 +28,7 @@ abstract class NonMimePart extends MessagePart
      *
      * @return string
      */
-    public function getContentType(string $default = 'text/plain') : ?string
+    public function getContentType(string $default = 'text/plain'): ?string
     {
         return $default;
     }
@@ -38,7 +38,7 @@ abstract class NonMimePart extends MessagePart
      *
      * @return string
      */
-    public function getCharset() : ?string
+    public function getCharset(): ?string
     {
         return 'ISO-8859-1';
     }
@@ -48,7 +48,7 @@ abstract class NonMimePart extends MessagePart
      *
      * @return string
      */
-    public function getContentDisposition(?string $default = 'inline') : ?string
+    public function getContentDisposition(?string $default = 'inline'): ?string
     {
         return 'inline';
     }
@@ -58,7 +58,7 @@ abstract class NonMimePart extends MessagePart
      *
      * @return string
      */
-    public function getContentTransferEncoding(?string $default = '7bit') : ?string
+    public function getContentTransferEncoding(?string $default = '7bit'): ?string
     {
         return '7bit';
     }
@@ -67,7 +67,7 @@ abstract class NonMimePart extends MessagePart
      * Returns false.
      *
      */
-    public function isMime() : bool
+    public function isMime(): bool
     {
         return false;
     }
@@ -78,7 +78,7 @@ abstract class NonMimePart extends MessagePart
      * NonMimeParts do not have a Content ID, and so this simply returns null.
      *
      */
-    public function getContentId() : ?string
+    public function getContentId(): ?string
     {
         return null;
     }

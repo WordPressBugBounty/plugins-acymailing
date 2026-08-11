@@ -54,7 +54,8 @@ class ReceivedDomainPart extends ReceivedPart
      * @param string $hostname
      * @param string $address
      */
-    public function __construct(MbWrapper $charsetConverter, $name, $value, $ehloName = null, $hostname = null, $address = null) {
+    public function __construct(MbWrapper $charsetConverter, $name, $value, $ehloName = null, $hostname = null, $address = null)
+    {
         parent::__construct($charsetConverter, $name, $value);
         $this->ehloName = $ehloName;
         $this->hostname = $hostname;
@@ -92,7 +93,7 @@ class ReceivedDomainPart extends ReceivedPart
      * address in the address position when parsing (but never a hostname).
      *
      */
-    public function getAddress() : ?string
+    public function getAddress(): ?string
     {
         return $this->address;
     }

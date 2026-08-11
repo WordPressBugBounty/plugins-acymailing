@@ -2,7 +2,13 @@
     "name": "symfony/polyfill-iconv",
     "type": "library",
     "description": "Symfony polyfill for the Iconv extension",
-    "keywords": ["polyfill", "shim", "compatibility", "portable", "iconv"],
+    "keywords": [
+        "polyfill",
+        "shim",
+        "compatibility",
+        "portable",
+        "iconv"
+    ],
     "homepage": "https://symfony.com",
     "license": "MIT",
     "authors": [
@@ -22,8 +28,12 @@
         "ext-iconv": "*"
     },
     "autoload": {
-        "psr-4": { "Symfony\\Polyfill\\Iconv\\": "" },
-        "files": [ "bootstrap.php" ]
+        "psr-4": {
+            "Symfony\\Polyfill\\Iconv\\": ""
+        },
+        "files": [
+            "bootstrap.php"
+        ]
     },
     "suggest": {
         "ext-iconv": "For best performance"

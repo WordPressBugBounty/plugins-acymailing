@@ -39,26 +39,28 @@ class MultipartHelper extends AbstractHelper
      * Creates and returns a unique boundary.
      *
      * @param string $mimeType first 3 characters of a multipart type are used,
-     *      e.g. REL for relative or ALT for alternative
+     *                         e.g. REL for relative or ALT for alternative
      */
-    public function getUniqueBoundary(string $mimeType) : string
+    public function getUniqueBoundary(string $mimeType): string
     {
         $type = \ltrim(\strtoupper(\preg_replace('/^(multipart\/(.{3}).*|.*)$/i', '$2-', $mimeType)), '-');
-        return \uniqid('----=MMP-' . $type . '-', true);
+
+        return \uniqid('----=MMP-'.$type.'-', true);
     }
 
     /**
      * Creates a unique mime boundary and assigns it to the passed part's
      * Content-Type header with the passed mime type.
      */
-    public function setMimeHeaderBoundaryOnPart(IMimePart $part, string $mimeType) : self
+    public function setMimeHeaderBoundaryOnPart(IMimePart $part, string $mimeType): self
     {
         $part->setRawHeader(
             HeaderConsts::CONTENT_TYPE,
             "$mimeType;\r\n\tboundary=\""
-                . $this->getUniqueBoundary($mimeType) . '"'
+            .$this->getUniqueBoundary($mimeType).'"'
         );
         $part->notify();
+
         return $this;
     }
 
@@ -69,7 +71,7 @@ class MultipartHelper extends AbstractHelper
      * the message.  The message's content and content headers are moved to the
      * new part.
      */
-    public function setMessageAsMixed(IMessage $message) : self
+    public function setMessageAsMixed(IMessage $message): self
     {
         if ($message->hasContent()) {
             $part = $this->genericHelper->createNewContentPartFrom($message);
@@ -82,6 +84,7 @@ class MultipartHelper extends AbstractHelper
                 $att->notify();
             }
         }
+
         return $this;
     }
 
@@ -92,13 +95,14 @@ class MultipartHelper extends AbstractHelper
      * the message.  The message's content and content headers are moved to the
      * new part.
      */
-    public function setMessageAsAlternative(IMessage $message) : self
+    public function setMessageAsAlternative(IMessage $message): self
     {
         if ($message->hasContent()) {
             $part = $this->genericHelper->createNewContentPartFrom($message);
             $message->addChild($part, 0);
         }
         $this->setMimeHeaderBoundaryOnPart($message, 'multipart/alternative');
+
         return $this;
     }
 
@@ -110,9 +114,10 @@ class MultipartHelper extends AbstractHelper
      * multipart/related child containing a content part of $mimeType, where
      * the whole mixed/related part should be removed.
      *
-     * @param string $mimeType the content-type to find below $alternativePart
+     * @param string    $mimeType        the content-type to find below $alternativePart
      * @param IMimePart $alternativePart The multipart/alternative part to look
-     *        under
+     *                                   under
+     *
      * @return bool|IMimePart false if a part is not found
      */
     public function getContentPartContainerFromAlternative($mimeType, IMimePart $alternativePart)
@@ -126,6 +131,7 @@ class MultipartHelper extends AbstractHelper
             $contPart = $part;
             $part = $part->getParent();
         } while ($part !== $alternativePart);
+
         return $contPart;
     }
 
@@ -137,7 +143,7 @@ class MultipartHelper extends AbstractHelper
      * removed, and parts of different content-types can optionally be moved to
      * the main message part.
      */
-    public function removeAllContentPartsFromAlternative(IMessage $message, string $mimeType, IMimePart $alternativePart, bool $keepOtherContent) : bool
+    public function removeAllContentPartsFromAlternative(IMessage $message, string $mimeType, IMimePart $alternativePart, bool $keepOtherContent): bool
     {
         $rmPart = $this->getContentPartContainerFromAlternative($mimeType, $alternativePart);
         if ($rmPart === false) {
@@ -158,6 +164,7 @@ class MultipartHelper extends AbstractHelper
         while ($message->getChildCount() === 1) {
             $this->genericHelper->replacePart($message, $message, $message->getChild(0));
         }
+
         return true;
     }
 
@@ -174,6 +181,7 @@ class MultipartHelper extends AbstractHelper
         $message->removePart($contentPart);
         $message->addChild($altPart, 0);
         $altPart->addChild($contentPart, 0);
+
         return $altPart;
     }
 
@@ -182,12 +190,13 @@ class MultipartHelper extends AbstractHelper
      * content-type equal to $exceptMimeType.  If the message is not a
      * multipart/mixed message, it is set to multipart/mixed first.
      */
-    public function moveAllNonMultiPartsToMessageExcept(IMessage $message, IMimePart $from, string $exceptMimeType) : self
+    public function moveAllNonMultiPartsToMessageExcept(IMessage $message, IMimePart $from, string $exceptMimeType): self
     {
-        $parts = $from->getAllParts(function(IMessagePart $part) use ($exceptMimeType) {
+        $parts = $from->getAllParts(function (IMessagePart $part) use ($exceptMimeType) {
             if ($part instanceof IMimePart && $part->isMultiPart()) {
                 return false;
             }
+
             return \strcasecmp($part->getContentType(), $exceptMimeType) !== 0;
         });
         if (\strcasecmp($message->getContentType(), 'multipart/mixed') !== 0) {
@@ -197,6 +206,7 @@ class MultipartHelper extends AbstractHelper
             $from->removePart($part);
             $message->addChild($part);
         }
+
         return $this;
     }
 
@@ -233,6 +243,7 @@ class MultipartHelper extends AbstractHelper
             $relatedPart->addChild($part);
         }
         $parent->addChild($relatedPart, 0);
+
         return $relatedPart;
     }
 
@@ -257,6 +268,7 @@ class MultipartHelper extends AbstractHelper
                 $altPart = $this->createMultipartRelatedPartForInlineChildrenOf($altPartParent);
             }
         }
+
         return $altPart;
     }
 
@@ -297,7 +309,7 @@ class MultipartHelper extends AbstractHelper
     public function createAndAddPartForAttachment(IMessage $message, $resource, string $mimeType, string $disposition, ?string $filename = null, string $encoding = 'base64')
     {
         if ($filename === null) {
-            $filename = 'file' . \uniqid();
+            $filename = 'file'.\uniqid();
         }
 
         $safe = \iconv('UTF-8', 'US-ASCII//translit//ignore', $filename);
@@ -328,13 +340,14 @@ class MultipartHelper extends AbstractHelper
      *
      * @return bool true on success
      */
-    public function removeAllContentPartsByMimeType(IMessage $message, string $mimeType, bool $keepOtherContent = false) : bool
+    public function removeAllContentPartsByMimeType(IMessage $message, string $mimeType, bool $keepOtherContent = false): bool
     {
         $alt = $message->getPart(0, PartFilter::fromInlineContentType('multipart/alternative'));
         if ($alt !== null) {
             return $this->removeAllContentPartsFromAlternative($message, $mimeType, $alt, $keepOtherContent);
         }
         $message->removeAllParts(PartFilter::fromInlineContentType($mimeType));
+
         return true;
     }
 
@@ -344,7 +357,7 @@ class MultipartHelper extends AbstractHelper
      *
      * @return bool true on success
      */
-    public function removePartByMimeType(IMessage $message, string $mimeType, int $index = 0) : bool
+    public function removePartByMimeType(IMessage $message, string $mimeType, int $index = 0): bool
     {
         $parts = $message->getAllParts(PartFilter::fromInlineContentType($mimeType));
         $alt = $message->getPart(0, PartFilter::fromInlineContentType('multipart/alternative'));
@@ -358,6 +371,7 @@ class MultipartHelper extends AbstractHelper
         if ($alt !== null && $alt->getChildCount() === 1) {
             $this->genericHelper->replacePart($message, $alt, $alt->getChild(0));
         }
+
         return true;
     }
 
@@ -367,7 +381,7 @@ class MultipartHelper extends AbstractHelper
      *
      * @param string|resource $stringOrHandle
      */
-    public function setContentPartForMimeType(IMessage $message, string $mimeType, $stringOrHandle, string $charset) : self
+    public function setContentPartForMimeType(IMessage $message, string $mimeType, $stringOrHandle, string $charset): self
     {
         $part = ($mimeType === 'text/html') ? $message->getHtmlPart() : $message->getTextPart();
         if ($part === null) {
@@ -377,6 +391,7 @@ class MultipartHelper extends AbstractHelper
             $part->setRawHeader(HeaderConsts::CONTENT_TYPE, "$contentType;\r\n\tcharset=\"$charset\"");
         }
         $part->setContent($stringOrHandle);
+
         return $this;
     }
 }
