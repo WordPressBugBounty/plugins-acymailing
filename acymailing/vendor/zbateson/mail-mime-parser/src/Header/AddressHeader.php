@@ -63,7 +63,6 @@ class AddressHeader extends AbstractHeader
                 $this->groups[] = $part;
             }
         }
-
         return $this;
     }
 
@@ -73,7 +72,7 @@ class AddressHeader extends AbstractHeader
      *
      * @return AddressPart[] The addresses.
      */
-    public function getAddresses(): array
+    public function getAddresses() : array
     {
         return $this->addresses;
     }
@@ -83,7 +82,7 @@ class AddressHeader extends AbstractHeader
      *
      * @return AddressGroupPart[]
      */
-    public function getGroups(): array
+    public function getGroups() : array
     {
         return $this->groups;
     }
@@ -94,14 +93,13 @@ class AddressHeader extends AbstractHeader
      * Comparison is done case insensitively.
      *
      */
-    public function hasAddress(string $email): bool
+    public function hasAddress(string $email) : bool
     {
         foreach ($this->addresses as $addr) {
             if (\strcasecmp($addr->getEmail(), $email) === 0) {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -110,7 +108,7 @@ class AddressHeader extends AbstractHeader
      *
      * @return ?string The email address
      */
-    public function getEmail(): ?string
+    public function getEmail() : ?string
     {
         return $this->getValue();
     }
@@ -121,12 +119,11 @@ class AddressHeader extends AbstractHeader
      *
      * @return string|null The person name.
      */
-    public function getPersonName(): ?string
+    public function getPersonName() : ?string
     {
         if (!empty($this->parts)) {
             return $this->parts[0]->getName();
         }
-
         return null;
     }
 }

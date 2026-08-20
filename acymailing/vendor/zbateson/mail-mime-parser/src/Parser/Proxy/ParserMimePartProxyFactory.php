@@ -44,9 +44,9 @@ class ParserMimePartProxyFactory extends ParserPartProxyFactory
     protected $parserPartChildrenContainerFactory;
 
     public function __construct(
-        StreamFactory                      $sdf,
-        PartHeaderContainerFactory         $phcf,
-        ParserPartStreamContainerFactory   $pscf,
+        StreamFactory $sdf,
+        PartHeaderContainerFactory $phcf,
+        ParserPartStreamContainerFactory $pscf,
         ParserPartChildrenContainerFactory $ppccf
     ) {
         $this->streamFactory = $sdf;
@@ -80,7 +80,6 @@ class ParserMimePartProxyFactory extends ParserPartProxyFactory
 
         $streamContainer->setStream($this->streamFactory->newMessagePartStream($part));
         $part->attach($streamContainer);
-
         return $parserProxy;
     }
 }

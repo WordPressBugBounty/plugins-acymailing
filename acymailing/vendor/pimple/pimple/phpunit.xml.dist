@@ -6,13 +6,13 @@
          colors="true"
          bootstrap="vendor/autoload.php"
 >
-	<testsuites>
-		<testsuite name="Pimple Test Suite">
-			<directory>./src/Pimple/Tests</directory>
-		</testsuite>
-	</testsuites>
+    <testsuites>
+        <testsuite name="Pimple Test Suite">
+            <directory>./src/Pimple/Tests</directory>
+        </testsuite>
+    </testsuites>
 
-	<listeners>
-		<listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener"/>
-	</listeners>
+    <listeners>
+        <listener class="Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+    </listeners>
 </phpunit>

@@ -28,9 +28,9 @@ class MimePart extends MultiPart implements IMimePart
     protected $headerContainer;
 
     public function __construct(
-        ?IMimePart             $parent = null,
-        ?PartStreamContainer   $streamContainer = null,
-        ?PartHeaderContainer   $headerContainer = null,
+        ?IMimePart $parent = null,
+        ?PartStreamContainer $streamContainer = null,
+        ?PartHeaderContainer $headerContainer = null,
         ?PartChildrenContainer $partChildrenContainer = null
     ) {
         $setStream = false;
@@ -62,7 +62,7 @@ class MimePart extends MultiPart implements IMimePart
      *
      * @return string|null the file name of the part or null.
      */
-    public function getFilename(): ?string
+    public function getFilename() : ?string
     {
         return $this->getHeaderParameter(
             HeaderConsts::CONTENT_DISPOSITION,
@@ -78,7 +78,7 @@ class MimePart extends MultiPart implements IMimePart
      * Returns true.
      *
      */
-    public function isMime(): bool
+    public function isMime() : bool
     {
         return true;
     }
@@ -86,7 +86,7 @@ class MimePart extends MultiPart implements IMimePart
     public function isMultiPart()
     {
         // casting to bool, preg_match returns 1 for true
-        return (bool)(\preg_match(
+        return (bool) (\preg_match(
             '~multipart/.*~i',
             $this->getContentType()
         ));
@@ -103,7 +103,7 @@ class MimePart extends MultiPart implements IMimePart
      * saving a part's content.
      *
      */
-    public function isTextPart(): bool
+    public function isTextPart() : bool
     {
         return ($this->getCharset() !== null);
     }
@@ -119,11 +119,10 @@ class MimePart extends MultiPart implements IMimePart
      * some cases.
      *
      * @param string $default Optional default value to specify a default other
-     *                        than text/plain if needed.
-     *
+     *        than text/plain if needed.
      * @return string the mime type
      */
-    public function getContentType(string $default = 'text/plain'): ?string
+    public function getContentType(string $default = 'text/plain') : ?string
     {
         return \strtolower($this->getHeaderValue(HeaderConsts::CONTENT_TYPE, $default));
     }
@@ -139,7 +138,7 @@ class MimePart extends MultiPart implements IMimePart
      *
      * @return string|null the charset
      */
-    public function getCharset(): ?string
+    public function getCharset() : ?string
     {
         $charset = $this->getHeaderParameter(HeaderConsts::CONTENT_TYPE, 'charset');
         if ($charset === null || \strcasecmp($charset, 'binary') === 0) {
@@ -147,10 +146,8 @@ class MimePart extends MultiPart implements IMimePart
             if ($contentType === 'text/plain' || $contentType === 'text/html') {
                 return 'ISO-8859-1';
             }
-
             return null;
         }
-
         return \strtoupper($charset);
     }
 
@@ -164,17 +161,15 @@ class MimePart extends MultiPart implements IMimePart
      * something else.
      *
      * @param string $default Optional default value if not set or does not
-     *                        match 'inline' or 'attachment'.
-     *
+     *        match 'inline' or 'attachment'.
      * @return string the content disposition
      */
-    public function getContentDisposition(?string $default = 'inline'): ?string
+    public function getContentDisposition(?string $default = 'inline') : ?string
     {
         $value = $this->getHeaderValue(HeaderConsts::CONTENT_DISPOSITION);
         if ($value === null || !\in_array($value, ['inline', 'attachment'])) {
             return $default;
         }
-
         return \strtolower($value);
     }
 
@@ -190,22 +185,20 @@ class MimePart extends MultiPart implements IMimePart
      * 'uue' and 'uuencode' will return 'x-uuencode' instead.
      *
      * @param string $default Optional default value to return if the header
-     *                        isn't set.
-     *
+     *        isn't set.
      * @return string the content transfer encoding.
      */
-    public function getContentTransferEncoding(?string $default = '7bit'): ?string
+    public function getContentTransferEncoding(?string $default = '7bit') : ?string
     {
         static $translated = [
             'x-uue' => 'x-uuencode',
             'uue' => 'x-uuencode',
-            'uuencode' => 'x-uuencode',
+            'uuencode' => 'x-uuencode'
         ];
         $type = \strtolower($this->getHeaderValue(HeaderConsts::CONTENT_TRANSFER_ENCODING, $default));
         if (isset($translated[$type])) {
             return $translated[$type];
         }
-
         return $type;
     }
 
@@ -216,7 +209,7 @@ class MimePart extends MultiPart implements IMimePart
      *
      * @return string|null the content ID or null if not defined.
      */
-    public function getContentId(): ?string
+    public function getContentId() : ?string
     {
         return $this->getHeaderValue(HeaderConsts::CONTENT_ID);
     }
@@ -232,7 +225,6 @@ class MimePart extends MultiPart implements IMimePart
         if ($this->parent === null || !$this->parent instanceof IMessage) {
             return false;
         }
-
         return $this->parent->getSignaturePart() === $this;
     }
 
@@ -241,7 +233,7 @@ class MimePart extends MultiPart implements IMimePart
         return $this->headerContainer->get($name, $offset);
     }
 
-    public function getHeaderAs(string $name, string $iHeaderClass, int $offset = 0): ?IHeader
+    public function getHeaderAs(string $name, string $iHeaderClass, int $offset = 0) : ?IHeader
     {
         return $this->headerContainer->getAs($name, $iHeaderClass, $offset);
     }
@@ -270,9 +262,8 @@ class MimePart extends MultiPart implements IMimePart
     {
         $header = $this->getHeader($name);
         if ($header !== null) {
-            return $header->getValue() ? : $defaultValue;
+            return $header->getValue() ?: $defaultValue;
         }
-
         return $defaultValue;
     }
 
@@ -282,7 +273,6 @@ class MimePart extends MultiPart implements IMimePart
         if ($obj && $obj instanceof ParameterHeader) {
             return $obj->getValueFor($param, $defaultValue);
         }
-
         return $defaultValue;
     }
 
@@ -293,7 +283,6 @@ class MimePart extends MultiPart implements IMimePart
     {
         $this->headerContainer->set($name, $value, $offset);
         $this->notify();
-
         return $this;
     }
 
@@ -304,7 +293,6 @@ class MimePart extends MultiPart implements IMimePart
     {
         $this->headerContainer->add($name, $value);
         $this->notify();
-
         return $this;
     }
 
@@ -315,7 +303,6 @@ class MimePart extends MultiPart implements IMimePart
     {
         $this->headerContainer->removeAll($name);
         $this->notify();
-
         return $this;
     }
 
@@ -326,7 +313,6 @@ class MimePart extends MultiPart implements IMimePart
     {
         $this->headerContainer->remove($name, $offset);
         $this->notify();
-
         return $this;
     }
 }

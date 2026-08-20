@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -34,7 +34,7 @@ final class MultipartStream implements StreamInterface
      */
     public function __construct(array $elements = [], ?string $boundary = null)
     {
-        $this->boundary = $boundary ? : bin2hex(random_bytes(20));
+        $this->boundary = $boundary ?: bin2hex(random_bytes(20));
         $this->stream = $this->createStream($elements);
     }
 
@@ -135,7 +135,7 @@ final class MultipartStream implements StreamInterface
         $length = self::getHeader($headers, 'content-length');
         if (!$length) {
             if ($length = $stream->getSize()) {
-                $headers['Content-Length'] = (string)$length;
+                $headers['Content-Length'] = (string) $length;
             }
         }
 
@@ -155,7 +155,7 @@ final class MultipartStream implements StreamInterface
     {
         $lowercaseHeader = strtolower($key);
         foreach ($headers as $k => $v) {
-            if (strtolower((string)$k) === $lowercaseHeader) {
+            if (strtolower((string) $k) === $lowercaseHeader) {
                 return $v;
             }
         }

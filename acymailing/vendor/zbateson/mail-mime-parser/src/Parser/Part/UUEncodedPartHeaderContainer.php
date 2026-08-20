@@ -32,7 +32,7 @@ class UUEncodedPartHeaderContainer extends PartHeaderContainer
      * Returns the file mode included in the uuencoded 'begin' line for this
      * part.
      */
-    public function getUnixFileMode(): ?int
+    public function getUnixFileMode() : ?int
     {
         return $this->mode;
     }
@@ -45,7 +45,6 @@ class UUEncodedPartHeaderContainer extends PartHeaderContainer
     public function setUnixFileMode(int $mode)
     {
         $this->mode = $mode;
-
         return $this;
     }
 
@@ -55,7 +54,7 @@ class UUEncodedPartHeaderContainer extends PartHeaderContainer
      *
      * @return string
      */
-    public function getFilename(): ?string
+    public function getFilename() : ?string
     {
         return $this->filename;
     }
@@ -68,7 +67,6 @@ class UUEncodedPartHeaderContainer extends PartHeaderContainer
     public function setFilename(string $filename)
     {
         $this->filename = $filename;
-
         return $this;
     }
 }

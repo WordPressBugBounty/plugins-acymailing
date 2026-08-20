@@ -37,12 +37,12 @@ class ParserMessageProxyFactory extends ParserMimePartProxyFactory
     protected $privacyHelper;
 
     public function __construct(
-        StreamFactory                      $sdf,
-        PartHeaderContainerFactory         $phcf,
-        ParserPartStreamContainerFactory   $pscf,
+        StreamFactory $sdf,
+        PartHeaderContainerFactory $phcf,
+        ParserPartStreamContainerFactory $pscf,
         ParserPartChildrenContainerFactory $ppccf,
-        MultipartHelper                    $multipartHelper,
-        PrivacyHelper                      $privacyHelper
+        MultipartHelper $multipartHelper,
+        PrivacyHelper $privacyHelper
     ) {
         parent::__construct($sdf, $phcf, $pscf, $ppccf);
         $this->multipartHelper = $multipartHelper;
@@ -74,7 +74,6 @@ class ParserMessageProxyFactory extends ParserMimePartProxyFactory
 
         $streamContainer->setStream($this->streamFactory->newMessagePartStream($message));
         $message->attach($streamContainer);
-
         return $parserProxy;
     }
 }

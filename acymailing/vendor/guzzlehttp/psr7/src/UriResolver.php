@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -11,7 +11,7 @@ use Psr\Http\Message\UriInterface;
  *
  * @author Tobias Schultze
  *
- * @see    https://datatracker.ietf.org/doc/html/rfc3986#section-5
+ * @see https://datatracker.ietf.org/doc/html/rfc3986#section-5
  */
 final class UriResolver
 {
@@ -57,7 +57,7 @@ final class UriResolver
      */
     public static function resolve(UriInterface $base, UriInterface $rel): UriInterface
     {
-        if ((string)$rel === '') {
+        if ((string) $rel === '') {
             // we can simply return the same base URI instance for this same-document reference
             return $base;
         }
@@ -95,15 +95,13 @@ final class UriResolver
             }
         }
 
-        return new Uri(
-            Uri::composeComponents(
-                $base->getScheme(),
-                $targetAuthority,
-                $targetPath,
-                $targetQuery,
-                $rel->getFragment()
-            )
-        );
+        return new Uri(Uri::composeComponents(
+            $base->getScheme(),
+            $targetAuthority,
+            $targetPath,
+            $targetQuery,
+            $rel->getFragment()
+        ));
     }
 
     /**

@@ -37,8 +37,8 @@ use ZBateson\MailMimeParser\Header\Part\CommentPart;
  * pattern will be considered comments, and will be returned as a separate
  * CommentPart.
  *
- * @see    https://tools.ietf.org/html/rfc5321#section-4.4
- * @see    https://github.com/Te-k/pyreceived/blob/master/test.py
+ * @see https://tools.ietf.org/html/rfc5321#section-4.4
+ * @see https://github.com/Te-k/pyreceived/blob/master/test.py
  * @author Zaahid Bateson
  * @author Mariusz Krzaczkowski
  */
@@ -47,12 +47,11 @@ class DomainConsumer extends GenericReceivedConsumer
     /**
      * Overridden to return true if the passed token is a closing parenthesis.
      */
-    protected function isEndToken(string $token): bool
+    protected function isEndToken(string $token) : bool
     {
         if ($token === ')') {
             return true;
         }
-
         return parent::isEndToken($token);
     }
 
@@ -64,7 +63,7 @@ class DomainConsumer extends GenericReceivedConsumer
      * @param string $hostname
      * @param string $address
      */
-    private function matchHostPart(string $value, ?string &$hostname, ?string &$address): bool
+    private function matchHostPart(string $value, ?string &$hostname, ?string &$address) : bool
     {
         $matches = [];
         $pattern = '~^(\[(IPv[64])?(?P<addr1>[a-f\d\.\:]+)\])?\s*(helo=)?(?P<name>[a-z0-9\-]+[a-z0-9\-\.]+)?\s*(\[(IPv[64])?(?P<addr2>[a-f\d\.\:]+)\])?$~i';
@@ -78,10 +77,8 @@ class DomainConsumer extends GenericReceivedConsumer
             if (!empty($matches['addr2'])) {
                 $address = $matches['addr2'];
             }
-
             return true;
         }
-
         return false;
     }
 
@@ -91,10 +88,9 @@ class DomainConsumer extends GenericReceivedConsumer
      * CommentPart.
      *
      * @param \ZBateson\MailMimeParser\Header\Part\HeaderPart[] $parts
-     *
      * @return \ZBateson\MailMimeParser\Header\Part\ReceivedDomainPart[]|\ZBateson\MailMimeParser\Header\Part\CommentPart[]|\ZBateson\MailMimeParser\Header\Part\HeaderPart[]
      */
-    protected function processParts(array $parts): array
+    protected function processParts(array $parts) : array
     {
         $ehloName = null;
         $hostname = null;
@@ -112,7 +108,7 @@ class DomainConsumer extends GenericReceivedConsumer
 
         $strValue = $ehloName;
         if ($commentPart !== null && $this->matchHostPart($commentPart->getComment(), $hostname, $address)) {
-            $strValue .= ' ('.$commentPart->getComment().')';
+            $strValue .= ' (' . $commentPart->getComment() . ')';
             $commentPart = null;
         }
 
@@ -123,7 +119,6 @@ class DomainConsumer extends GenericReceivedConsumer
             $hostname,
             $address
         );
-
         return \array_filter([$domainPart, $commentPart]);
     }
 }

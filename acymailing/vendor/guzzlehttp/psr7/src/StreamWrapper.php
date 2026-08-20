@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -40,10 +40,8 @@ final class StreamWrapper
         } elseif ($stream->isWritable()) {
             $mode = 'w';
         } else {
-            throw new \InvalidArgumentException(
-                'The stream must be readable, '
-                .'writable, or both.'
-            );
+            throw new \InvalidArgumentException('The stream must be readable, '
+                .'writable, or both.');
         }
 
         return fopen('guzzle://stream', $mode, false, self::createStreamContext($stream));
@@ -162,7 +160,7 @@ final class StreamWrapper
             'uid' => 0,
             'gid' => 0,
             'rdev' => 0,
-            'size' => $this->stream->getSize() ? : 0,
+            'size' => $this->stream->getSize() ?: 0,
             'atime' => 0,
             'mtime' => 0,
             'ctime' => 0,

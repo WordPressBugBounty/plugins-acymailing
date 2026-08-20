@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -34,9 +34,9 @@ class Request implements RequestInterface
      */
     public function __construct(
         string $method,
-               $uri,
-        array  $headers = [],
-               $body = null,
+        $uri,
+        array $headers = [],
+        $body = null,
         string $version = '1.1'
     ) {
         $this->assertMethod($method);

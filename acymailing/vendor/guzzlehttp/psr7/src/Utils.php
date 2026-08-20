@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -21,11 +21,11 @@ final class Utils
         $result = [];
 
         foreach ($keys as &$key) {
-            $key = strtolower((string)$key);
+            $key = strtolower((string) $key);
         }
 
         foreach ($data as $k => $v) {
-            if (!in_array(strtolower((string)$k), $keys)) {
+            if (!in_array(strtolower((string) $k), $keys)) {
                 $result[$k] = $v;
             }
         }
@@ -204,10 +204,10 @@ final class Utils
                 $changes['version'] ?? $request->getProtocolVersion(),
                 $request->getServerParams()
             ))
-                ->withParsedBody($request->getParsedBody())
-                ->withQueryParams($request->getQueryParams())
-                ->withCookieParams($request->getCookieParams())
-                ->withUploadedFiles($request->getUploadedFiles());
+            ->withParsedBody($request->getParsedBody())
+            ->withQueryParams($request->getQueryParams())
+            ->withCookieParams($request->getCookieParams())
+            ->withUploadedFiles($request->getUploadedFiles());
 
             foreach ($request->getAttributes() as $key => $value) {
                 $new = $new->withAttribute($key, $value);
@@ -303,7 +303,7 @@ final class Utils
         if (is_scalar($resource)) {
             $stream = self::tryFopen('php://temp', 'r+');
             if ($resource !== '') {
-                fwrite($stream, (string)$resource);
+                fwrite($stream, (string) $resource);
                 fseek($stream, 0);
             }
 
@@ -341,7 +341,7 @@ final class Utils
                         return $result;
                     }, $options);
                 } elseif (method_exists($resource, '__toString')) {
-                    return self::streamFor((string)$resource, $options);
+                    return self::streamFor((string) $resource, $options);
                 }
                 break;
             case 'NULL':
@@ -372,14 +372,12 @@ final class Utils
     {
         $ex = null;
         set_error_handler(static function (int $errno, string $errstr) use ($filename, $mode, &$ex): bool {
-            $ex = new \RuntimeException(
-                sprintf(
-                    'Unable to open "%s" using mode "%s": %s',
-                    $filename,
-                    $mode,
-                    $errstr
-                )
-            );
+            $ex = new \RuntimeException(sprintf(
+                'Unable to open "%s" using mode "%s": %s',
+                $filename,
+                $mode,
+                $errstr
+            ));
 
             return true;
         });
@@ -388,14 +386,12 @@ final class Utils
             /** @var resource $handle */
             $handle = fopen($filename, $mode);
         } catch (\Throwable $e) {
-            $ex = new \RuntimeException(
-                sprintf(
-                    'Unable to open "%s" using mode "%s": %s',
-                    $filename,
-                    $mode,
-                    $e->getMessage()
-                ), 0, $e
-            );
+            $ex = new \RuntimeException(sprintf(
+                'Unable to open "%s" using mode "%s": %s',
+                $filename,
+                $mode,
+                $e->getMessage()
+            ), 0, $e);
         }
 
         restore_error_handler();
@@ -423,12 +419,10 @@ final class Utils
     {
         $ex = null;
         set_error_handler(static function (int $errno, string $errstr) use (&$ex): bool {
-            $ex = new \RuntimeException(
-                sprintf(
-                    'Unable to read stream contents: %s',
-                    $errstr
-                )
-            );
+            $ex = new \RuntimeException(sprintf(
+                'Unable to read stream contents: %s',
+                $errstr
+            ));
 
             return true;
         });
@@ -441,12 +435,10 @@ final class Utils
                 $ex = new \RuntimeException('Unable to read stream contents');
             }
         } catch (\Throwable $e) {
-            $ex = new \RuntimeException(
-                sprintf(
-                    'Unable to read stream contents: %s',
-                    $e->getMessage()
-                ), 0, $e
-            );
+            $ex = new \RuntimeException(sprintf(
+                'Unable to read stream contents: %s',
+                $e->getMessage()
+            ), 0, $e);
         }
 
         restore_error_handler();

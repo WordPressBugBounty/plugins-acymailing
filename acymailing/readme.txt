@@ -2,8 +2,8 @@
 Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.8
-Tested up to: 7.0
-Stable tag: 11.0.3
+Tested up to: 7.1
+Stable tag: 11.0.4
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -116,12 +116,9 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 11.0.3 - August 11, 2026 =
-* The REST API now returns an error message when trying to create a campaign with unallowed lists.
+= 11.0.4 - August 20, 2026 =
+* A security has been added on the bounce messages handling to slightly improve performance.
 
-* An issue that could occur in the automation conditions that could prevent adding new conditions in some cases has been fixed.
-* Clicking the download button on a file custom field doesn't open the file selection popup anymore.
-* We fixed an error that could occur on the send settings of a campaign.
-* The new attachments can now correctly be opened when sending an email and not embedding files. Re-uploading recent attachments or fixing their access rights to 644 will be necessary.
+* Pie charts have been fixed on the statistics page.
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)

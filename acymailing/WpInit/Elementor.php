@@ -20,7 +20,7 @@ class Elementor
             'select2lib',
             ACYM_JS.'libraries/select2-full.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'libraries'.DS.'select2-full.min.js'),
             ['jquery'],
-            '11.0.3',
+            '11.0.4',
             [
                 'in_footer' => false,
             ]
@@ -29,7 +29,7 @@ class Elementor
             'acym_script_widget_article_elementor',
             ACYM_JS.'widget.min.js?v='.time(),
             ['jquery', 'select2lib'],
-            '11.0.3',
+            '11.0.4',
             [
                 'in_footer' => true,
             ]
@@ -44,7 +44,7 @@ class Elementor
             'acymailing-compatibility-elementor',
             ACYM_JS.'libraries/elementor.min.js',
             [],
-            '11.0.3',
+            '11.0.4',
             [
                 'in_footer' => true,
             ]
@@ -53,7 +53,7 @@ class Elementor
             'acym_style_widget_article_elementor',
             ACYM_CSS.'libraries/elementor.min.css?v='.time(),
             [],
-            '11.0.3',
+            '11.0.4',
             [
                 'in_footer' => true,
             ]

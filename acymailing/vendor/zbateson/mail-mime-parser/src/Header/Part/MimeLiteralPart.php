@@ -61,8 +61,8 @@ class MimeLiteralPart extends LiteralPart
         $this->value = $this->decodeMime($token);
         // preg_match returns int
         $pattern = self::MIME_PART_PATTERN;
-        $this->canIgnoreSpacesBefore = (bool)\preg_match("/^\s*{$pattern}/", $token);
-        $this->canIgnoreSpacesAfter = (bool)\preg_match("/{$pattern}\s*\$/", $token);
+        $this->canIgnoreSpacesBefore = (bool) \preg_match("/^\s*{$pattern}/", $token);
+        $this->canIgnoreSpacesAfter = (bool) \preg_match("/{$pattern}\s*\$/", $token);
     }
 
     /**
@@ -73,7 +73,7 @@ class MimeLiteralPart extends LiteralPart
      * or converts the encoding on the text part by calling convertEncoding.
      *
      */
-    protected function decodeMime(string $value): string
+    protected function decodeMime(string $value) : string
     {
         $pattern = self::MIME_PART_PATTERN;
         // remove whitespace between two adjacent mime encoded parts
@@ -84,7 +84,6 @@ class MimeLiteralPart extends LiteralPart
         foreach ($aMimeParts as $entity) {
             $ret .= $this->decodeSplitPart($entity);
         }
-
         return $ret;
     }
 
@@ -94,7 +93,7 @@ class MimeLiteralPart extends LiteralPart
      *
      * @param string[] $matches
      */
-    private function decodeMatchedEntity(array $matches): string
+    private function decodeMatchedEntity(array $matches) : string
     {
         $body = $matches[4];
         if (\strtoupper($matches[3]) === 'Q') {
@@ -105,7 +104,6 @@ class MimeLiteralPart extends LiteralPart
         $language = $matches[2];
         $decoded = $this->convertEncoding($body, $matches[1], true);
         $this->addToLanguage($decoded, $language);
-
         return $decoded;
     }
 
@@ -120,14 +118,13 @@ class MimeLiteralPart extends LiteralPart
      * way to go to support the most charsets.
      *
      */
-    private function decodeSplitPart(string $entity): string
+    private function decodeSplitPart(string $entity) : string
     {
         if (\preg_match('/^=\?([A-Za-z\-_0-9]+)\*?([A-Za-z\-_0-9]+)?\?([QBqb])\?([^\?]*)\?=$/', $entity, $matches)) {
             return $this->decodeMatchedEntity($matches);
         }
         $decoded = $this->convertEncoding($entity);
         $this->addToLanguage($decoded);
-
         return $decoded;
     }
 
@@ -138,7 +135,7 @@ class MimeLiteralPart extends LiteralPart
      * constructor.
      *
      */
-    public function ignoreSpacesBefore(): bool
+    public function ignoreSpacesBefore() : bool
     {
         return $this->canIgnoreSpacesBefore;
     }
@@ -150,7 +147,7 @@ class MimeLiteralPart extends LiteralPart
      * constructor.
      *
      */
-    public function ignoreSpacesAfter(): bool
+    public function ignoreSpacesAfter() : bool
     {
         return $this->canIgnoreSpacesAfter;
     }
@@ -158,13 +155,12 @@ class MimeLiteralPart extends LiteralPart
     /**
      * Adds the passed part into the languages array with the given language.
      */
-    protected function addToLanguage(string $part, ?string $language = null): self
+    protected function addToLanguage(string $part, ?string $language = null) : self
     {
         $this->languages[] = [
             'lang' => $language,
-            'value' => $part,
+            'value' => $part
         ];
-
         return $this;
     }
 

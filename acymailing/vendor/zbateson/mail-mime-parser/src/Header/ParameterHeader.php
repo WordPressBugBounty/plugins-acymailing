@@ -64,7 +64,6 @@ class ParameterHeader extends AbstractHeader
                 $this->parameters[\strtolower($part->getName())] = $part;
             }
         }
-
         return $this;
     }
 
@@ -73,7 +72,7 @@ class ParameterHeader extends AbstractHeader
      *
      * @param string $name The parameter to look up.
      */
-    public function hasParameter(string $name): bool
+    public function hasParameter(string $name) : bool
     {
         return isset($this->parameters[\strtolower($name)]);
     }
@@ -82,18 +81,16 @@ class ParameterHeader extends AbstractHeader
      * Returns the value of the parameter with the given name, or $defaultValue
      * if not set.
      *
-     * @param string $name         The parameter to retrieve.
+     * @param string $name The parameter to retrieve.
      * @param string $defaultValue Optional default value (defaulting to null if
-     *                             not provided).
-     *
+     *        not provided).
      * @return string|null The parameter's value.
      */
-    public function getValueFor(string $name, ?string $defaultValue = null): ?string
+    public function getValueFor(string $name, ?string $defaultValue = null) : ?string
     {
         if (!$this->hasParameter($name)) {
             return $defaultValue;
         }
-
         return $this->parameters[\strtolower($name)]->getValue();
     }
 }

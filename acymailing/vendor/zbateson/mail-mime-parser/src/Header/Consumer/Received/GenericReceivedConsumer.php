@@ -61,7 +61,7 @@ class GenericReceivedConsumer extends GenericConsumer
      * actual string that started the consumer, which could be in any case.
      *
      */
-    protected function getPartName(): string
+    protected function getPartName() : string
     {
         return $this->partName;
     }
@@ -71,7 +71,7 @@ class GenericReceivedConsumer extends GenericConsumer
      *
      * @return \ZBateson\MailMimeParser\Header\Consumer\AbstractConsumer[] the sub-consumers
      */
-    protected function getSubConsumers(): array
+    protected function getSubConsumers() : array
     {
         return [$this->consumerService->getCommentConsumer()];
     }
@@ -80,10 +80,9 @@ class GenericReceivedConsumer extends GenericConsumer
      * Returns true if the passed token matches (case-insensitively)
      * $this->getPartName() with optional whitespace surrounding it.
      */
-    protected function isStartToken(string $token): bool
+    protected function isStartToken(string $token) : bool
     {
-        $pattern = '/^'.\preg_quote($this->getPartName(), '/').'$/i';
-
+        $pattern = '/^' . \preg_quote($this->getPartName(), '/') . '$/i';
         return (\preg_match($pattern, $token) === 1);
     }
 
@@ -98,7 +97,7 @@ class GenericReceivedConsumer extends GenericConsumer
      * o for
      * o ;
      */
-    protected function isEndToken(string $token): bool
+    protected function isEndToken(string $token) : bool
     {
         return (\preg_match('/^(by|via|with|id|for|;)$/i', $token) === 1);
     }
@@ -110,11 +109,11 @@ class GenericReceivedConsumer extends GenericConsumer
      *
      * @return string[] an array of regex pattern matchers
      */
-    protected function getTokenSeparators(): array
+    protected function getTokenSeparators() : array
     {
         return [
             '\s+',
-            '(\A\s*|\s+)(?i)'.\preg_quote($this->getPartName(), '/').'(?-i)(?=\s+)',
+            '(\A\s*|\s+)(?i)' . \preg_quote($this->getPartName(), '/') . '(?-i)(?=\s+)'
         ];
     }
 
@@ -124,10 +123,9 @@ class GenericReceivedConsumer extends GenericConsumer
      * elements.
      *
      * @param \ZBateson\MailMimeParser\Header\Part\HeaderPart[] $parts
-     *
      * @return \ZBateson\MailMimeParser\Header\Part\HeaderPart[]|\ZBateson\MailMimeParser\Header\Part\CommentPart[]
      */
-    protected function processParts(array $parts): array
+    protected function processParts(array $parts) : array
     {
         $strValue = '';
         $ret = [];
@@ -140,7 +138,6 @@ class GenericReceivedConsumer extends GenericConsumer
             $strValue .= $part->getValue();
         }
         \array_unshift($ret, $this->partFactory->newReceivedPart($this->getPartName(), $strValue));
-
         return $ret;
     }
 }

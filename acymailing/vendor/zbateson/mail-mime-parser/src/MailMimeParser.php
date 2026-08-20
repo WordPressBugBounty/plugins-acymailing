@@ -128,11 +128,10 @@ class MailMimeParser
      * destroyed.
      *
      * @param resource|StreamInterface|string $resource The resource handle to
-     *                                                  the input stream of the mime message, or a string containing a
-     *                                                  mime message.
-     * @param bool                            $attached pass true to have it attached to the returned
-     *                                                  IMessage and destroyed with it.
-     *
+     *        the input stream of the mime message, or a string containing a
+     *        mime message.
+     * @param bool $attached pass true to have it attached to the returned
+     *        IMessage and destroyed with it.
      * @return \ZBateson\MailMimeParser\IMessage
      */
     public function parse($resource, $attached)
@@ -144,7 +143,6 @@ class MailMimeParser
         if (!$stream->isSeekable()) {
             $stream = new CachingStream($stream);
         }
-
         return $this->messageParser->parse($stream);
     }
 }

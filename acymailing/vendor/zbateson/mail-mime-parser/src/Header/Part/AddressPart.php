@@ -46,7 +46,7 @@ class AddressPart extends ParameterPart
      *
      * @return string The email address.
      */
-    public function getEmail(): string
+    public function getEmail() : string
     {
         return $this->value;
     }

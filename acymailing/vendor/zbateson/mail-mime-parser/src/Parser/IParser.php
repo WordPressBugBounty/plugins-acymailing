@@ -31,7 +31,7 @@ interface IParser
      * Called by the ParserManager to determine if the passed PartBuilder is a
      * part handled by this IParser.
      */
-    public function canParse(PartBuilder $part): bool;
+    public function canParse(PartBuilder $part) : bool;
 
     /**
      * Returns the ParserPartProxyFactory responsible for creating IMessage

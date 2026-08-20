@@ -29,7 +29,7 @@ class AddressEmailConsumer extends AbstractConsumer
      *
      * @return AbstractConsumer[] the sub-consumers
      */
-    protected function getSubConsumers(): array
+    protected function getSubConsumers() : array
     {
         return [
             $this->consumerService->getCommentConsumer(),
@@ -43,7 +43,7 @@ class AddressEmailConsumer extends AbstractConsumer
      *
      * @return string[] the patterns
      */
-    public function getTokenSeparators(): array
+    public function getTokenSeparators() : array
     {
         return ['<', '>'];
     }
@@ -51,7 +51,7 @@ class AddressEmailConsumer extends AbstractConsumer
     /**
      * Returns true for the '>' char.
      */
-    protected function isEndToken(string $token): bool
+    protected function isEndToken(string $token) : bool
     {
         return ($token === '>');
     }
@@ -59,7 +59,7 @@ class AddressEmailConsumer extends AbstractConsumer
     /**
      * Returns true for the '<' char.
      */
-    protected function isStartToken(string $token): bool
+    protected function isStartToken(string $token) : bool
     {
         return ($token === '<');
     }
@@ -70,22 +70,20 @@ class AddressEmailConsumer extends AbstractConsumer
      * name and email set.
      *
      * @param \ZBateson\MailMimeParser\Header\IHeaderPart[] $parts
-     *
      * @return \ZBateson\MailMimeParser\Header\IHeaderPart[]|array
      */
-    protected function processParts(array $parts): array
+    protected function processParts(array $parts) : array
     {
         $strEmail = '';
         foreach ($parts as $p) {
             $val = $p->getValue();
             if ((($p instanceof LiteralPart) && !($p instanceof CommentPart)) && $val !== '') {
-                $val = '"'.\preg_replace('/(["\\\])/', '\\\$1', $val).'"';
+                $val = '"' . \preg_replace('/(["\\\])/', '\\\$1', $val) . '"';
             } else {
                 $val = \preg_replace('/\s+/', '', $val);
             }
             $strEmail .= $val;
         }
-
         return [$this->partFactory->newAddressPart('', $strEmail)];
     }
 }

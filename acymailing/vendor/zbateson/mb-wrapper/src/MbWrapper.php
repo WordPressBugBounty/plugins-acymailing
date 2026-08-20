@@ -312,7 +312,6 @@ class MbWrapper
      * characters before being returned.
      *
      * @param string|string[] $charset
-     *
      * @return string|string[]
      */
     private function getNormalizedCharset($charset)
@@ -323,7 +322,6 @@ class MbWrapper
         } else {
             $upper = \strtoupper($charset);
         }
-
         return \preg_replace('/[^A-Z0-9]+/', '', $upper);
     }
 
@@ -336,7 +334,7 @@ class MbWrapper
      * supported, a blank string is returned.
      *
      */
-    public function convert(string $str, string $fromCharset, string $toCharset): string
+    public function convert(string $str, string $fromCharset, string $toCharset) : string
     {
         // there may be some mb-supported encodings not supported by iconv (on my libiconv for instance
         // HZ isn't supported), and so it may happen that failing an mb_convert_encoding, an iconv
@@ -349,23 +347,19 @@ class MbWrapper
         if ($str !== '') {
             if ($from !== false && $to === false) {
                 $str = \mb_convert_encoding($str, 'UTF-8', $from);
-
-                return \iconv('UTF-8', $this->getIconvAlias($toCharset).'//TRANSLIT//IGNORE', $str);
+                return \iconv('UTF-8', $this->getIconvAlias($toCharset) . '//TRANSLIT//IGNORE', $str);
             } elseif ($from === false && $to !== false) {
                 $str = \iconv($this->getIconvAlias($fromCharset), 'UTF-8//TRANSLIT//IGNORE', $str);
-
                 return \mb_convert_encoding($str, $to, 'UTF-8');
             } elseif ($from !== false && $to !== false) {
                 return \mb_convert_encoding($str, $to, $from);
             }
-
             return \iconv(
                 $this->getIconvAlias($fromCharset),
-                $this->getIconvAlias($toCharset).'//TRANSLIT//IGNORE',
+                $this->getIconvAlias($toCharset) . '//TRANSLIT//IGNORE',
                 $str
             );
         }
-
         return $str;
     }
 
@@ -375,14 +369,13 @@ class MbWrapper
      * Either uses mb_check_encoding, or iconv if it's not a supported mb
      * encoding.
      */
-    public function checkEncoding(string $str, string $charset): bool
+    public function checkEncoding(string $str, string $charset) : bool
     {
         $mb = $this->getMbCharset($charset);
         if ($mb !== false) {
             return \mb_check_encoding($str, $mb);
         }
         $ic = $this->getIconvAlias($charset);
-
         return (@\iconv($ic, $ic, $str) !== false);
     }
 
@@ -390,21 +383,20 @@ class MbWrapper
      * Uses either mb_strlen or iconv_strlen to return the number of characters
      * in the passed $str for the given $charset
      */
-    public function getLength(string $str, string $charset): int
+    public function getLength(string $str, string $charset) : int
     {
         $mb = $this->getMbCharset($charset);
         if ($mb !== false) {
             return \mb_strlen($str, $mb);
         }
-
-        return \iconv_strlen($str, $this->getIconvAlias($charset).'//TRANSLIT//IGNORE');
+        return \iconv_strlen($str, $this->getIconvAlias($charset) . '//TRANSLIT//IGNORE');
     }
 
     /**
      * Uses either mb_substr or iconv_substr to create and return a substring of
      * the passed $str.
      */
-    public function getSubstr(string $str, string $charset, int $start, ?int $length = null): string
+    public function getSubstr(string $str, string $charset, int $start, ?int $length = null) : string
     {
         $mb = $this->getMbCharset($charset);
         if ($mb !== false) {
@@ -415,14 +407,12 @@ class MbWrapper
             // iconv_substr fails with CP1258 for some reason, and returns only
             // a subset of characters (e.g. the first 5, instead of $length)
             $str = $this->convert($str, $ic, 'UTF-8');
-
             return $this->convert($this->getSubstr($str, 'UTF-8', $start, $length), 'UTF-8', $ic);
         }
         if ($length === null) {
-            $length = \iconv_strlen($str, $ic.'//TRANSLIT//IGNORE');
+            $length = \iconv_strlen($str, $ic . '//TRANSLIT//IGNORE');
         }
-
-        return \iconv_substr($str, $start, $length, $ic.'//TRANSLIT//IGNORE');
+        return \iconv_substr($str, $start, $length, $ic . '//TRANSLIT//IGNORE');
     }
 
     /**
@@ -443,7 +433,6 @@ class MbWrapper
         } elseif (\array_key_exists($normalized, self::$mbAliases)) {
             return self::$mbAliases[$normalized];
         }
-
         return false;
     }
 
@@ -453,13 +442,12 @@ class MbWrapper
      *
      * @return string the mapped charset (if mapped) or $cs otherwise
      */
-    private function getIconvAlias(string $cs): string
+    private function getIconvAlias(string $cs) : string
     {
         $normalized = $this->getNormalizedCharset($cs);
         if (\array_key_exists($normalized, self::$iconvAliases)) {
             return static::$iconvAliases[$normalized];
         }
-
         return $cs;
     }
 }

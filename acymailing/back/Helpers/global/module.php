@@ -93,14 +93,14 @@ function acym_initModule(?object $params = null, array $options = []): void
                 'style_email_spellchecker',
                 ACYM_CSS.'libraries/email-misspelled.min.css?v='.$version,
                 [],
-                '11.0.3'
+                '11.0.4'
             );
         }
         wp_enqueue_style(
             'style_acymailing_module',
             ACYM_CSS.'module.min.css?v='.$version,
             [],
-            '11.0.3'
+            '11.0.4'
         );
     } else {
         if ($spellChecker) acym_addStyle(false, ACYM_CSS.'libraries/email-misspelled.min.css?v='.$version);

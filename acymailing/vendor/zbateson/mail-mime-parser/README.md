@@ -38,12 +38,11 @@ As of mail-mime-parser 2.3.0, support for php 5.4, 5.5, 5.6 and 7.0 has been dro
 
 ## Change in 2.0
 
-Upgrade to 2.0 to take advantage of the new on-demand parser which parses parts of a message as they're requested. This means reading only the headers from a larger message is as fast as a smaller message because the whole message is no longer parsed (similarly reading just the content and not a message's large attachments is also much faster.)
+Upgrade to 2.0 to take advantage of the new on-demand parser which parses parts of a message as they're requested.  This means reading only the headers from a larger message is as fast as a smaller message because the whole message is no longer parsed (similarly reading just the content and not a message's large attachments is also much faster.)
 
 Because of the on-demand parsing, starting in 2.0, the passed resource handle or stream must remain open while the returned message object is still in use.
 
 Old code:
-
 ```php
 $handle = fopen('file.mime', 'r');
 $message = $mailParser->parse($handle);         // returned `Message`
@@ -51,7 +50,6 @@ fclose($handle);
 ```
 
 New code:
-
 ```php
 // attaches the resource handle to the returned `IMessage` if the second parameter
 // is true.  The resource handle is closed when the IMessage is destroyed.
@@ -62,7 +60,7 @@ For a more complete list of changes, please visit the [2.0 Upgrade Guide](https:
 
 ## Requirements
 
-MailMimeParser requires PHP 7.1 or newer. Tested on PHP 7.1, 7.2, 7.3, 7.4, 8.0, 8.1 and 8.2.
+MailMimeParser requires PHP 7.1 or newer.  Tested on PHP 7.1, 7.2, 7.3, 7.4, 8.0, 8.1 and 8.2.
 
 ## Usage
 

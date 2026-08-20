@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -16,21 +16,9 @@ use Psr\Http\Message\StreamInterface;
 final class FnStream implements StreamInterface
 {
     private const SLOTS = [
-        '__toString',
-        'close',
-        'detach',
-        'rewind',
-        'getSize',
-        'tell',
-        'eof',
-        'isSeekable',
-        'seek',
-        'isWritable',
-        'write',
-        'isReadable',
-        'read',
-        'getContents',
-        'getMetadata',
+        '__toString', 'close', 'detach', 'rewind',
+        'getSize', 'tell', 'eof', 'isSeekable', 'seek', 'isWritable', 'write',
+        'isReadable', 'read', 'getContents', 'getMetadata',
     ];
 
     /** @var array<string, callable> */
@@ -56,10 +44,8 @@ final class FnStream implements StreamInterface
      */
     public function __get(string $name): void
     {
-        throw new \BadMethodCallException(
-            str_replace('_fn_', '', $name)
-            .'() is not implemented in the FnStream'
-        );
+        throw new \BadMethodCallException(str_replace('_fn_', '', $name)
+            .'() is not implemented in the FnStream');
     }
 
     /**
@@ -113,7 +99,7 @@ final class FnStream implements StreamInterface
             if (\PHP_VERSION_ID >= 70400) {
                 throw $e;
             }
-            trigger_error(sprintf('%s::__toString exception: %s', self::class, (string)$e), E_USER_ERROR);
+            trigger_error(sprintf('%s::__toString exception: %s', self::class, (string) $e), E_USER_ERROR);
 
             return '';
         }

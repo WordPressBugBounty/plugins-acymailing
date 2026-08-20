@@ -28,12 +28,12 @@ class IdBaseConsumer extends AbstractConsumer
      *
      * @return AbstractConsumer[] the sub-consumers
      */
-    protected function getSubConsumers(): array
+    protected function getSubConsumers() : array
     {
         return [
             $this->consumerService->getCommentConsumer(),
             $this->consumerService->getQuotedStringConsumer(),
-            $this->consumerService->getIdConsumer(),
+            $this->consumerService->getIdConsumer()
         ];
     }
 
@@ -42,7 +42,7 @@ class IdBaseConsumer extends AbstractConsumer
      *
      * @return string[] an array of regex pattern matchers.
      */
-    protected function getTokenSeparators(): array
+    protected function getTokenSeparators() : array
     {
         return ['\s+'];
     }
@@ -51,7 +51,7 @@ class IdBaseConsumer extends AbstractConsumer
      * IdBaseConsumer doesn't have start/end tokens, and so always returns
      * false.
      */
-    protected function isEndToken(string $token): bool
+    protected function isEndToken(string $token) : bool
     {
         return false;
     }
@@ -62,7 +62,7 @@ class IdBaseConsumer extends AbstractConsumer
      *
      * @codeCoverageIgnore
      */
-    protected function isStartToken(string $token): bool
+    protected function isStartToken(string $token) : bool
     {
         return false;
     }
@@ -70,10 +70,9 @@ class IdBaseConsumer extends AbstractConsumer
     /**
      * Returns null for whitespace, and LiteralPart for anything else.
      *
-     * @param string $token     the token
-     * @param bool   $isLiteral set to true if the token represents a literal -
-     *                          e.g. an escaped token
-     *
+     * @param string $token the token
+     * @param bool $isLiteral set to true if the token represents a literal -
+     *        e.g. an escaped token
      * @return \ZBateson\MailMimeParser\Header\IHeaderPart|null the constructed
      *         header part or null if the token should be ignored
      */
@@ -82,7 +81,6 @@ class IdBaseConsumer extends AbstractConsumer
         if (\preg_match('/^\s+$/', $token)) {
             return null;
         }
-
         return $this->partFactory->newLiteralPart($token);
     }
 
@@ -90,12 +88,11 @@ class IdBaseConsumer extends AbstractConsumer
      * Overridden to filter out any found CommentPart objects.
      *
      * @param \ZBateson\MailMimeParser\Header\IHeaderPart[] $parts
-     *
      * @return \ZBateson\MailMimeParser\Header\IHeaderPart[]
      */
-    protected function processParts(array $parts): array
+    protected function processParts(array $parts) : array
     {
-        return \array_values(\array_filter($parts, function ($part) {
+        return \array_values(\array_filter($parts, function($part) {
             return !(empty($part) || $part instanceof CommentPart);
         }));
     }

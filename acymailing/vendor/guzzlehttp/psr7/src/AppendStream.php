@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -46,7 +46,7 @@ final class AppendStream implements StreamInterface
             if (\PHP_VERSION_ID >= 70400) {
                 throw $e;
             }
-            trigger_error(sprintf('%s::__toString exception: %s', self::class, (string)$e), E_USER_ERROR);
+            trigger_error(sprintf('%s::__toString exception: %s', self::class, (string) $e), E_USER_ERROR);
 
             return '';
         }
@@ -142,7 +142,7 @@ final class AppendStream implements StreamInterface
     {
         return !$this->streams
             || ($this->current >= count($this->streams) - 1
-                && $this->streams[$this->current]->eof());
+             && $this->streams[$this->current]->eof());
     }
 
     public function rewind(): void
@@ -168,10 +168,8 @@ final class AppendStream implements StreamInterface
             try {
                 $stream->rewind();
             } catch (\Exception $e) {
-                throw new \RuntimeException(
-                    'Unable to seek stream '
-                    .$i.' of the AppendStream', 0, $e
-                );
+                throw new \RuntimeException('Unable to seek stream '
+                    .$i.' of the AppendStream', 0, $e);
             }
         }
 

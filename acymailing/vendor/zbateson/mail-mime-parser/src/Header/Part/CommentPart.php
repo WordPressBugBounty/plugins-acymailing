@@ -39,7 +39,7 @@ class CommentPart extends MimeLiteralPart
      * Returns the comment's text.
      *
      */
-    public function getComment(): string
+    public function getComment() : string
     {
         return $this->comment;
     }

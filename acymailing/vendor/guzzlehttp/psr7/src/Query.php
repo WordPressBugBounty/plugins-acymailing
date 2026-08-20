@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -27,7 +27,7 @@ final class Query
 
         if ($urlEncoding === true) {
             $decoder = function ($value) {
-                return rawurldecode(str_replace('+', ' ', (string)$value));
+                return rawurldecode(str_replace('+', ' ', (string) $value));
             };
         } elseif ($urlEncoding === PHP_QUERY_RFC3986) {
             $decoder = 'rawurldecode';
@@ -89,22 +89,16 @@ final class Query
             throw new \InvalidArgumentException('Invalid type');
         }
 
-        $castBool = $treatBoolsAsInts
-            ? static function ($v) {
-                return (int)$v;
-            }
-            : static function ($v) {
-                return $v ? 'true' : 'false';
-            };
+        $castBool = $treatBoolsAsInts ? static function ($v) { return (int) $v; } : static function ($v) { return $v ? 'true' : 'false'; };
 
         $qs = '';
         foreach ($params as $k => $v) {
-            $k = $encoder((string)$k);
+            $k = $encoder((string) $k);
             if (!is_array($v)) {
                 $qs .= $k;
                 $v = is_bool($v) ? $castBool($v) : $v;
                 if ($v !== null) {
-                    $qs .= '='.$encoder((string)$v);
+                    $qs .= '='.$encoder((string) $v);
                 }
                 $qs .= '&';
             } else {
@@ -112,13 +106,13 @@ final class Query
                     $qs .= $k;
                     $vv = is_bool($vv) ? $castBool($vv) : $vv;
                     if ($vv !== null) {
-                        $qs .= '='.$encoder((string)$vv);
+                        $qs .= '='.$encoder((string) $vv);
                     }
                     $qs .= '&';
                 }
             }
         }
 
-        return $qs ? (string)substr($qs, 0, -1) : '';
+        return $qs ? (string) substr($qs, 0, -1) : '';
     }
 }

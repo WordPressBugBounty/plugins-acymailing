@@ -28,9 +28,9 @@ class IMimePartFactory extends IMessagePartFactory
     protected $partChildrenContainerFactory;
 
     public function __construct(
-        StreamFactory                $streamFactory,
-        PartStreamContainerFactory   $partStreamContainerFactory,
-        PartHeaderContainerFactory   $partHeaderContainerFactory,
+        StreamFactory $streamFactory,
+        PartStreamContainerFactory $partStreamContainerFactory,
+        PartHeaderContainerFactory $partHeaderContainerFactory,
         PartChildrenContainerFactory $partChildrenContainerFactory
     ) {
         parent::__construct($streamFactory, $partStreamContainerFactory);
@@ -54,7 +54,6 @@ class IMimePartFactory extends IMessagePartFactory
             $this->partChildrenContainerFactory->newInstance()
         );
         $streamContainer->setStream($this->streamFactory->newMessagePartStream($part));
-
         return $part;
     }
 }

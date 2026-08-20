@@ -41,7 +41,7 @@ class ParserNonMimeMessageProxy extends ParserMessageProxy
      *
      * @return int|null The start position or null
      */
-    public function getNextPartStart(): ?int
+    public function getNextPartStart() : ?int
     {
         return $this->nextPartStart;
     }
@@ -52,7 +52,7 @@ class ParserNonMimeMessageProxy extends ParserMessageProxy
      *
      * @return int|null The file mode or null
      */
-    public function getNextPartMode(): ?int
+    public function getNextPartMode() : ?int
     {
         return $this->nextPartMode;
     }
@@ -63,7 +63,7 @@ class ParserNonMimeMessageProxy extends ParserMessageProxy
      *
      * @return string|null The file name or null
      */
-    public function getNextPartFilename(): ?string
+    public function getNextPartFilename() : ?string
     {
         return $this->nextPartFilename;
     }
@@ -72,20 +72,18 @@ class ParserNonMimeMessageProxy extends ParserMessageProxy
      * Sets the next part's start position within the message's raw stream.
      *
      */
-    public function setNextPartStart(int $nextPartStart): self
+    public function setNextPartStart(int $nextPartStart) : self
     {
         $this->nextPartStart = $nextPartStart;
-
         return $this;
     }
 
     /**
      * Sets the next part's unix file mode from its 'begin' line.
      */
-    public function setNextPartMode(int $nextPartMode): self
+    public function setNextPartMode(int $nextPartMode) : self
     {
         $this->nextPartMode = $nextPartMode;
-
         return $this;
     }
 
@@ -93,22 +91,20 @@ class ParserNonMimeMessageProxy extends ParserMessageProxy
      * Sets the next part's filename from its 'begin' line.
      *
      */
-    public function setNextPartFilename(string $nextPartFilename): self
+    public function setNextPartFilename(string $nextPartFilename) : self
     {
         $this->nextPartFilename = $nextPartFilename;
-
         return $this;
     }
 
     /**
      * Sets the next part start position, file mode, and filename to null
      */
-    public function clearNextPart(): self
+    public function clearNextPart() : self
     {
         $this->nextPartStart = null;
         $this->nextPartMode = null;
         $this->nextPartFilename = null;
-
         return $this;
     }
 }
