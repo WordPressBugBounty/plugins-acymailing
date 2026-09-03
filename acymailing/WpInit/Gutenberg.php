@@ -47,7 +47,7 @@ class Gutenberg
             'gutenberg-acymailing-subscription-form',
             ACYM_JS.'gutenberg/subscription.min.js?time='.time(),
             [],
-            '11.0.4',
+            '11.0.5',
             [
                 'in_footer' => false,
             ]
@@ -227,7 +227,7 @@ class Gutenberg
             'gutenberg-acymailing-profile',
             ACYM_JS.'gutenberg/profile.min.js?time='.time(),
             [],
-            '11.0.4',
+            '11.0.5',
             [
                 'in_footer' => false,
             ]
@@ -299,7 +299,7 @@ class Gutenberg
             'gutenberg-acymailing-archive',
             ACYM_JS.'gutenberg/archive.min.js?time='.time(),
             [],
-            '11.0.4',
+            '11.0.5',
             [
                 'in_footer' => false,
             ]

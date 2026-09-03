@@ -2,6 +2,20 @@
 defined('ABSPATH') || die('Restricted Access');
 
 
+__('Close', 'acymailing');
+__('Phone country code', 'acymailing');
+__('Phone number', 'acymailing');
+__('opens in a new window', 'acymailing');
+__('Anonymous statistics', 'acymailing');
+__('When enabled, statistics (opens, clicks, sends, opening platforms, open times...) are still collected globally but are no longer linked to individual subscribers. Unique open and click counts are not available in this mode.', 'acymailing');
+__('Individual statistics are disabled because anonymous statistics are enabled.', 'acymailing');
+__('Not available when anonymous statistics are enabled.', 'acymailing');
+__('%1$s clicks registered out of %2$s users', 'acymailing');
+__('Mail opened %1$s times out of %2$s sent', 'acymailing');
+__('Percentage of recipients who opened or clicked, compared to your overall average. The arrow shows whether this campaign is above or below that average.', 'acymailing');
+__('In anonymous mode, opens and clicks are counted globally, not per subscriber. This shows the average number of opens or clicks per email sent (e.g. 3.25×), compared to your overall average.', 'acymailing');
+__('Opens', 'acymailing');
+__('Clicks', 'acymailing');
 __('Do not track new subscribers by default', 'acymailing');
 __('When enabled, new subscribers are created with tracking disabled (no open/click pixel) unless they explicitly consent. Existing subscribers are not affected.', 'acymailing');
 __('Allow subscribers to manage their tracking from their profile page', 'acymailing');

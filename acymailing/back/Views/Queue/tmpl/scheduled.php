@@ -72,7 +72,7 @@ defined('ABSPATH') || die('Restricted Access');
                                         }
                                         acym_tooltip(
                                             [
-                                                'hoveredText' => '<i class="'.esc_attr($class).'" style="color:'.esc_attr($oneList->color).'"></i>',
+                                                'hoveredText' => '<i class="'.esc_attr($class).'" style="color:'.esc_attr($oneList->color ?? '#0079d3').'"></i>',
                                                 'textShownInTooltip' => $oneList->name,
                                             ]
                                         );

@@ -23,11 +23,17 @@ if (empty($termspolicy['terms_type']) || $termspolicy['terms_type'] === 'article
 }
 
 if (!empty($termspolicy['privacy_type']) && $termspolicy['privacy_type'] === 'url' && !empty($privacyURL)) {
-    $privacyURL = '<a href="'.esc_url($privacyURL).'" target="_blank">'.esc_html(acym_translation('ACYM_PRIVACY_POLICY')).'</a>';
+    $privacyLabel = acym_translation('ACYM_PRIVACY_POLICY');
+    $privacyURL = '<a href="'.esc_url($privacyURL).'" target="_blank" rel="noopener noreferrer" aria-label="'.esc_attr(
+            $privacyLabel.', '.acym_translation('ACYM_OPENS_NEW_WINDOW')
+        ).'">'.esc_html($privacyLabel).'</a>';
 }
 
 if (!empty($termspolicy['terms_type']) && $termspolicy['terms_type'] === 'url' && !empty($termsURL)) {
-    $termsURL = '<a href="'.esc_url($termsURL).'" target="_blank">'.esc_html(acym_translation('ACYM_TERMS_CONDITIONS')).'</a>';
+    $termsLabel = acym_translation('ACYM_TERMS_CONDITIONS');
+    $termsURL = '<a href="'.esc_url($termsURL).'" target="_blank" rel="noopener noreferrer" aria-label="'.esc_attr(
+            $termsLabel.', '.acym_translation('ACYM_OPENS_NEW_WINDOW')
+        ).'">'.esc_html($termsLabel).'</a>';
 }
 
 
@@ -45,7 +51,7 @@ if (!empty($termslink)) {
     echo '<div class="acym__subscription__form__termscond">';
     echo '<div class="onefield fieldacyterms" id="field_terms_'.esc_attr($form->form_tag_name).'">';
     echo '<label for="mailingdata_terms_'.esc_attr($form->form_tag_name).'">';
-    echo '<input id="mailingdata_terms_'.esc_attr($form->form_tag_name).'" class="checkbox" type="checkbox" name="terms" title="'.esc_attr(
+    echo '<input id="mailingdata_terms_'.esc_attr($form->form_tag_name).'" class="checkbox" type="checkbox" name="terms" aria-required="true" title="'.esc_attr(
             acym_translation('ACYM_TERMS_CONDITIONS')
         ).'"/> ';
     echo wp_kses(

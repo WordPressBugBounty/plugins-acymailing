@@ -100,7 +100,7 @@ if (empty($data['allCampaigns'])) { ?>
                             foreach ($email->lists as $list) {
                                 acym_tooltip(
                                     [
-                                        'hoveredText' => '<i class="acym_subscription acymicon-circle" style="color:'.esc_attr($list->color).'"></i>',
+                                        'hoveredText' => '<i class="acym_subscription acymicon-circle" style="color:'.esc_attr($list->color ?? '#0079d3').'"></i>',
                                         'textShownInTooltip' => esc_html($list->name),
                                     ]
                                 );

@@ -2,7 +2,7 @@
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- View file, its variables are local to the include scope, not true globals.
 defined('ABSPATH') || die('Restricted Access');
 ?>
-<div class="acym__subscription__form__lists">
+<div class="acym__subscription__form__lists" role="group" aria-label="<?php echo esc_attr(acym_translation('ACYM_NEWSLETTERS')); ?>">
     <?php
     foreach ($form->settings['lists']['displayed'] as $listId) {
         if (!empty($form->settings['lists']['automatic_subscribe']) && in_array($listId, $form->settings['lists']['automatic_subscribe'])) continue;

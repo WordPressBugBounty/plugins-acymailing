@@ -145,7 +145,7 @@ $campaignController = acym_isAdmin() ? 'campaigns' : 'frontcampaigns';
 							<div class="cell grid-x acym__listing__row">
 								<span class="cell small-6">
 									<i class="acymicon-circle acym__campaign__summary__recipients__list__color margin-right-1"
-									   style="color: <?php echo esc_attr($oneList->color); ?>">
+									   style="color: <?php echo esc_attr($oneList->color ?? '#0079d3'); ?>">
 									</i>
 									<b><?php echo esc_html($oneList->name); ?></b>
 								</span>

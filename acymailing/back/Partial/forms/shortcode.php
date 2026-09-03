@@ -8,7 +8,7 @@ defined('ABSPATH') || die('Restricted Access');
     } else {
         echo '<form action="'.esc_url($form->form_tag_action).'" id="'.esc_attr($form->form_tag_name).'" name="'.esc_attr(
                 $form->form_tag_name
-            ).'" enctype="multipart/form-data" onsubmit="return submitAcymForm(\'subscribe\',\''.esc_attr($form->form_tag_name).'\', \'acymSubmitSubForm\')">';
+            ).'" aria-label="'.esc_attr(acym_translation('ACYM_SUBSCRIPTION')).'" enctype="multipart/form-data" onsubmit="return submitAcymForm(\'subscribe\',\''.esc_attr($form->form_tag_name).'\', \'acymSubmitSubForm\')">';
     }
     include acym_getPartial('forms', 'fields');
     include acym_getPartial('forms', 'button');

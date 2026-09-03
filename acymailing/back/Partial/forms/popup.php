@@ -4,13 +4,16 @@ defined('ABSPATH') || die('Restricted Access');
 ?>
 <div id="acym_fulldiv_<?php echo esc_attr($form->form_tag_name); ?>"
      class="acym__subscription__form__popup__overlay acym__subscription__form-erase"
+     role="dialog"
+     aria-modal="true"
+     aria-label="<?php echo esc_attr(acym_translation('ACYM_SUBSCRIPTION')); ?>"
     <?php
     if (!$edition && isset($form->settings['display']['scroll']) && $form->settings['display']['scroll'] != 0) {
         echo 'style="display: none;"';
     }
     ?>>
 	<div class="acym__subscription__form__popup">
-		<div class="acym__subscription__form__popup__close acymicon-close"></div>
+		<button type="button" class="acym__subscription__form__popup__close acymicon-close" aria-label="<?php echo esc_attr(acym_translation('ACYM_CLOSE')); ?>"></button>
         <?php
         if ($edition) {
             echo '<form action="#" onsubmit="return false;" id="'.esc_attr($form->form_tag_name).'">';
@@ -25,8 +28,9 @@ defined('ABSPATH') || die('Restricted Access');
 						acym-data-cookie="'.intval($cookieExpiration).'" 
 						action="'.esc_url($form->form_tag_action).'" 
 						id="'.esc_attr($form->form_tag_name).'" 
-						name="'.esc_attr($form->form_tag_name).'" 
-						enctype="multipart/form-data" 
+						name="'.esc_attr($form->form_tag_name).'"
+						aria-label="'.esc_attr(acym_translation('ACYM_SUBSCRIPTION')).'"
+						enctype="multipart/form-data"
 						onsubmit="return submitAcymForm(\'subscribe\',\''.esc_attr($form->form_tag_name).'\', \'acymSubmitSubForm\')">';
         }
         if (in_array($form->settings['style']['position'], ['image-top', 'image-left'])) {
@@ -89,6 +93,11 @@ $positionCss = $positionMap[$popupPosition] ?? 'top: 50%; left: 50%; transform: 
 		font-weight: bold;
 		font-size: 1rem;
 		cursor: pointer;
+		background: none;
+		border: none;
+		padding: 0;
+		line-height: 1;
+		color: inherit;
 	}
 
 	#acym_fulldiv_<?php echo esc_html($form->form_tag_name); ?> .acym__subscription__form__popup{
@@ -182,9 +191,59 @@ $positionCss = $positionMap[$popupPosition] ?? 'top: 50%; left: 50%; transform: 
             }
 
             const isDisplayButton = <?php echo $isButton ? 'true' : 'false'; ?>;
+            let acymLastFocusedElement = null;
+
+            function acymGetFocusableElements() {
+                return acym_popupForm.querySelectorAll(
+                    'button, [href], input:not([type="hidden"]), select, textarea, [tabindex]:not([tabindex="-1"])'
+                );
+            }
+
+            function acymPopupKeydown(event) {
+                if (event.key === 'Escape' || event.key === 'Esc') {
+                    acym_closePopupform<?php echo esc_html($form->form_tag_name); ?>(acym_popupForm);
+                    return;
+                }
+
+                if (event.key !== 'Tab') {
+                    return;
+                }
+
+                const focusable = acymGetFocusableElements();
+                if (focusable.length === 0) {
+                    return;
+                }
+
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+
+                if (event.shiftKey && document.activeElement === first) {
+                    event.preventDefault();
+                    last.focus();
+                } else if (!event.shiftKey && document.activeElement === last) {
+                    event.preventDefault();
+                    first.focus();
+                }
+            }
+
+            function acym_openPopupform<?php echo esc_html($form->form_tag_name); ?>() {
+                acymLastFocusedElement = document.activeElement;
+                acym_popupForm.style.display = 'inline';
+                acym_popupForm.addEventListener('keydown', acymPopupKeydown);
+
+                const focusable = acymGetFocusableElements();
+                if (focusable.length > 0) {
+                    focusable[0].focus();
+                }
+            }
 
             function acym_closePopupform<?php echo esc_html($form->form_tag_name); ?>(element) {
                 element.style.display = 'none';
+                acym_popupForm.removeEventListener('keydown', acymPopupKeydown);
+
+                if (acymLastFocusedElement && typeof acymLastFocusedElement.focus === 'function') {
+                    acymLastFocusedElement.focus();
+                }
 
                 if (isDisplayButton) {
                     return;
@@ -223,7 +282,7 @@ $positionCss = $positionMap[$popupPosition] ?? 'top: 50%; left: 50%; transform: 
                 }
 
                 button.addEventListener('click', function () {
-                    acym_popupForm.style.display = 'inline';
+                    acym_openPopupform<?php echo esc_html($form->form_tag_name); ?>();
                 });
             }
 
@@ -250,7 +309,7 @@ $positionCss = $positionMap[$popupPosition] ?? 'top: 50%; left: 50%; transform: 
                     windowSize <= browserHeight || !scrollRemaining
                 )) {
                     scrollRemaining = false;
-                    acym_popupForm.style.display = 'inline';
+                    acym_openPopupform<?php echo esc_html($form->form_tag_name); ?>();
                 } else {
                     function displayAcymPopupForm() {
                         let scrollPercent = Math.round((
@@ -262,7 +321,7 @@ $positionCss = $positionMap[$popupPosition] ?? 'top: 50%; left: 50%; transform: 
                             scrollRemaining = false;
                             window.removeEventListener('scroll', displayAcymPopupForm);
                             if (!delayRemaining && acym_popupForm) {
-                                acym_popupForm.style.display = 'inline';
+                                acym_openPopupform<?php echo esc_html($form->form_tag_name); ?>();
                             }
                         }
                     }
@@ -278,7 +337,7 @@ $positionCss = $positionMap[$popupPosition] ?? 'top: 50%; left: 50%; transform: 
                         if (acym_popupForm !== null) {
                             delayRemaining = false;
                             if (!scrollRemaining) {
-                                acym_popupForm.style.display = 'inline';
+                                acym_openPopupform<?php echo esc_html($form->form_tag_name); ?>();
                                 window.removeEventListener('scroll', displayAcymPopupForm);
                             }
                         }

@@ -8,22 +8,18 @@ defined('ABSPATH') || die('Restricted Access');
         echo '<form action="#" onsubmit="return false;" id="'.esc_attr($form->form_tag_name).'">';
     } else {
         $cookieExpiration = empty($form->settings['cookie']['cookie_expiration']) ? '1' : $form->settings['cookie']['cookie_expiration'];
-        echo '<form 
-        		acym-data-id="'.esc_attr($form->id).'" 
+        echo '<form
+        		acym-data-id="'.esc_attr($form->id).'"
         		acym-data-cookie="'.intval($cookieExpiration).'"
         		action="'.esc_url($form->form_tag_action).'"
         		id="'.esc_attr($form->form_tag_name).'"
         		name="'.esc_attr($form->form_tag_name).'"
-        		enctype="multipart/form-data" 
+        		aria-label="'.esc_attr(acym_translation('ACYM_SUBSCRIPTION')).'"
+        		enctype="multipart/form-data"
         		onsubmit="return submitAcymForm(\'subscribe\',\''.esc_attr($form->form_tag_name).'\', \'acymSubmitSubForm\');">';
     }
-    $files = [
-        0 => $form->settings['style']['position'] == 'button-right' ? 'fields' : 'button',
-        1 => $form->settings['style']['position'] == 'button-right' ? 'button' : 'fields',
-    ];
-
-    include acym_getPartial('forms', $files[0]);
-    include acym_getPartial('forms', $files[1]);
+    include acym_getPartial('forms', 'fields');
+    include acym_getPartial('forms', 'button');
     include acym_getPartial('forms', 'hidden_params');
 
     echo '</form>';
@@ -63,9 +59,38 @@ defined('ABSPATH') || die('Restricted Access');
 		align-items: center
 	}
 
+    <?php if (($form->settings['style']['position'] ?? '') !== 'button-right') { ?>
+	<?php echo '#acym_fulldiv_'.esc_html($form->form_tag_name); ?>.acym__subscription__form__header .acym__subscription__form__button{
+		order: -1;
+	}
+    <?php } ?>
+
 	<?php echo '#acym_fulldiv_'.esc_html($form->form_tag_name); ?>
 	.acym__users__creation__fields__title{
 		margin: 0.5rem
+	}
+
+	<?php echo '#acym_fulldiv_'.esc_html($form->form_tag_name); ?>.acym__subscription__form__header,
+	<?php echo '#acym_fulldiv_'.esc_html($form->form_tag_name); ?>.acym__subscription__form__header <?php echo '#'.esc_html($form->form_tag_name); ?>,
+	<?php echo '#acym_fulldiv_'.esc_html($form->form_tag_name); ?>.acym__subscription__form__header .acym__subscription__form__fields{
+		flex-wrap: wrap;
+		max-width: 100%;
+	}
+
+	<?php echo '#acym_fulldiv_'.esc_html($form->form_tag_name); ?>.acym__subscription__form__header{
+		height: auto;
+		min-height: <?php echo esc_html($form->settings['style']['size']['height']); ?>px;
+	}
+
+	<?php echo '#acym_fulldiv_'.esc_html($form->form_tag_name); ?>.acym__subscription__form__header .acym__subscription__form__fields .onefield{
+		width: auto;
+	}
+
+	<?php echo '#acym_fulldiv_'.esc_html($form->form_tag_name); ?>.acym__subscription__form__header .acym__subscription__form__fields .onefield input:not([type="radio"]):not([type="checkbox"]):not([type="hidden"]),
+	<?php echo '#acym_fulldiv_'.esc_html($form->form_tag_name); ?>.acym__subscription__form__header .acym__subscription__form__fields .onefield select,
+	<?php echo '#acym_fulldiv_'.esc_html($form->form_tag_name); ?>.acym__subscription__form__header .acym__subscription__form__fields .onefield textarea{
+		width: auto;
+		max-width: 220px;
 	}
 </style>
 <?php if (!$edition) { ?>

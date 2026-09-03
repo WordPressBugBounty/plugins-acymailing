@@ -40,7 +40,7 @@ defined('ABSPATH') || die('Restricted Access');
                     <?php foreach ($data['lists'] as $list) { ?>
 						<div class="cell shrink acym__campaign__summary__generated__list__tag">
 							<i class="acymicon-circle"
-							   style="color: <?php echo esc_attr($list->color); ?>;"></i><?php echo esc_html($list->name); ?>
+							   style="color: <?php echo esc_attr($list->color ?? '#0079d3'); ?>;"></i><?php echo esc_html($list->name); ?>
 						</div>
                     <?php } ?>
 				</div>

@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.8
 Tested up to: 7.1
-Stable tag: 11.0.4
+Stable tag: 11.0.5
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -116,9 +116,19 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 11.0.4 - August 20, 2026 =
-* A security has been added on the bounce messages handling to slightly improve performance.
+= 11.0.5 - September 3, 2026 =
+* A new option lets you anonymize statistics: opens, clicks and sends are still counted globally, but no individual subscriber tracking data is stored.
 
-* Pie charts have been fixed on the statistics page.
+* A default color has been added on the unsubscribe page for lists without color.
+* The results ordering has been improved when fetching users through the REST API.
+* The accessibility of subscription forms has been improved.
+
+* A fatal error has been fixed on the dashboard recent campaigns block when a campaign had no statistics yet.
+* Security has been improved on image embedding in sent emails.
+* A fatal error has been fixed when triggering mailbox actions with an allowed sender based on user groups.
+* A fatal error has been fixed on the users listing when a list had no color set.
+* A link was broken and has been fixed; if you add an email to a follow-up, you can now send the new email to the users who already triggered the follow-up.
+* An incompatibility with WordPress versions 6.6 or older has been fixed. This prevented the update of the plugin.
+
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)

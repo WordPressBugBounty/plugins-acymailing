@@ -17,9 +17,14 @@ defined('ABSPATH') || die('Restricted Access');
     }
     if (!empty($data['placeholder'])) {
         echo ' placeholder="'.esc_attr($data['placeholder']).'" aria-label="'.esc_attr($data['placeholder']).'"';
+    } elseif (!empty($data['aria-label'])) {
+        echo ' aria-label="'.esc_attr($data['aria-label']).'"';
     }
     if (!empty($data['data-required'])) {
         echo ' data-required="'.esc_attr($data['data-required']).'"';
+    }
+    if (!empty($data['aria-required'])) {
+        echo ' aria-required="true"';
     }
     if (isset($data['value'])) {
         echo ' value="'.esc_attr($data['value']).'"';
