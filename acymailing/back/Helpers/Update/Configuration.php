@@ -127,7 +127,7 @@ trait Configuration
         $allPref['Starter'] = ACYM_STARTER;
         $allPref['Essential'] = ACYM_ESSENTIAL;
         $allPref['Enterprise'] = ACYM_ENTERPRISE;
-        $allPref['previous_version'] = '11.0.5';
+        $allPref['previous_version'] = '11.1.0';
 
         $allPref['display_built_by'] = acym_level(ACYM_ESSENTIAL) ? 0 : 1;
         $allPref['php_overrides'] = 0;

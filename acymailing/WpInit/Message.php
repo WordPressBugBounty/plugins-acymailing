@@ -21,13 +21,13 @@ class Message
             'acy_front_messages_css',
             ACYM_CSS.'front/messages.min.css?v='.filemtime(ACYM_MEDIA.'css'.DS.'front'.DS.'messages.min.css'),
             [],
-            '11.0.5'
+            '11.1.0'
         );
         wp_enqueue_script(
             'acy_front_messages_js',
             ACYM_JS.'front/messages.min.js?v='.filemtime(ACYM_MEDIA.'js'.DS.'front'.DS.'messages.min.js'),
             [],
-            '11.0.5',
+            '11.1.0',
             [
                 'in_footer' => false,
             ]

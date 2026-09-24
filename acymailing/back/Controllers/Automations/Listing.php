@@ -34,7 +34,7 @@ trait Listing
     {
         wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
-        $automations = acym_getVar('int', 'elements_checked');
+        $automations = acym_getVar('array', 'elements_checked', []);
 
         if (empty($automations)) {
             $this->listing();

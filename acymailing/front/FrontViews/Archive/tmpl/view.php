@@ -11,7 +11,12 @@ defined('ABSPATH') || die('Restricted Access');
 	<h1 class="contentheading"><?php echo esc_html($data['mail']->subject); ?></h1>
 
 	<input type="hidden" id="archive_view__content" value="<?php echo esc_attr($data['mail']->body); ?>" />
-	<div style="min-width:80%" id="archive_view__preview"><?php echo $data['mail']->body; ?></div>
+	<div style="min-width:80%" id="archive_view__preview">
+		<?php
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Campaign content, built by admin and cannot be escaped.
+		echo $data['mail']->body;
+		?>
+	</div>
 
     <?php
     $attachments = json_decode(!empty($data['mail']->attachments) ? $data['mail']->attachments : '[]', true);

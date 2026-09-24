@@ -85,7 +85,7 @@ defined('ABSPATH') || die('Restricted Access');
 						name="config[trackingsystem][]"
 						id="trackingsystem[0]"
 						value="acymailing"
-                    <?php acym_checked(stripos($trackingMode, 'acymailing') !== false); ?>
+                    <?php checked(stripos($trackingMode, 'acymailing') !== false); ?>
 				/>
 				<label for="trackingsystem[0]">AcyMailing<?php acym_info(['textShownInTooltip' => 'ACYM_TRACKINGSYSTEM_ACY_DESC']); ?></label>
 
@@ -94,7 +94,7 @@ defined('ABSPATH') || die('Restricted Access');
 						name="config[trackingsystem][]"
 						id="trackingsystem[1]"
 						value="google"
-                    <?php acym_checked(stripos($trackingMode, 'google') !== false); ?>
+                    <?php checked(stripos($trackingMode, 'google') !== false); ?>
 				/>
 				<label for="trackingsystem[1]">Google Analytics<?php acym_info(['textShownInTooltip' => 'ACYM_TRACKINGSYSTEM_GA_DESC']); ?></label>
 
@@ -280,7 +280,7 @@ defined('ABSPATH') || die('Restricted Access');
 					<input type="radio"
 					       name="config[csv_separator]"
 					       value=";"
-                        <?php acym_checked($this->config->get('csv_separator', ',') === ';'); ?> />
+                        <?php checked($this->config->get('csv_separator', ',') === ';'); ?> />
 					;
 				</label>
 
@@ -288,7 +288,7 @@ defined('ABSPATH') || die('Restricted Access');
 					<input type="radio"
 					       name="config[csv_separator]"
 					       value=","
-                        <?php acym_checked($this->config->get('csv_separator', ',') === ','); ?> />
+                        <?php checked($this->config->get('csv_separator', ',') === ','); ?> />
 					,
 				</label>
 			</div>

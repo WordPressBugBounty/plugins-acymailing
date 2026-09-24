@@ -44,6 +44,6 @@ defined('ABSPATH') || die('Restricted Access');
     if (!empty($data['readonly'])) {
         echo ' readonly="readonly"';
     }
-    acym_disabled($data['disabled'] ?? false);
+    disabled($data['disabled'] ?? false);
     ?>
 >

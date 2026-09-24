@@ -48,7 +48,7 @@ defined('ABSPATH') || die('Restricted Access');
 			<div class="cell margin-bottom-1 acym_vcenter">
 				<input type="hidden" id="from_as_replyto_value" name="config[from_as_replyto]" value="<?php echo esc_attr($this->config->get('from_as_replyto', 1)); ?>" />
 				<input id="from_as_replyto" data-toggle="acy_toggle_replyto" data-value="from_as_replyto_value" class="acym_toggle" type="checkbox" <?php
-                acym_checked($this->config->get('from_as_replyto', 1) == 1);
+                checked($this->config->get('from_as_replyto', 1) == 1);
                 ?>/>
 				<label for="from_as_replyto">
                     <?php echo esc_html(acym_translation('ACYM_FROM_AS_REPLYTO')); ?>

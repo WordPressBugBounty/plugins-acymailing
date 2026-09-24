@@ -26,7 +26,7 @@ defined('ABSPATH') || die('Restricted Access');
                 'text' => acym_translation('ACYM_IMPORT_SUBSCRIBERS'),
                 'class' => 'acym__users__import__button',
             ],
-            'additionalData' => $data['importHelper']->additionalDataUsersImport(true),
+            'additionalData' => fn() => $data['importHelper']->displayAdditionalDataUsersImport(true),
         ]
     );
 

@@ -13,7 +13,7 @@ defined('ABSPATH') || die('Restricted Access');
             if (!empty($data['data-required'])) {
                 echo ' data-required="'.esc_attr($data['data-required']).'"';
             }
-            acym_checked($data['value'] == $radioKey);
+            checked($data['value'] == $radioKey);
             ?>
 		> <?php echo esc_html($radioText); ?>
 	</label>

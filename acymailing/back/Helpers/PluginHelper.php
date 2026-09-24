@@ -881,7 +881,7 @@ class PluginHelper extends AcymObject
         $suffix = preg_replace('#[^a-zA-Z0-9]#U', '_', $dynamicIdentifier);
         $updateFunction = 'updateDynamic'.$suffix;
 
-        $jsOptionsMerge = [];
+        $jsOptions = [];
         $topOptions = [];
         $sections = [];
 
@@ -900,7 +900,7 @@ class PluginHelper extends AcymObject
                 continue;
             }
 
-            $this->appendOptionJs($jsOptionsMerge, $option, $suffix, $type);
+            $jsOptions[] = $option;
 
             $isTop = !empty($option['main']) || in_array($option['type'], ['pictures', 'checkbox'], true);
 
@@ -956,7 +956,7 @@ class PluginHelper extends AcymObject
         }
 
         // ---- Phase 3: the inline script + individual extras ----
-        $this->displayDynamicScript($jsOptionsMerge, $suffix, $updateFunction, $dynamicIdentifier, $type, $defaultValues);
+        $this->displayDynamicScript($jsOptions, $suffix, $updateFunction, $dynamicIdentifier, $type, $defaultValues);
 
         if ($type === 'individual') {
             acym_trigger('displayCustomViewEditor', [], 'plgAcym'.ucfirst($dynamicIdentifier));
@@ -1076,8 +1076,19 @@ class PluginHelper extends AcymObject
                 $this->displayLanguageField($option, $suffix, $updateFunction);
                 break;
             case 'custom':
-                echo $option['output'];
+                $this->displayCustomOptionOutput($option);
                 break;
+        }
+    }
+
+    private function displayCustomOptionOutput(array $option): void
+    {
+        if (empty($option['output'])) {
+            return;
+        }
+
+        if (!is_string($option['output']) && is_callable($option['output'])) {
+            ($option['output'])();
         }
     }
 
@@ -1180,7 +1191,7 @@ class PluginHelper extends AcymObject
                         value="'.esc_attr($value).'" 
                         id="'.esc_attr($value.$suffix).'" 
                         onclick="'.esc_attr($updateFunction).'();" ';
-            acym_checked((bool)$title[1]);
+            checked((bool)$title[1]);
             echo ' />';
             echo '<label style="margin-left:5px" for="'.esc_attr($value.$suffix).'">';
             echo esc_html(acym_translation($title[0]));
@@ -1364,67 +1375,79 @@ class PluginHelper extends AcymObject
         echo '</div>';
     }
 
-    private function appendOptionJs(array &$jsOptionsMerge, array $option, string $suffix, string $type): void
+    private function echoOptionJs(array $option, string $suffix, string $type): void
     {
         switch ($option['type']) {
             case 'pictures':
                 if (!empty($option['caption'])) {
-                    $jsOptionsMerge[] = 'otherinfo += "| caption:" + jQuery(\'input[name="caption'.esc_attr($suffix).'"]:checked\').val();';
+                    echo 'otherinfo += "| caption:" + jQuery(\'input[name="caption'.esc_attr($suffix).'"]:checked\').val();
+                    ';
                 }
-                $jsOptionsMerge[] = '
+                echo '
                 var _pictVal'.esc_attr($suffix).' = jQuery(\'input[name="pict'.esc_attr($suffix).'"]:checked\').val();
                 otherinfo += "| pict:" + _pictVal'.esc_attr($suffix).';
 
-                if(_pictVal'.esc_attr($suffix).' == "resized"){
+                if (_pictVal'.esc_attr($suffix).' == "resized") {
                     jQuery("#pictsize'.esc_attr($suffix).'").show();
                     otherinfo += "| maxwidth:" + jQuery(\'input[name="pictwidth'.esc_attr($suffix).'"]\').val();
                     otherinfo += "| maxheight:" + jQuery(\'input[name="pictheight'.esc_attr($suffix).'"]\').val();
                 }else{
                     jQuery("#pictsize'.esc_attr($suffix).'").hide();
-                }';
+                }
+                ';
+
                 break;
 
             case 'checkbox':
                 $separator = empty($option['separator']) ? ',' : $option['separator'];
-                $jsOptionsMerge[] = 'var _checked'.esc_attr($option['name'].$suffix).' = [];
+                echo 'var _checked'.esc_attr($option['name'].$suffix).' = [];
                 jQuery("input:checkbox[name='.esc_attr($option['name'].$suffix).']:checked").each(function(){
                     _checked'.esc_attr($option['name'].$suffix).'.push(jQuery(this).val());
                 });
                 if(_checked'.esc_attr($option['name'].$suffix).'.length) otherinfo += "| '.esc_attr($option['name']).':" + _checked'.esc_attr(
                         $option['name'].$suffix
-                    ).'.join("'.esc_attr($separator).'");';
+                    ).'.join("'.esc_attr($separator).'");
+                    ';
 
                 if ($option['title'] === 'ACYM_DISPLAY' && (!isset($option['format']) || $option['format'])) {
                     if ($type === 'grouped') {
-                        $jsOptionsMerge[] = 'var alternate = jQuery(\'input[name="alternate'.esc_attr($suffix).'"]:checked\').val();';
-                        $jsOptionsMerge[] = 'if (!acym_helper.empty(alternate)) otherinfo += "| alternate";';
+                        echo 'var alternate = jQuery(\'input[name="alternate'.esc_attr($suffix).'"]:checked\').val();
+                        ';
+                        echo 'if (!acym_helper.empty(alternate)) otherinfo += "| alternate";
+                        ';
                     }
-                    $jsOptionsMerge[] = 'var selectedFormatOption = jQuery(\'.button-radio-selected[acym-button-radio-group="dcontentFormat'.esc_attr($suffix).'"]\')';
-                    $jsOptionsMerge[] = 'if (!acym_helper.empty(selectedFormatOption)) otherinfo += "| format:" + selectedFormatOption.attr("acym-data-type");';
+                    echo 'var selectedFormatOption = jQuery(\'.button-radio-selected[acym-button-radio-group="dcontentFormat'.esc_attr($suffix).'"]\');
+                    ';
+                    echo 'if (!acym_helper.empty(selectedFormatOption)) otherinfo += "| format:" + selectedFormatOption.attr("acym-data-type");
+                    ';
                 }
                 break;
 
             case 'boolean':
             case 'radio':
-                $jsOptionsMerge[] = 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'input[name="'.esc_attr($option['name'].$suffix).'"]:checked\').val();';
+                echo 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'input[name="'.esc_attr($option['name'].$suffix).'"]:checked\').val();
+                ';
                 break;
 
             case 'select':
                 if ($option['name'] === 'order') {
-                    $jsOptionsMerge[] = 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'[name="'.esc_attr(
+                    echo 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'[name="'.esc_attr(
                             $option['name'].$suffix
-                        ).'"]\').val() + "," + jQuery(\'[name="orderdir'.esc_attr($suffix).'"]\').val();';
+                        ).'"]\').val() + "," + jQuery(\'[name="orderdir'.esc_attr($suffix).'"]\').val();
+                        ';
                 } else {
-                    $jsOptionsMerge[] = 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'[name="'.esc_attr($option['name'].$suffix).'"]\').val();';
+                    echo 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'[name="'.esc_attr($option['name'].$suffix).'"]\').val();
+                    ';
                 }
                 break;
 
             case 'language':
-                $jsOptionsMerge[] = 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'[name="'.esc_attr($option['name'].$suffix).'"]\').val();';
+                echo 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'[name="'.esc_attr($option['name'].$suffix).'"]\').val();
+                ';
                 break;
 
             case 'multiselect':
-                $jsOptionsMerge[] = '
+                echo '
                 var theMultiSelect = document.querySelector(\'[name="'.esc_attr($option['name'].$suffix).'[]"]\');
                 var selectedOptions = [];
                 for(var i = 0 ; i < theMultiSelect.length ; i++){
@@ -1432,24 +1455,60 @@ class PluginHelper extends AcymObject
                         selectedOptions.push(theMultiSelect[i].value);
                     }
                 }
-                otherinfo += "| '.esc_attr($option['name']).':" + selectedOptions.join(",");';
+                otherinfo += "| '.esc_attr($option['name']).':" + selectedOptions.join(",");
+                ';
                 break;
 
             case 'text':
             case 'number':
             case 'intextfield':
             case 'date':
-                $jsOptionsMerge[] = 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'input[name="'.esc_attr($option['name'].$suffix).'"]\').val();';
+                echo 'otherinfo += "| '.esc_attr($option['name']).':" + jQuery(\'input[name="'.esc_attr($option['name'].$suffix).'"]\').val();
+                ';
                 break;
 
             case 'custom':
-                //TODO
-                $jsOptionsMerge[] = $option['js'];
+                $this->echoLegacyOptionJs($option);
                 break;
         }
     }
 
-    private function displayDynamicScript(array $jsOptionsMerge, string $suffix, string $updateFunction, string $dynamicIdentifier, string $type, $defaultValues): void
+    private function echoLegacyOptionJs(array $option): void
+    {
+        if (empty($option['js'])) {
+            return;
+        }
+
+        $jsonFlags = JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+
+        foreach (explode(';', $option['js']) as $statement) {
+            $statement = trim($statement);
+            if ($statement === '') {
+                continue;
+            }
+
+            // otherinfo += "| key:constant"
+            if (preg_match('#^otherinfo\s*\+=\s*"\|\s*([a-zA-Z0-9_-]+):([^"]*)"$#', $statement, $matches)) {
+                echo 'otherinfo += '.json_encode('| '.$matches[1].':'.$matches[2], $jsonFlags).';
+                ';
+                continue;
+            }
+
+            // otherinfo += "| key:" + jQuery('selector').val()
+            if (preg_match('#^otherinfo\s*\+=\s*"\|\s*([a-zA-Z0-9_-]+):"\s*\+\s*jQuery\(\s*\'(.*)\'\s*\)\.val\(\)$#', $statement, $matches)) {
+                echo 'otherinfo += '.json_encode('| '.$matches[1].':', $jsonFlags).' + jQuery('.json_encode($matches[2], $jsonFlags).').val();
+                ';
+                continue;
+            }
+
+            acym_logError(
+                'Unsupported deprecated "js" option declared by an add-on for the option "'.($option['name'] ?? '').'", it was not applied: '.$statement,
+                'plugin'
+            );
+        }
+    }
+
+    private function displayDynamicScript(array $jsOptions, string $suffix, string $updateFunction, string $dynamicIdentifier, string $type, $defaultValues): void
     {
         $storageVar = 'window._additionalInfo'.$suffix;
 
@@ -1489,7 +1548,9 @@ class PluginHelper extends AcymObject
 
         echo 'function '.esc_attr($updateFunction).'(){';
         echo 'var tag = ""; var otherinfo = "";';
-        echo implode("\r\n\r\n", $jsOptionsMerge);
+        foreach ($jsOptions as $option) {
+            $this->echoOptionJs($option, $suffix, $type);
+        }
         echo 'for (let [index, info] of Object.entries('.esc_attr($storageVar).')){ otherinfo += "| "+index+":"+info; }';
 
         if ($type === 'individual') {
@@ -1595,9 +1656,10 @@ class PluginHelper extends AcymObject
         $language = acym_getVar('string', 'language', 'main');
         if (!empty($language)) {
             if ($language === 'main') {
-                $language = $this->config->get('multilingual_default', ACYM_DEFAULT_LANGUAGE);
+                $language = acym_getDefaultNewsletterLanguage();
             }
             $email->links_language = $language;
+            $email->language = $language;
         }
 
         $email->creation_date = acym_date('now', 'Y-m-d H:i:s', false);

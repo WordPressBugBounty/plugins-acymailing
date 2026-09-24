@@ -13,7 +13,7 @@ defined('ABSPATH') || die('Restricted Access');
 			<input type="checkbox"
 			       value="<?php echo esc_attr($listId); ?>"
 			       name="subscription[]"
-                <?php acym_checked(!empty($form->settings['lists']['checked']) && in_array($listId, $form->settings['lists']['checked'])); ?>>
+                <?php checked(!empty($form->settings['lists']['checked']) && in_array($listId, $form->settings['lists']['checked'])); ?>>
             <?php echo esc_html($label); ?>
 		</label>
         <?php

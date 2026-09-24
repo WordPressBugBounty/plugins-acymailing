@@ -15,7 +15,7 @@ defined('ABSPATH') || die('Restricted Access');
                 if (!empty($data['data-required'])) {
                     echo ' data-required="'.esc_attr($data['data-required']).'"';
                 }
-                acym_checked(in_array($checkboxKey, $data['value']));
+                checked(in_array($checkboxKey, $data['value']));
                 ?>
 			> <?php echo esc_html($checkboxText); ?>
 		</label>

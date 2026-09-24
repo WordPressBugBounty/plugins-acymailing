@@ -119,7 +119,7 @@ if ($listPosition === 'before') {
             echo '<td class="acytracking" '.($displayOutside && !$displayInline ? 'colspan="2"' : '').'>';
             echo '<label for="mailingdata_tracking_'.esc_attr($formName).'">';
             echo '<input type="hidden" name="user[tracking]" value="0"/>';
-            echo '<input id="mailingdata_tracking_'.esc_attr($formName).'" class="checkbox" type="checkbox" name="user[tracking]" value="1" '.acym_checked($trackingChecked, true, false).'/> '.esc_html(
+            echo '<input id="mailingdata_tracking_'.esc_attr($formName).'" class="checkbox" type="checkbox" name="user[tracking]" value="1" '.checked($trackingChecked, true, false).'/> '.esc_html(
                     acym_translation('ACYM_TRACKING_CONSENT')
                 );
             echo '</label>';

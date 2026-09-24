@@ -84,7 +84,7 @@ defined('ABSPATH') || die('Restricted Access');
                 [
                     'entity' => 'list',
                     'columnsToDisplay' => $entityHelper->getColumnsForList(),
-                    'additionalData' => $importHelper->additionalDataUsersImport(true),
+                    'additionalData' => fn() => $importHelper->displayAdditionalDataUsersImport(true),
                 ]
             );
             acym_modal(

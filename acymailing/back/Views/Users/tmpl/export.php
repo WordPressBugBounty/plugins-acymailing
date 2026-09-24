@@ -19,7 +19,7 @@ use AcyMailing\Helpers\EntitySelectHelper;
                             continue;
                         }
                         ?>
-						<input <?php acym_checked(in_array($fieldName, $defaultFields)); ?>
+						<input <?php checked(in_array($fieldName, $defaultFields)); ?>
 								id="checkbox_<?php echo esc_attr($fieldName); ?>"
 								class="acym__users__export__export_fields"
 								type="checkbox"
@@ -37,7 +37,7 @@ use AcyMailing\Helpers\EntitySelectHelper;
 
                         $fieldName = $field->name;
                         ?>
-						<input <?php acym_checked(in_array($field->id, $defaultFields)); ?>
+						<input <?php checked(in_array($field->id, $defaultFields)); ?>
 								id="checkbox_<?php echo esc_attr($fieldName); ?>"
 								class="acym__users__export__export_fields"
 								type="checkbox"
@@ -50,7 +50,7 @@ use AcyMailing\Helpers\EntitySelectHelper;
                         <?php
                     }
                     ?>
-					<input <?php acym_checked(in_array('subscribe_date', $defaultFields)); ?>
+					<input <?php checked(in_array('subscribe_date', $defaultFields)); ?>
 							id="checkbox_subscribe_date"
 							class="acym__users__export__export_fields"
 							type="checkbox"
@@ -61,7 +61,7 @@ use AcyMailing\Helpers\EntitySelectHelper;
 					</label>
 					<br />
 
-					<input <?php acym_checked(in_array('unsubscribe_date', $defaultFields)); ?>
+					<input <?php checked(in_array('unsubscribe_date', $defaultFields)); ?>
 							id="checkbox_unsubscribe_date"
 							class="acym__users__export__export_fields"
 							type="checkbox"

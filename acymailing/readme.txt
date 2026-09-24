@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.8
 Tested up to: 7.1
-Stable tag: 11.0.5
+Stable tag: 11.1.0
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -116,19 +116,24 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 11.0.5 - September 3, 2026 =
-* A new option lets you anonymize statistics: opens, clicks and sends are still counted globally, but no individual subscriber tracking data is stored.
+= 11.1.0 - September 24, 2026 =
+* We replaced the date picker with the default html date picker to improve the user experience, the accessibility and performance.
+* We added on the profile edition (front-end), a checkbox available for all users to manage their tracking preferences.
 
-* A default color has been added on the unsubscribe page for lists without color.
-* The results ordering has been improved when fetching users through the REST API.
-* The accessibility of subscription forms has been improved.
+* [add-ons] We added an option to specify the menu item to use for DP Calendar event links.
+* Development files are no longer included in the third-party libraries shipped with the package, resulting in a lighter and cleaner installation.
+* Newsletters now use the website default language instead of the administrator language for dynamic tags like {date:X}, the "Read more" text and the default templates.
 
-* A fatal error has been fixed on the dashboard recent campaigns block when a campaign had no statistics yet.
-* Security has been improved on image embedding in sent emails.
-* A fatal error has been fixed when triggering mailbox actions with an allowed sender based on user groups.
-* A fatal error has been fixed on the users listing when a list had no color set.
-* A link was broken and has been fixed; if you add an email to a follow-up, you can now send the new email to the users who already triggered the follow-up.
-* An incompatibility with WordPress versions 6.6 or older has been fixed. This prevented the update of the plugin.
-
+* We fixed the error message displayed when uploading a file of a non-accepted type that showed raw HTML instead of a readable message.
+* We have fixed the display of links added in subscription form texts and custom fields that were removed on display.
+* We fixed the List-Unsubscribe header so one-click unsubscribe works again.
+* Security for some custom fields has been enhanced.
+* A security issue related to a very specific scenario has been fixed in the mailbox actions.
+* Some translations were not properly replacing HTML characters
+* Imported email addresses are now always stored in lower case, preventing case sensitive duplicates and subscriptions or custom fields being silently skipped during an import.
+* Importing users with an empty date column (like the last open or last click date) no longer triggers a database error, the value is now stored as empty.
+* An "Access denied for this email" error has been fixed when creating a campaign from the dashboard while the favorite template had been deleted.
+* The action buttons now work again on the follow-up, automation and mailbox action listings, where the duplicate buttons silently reloaded the page without doing the action asked and the statistics button did nothing when clicked.
+* The subscription form no longer returns a 404 error when submitted from a secondary language on multilingual websites using Polylang or WPML.
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)

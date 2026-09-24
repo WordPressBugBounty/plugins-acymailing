@@ -20,7 +20,7 @@ if (!empty($currentEmail)) {
 echo '<div class="onefield fieldacytracking" id="field_tracking_'.esc_attr($form->form_tag_name).'">';
 echo '<label for="mailingdata_tracking_'.esc_attr($form->form_tag_name).'">';
 echo '<input type="hidden" name="user[tracking]" value="0"/>';
-echo '<input id="mailingdata_tracking_'.esc_attr($form->form_tag_name).'" class="checkbox" type="checkbox" name="user[tracking]" value="1" '.acym_checked($trackingChecked, true, false).'/> '.esc_html(
+echo '<input id="mailingdata_tracking_'.esc_attr($form->form_tag_name).'" class="checkbox" type="checkbox" name="user[tracking]" value="1" '.checked($trackingChecked, true, false).'/> '.esc_html(
         acym_translation('ACYM_TRACKING_CONSENT')
     );
 echo '</label>';

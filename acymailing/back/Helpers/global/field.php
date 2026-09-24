@@ -1,6 +1,8 @@
 <?php
 defined('ABSPATH') || die('Restricted Access');
 
+use AcyMailing\Helpers\SecurityHelper;
+
 /**
  * @param ?mixed $selected
  */
@@ -79,7 +81,7 @@ function acym_radio(
         }
 
         echo '<input ';
-        acym_checked((string)$value === (string)$selected);
+        checked((string)$value === (string)$selected);
         foreach ($currentAttributes as $oneAttribute => $oneValue) {
             if (is_array($oneValue) || is_object($oneValue)) {
                 $oneValue = json_encode($oneValue);
@@ -212,8 +214,8 @@ function acym_select(
             echo '</optgroup>';
         } else {
             echo '<option value="'.esc_attr($value).'"';
-            acym_selected(strval($value) === strval($selected));
-            acym_disabled($disabled);
+            selected(strval($value) === strval($selected));
+            disabled($disabled);
             echo '>'.esc_html($text).'</option>';
         }
     }
@@ -276,8 +278,8 @@ function acym_selectMultiple(
             echo '</optgroup>';
         } else {
             echo '<option value="'.esc_attr($value).'"';
-            acym_selected(in_array($value, $selected));
-            acym_disabled(is_object($oneDataValue) && !empty($oneDataValue->disable));
+            selected(in_array($value, $selected));
+            disabled(is_object($oneDataValue) && !empty($oneDataValue->disable));
             echo '>'.esc_html($text).'</option>';
         }
     }
@@ -326,7 +328,8 @@ function acym_switch(
     static $occurrence = 100;
     $occurrence++;
 
-    $id = 'switch_'.$occurrence;
+    // A switch displayed in a filter or a condition is cloned for every row
+    $id = (is_array($options) && !empty($options['idPrefix']) ? $options['idPrefix'] : '').'switch_'.$occurrence;
 
     //TODO remove old parameters in January 2027 (only used in WC, Hika, VM and ultimate member plugins, which were updated in July 2026
     if (!is_array($options)) {
@@ -408,8 +411,8 @@ function acym_switch(
 		       tabindex="0"
 		       role="switch"
             <?php
-            acym_checked($options['value'] == 1);
-            acym_disabled($options['disabled']);
+            checked($options['value'] == 1);
+            disabled($options['disabled']);
             if (!empty($checkboxAriaLabel)) {
                 echo ' aria-label="'.esc_attr($checkboxAriaLabel).'"';
             }
@@ -837,13 +840,13 @@ function acym_checkbox(
 			<input type="checkbox"
 			       name="<?php echo esc_attr($name); ?>"
 			       value="<?php echo esc_attr($key); ?>"
-                <?php acym_checked(in_array($key, $selected)); ?>
+                <?php checked(in_array($key, $selected)); ?>
                 <?php
                 if (!empty($dataAttr[$key])) {
                     echo 'data-attr="'.esc_attr($dataAttr[$key]).'"';
                 }
                 ?>>
-            <?php echo $value; ?>
+            <?php echo wp_kses($value, SecurityHelper::ALLOWED_HTML_CHECKBOX_LABEL); ?>
 		</label>
         <?php
     }
@@ -874,7 +877,7 @@ function acym_filterStatus(array $options, string $selected, string $name): void
 		<button type="button"
 		        acym-data-status="<?php echo esc_attr($value); ?>"
 		        class="acym__filter__status<?php echo $value === $selected ? ' font-bold acym__status__select' : ''; ?>"
-            <?php acym_disabled(!is_null($text[1]) && empty($text[1])); ?>
+            <?php disabled(!is_null($text[1]) && empty($text[1])); ?>
 		>
             <?php echo esc_html(acym_translation($text[0])); ?>
             <?php
@@ -930,7 +933,7 @@ function acym_displayParam(string $type, $value, string $name): void
     $field->value = $value;
     $field->name = $name;
 
-    echo $field->getInput();
+    echo wp_kses($field->getInput(), SecurityHelper::ALLOWED_HTML_PARAM_FIELD);
 }
 
 function acym_externalLink(

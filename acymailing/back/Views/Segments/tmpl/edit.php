@@ -4,13 +4,13 @@ defined('ABSPATH') || die('Restricted Access');
 ?>
 <form id="acym_form" action="<?php echo esc_url(acym_completeLink(acym_getVar('cmd', 'ctrl'))); ?>" method="post" name="acySegments" data-abide novalidate>
     <?php
-    foreach ($data['filter_option'] as $key => $filterHtml) {
+    foreach ($data['filters'] as $key => $filter) {
         if (empty($key)) {
             continue;
         }
         ?>
 		<template id="acym__segments__edit__info__template__<?php echo esc_attr($key); ?>">
-            <?php echo $filterHtml; ?>
+            <?php acym_displayAddonOption($filter); ?>
 		</template>
     <?php } ?>
 	<input type="hidden" value="<?php echo empty($data['segment']->id) ? '' : esc_attr($data['segment']->id); ?>" name="segmentId">

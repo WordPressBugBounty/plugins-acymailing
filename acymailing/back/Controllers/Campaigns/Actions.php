@@ -98,7 +98,7 @@ trait Actions
         wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         //We get the id of follow-ups checked
-        $followupsSelected = acym_getVar('int', 'elements_checked');
+        $followupsSelected = acym_getVar('array', 'elements_checked', []);
 
         $followupClass = new FollowupClass();
         $mailClass = new MailClass();

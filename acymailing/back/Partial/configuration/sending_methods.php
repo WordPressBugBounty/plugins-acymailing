@@ -52,7 +52,7 @@ defined('ABSPATH') || die('Restricted Access');
 				</span>
 				<input type="radio"
 				       name="<?php echo !empty($data['isSml']) ? 'sml' : 'config'; ?>[mailer_method]"
-                    <?php acym_checked($selected); ?>
+                    <?php checked($selected); ?>
 					   id="<?php echo esc_attr($idCheckbox); ?>"
 					   value="<?php echo esc_attr($key); ?>"
 					   style="display: none">
@@ -67,10 +67,6 @@ defined('ABSPATH') || die('Restricted Access');
     }
     ?>
 	<div class="cell <?php echo esc_attr($class); ?> grid-x">
-        <?php
-        foreach ($data['sendingMethodsHtmlSettings'] as $html) {
-            echo $html;
-        }
-        ?>
+        <?php acym_trigger('onAcymGetSendingMethodsHtmlSetting', [&$data]); ?>
 	</div>
 </div>

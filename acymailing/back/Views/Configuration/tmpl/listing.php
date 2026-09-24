@@ -18,6 +18,7 @@ defined('ABSPATH') || die('Restricted Access');
             'languages' => 'ACYM_CONFIGURATION_LANGUAGES',
         ];
 
+
         acym_trigger('onConfigurationAddTabs', [&$tabs]);
 
         foreach ($tabs as $oneTab => $title) {

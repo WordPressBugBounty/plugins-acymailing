@@ -36,7 +36,7 @@ trait Ajax
                 'entity' => 'list',
                 'entityParams' => ['join' => 'join_lists-'.implode(',', $selectedListsIds)],
                 'columnsToDisplay' => $entityHelper->getColumnsForList('lists.list_id', true),
-                'additionalData' => $importHelper->additionalDataUsersImport($genericImport),
+                'additionalData' => fn() => $importHelper->displayAdditionalDataUsersImport($genericImport),
             ]
         );
         exit;
@@ -106,7 +106,7 @@ trait Ajax
 
             $return .= '<div class="cell shrink"><input type="checkbox" id="modal__pagination__listing__lists__list'.esc_attr($list->id).'" value="'.esc_attr(
                     $list->id
-                ).'" class="modal__pagination__listing__lists__list--checkbox" name="lists_checked[]"'.acym_checked(
+                ).'" class="modal__pagination__listing__lists__list--checkbox" name="lists_checked[]"'.checked(
                     !empty($matchingListsData->idsSelected) && in_array($list->id, $matchingListsData->idsSelected),
                     true,
                     false

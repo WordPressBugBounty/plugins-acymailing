@@ -114,7 +114,7 @@ class RegacyHelper extends AcymObject
                             <td style="border:0">
                                 <input type="checkbox" id="acym__'.$base.'__lists-'.intval(
                     $id
-                ).'" class="acym_checkbox" name="'.$base.'_visible_lists_checked[]" '.acym_checked(
+                ).'" class="acym_checkbox" name="'.$base.'_visible_lists_checked[]" '.checked(
                     $oneList['checked'] || in_array($id, $checkedListsOnAjaxUpdate),
                     true,
                     false

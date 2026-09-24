@@ -81,7 +81,7 @@ defined('ABSPATH') || die('Restricted Access');
 								<div class="queue_lists">
                                     <?php
                                     if (!$row->iscampaign) {
-                                        echo $row->lists;
+                                        echo esc_html($row->lists);
                                     } else {
                                         $i = 0;
                                         $class = 'acym_subscription acymicon-circle';
