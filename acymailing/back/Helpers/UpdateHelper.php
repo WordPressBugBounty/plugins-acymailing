@@ -22,7 +22,7 @@ class UpdateHelper extends AcymObject
     const BOUNCE_VERSION = 9;
 
     private string $level = 'starter';
-    private string $version = '11.1.0';
+    private string $version = '11.1.1';
     private string $previousVersion;
     private bool $isUpdating = false;
 
@@ -47,7 +47,7 @@ class UpdateHelper extends AcymObject
         $pluginClass = new PluginClass();
         $pluginsToUpdate = $pluginClass->getNotUptoDatePlugins();
         foreach ($pluginsToUpdate as $onePlugin) {
-            $pluginClass->updateAddon($onePlugin);
+            $pluginClass->updateAddon($onePlugin, false);
         }
     }
 

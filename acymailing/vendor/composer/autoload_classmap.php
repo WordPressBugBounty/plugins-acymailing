@@ -113,6 +113,7 @@ return array(
     'AcyMailing\\Controllers\\Segments\\Campaign' => $baseDir . '/back/Controllers/Segments/Campaign.php',
     'AcyMailing\\Controllers\\Segments\\Edition' => $baseDir . '/back/Controllers/Segments/Edition.php',
     'AcyMailing\\Controllers\\Segments\\Listing' => $baseDir . '/back/Controllers/Segments/Listing.php',
+    'AcyMailing\\Controllers\\Shared\\EditorActions' => $baseDir . '/back/Controllers/Shared/EditorActions.php',
     'AcyMailing\\Controllers\\StatsController' => $baseDir . '/back/Controllers/StatsController.php',
     'AcyMailing\\Controllers\\Stats\\ClickMap' => $baseDir . '/back/Controllers/Stats/ClickMap.php',
     'AcyMailing\\Controllers\\Stats\\Detailed' => $baseDir . '/back/Controllers/Stats/Detailed.php',

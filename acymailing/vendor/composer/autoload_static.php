@@ -223,6 +223,7 @@ class ComposerStaticInitaa27ffae5a54d18e2ceb750f48a9aaac
         'AcyMailing\\Controllers\\Segments\\Campaign' => __DIR__ . '/../..' . '/back/Controllers/Segments/Campaign.php',
         'AcyMailing\\Controllers\\Segments\\Edition' => __DIR__ . '/../..' . '/back/Controllers/Segments/Edition.php',
         'AcyMailing\\Controllers\\Segments\\Listing' => __DIR__ . '/../..' . '/back/Controllers/Segments/Listing.php',
+        'AcyMailing\\Controllers\\Shared\\EditorActions' => __DIR__ . '/../..' . '/back/Controllers/Shared/EditorActions.php',
         'AcyMailing\\Controllers\\StatsController' => __DIR__ . '/../..' . '/back/Controllers/StatsController.php',
         'AcyMailing\\Controllers\\Stats\\ClickMap' => __DIR__ . '/../..' . '/back/Controllers/Stats/ClickMap.php',
         'AcyMailing\\Controllers\\Stats\\Detailed' => __DIR__ . '/../..' . '/back/Controllers/Stats/Detailed.php',

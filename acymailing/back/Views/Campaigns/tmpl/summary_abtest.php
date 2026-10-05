@@ -24,7 +24,7 @@ defined('ABSPATH') || die('Restricted Access');
 
         if (empty($version->id) || empty($data['abtest_mails'][$version->id])) continue;
 
-        echo '<input type="hidden" id="acym__summary-body-'.esc_attr($version->code).'" value="'.esc_attr(acym_absoluteURL($data['abtest_mails'][$version->id]->body)).'">';
+        acym_mailContentInput(acym_absoluteURL($data['abtest_mails'][$version->id]->body), 'acym__summary-body-'.$version->code);
         echo '<input type="hidden" id="acym__summary-subject-'.esc_attr($version->code).'" value="'.esc_attr($data['abtest_mails'][$version->id]->subject).'">';
         echo '<input type="hidden" id="acym__summary-preview-'.esc_attr($version->code).'" value="'.esc_attr($data['abtest_mails'][$version->id]->preheader).'">';
     }

@@ -1,13 +1,19 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 11.1.0\n"
+"Project-Id-Version: AcyMailing 11.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-24\n"
+"POT-Creation-Date: 2026-10-05\n"
 "X-Domain: acymailing\n"
 
+
+msgid "Error decoding the email %1$s: %2$s"
+msgstr ""
+
+msgid "The structure of this email could not be read (%s), its raw content will be analysed"
+msgstr ""
 
 msgid "Close"
 msgstr ""

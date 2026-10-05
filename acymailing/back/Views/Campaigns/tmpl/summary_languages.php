@@ -28,9 +28,7 @@ defined('ABSPATH') || die('Restricted Access');
             continue;
         }
 
-        echo '<input type="hidden" id="acym__summary-body-'.esc_attr($language->code).'" value="'.esc_attr(
-                acym_absoluteURL($data['multilingual_mails'][$language->code]->body)
-            ).'">';
+        acym_mailContentInput(acym_absoluteURL($data['multilingual_mails'][$language->code]->body), 'acym__summary-body-'.$language->code);
         echo '<input type="hidden" id="acym__summary-subject-'.esc_attr($language->code).'" value="'.esc_attr($data['multilingual_mails'][$language->code]->subject).'">';
         echo '<input type="hidden" id="acym__summary-preview-'.esc_attr($language->code).'" value="'.esc_attr($data['multilingual_mails'][$language->code]->preheader).'">';
     }

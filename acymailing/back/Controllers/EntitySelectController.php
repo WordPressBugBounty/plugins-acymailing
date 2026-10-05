@@ -65,6 +65,7 @@ class EntitySelectController extends AcymController
 
         if ('list' === $entity) {
             $entityParams['columns'][] = 'description';
+            $entityParams['columns'][] = 'active';
         }
 
         if (!acym_isAdmin()) {
@@ -85,12 +86,19 @@ class EntitySelectController extends AcymController
     {
         if ($entity === 'list') {
             foreach ($availableEntity['elements'] as $key => $element) {
-                $availableEntity['elements'][$key]->color = '<i style="color: '.$element->color.'" class="acym_subscription acymicon-circle">';
+                $availableEntity['elements'][$key]->color = '<i style="color: '.esc_attr(
+                        $element->color ?? '#0079d3'
+                    ).'" class="acym_subscription acymicon-circle">';
+                $availableEntity['elements'][$key]->name = esc_html($element->name);
+                if (empty($element->active)) {
+                    $availableEntity['elements'][$key]->name .= '<span class="acym__entity_select__list__inactive">'.esc_html(
+                            acym_translation('ACYM_INACTIVE')
+                        ).'</span>';
+                }
                 if (!empty($element->description)) {
                     ob_start();
-                    acym_info(['textShownInTooltip' => $element->description]);
-                    $tooltip = ob_get_clean();
-                    $availableEntity['elements'][$key]->name = $element->name.$tooltip;
+                    acym_info(['textShownInTooltip' => esc_html($element->description)]);
+                    $availableEntity['elements'][$key]->name .= ob_get_clean();
                 }
             }
         } elseif ($entity === 'user') {
@@ -98,7 +106,10 @@ class EntitySelectController extends AcymController
                 ob_start();
                 acym_info(['textShownInTooltip' => '<i class="acymicon-circle-o-notch acymicon-spin"></i>']);
                 $tooltip = ob_get_clean();
-                $availableEntity['elements'][$key]->email = $element->email.'<span class="acym__hover__user_info" data-id="'.esc_attr($availableEntity['elements'][$key]->id).'">
+                $availableEntity['elements'][$key]->name = esc_html($element->name ?? '');
+                $availableEntity['elements'][$key]->email = esc_html($element->email).'<span class="acym__hover__user_info" data-id="'.esc_attr(
+                        $element->id
+                    ).'">
                 '.$tooltip.'
                 </span>';
             }

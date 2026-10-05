@@ -120,6 +120,7 @@ class ConfigurationClass extends AcymClass
         $mailClass = new MailClass();
         $mailClass->updateFollowupPriority($oldFollowupPriority, $newFollowupPriority);
 
+
         return (bool)$status;
     }
 }

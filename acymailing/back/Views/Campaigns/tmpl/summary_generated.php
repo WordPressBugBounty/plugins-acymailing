@@ -81,7 +81,7 @@ defined('ABSPATH') || die('Restricted Access');
 					</div>
 				</div>
 				<div class="cell grid-x acym__campaign__summary__generated__mail__one">
-					<input type="hidden" class="acym__hidden__mail__content" value="<?php echo esc_attr(acym_absoluteURL($data['mail']->body)); ?>">
+                    <?php acym_mailContentInput(acym_absoluteURL($data['mail']->body), '', 'acym__hidden__mail__content'); ?>
 					<input type="hidden" class="acym__hidden__mail__stylesheet" value="<?php echo esc_attr($data['mail']->stylesheet); ?>">
 					<div class="cell grid-x acym__campaign__summary__generated__mail__preview">
 						<i class="acymicon-sort acym__campaign__summary__generated__mail__toogle__preview"></i>

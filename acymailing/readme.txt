@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.8
 Tested up to: 7.1
-Stable tag: 11.1.0
+Stable tag: 11.1.1
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -116,24 +116,17 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 11.1.0 - September 24, 2026 =
-* We replaced the date picker with the default html date picker to improve the user experience, the accessibility and performance.
-* We added on the profile edition (front-end), a checkbox available for all users to manage their tracking preferences.
+= 11.1.1 - October 5, 2026 =
+* The emails sent with the AcyMailing sending service are now lighter and can be sent a bit faster.
+* HTML content is not allowed anymore in custom field values.
+* Better information messages are shown on Google/Outlook Oauth authentication failure for email sending.
+* Deactivated lists are now identified by an "Inactive" tag on the recipients step and on the campaign summary.
+* We improved the Gravity Forms integration to save submitted lists in Gravity Forms entries (displayed in entry listing and available in notifications).
 
-* [add-ons] We added an option to specify the menu item to use for DP Calendar event links.
-* Development files are no longer included in the third-party libraries shipped with the package, resulting in a lighter and cleaner installation.
-* Newsletters now use the website default language instead of the administrator language for dynamic tags like {date:X}, the "Read more" text and the default templates.
-
-* We fixed the error message displayed when uploading a file of a non-accepted type that showed raw HTML instead of a readable message.
-* We have fixed the display of links added in subscription form texts and custom fields that were removed on display.
-* We fixed the List-Unsubscribe header so one-click unsubscribe works again.
-* Security for some custom fields has been enhanced.
-* A security issue related to a very specific scenario has been fixed in the mailbox actions.
-* Some translations were not properly replacing HTML characters
-* Imported email addresses are now always stored in lower case, preventing case sensitive duplicates and subscriptions or custom fields being silently skipped during an import.
-* Importing users with an empty date column (like the last open or last click date) no longer triggers a database error, the value is now stored as empty.
-* An "Access denied for this email" error has been fixed when creating a campaign from the dashboard while the favorite template had been deleted.
-* The action buttons now work again on the follow-up, automation and mailbox action listings, where the duplicate buttons silently reloaded the page without doing the action asked and the statistics button did nothing when clicked.
-* The subscription form no longer returns a 404 error when submitted from a secondary language on multilingual websites using Polylang or WPML.
+* The link to process the bounces, displayed after running the bounce handling, is clickable again.
+* Video insertion in campaigns is fixed for user groups without template management permissions.
+* The bounce handling no longer stops with an error when an email of the mailbox cannot be read. The faulty email is now reported and analysed from its raw content so all the following messages are still handled.
+* Several issues have been fixed on the filters of the segments and automations: the delay of the statistics filters is now correctly reloaded and can be set on each filter, no delay is applied by default anymore, and a faulty add-on no longer breaks the display of the page.
+* A list deactivated after being added to a campaign is displayed again on the recipients step.
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)

@@ -2,6 +2,8 @@
 defined('ABSPATH') || die('Restricted Access');
 
 
+__('Error decoding the email %1$s: %2$s', 'acymailing');
+__('The structure of this email could not be read (%s), its raw content will be analysed', 'acymailing');
 __('Close', 'acymailing');
 __('Phone country code', 'acymailing');
 __('Phone number', 'acymailing');
