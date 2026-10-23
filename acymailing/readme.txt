@@ -116,7 +116,7 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 
 == Changelog ==
 
-= 11.1.1 - October 5, 2026 =
+= 11.1.1 - October 6, 2026 =
 * The emails sent with the AcyMailing sending service are now lighter and can be sent a bit faster.
 * HTML content is not allowed anymore in custom field values.
 * Better information messages are shown on Google/Outlook Oauth authentication failure for email sending.
