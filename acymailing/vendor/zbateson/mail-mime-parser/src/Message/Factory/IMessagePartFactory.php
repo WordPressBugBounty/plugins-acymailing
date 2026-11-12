@@ -27,7 +27,7 @@ abstract class IMessagePartFactory
     protected $partStreamContainerFactory;
 
     public function __construct(
-        StreamFactory $streamFactory,
+        StreamFactory              $streamFactory,
         PartStreamContainerFactory $partStreamContainerFactory
     ) {
         $this->streamFactory = $streamFactory;

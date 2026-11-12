@@ -79,7 +79,7 @@ trait Import
 
         $importHelper = new ImportHelper();
 
-        if (empty($function) || !$importHelper->$function()) {
+        if (empty($function) || $importHelper->isUserEmailIndexMissing() || !$importHelper->$function()) {
             $this->import();
 
             return;
@@ -125,7 +125,9 @@ trait Import
         wp_verify_nonce(acym_getVar('cmd', '_wpnonce'), 'acymnonce') || die('Invalid Token');
 
         $importHelper = new ImportHelper();
-        $importHelper->finalizeImport();
+        if (!$importHelper->isUserEmailIndexMissing()) {
+            $importHelper->finalizeImport();
+        }
 
         $this->listing();
     }

@@ -40,11 +40,11 @@ class Message extends MimePart implements IMessage
     private $privacyHelper;
 
     public function __construct(
-        ?PartStreamContainer $streamContainer = null,
-        ?PartHeaderContainer $headerContainer = null,
+        ?PartStreamContainer   $streamContainer = null,
+        ?PartHeaderContainer   $headerContainer = null,
         ?PartChildrenContainer $partChildrenContainer = null,
-        ?MultipartHelper $multipartHelper = null,
-        ?PrivacyHelper $privacyHelper = null
+        ?MultipartHelper       $multipartHelper = null,
+        ?PrivacyHelper         $privacyHelper = null
     ) {
         parent::__construct(
             null,
@@ -73,10 +73,11 @@ class Message extends MimePart implements IMessage
      * destroyed.
      *
      * @param resource|StreamInterface|string $resource The resource handle to
-     *        the input stream of the mime message, or a string containing a
-     *        mime message.
-     * @param bool $attached pass true to have it attached to the returned
-     *        IMessage and destroyed with it.
+     *                                                  the input stream of the mime message, or a string containing a
+     *                                                  mime message.
+     * @param bool                            $attached pass true to have it attached to the returned
+     *                                                  IMessage and destroyed with it.
+     *
      * @return IMessage
      */
     public static function from($resource, $attached)
@@ -85,6 +86,7 @@ class Message extends MimePart implements IMessage
         if ($mmp === null) {
             $mmp = new MailMimeParser();
         }
+
         return $mmp->parse($resource, $attached);
     }
 
@@ -95,10 +97,11 @@ class Message extends MimePart implements IMessage
      * MIME-Version header defined.
      *
      */
-    public function isMime() : bool
+    public function isMime(): bool
     {
         $contentType = $this->getHeaderValue(HeaderConsts::CONTENT_TYPE);
         $mimeVersion = $this->getHeaderValue(HeaderConsts::MIME_VERSION);
+
         return ($contentType !== null || $mimeVersion !== null);
     }
 
@@ -138,6 +141,7 @@ class Message extends MimePart implements IMessage
         if ($textPart !== null) {
             return $textPart->getContentStream($charset);
         }
+
         return null;
     }
 
@@ -147,6 +151,7 @@ class Message extends MimePart implements IMessage
         if ($part !== null) {
             return $part->getContent($charset);
         }
+
         return null;
     }
 
@@ -156,6 +161,7 @@ class Message extends MimePart implements IMessage
         if ($htmlPart !== null) {
             return $htmlPart->getContentStream($charset);
         }
+
         return null;
     }
 
@@ -165,6 +171,7 @@ class Message extends MimePart implements IMessage
         if ($part !== null) {
             return $part->getContent($charset);
         }
+
         return null;
     }
 
@@ -180,10 +187,11 @@ class Message extends MimePart implements IMessage
                 $resource,
                 $charset
             );
+
         return $this;
     }
 
-    public function setHtmlPart($resource, string $charset = 'UTF-8') : self
+    public function setHtmlPart($resource, string $charset = 'UTF-8'): self
     {
         $this->multipartHelper
             ->setContentPartForMimeType(
@@ -192,10 +200,11 @@ class Message extends MimePart implements IMessage
                 $resource,
                 $charset
             );
+
         return $this;
     }
 
-    public function removeTextPart(int $index = 0) : bool
+    public function removeTextPart(int $index = 0): bool
     {
         return $this->multipartHelper
             ->removePartByMimeType(
@@ -205,7 +214,7 @@ class Message extends MimePart implements IMessage
             );
     }
 
-    public function removeAllTextParts(bool $moveRelatedPartsBelowMessage = true) : bool
+    public function removeAllTextParts(bool $moveRelatedPartsBelowMessage = true): bool
     {
         return $this->multipartHelper
             ->removeAllContentPartsByMimeType(
@@ -215,7 +224,7 @@ class Message extends MimePart implements IMessage
             );
     }
 
-    public function removeHtmlPart(int $index = 0) : bool
+    public function removeHtmlPart(int $index = 0): bool
     {
         return $this->multipartHelper
             ->removePartByMimeType(
@@ -225,7 +234,7 @@ class Message extends MimePart implements IMessage
             );
     }
 
-    public function removeAllHtmlParts(bool $moveRelatedPartsBelowMessage = true) : bool
+    public function removeAllHtmlParts(bool $moveRelatedPartsBelowMessage = true): bool
     {
         return $this->multipartHelper
             ->removeAllContentPartsByMimeType(
@@ -250,7 +259,7 @@ class Message extends MimePart implements IMessage
         );
     }
 
-    public function getAttachmentCount() : int
+    public function getAttachmentCount(): int
     {
         return \count($this->getAllAttachmentParts());
     }
@@ -269,6 +278,7 @@ class Message extends MimePart implements IMessage
                 $filename,
                 $encoding
             );
+
         return $this;
     }
 
@@ -282,13 +292,15 @@ class Message extends MimePart implements IMessage
             $filename = \basename($filePath);
         }
         $this->addAttachmentPart($handle, $mimeType, $filename, $disposition, $encoding);
+
         return $this;
     }
 
-    public function removeAttachmentPart(int $index) : self
+    public function removeAttachmentPart(int $index): self
     {
         $part = $this->getAttachmentPart($index);
         $this->removePart($part);
+
         return $this;
     }
 
@@ -311,8 +323,8 @@ class Message extends MimePart implements IMessage
         if (\strcasecmp($this->getContentType(), 'multipart/signed') === 0) {
             return $this->getChild(1);
         }
-            return null;
 
+        return null;
     }
 
     /**
@@ -322,13 +334,15 @@ class Message extends MimePart implements IMessage
     {
         $this->privacyHelper
             ->setMessageAsMultipartSigned($this, $micalg, $protocol);
+
         return $this;
     }
 
-    public function setSignature(string $body) : self
+    public function setSignature(string $body): self
     {
         $this->privacyHelper
             ->setSignature($this, $body);
+
         return $this;
     }
 }

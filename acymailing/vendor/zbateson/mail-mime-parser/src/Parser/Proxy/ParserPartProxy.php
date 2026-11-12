@@ -48,9 +48,10 @@ abstract class ParserPartProxy extends PartBuilder
      *
      * @param IMessagePart $part The part
      */
-    public function setPart(IMessagePart $part) : self
+    public function setPart(IMessagePart $part): self
     {
         $this->part = $part;
+
         return $this;
     }
 
@@ -79,6 +80,7 @@ abstract class ParserPartProxy extends PartBuilder
         if (!$this->isContentParsed()) {
             $this->parser->parseContent($this);
         }
+
         return $this;
     }
 
@@ -93,6 +95,7 @@ abstract class ParserPartProxy extends PartBuilder
     public function parseAll()
     {
         $this->parseContent();
+
         return $this;
     }
 
@@ -116,27 +119,27 @@ abstract class ParserPartProxy extends PartBuilder
         return $this->partBuilder->getMessageResourceHandle();
     }
 
-    public function getMessageResourceHandlePos() : int
+    public function getMessageResourceHandlePos(): int
     {
         return $this->partBuilder->getMessageResourceHandlePos();
     }
 
-    public function getStreamPartStartPos() : int
+    public function getStreamPartStartPos(): int
     {
         return $this->partBuilder->getStreamPartStartPos();
     }
 
-    public function getStreamPartLength() : int
+    public function getStreamPartLength(): int
     {
         return $this->partBuilder->getStreamPartLength();
     }
 
-    public function getStreamContentStartPos() : ?int
+    public function getStreamContentStartPos(): ?int
     {
         return $this->partBuilder->getStreamContentStartPos();
     }
 
-    public function getStreamContentLength() : int
+    public function getStreamContentLength(): int
     {
         return $this->partBuilder->getStreamContentLength();
     }
@@ -147,6 +150,7 @@ abstract class ParserPartProxy extends PartBuilder
     public function setStreamPartStartPos(int $streamPartStartPos)
     {
         $this->partBuilder->setStreamPartStartPos($streamPartStartPos);
+
         return $this;
     }
 
@@ -156,6 +160,7 @@ abstract class ParserPartProxy extends PartBuilder
     public function setStreamPartEndPos(int $streamPartEndPos)
     {
         $this->partBuilder->setStreamPartEndPos($streamPartEndPos);
+
         return $this;
     }
 
@@ -165,6 +170,7 @@ abstract class ParserPartProxy extends PartBuilder
     public function setStreamContentStartPos(int $streamContentStartPos)
     {
         $this->partBuilder->setStreamContentStartPos($streamContentStartPos);
+
         return $this;
     }
 
@@ -174,15 +180,16 @@ abstract class ParserPartProxy extends PartBuilder
     public function setStreamPartAndContentEndPos(int $streamContentEndPos)
     {
         $this->partBuilder->setStreamPartAndContentEndPos($streamContentEndPos);
+
         return $this;
     }
 
-    public function isContentParsed() : ?bool
+    public function isContentParsed(): ?bool
     {
         return $this->partBuilder->isContentParsed();
     }
 
-    public function isMime() : bool
+    public function isMime(): bool
     {
         return $this->partBuilder->isMime();
     }

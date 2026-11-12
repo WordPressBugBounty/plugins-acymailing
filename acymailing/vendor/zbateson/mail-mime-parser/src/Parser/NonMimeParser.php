@@ -28,9 +28,9 @@ class NonMimeParser extends AbstractParser
     protected $partHeaderContainerFactory;
 
     public function __construct(
-        ParserNonMimeMessageProxyFactory $parserNonMimeMessageProxyFactory,
-        ParserUUEncodedPartProxyFactory $parserUuEncodedPartProxyFactory,
-        PartBuilderFactory $partBuilderFactory,
+        ParserNonMimeMessageProxyFactory    $parserNonMimeMessageProxyFactory,
+        ParserUUEncodedPartProxyFactory     $parserUuEncodedPartProxyFactory,
+        PartBuilderFactory                  $partBuilderFactory,
         UUEncodedPartHeaderContainerFactory $uuEncodedPartHeaderContainerFactory
     ) {
         parent::__construct($parserNonMimeMessageProxyFactory, $parserUuEncodedPartProxyFactory, $partBuilderFactory);
@@ -42,7 +42,7 @@ class NonMimeParser extends AbstractParser
      * a ParserManager.
      *
      */
-    public function canParse(PartBuilder $part) : bool
+    public function canParse(PartBuilder $part): bool
     {
         return true;
     }
@@ -64,6 +64,7 @@ class NonMimeParser extends AbstractParser
         $proxy = $this->parserManager->createParserProxyFor($pb);
         $pb->setStreamPartStartPos($parent->getNextPartStart());
         $pb->setStreamContentStartPos($parent->getNextPartStart());
+
         return $proxy;
     }
 
@@ -74,7 +75,7 @@ class NonMimeParser extends AbstractParser
      *
      * @param ParserNonMimeMessageProxy|ParserUUEncodedPartProxy $proxy
      */
-    private function parseNextPart(ParserPartProxy $proxy) : self
+    private function parseNextPart(ParserPartProxy $proxy): self
     {
         $handle = $proxy->getMessageResourceHandle();
         while (!\feof($handle)) {
@@ -82,12 +83,14 @@ class NonMimeParser extends AbstractParser
             $line = \trim(MessageParser::readLine($handle));
             if (\preg_match('/^begin ([0-7]{3}) (.*)$/', $line, $matches)) {
                 $proxy->setNextPartStart($start);
-                $proxy->setNextPartMode((int) $matches[1]);
+                $proxy->setNextPartMode((int)$matches[1]);
                 $proxy->setNextPartFilename($matches[2]);
+
                 return $this;
             }
             $proxy->setStreamPartAndContentEndPos(\ftell($handle));
         }
+
         return $this;
     }
 
@@ -104,6 +107,7 @@ class NonMimeParser extends AbstractParser
             $proxy->setStreamContentStartPos(\ftell($handle));
         }
         $this->parseNextPart($proxy);
+
         return $this;
     }
 
@@ -115,6 +119,7 @@ class NonMimeParser extends AbstractParser
         }
         $child = $this->createPart($proxy);
         $proxy->clearNextPart();
+
         return $child;
     }
 }

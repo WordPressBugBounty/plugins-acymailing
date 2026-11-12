@@ -99,7 +99,7 @@ trait Configuration
         $allPref['trackingsystem'] = 'acymailing';
         $allPref['trackingsystemexternalwebsite'] = 1;
         $allPref['generate_name'] = 1;
-        $allPref['allow_modif'] = 'data';
+        $allPref['allow_modif'] = 'none';
         $allPref['from_as_replyto'] = '1';
         $allPref['bounceVersion'] = self::BOUNCE_VERSION;
         $allPref['numberThumbnail'] = 2;
@@ -127,7 +127,7 @@ trait Configuration
         $allPref['Starter'] = ACYM_STARTER;
         $allPref['Essential'] = ACYM_ESSENTIAL;
         $allPref['Enterprise'] = ACYM_ENTERPRISE;
-        $allPref['previous_version'] = '11.1.1';
+        $allPref['previous_version'] = '11.1.2';
 
         $allPref['display_built_by'] = acym_level(ACYM_ESSENTIAL) ? 0 : 1;
         $allPref['php_overrides'] = 0;

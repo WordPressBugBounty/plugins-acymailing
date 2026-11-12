@@ -33,11 +33,11 @@ class MimeParser extends AbstractParser
     protected $headerParser;
 
     public function __construct(
-        ParserMessageProxyFactory $parserMessageProxyFactory,
+        ParserMessageProxyFactory  $parserMessageProxyFactory,
         ParserMimePartProxyFactory $parserMimePartProxyFactory,
-        PartBuilderFactory $partBuilderFactory,
+        PartBuilderFactory         $partBuilderFactory,
         PartHeaderContainerFactory $partHeaderContainerFactory,
-        HeaderParser $headerParser
+        HeaderParser               $headerParser
     ) {
         parent::__construct($parserMessageProxyFactory, $parserMimePartProxyFactory, $partBuilderFactory);
         $this->partHeaderContainerFactory = $partHeaderContainerFactory;
@@ -48,7 +48,7 @@ class MimeParser extends AbstractParser
      * Returns true if the passed PartBuilder::isMime() method returns true.
      *
      */
-    public function canParse(PartBuilder $part) : bool
+    public function canParse(PartBuilder $part): bool
     {
         return $part->isMime();
     }
@@ -63,7 +63,7 @@ class MimeParser extends AbstractParser
      *
      * @param resource $handle
      */
-    private function readBoundaryLine($handle, ParserMimePartProxy $proxy) : string
+    private function readBoundaryLine($handle, ParserMimePartProxy $proxy): string
     {
         $size = 2048;
         $isCut = false;
@@ -74,6 +74,7 @@ class MimeParser extends AbstractParser
         }
         $ret = \rtrim($line, "\r\n");
         $proxy->setLastLineEndingLength(\strlen($line) - \strlen($ret));
+
         return ($isCut) ? '' : $ret;
     }
 
@@ -92,7 +93,7 @@ class MimeParser extends AbstractParser
      * the passed $handle's read pos before the boundary and its line separator
      * were read.
      */
-    private function findContentBoundary(ParserMimePartProxy $proxy) : self
+    private function findContentBoundary(ParserMimePartProxy $proxy): self
     {
         $handle = $proxy->getMessageResourceHandle();
         // last separator before a boundary belongs to the boundary, and is not
@@ -103,11 +104,13 @@ class MimeParser extends AbstractParser
             $line = $this->readBoundaryLine($handle, $proxy);
             if (\substr($line, 0, 2) === '--' && $proxy->setEndBoundaryFound($line)) {
                 $proxy->setStreamPartAndContentEndPos($endPos);
+
                 return $this;
             }
         }
         $proxy->setStreamPartAndContentEndPos(\ftell($handle));
         $proxy->setEof();
+
         return $this;
     }
 
@@ -118,6 +121,7 @@ class MimeParser extends AbstractParser
     {
         $proxy->setStreamContentStartPos($proxy->getMessageResourceHandlePos());
         $this->findContentBoundary($proxy);
+
         return $this;
     }
 
@@ -152,11 +156,13 @@ class MimeParser extends AbstractParser
                 $headerContainer
             );
             $parserProxy = $this->parserManager->createParserProxyFor($child);
+
             return $parserProxy;
         }
         // reads content past an end boundary if there is any
         $parserProxy = $this->parserPartProxyFactory->newInstance($child, $this);
         $this->parseContent($parserProxy);
+
         return null;
     }
 
@@ -167,6 +173,7 @@ class MimeParser extends AbstractParser
         }
         $headerContainer = $this->partHeaderContainerFactory->newInstance();
         $child = $this->partBuilderFactory->newChildPartBuilder($headerContainer, $proxy);
+
         return $this->createPart($proxy, $headerContainer, $child);
     }
 }

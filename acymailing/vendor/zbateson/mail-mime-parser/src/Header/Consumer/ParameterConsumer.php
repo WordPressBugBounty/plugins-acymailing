@@ -32,7 +32,7 @@ class ParameterConsumer extends GenericConsumer
      *
      * @return string[]
      */
-    protected function getTokenSeparators() : array
+    protected function getTokenSeparators(): array
     {
         return [';', '='];
     }
@@ -48,11 +48,12 @@ class ParameterConsumer extends GenericConsumer
      *
      * @return string the regex pattern
      */
-    protected function getTokenSplitPattern() : string
+    protected function getTokenSplitPattern(): string
     {
         $sChars = \implode('|', $this->getAllTokenSeparators());
         $mimePartPattern = MimeLiteralPart::MIME_PART_PATTERN_NO_QUOTES;
-        return '~(' . $mimePartPattern . '|\\\\.|' . $sChars . ')~';
+
+        return '~('.$mimePartPattern.'|\\\\.|'.$sChars.')~';
     }
 
     /**
@@ -67,6 +68,7 @@ class ParameterConsumer extends GenericConsumer
         if ($isLiteral) {
             return $this->partFactory->newLiteralPart($token);
         }
+
         return $this->partFactory->newToken($token);
     }
 
@@ -85,6 +87,7 @@ class ParameterConsumer extends GenericConsumer
             $splitParts[$name] = $ret;
         }
         $splitParts[$name]->addPart($value, $isEncoded, $index);
+
         return $ret;
     }
 
@@ -108,10 +111,11 @@ class ParameterConsumer extends GenericConsumer
                 $splitParts,
                 $matches[1],
                 $strValue,
-                (int) $matches[2],
+                (int)$matches[2],
                 (($matches[2] === '') || !empty($matches[3]))
             );
         }
+
         return $this->partFactory->newParameterPart($strName, $strValue);
     }
 
@@ -125,18 +129,21 @@ class ParameterConsumer extends GenericConsumer
      * Returns true if the token was processed, and false otherwise.
      *
      */
-    private function processTokenPart(string $tokenValue, ArrayObject $combined, ArrayObject $splitParts, string &$strName, string &$strCat) : bool
+    private function processTokenPart(string $tokenValue, ArrayObject $combined, ArrayObject $splitParts, string &$strName, string &$strCat): bool
     {
         if ($tokenValue === ';') {
             $combined[] = $this->getPartFor($strName, $strCat, $splitParts);
             $strName = '';
             $strCat = '';
+
             return true;
         } elseif ($tokenValue === '=' && $strCat !== '') {
             $strName = $strCat;
             $strCat = '';
+
             return true;
         }
+
         return false;
     }
 
@@ -149,7 +156,7 @@ class ParameterConsumer extends GenericConsumer
      *
      * @return IHeaderPart[]|array
      */
-    private function finalizeParameterParts(ArrayObject $combined) : array
+    private function finalizeParameterParts(ArrayObject $combined): array
     {
         foreach ($combined as $key => $part) {
             if ($part instanceof SplitParameterToken) {
@@ -160,6 +167,7 @@ class ParameterConsumer extends GenericConsumer
                 );
             }
         }
+
         return $this->filterIgnoredSpaces($combined->getArrayCopy());
     }
 
@@ -168,9 +176,10 @@ class ParameterConsumer extends GenericConsumer
      * objects out of created Token and LiteralParts.
      *
      * @param IHeaderPart[] $parts The parsed parts.
+     *
      * @return IHeaderPart[] Array of resulting final parts.
      */
-    protected function processParts(array $parts) : array
+    protected function processParts(array $parts): array
     {
         $combined = new ArrayObject();
         $splitParts = new ArrayObject();
@@ -184,6 +193,7 @@ class ParameterConsumer extends GenericConsumer
             }
             $strCat .= $pValue;
         }
+
         return $this->finalizeParameterParts($combined);
     }
 }

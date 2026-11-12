@@ -43,7 +43,7 @@ class ConsumerService
         'with' => null,
         'id' => null,
         'for' => null,
-        'date' => null
+        'date' => null,
     ];
 
     public function __construct(HeaderPartFactory $partFactory, MimeLiteralPartFactory $mimeLiteralPartFactory)
@@ -171,6 +171,7 @@ class ConsumerService
             }
             $this->receivedConsumers[$partName] = $consumer;
         }
+
         return $this->receivedConsumers[$partName];
     }
 

@@ -127,7 +127,7 @@ final class Iconv
 
     public static function iconv($inCharset, $outCharset, $str)
     {
-        $str = (string) $str;
+        $str = (string)$str;
         if ('' === $str) {
             return '';
         }
@@ -184,7 +184,7 @@ final class Iconv
         // Load charset maps
 
         if (('utf-8' !== $inCharset && !self::loadMap('from.', $inCharset, $inMap))
-          || ('utf-8' !== $outCharset && !self::loadMap('to.', $outCharset, $outMap))) {
+            || ('utf-8' !== $outCharset && !self::loadMap('to.', $outCharset, $outMap))) {
             trigger_error(sprintf(self::ERROR_WRONG_CHARSET, $inCharset, $outCharset));
 
             return false;
@@ -290,9 +290,9 @@ final class Iconv
         while ($i < $len) {
             $c = strtolower($str[$i]);
             if ((\ICONV_MIME_DECODE_CONTINUE_ON_ERROR & $mode)
-              && 'utf-8' !== $c
-              && !isset(self::$alias[$c])
-              && !self::loadMap('from.', $c, $d)) {
+                && 'utf-8' !== $c
+                && !isset(self::$alias[$c])
+                && !self::loadMap('from.', $c, $d)) {
                 $d = false;
             } elseif ('B' === strtoupper($str[$i + 1])) {
                 $d = base64_decode($str[$i + 2]);
@@ -328,9 +328,12 @@ final class Iconv
     public static function iconv_get_encoding($type = 'all')
     {
         switch ($type) {
-            case 'input_encoding': return self::$inputEncoding;
-            case 'output_encoding': return self::$outputEncoding;
-            case 'internal_encoding': return self::$internalEncoding;
+            case 'input_encoding':
+                return self::$inputEncoding;
+            case 'output_encoding':
+                return self::$outputEncoding;
+            case 'internal_encoding':
+                return self::$internalEncoding;
         }
 
         return [
@@ -343,10 +346,17 @@ final class Iconv
     public static function iconv_set_encoding($type, $charset)
     {
         switch ($type) {
-            case 'input_encoding': self::$inputEncoding = $charset; break;
-            case 'output_encoding': self::$outputEncoding = $charset; break;
-            case 'internal_encoding': self::$internalEncoding = $charset; break;
-            default: return false;
+            case 'input_encoding':
+                self::$inputEncoding = $charset;
+                break;
+            case 'output_encoding':
+                self::$outputEncoding = $charset;
+                break;
+            case 'internal_encoding':
+                self::$internalEncoding = $charset;
+                break;
+            default:
+                return false;
         }
 
         return true;
@@ -382,7 +392,7 @@ final class Iconv
 
         $chars = $chars[0] ?? [];
 
-        $lineBreak = (int) $pref['line-length'];
+        $lineBreak = (int)$pref['line-length'];
         $lineStart = "=?{$pref['output-charset']}?{$scheme}?";
         $lineLength = \strlen($fieldName) + 2 + \strlen($lineStart) + 2;
         $lineOffset = \strlen($lineStart) + 3;
@@ -493,7 +503,7 @@ final class Iconv
             }
         }
 
-        if ($offset = (int) $offset) {
+        if ($offset = (int)$offset) {
             $haystack = self::iconv_substr($haystack, $offset, 2147483647, 'utf-8');
         }
         $pos = strpos($haystack, $needle);
@@ -532,9 +542,9 @@ final class Iconv
             return false;
         }
 
-        $s = (string) $s;
+        $s = (string)$s;
         $slen = self::iconv_strlen($s, 'utf-8');
-        $start = (int) $start;
+        $start = (int)$start;
 
         if (0 > $start) {
             $start += $slen;
@@ -629,8 +639,8 @@ final class Iconv
                 $u[$j++] = $uchr[0];
 
                 isset($uchr[1]) && 0 !== ($u[$j++] = $uchr[1])
-                    && isset($uchr[2]) && 0 !== ($u[$j++] = $uchr[2])
-                    && isset($uchr[3]) && 0 !== ($u[$j++] = $uchr[3]);
+                && isset($uchr[2]) && 0 !== ($u[$j++] = $uchr[2])
+                && isset($uchr[3]) && 0 !== ($u[$j++] = $uchr[3]);
             }
         }
 
@@ -723,7 +733,7 @@ final class Iconv
     private static function pregOffset($offset)
     {
         $rx = [];
-        $offset = (int) $offset;
+        $offset = (int)$offset;
 
         while ($offset > 65535) {
             $rx[] = '.{65535}';

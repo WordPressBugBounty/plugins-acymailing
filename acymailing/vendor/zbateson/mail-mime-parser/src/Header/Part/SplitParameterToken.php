@@ -66,7 +66,7 @@ class SplitParameterToken extends HeaderPart
      * current object if $index is 0 and adds the value part to the encodedParts
      * array.
      */
-    protected function extractMetaInformationAndValue(string $value, int $index) : self
+    protected function extractMetaInformationAndValue(string $value, int $index): self
     {
         if (\preg_match('~^([^\']*)\'([^\']*)\'(.*)$~', $value, $matches)) {
             if ($index === 0) {
@@ -76,6 +76,7 @@ class SplitParameterToken extends HeaderPart
             $value = $matches[3];
         }
         $this->encodedParts[$index] = $value;
+
         return $this;
     }
 
@@ -90,8 +91,8 @@ class SplitParameterToken extends HeaderPart
      * value.
      *
      * @param string $value
-     * @param bool $isEncoded
-     * @param int $index
+     * @param bool   $isEncoded
+     * @param int    $index
      */
     public function addPart($value, $isEncoded, $index)
     {
@@ -115,7 +116,7 @@ class SplitParameterToken extends HeaderPart
      * The returned string is converted to UTF-8 before being returned.
      *
      */
-    private function getNextEncodedValue() : string
+    private function getNextEncodedValue(): string
     {
         $cur = \current($this->encodedParts);
         $key = \key($this->encodedParts);
@@ -129,6 +130,7 @@ class SplitParameterToken extends HeaderPart
             }
             $key = $nKey;
         }
+
         return $this->convertEncoding(
             \rawurldecode($running),
             $this->charset,
@@ -140,7 +142,7 @@ class SplitParameterToken extends HeaderPart
      * Reconstructs the value of the split parameter into a single UTF-8 string
      * and returns it.
      */
-    public function getValue() : ?string
+    public function getValue(): ?string
     {
         $parts = $this->literalParts;
 
@@ -151,10 +153,11 @@ class SplitParameterToken extends HeaderPart
         }
 
         \ksort($parts);
+
         return \array_reduce(
             $parts,
-            function($carry, $item) {
-                return $carry . $item;
+            function ($carry, $item) {
+                return $carry.$item;
             },
             ''
         );

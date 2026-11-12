@@ -36,6 +36,7 @@ return array(
     'AcyMailing\\Classes\\ScenarioQueueClass' => $baseDir . '/back/Classes/ScenarioQueueClass.php',
     'AcyMailing\\Classes\\ScenarioStepClass' => $baseDir . '/back/Classes/ScenarioStepClass.php',
     'AcyMailing\\Classes\\SegmentClass' => $baseDir . '/back/Classes/SegmentClass.php',
+    'AcyMailing\\Classes\\StatsCacheClass' => $baseDir . '/back/Classes/StatsCacheClass.php',
     'AcyMailing\\Classes\\StepClass' => $baseDir . '/back/Classes/StepClass.php',
     'AcyMailing\\Classes\\TagClass' => $baseDir . '/back/Classes/TagClass.php',
     'AcyMailing\\Classes\\UrlClass' => $baseDir . '/back/Classes/UrlClass.php',

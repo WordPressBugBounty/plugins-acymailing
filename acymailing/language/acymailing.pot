@@ -1,13 +1,61 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: AcyMailing 11.1.1\n"
+"Project-Id-Version: AcyMailing 11.1.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/acymailing\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-06\n"
+"POT-Creation-Date: 2026-11-12\n"
 "X-Domain: acymailing\n"
 
+
+msgid "This is an enquiry email via {URL} from:\n{NAME} {EMAIL}\n\n{BODY}"
+msgstr ""
+
+msgid "The subject entered by the visitor in the contact form"
+msgstr ""
+
+msgid "The name entered by the visitor in the contact form"
+msgstr ""
+
+msgid "The email address entered by the visitor in the contact form"
+msgstr ""
+
+msgid "The message entered by the visitor in the contact form"
+msgstr ""
+
+msgid "The automated tasks are disabled, enable them to send your emails automatically."
+msgstr ""
+
+msgid "Your automated tasks have not run for over 12 hours, check the cron task on your server or allow our IP 178.23.155.178 if you use our service."
+msgstr ""
+
+msgid "Profile page"
+msgstr ""
+
+msgid "Change the title of the profile page"
+msgstr ""
+
+msgid "Select profile page color theme"
+msgstr ""
+
+msgid "Profile page logo"
+msgstr ""
+
+msgid "Display an image on the profile page"
+msgstr ""
+
+msgid "The unique index on the email column of the AcyMailing subscribers table is missing. The import has been stopped to prevent duplicate subscribers, please fix your database with the \"%s\" button in the Security tab of the configuration."
+msgstr ""
+
+msgid "Manage your subscription"
+msgstr ""
+
+msgid "Someone, most likely you, asked to change the subscription linked to this email address on our website. Use the link below to manage it."
+msgstr ""
+
+msgid "If you did not ask for this, you can simply ignore this email: nothing has been changed."
+msgstr ""
 
 msgid "Error decoding the email %1$s: %2$s"
 msgstr ""
@@ -7951,9 +7999,6 @@ msgid "Manual send process"
 msgstr ""
 
 msgid "Random"
-msgstr ""
-
-msgid "Your cron does not seem to be enabled, don't forget to create it!"
 msgstr ""
 
 msgid "Report"

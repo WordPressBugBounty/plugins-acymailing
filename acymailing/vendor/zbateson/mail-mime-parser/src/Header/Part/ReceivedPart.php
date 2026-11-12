@@ -27,7 +27,8 @@ class ReceivedPart extends ParameterPart
      * @param string $name
      * @param string $value
      */
-    public function __construct(MbWrapper $charsetConverter, $name, $value) {
+    public function __construct(MbWrapper $charsetConverter, $name, $value)
+    {
         parent::__construct($charsetConverter, '', '');
         // can't be mime-encoded
         $this->name = \trim($name);

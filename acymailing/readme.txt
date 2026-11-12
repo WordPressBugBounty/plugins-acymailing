@@ -3,7 +3,7 @@ Contributors: acyba
 Tags: automation, Contact list, drag-and-drop, Email marketing, newsletter
 Requires at least: 5.8
 Tested up to: 7.1
-Stable tag: 11.1.1
+Stable tag: 11.1.2
 Requires PHP: 7.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -79,7 +79,7 @@ There are 3 ways to install this plugin:
 
 == Frequently Asked Questions ==
 = Where do I report security bugs found in this plugin? =
-Please report security bugs found in the source code of the AcyMailing plugin through the [Patchstack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/9e5fb5a8-5a77-4d2e-baca-dd2a0a0e785d). The Patchstack team will assist you with verification, CVE assignment, and notify the developers of this plugin.
+Report them privately to security@acyba.com, or through [our contact form](https://www.acymailing.com/contact/). Never in the support forum or in any public thread. See the Security section of this page for what to include and what we commit to.
 
 = How to contact us? =
 Feel free to do it via this form: [https://www.acymailing.com/contact/](https://www.acymailing.com/contact/)
@@ -114,19 +114,46 @@ An all in one solution, simple, cheaper and made for you that allows you to comp
 4. Automations
 
 
+== Security ==
+
+Please report security issues privately to security@acyba.com, or through https://www.acymailing.com/contact/
+
+Never report them in the support forum or in any public thread: that exposes every site running AcyMailing until a patch is out.
+
+Include the AcyMailing version, the WordPress version, the steps to reproduce and the privileges required. We acknowledge reports within one business day and send an initial assessment within three to five business days.
+
+We ask that you do not publicly disclose details until we have agreed on a disclosure date together. We will credit you in the advisory, in the form you choose, or not at all if you prefer. We do not run a paid bug bounty program.
+
+* Disclosure policy: https://www.acymailing.com/security-policy
+* Published advisories: https://www.acymailing.com/security
+
 == Changelog ==
 
-= 11.1.1 - October 6, 2026 =
-* The emails sent with the AcyMailing sending service are now lighter and can be sent a bit faster.
-* HTML content is not allowed anymore in custom field values.
-* Better information messages are shown on Google/Outlook Oauth authentication failure for email sending.
-* Deactivated lists are now identified by an "Inactive" tag on the recipients step and on the campaign summary.
-* We improved the Gravity Forms integration to save submitted lists in Gravity Forms entries (displayed in entry listing and available in notifications).
+= 11.1.2 - November 12, 2026 =
+* [High] Fixed an information disclosure allowing an unauthenticated visitor to read subscriber data, including the subscriber key. Full details will be published in our security advisory once users have had time to update.
+* [High] Depending on the "Allow subscriber data modifications without authentication" option status, an anonymous visitor could unsubscribe any subscriber whose email address they knew, without any proof that the address was theirs. Ownership is now proven on every branch, whatever the subscription modification setting. Full details will be published in our security advisory once users have had time to update.
+* [High] Any logged-in user could subscribe or unsubscribe any other subscriber. A request now acts only on the subscriber it identified, and is protected by a security token. Full details will be published in our security advisory once users have had time to update.
+* [Medium] Redirections after subscription did not enforce domain validation. The redirection now has a domain approval list through the "Allowed hosts" option, and any form with a non-approved domain will redirect to the main website. Full details will be published in our security advisory once users have had time to update.
+* [Medium] The online version of a campaign could be opened without permission, including campaigns unpublished after sending and campaigns sent to a restricted audience. The online version can now only be opened by users that either sent or received the email. Full details will be published in our security advisory once users have had time to update.
+* We reworked the subscription handling without connection feature to improve its security and reliability. It is now fully disabled by default, and an email is now sent to confirm modifications.
 
-* The link to process the bounces, displayed after running the bounce handling, is clickable again.
-* Video insertion in campaigns is fixed for user groups without template management permissions.
-* The bounce handling no longer stops with an error when an email of the mailbox cannot be read. The faulty email is now reported and analysed from its raw content so all the following messages are still handled.
-* Several issues have been fixed on the filters of the segments and automations: the delay of the statistics filters is now correctly reloaded and can be set on each filter, no delay is applied by default anymore, and a faulty add-on no longer breaks the display of the page.
-* A list deactivated after being added to a campaign is displayed again on the recipients step.
+* The "Modify my profile" dynamic text now opens a dedicated page, with its own logo, image, colour and title to set in the configuration, where subscribers can edit their information and manage all their subscriptions before being redirected back to your website. On WordPress it previously opened the online version of the campaign.
+* The statistics page and the dashboard load much faster on websites with a large amount of statistics: the global statistics are now kept in cache for one hour and new database indexes speed up the charts and the automatic deletion of old statistics and user history.
+
+* The "Handle the messages now" link displayed after running the bounce handling is clickable again.
+* We fixed the delete action from the detailed queue.
+* The bounce handling can connect again to IMAP servers that do not support the XOAUTH2 authentication, like Dovecot based mailboxes.
+* Importing an email address that already exists no longer creates a duplicated subscriber on websites where the unique index is missing from the subscribers table.
+* The user import is now stopped with an error message when the unique index on the email column is missing from the subscribers table, instead of creating duplicated subscribers.
+* The "Check database integrity" button now restores the missing unique index on the email column of the subscribers table.
+* The "Subscribe" button on the subscribers listing displays again the number of selected subscribers.
+* Dynamic tags like {date:X} and the add-ons content are translated again in the website default language. They could be displayed in English when the multilingual emails were turned off after being configured, and on Joomla the administrator language was still used instead of the website one.
+* The content located between two occurrences of the same dynamic text is no longer removed from the campaign summary and the sent emails.
+* An automatic campaign using the "Every X hours/days/weeks/months" trigger is no longer generated twice when its next execution date is moved to an earlier time: it was also sent at the time initially planned. The automations using that trigger are fixed as well.
+* Fixed sending time when scheduled campaign are triggered during daylight saving time/standard time change (DST).
+* POST requests sent to external services now include their content type, which could prevent the Google/Outlook authentication from completing.
+* The subscription form inserted with a shortcode is no longer broken by the themes and page builders reformatting the content of the page, which could add empty paragraphs and display the fields side by side.
+* Fixed compatibility with latest Gravity Forms version.
+* [add-ons] The Contact Form 7 integration now subscribes the user only once Contact Form 7 accepted the submission, so that submissions rejected as spam (reCAPTCHA, Akismet...) don't create subscribers anymore.
 
 [See the whole changelog here.](https://www.acymailing.com/changelog)

@@ -22,7 +22,7 @@ class ReceivedDateConsumer extends DateConsumer
     /**
      * Returns true if the token is a ';'
      */
-    protected function isStartToken(string $token) : bool
+    protected function isStartToken(string $token): bool
     {
         return ($token === ';');
     }
@@ -32,7 +32,7 @@ class ReceivedDateConsumer extends DateConsumer
      *
      * @return string[] an array of regex pattern matchers
      */
-    protected function getTokenSeparators() : array
+    protected function getTokenSeparators(): array
     {
         return [';'];
     }

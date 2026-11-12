@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace GuzzleHttp\Psr7;
 
@@ -66,11 +66,11 @@ class ServerRequest extends Request implements ServerRequestInterface
      */
     public function __construct(
         string $method,
-        $uri,
-        array $headers = [],
-        $body = null,
+               $uri,
+        array  $headers = [],
+               $body = null,
         string $version = '1.1',
-        array $serverParams = []
+        array  $serverParams = []
     ) {
         $this->serverParams = $serverParams;
 
@@ -122,8 +122,8 @@ class ServerRequest extends Request implements ServerRequestInterface
 
         return new UploadedFile(
             $value['tmp_name'],
-            (int) $value['size'],
-            (int) $value['error'],
+            (int)$value['size'],
+            (int)$value['error'],
             $value['name'],
             $value['type']
         );

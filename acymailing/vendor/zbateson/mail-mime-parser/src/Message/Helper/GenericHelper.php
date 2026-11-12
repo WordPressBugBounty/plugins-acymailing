@@ -31,7 +31,7 @@ class GenericHelper extends AbstractHelper
      * one defined in the static $nonMimeContentFields
      *
      */
-    private function isMimeContentField(IHeader $header, array $exceptions = []) : bool
+    private function isMimeContentField(IHeader $header, array $exceptions = []): bool
     {
         return (\stripos($header->getName(), 'Content') === 0
             && !\in_array(\strtolower(\str_replace('-', '', $header->getName())), \array_merge(self::$nonMimeContentFields, $exceptions)));
@@ -60,7 +60,7 @@ class GenericHelper extends AbstractHelper
      * An exception is made for the obsolete Content-Return header, which isn't
      * isn't a MIME content field and so isn't removed.
      */
-    public function removeContentHeadersAndContent(IMimePart $part) : self
+    public function removeContentHeadersAndContent(IMimePart $part): self
     {
         foreach ($part->getAllHeaders() as $header) {
             if ($this->isMimeContentField($header)) {
@@ -68,6 +68,7 @@ class GenericHelper extends AbstractHelper
             }
         }
         $part->detachContentStream();
+
         return $this;
     }
 
@@ -113,6 +114,7 @@ class GenericHelper extends AbstractHelper
     {
         $mime = $this->mimePartFactory->newInstance();
         $this->copyContentHeadersAndContent($part, $mime, true);
+
         return $mime;
     }
 
@@ -142,11 +144,12 @@ class GenericHelper extends AbstractHelper
      * replaced, and instead $replacement's type headers are copied to $message,
      * and any children below $replacement are added directly below $message.
      */
-    public function replacePart(IMessage $message, IMimePart $part, IMimePart $replacement) : self
+    public function replacePart(IMessage $message, IMimePart $part, IMimePart $replacement): self
     {
         $position = $message->removePart($replacement);
         if ($part === $message) {
             $this->movePartContentAndChildren($replacement, $message);
+
             return $this;
         }
         $parent = $part->getParent();

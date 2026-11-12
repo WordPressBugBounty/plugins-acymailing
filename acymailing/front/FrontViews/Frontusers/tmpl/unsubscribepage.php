@@ -181,9 +181,8 @@ defined('ABSPATH') || die('Restricted Access');
 		border-color: <?php echo esc_html($data['hoverColor']); ?> !important;
 	}
 
-	.switch input:checked ~ .switch-paddle{
-		background-color: <?php echo esc_html($data['unsubscribeColor']); ?> !important;
-		border-color: <?php echo esc_html($data['unsubscribeColor']); ?> !important;
+	#acym_wrapper .acym__unsubscribe__page .switch{
+		--color-switch: <?php echo esc_html($data['unsubscribeColor']); ?>;
 	}
 
 	.acym__unsub__reason__selected{

@@ -34,11 +34,12 @@ class DateHeader extends AbstractHeader
      *
      * @return \DateTime|null The parsed DateTime object.
      */
-    public function getDateTime() : ?\DateTime
+    public function getDateTime(): ?\DateTime
     {
         if (!empty($this->parts) && $this->parts[0] instanceof DatePart) {
             return $this->parts[0]->getDateTime();
         }
+
         return null;
     }
 
@@ -48,12 +49,13 @@ class DateHeader extends AbstractHeader
      *
      * @return DateTimeImmutable|null The parsed DateTimeImmutable object.
      */
-    public function getDateTimeImmutable() : ?\DateTimeImmutable
+    public function getDateTimeImmutable(): ?\DateTimeImmutable
     {
         $dateTime = $this->getDateTime();
         if ($dateTime !== null) {
             return DateTimeImmutable::createFromMutable($dateTime);
         }
+
         return null;
     }
 }

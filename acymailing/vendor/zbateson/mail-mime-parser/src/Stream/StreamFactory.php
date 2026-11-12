@@ -57,6 +57,7 @@ class StreamFactory
                 $part->getStreamContentStartPos()
             );
         }
+
         return null;
     }
 
@@ -64,7 +65,7 @@ class StreamFactory
      * Creates and returns a SeekingLimitedStream.
      *
      */
-    private function newLimitStream(StreamInterface $stream, int $length, int $start) : SeekingLimitStream
+    private function newLimitStream(StreamInterface $stream, int $length, int $start): SeekingLimitStream
     {
         return new SeekingLimitStream(
             $this->newNonClosingStream($stream),

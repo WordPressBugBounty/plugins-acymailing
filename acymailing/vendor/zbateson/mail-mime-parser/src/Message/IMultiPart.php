@@ -31,16 +31,17 @@ interface IMultiPart extends IMessagePart
      * out.  Some default filters are provided by static functions returning
      * callables in {@see PartFilter}.
      *
+     * @param int      $index    The 0-based index (0 being this part if $fnFilter is
+     *                           null or this part is satisfied by the filter).
+     * @param callable $fnFilter Optional function accepting an IMessagePart and
+     *                           returning true if the part should be included.
+     *
+     * @return IMessagePart|null A matching part, or null if not found.
      * @see IMultiPart::getAllParts() to get an array of all parts with an
      *      optional filter.
      * @see IMultiPart::getPartCount() to get the number of parts with an
      *      optional filter.
      * @see IMultiPart::getChild() to get a direct child of the current part.
-     * @param int $index The 0-based index (0 being this part if $fnFilter is
-     *        null or this part is satisfied by the filter).
-     * @param callable $fnFilter Optional function accepting an IMessagePart and
-     *        returning true if the part should be included.
-     * @return IMessagePart|null A matching part, or null if not found.
      */
     public function getPart($index, $fnFilter = null);
 
@@ -58,15 +59,16 @@ interface IMultiPart extends IMessagePart
      * out.  Some default filters are provided by static functions returning
      * callables in {@see PartFilter}.
      *
+     * @param callable $fnFilter Optional function accepting an IMessagePart and
+     *                           returning true if the part should be included.
+     *
+     * @return IMessagePart[] An array of matching parts.
+     * @see IMultiPart::getChildParts() to get an array of all direct children
+     *      of the current part.
      * @see IMultiPart::getPart() to find a part at a specific 0-based index
      *      with an optional filter.
      * @see IMultiPart::getPartCount() to get the number of parts with an
      *      optional filter.
-     * @see IMultiPart::getChildParts() to get an array of all direct children
-     *      of the current part.
-     * @param callable $fnFilter Optional function accepting an IMessagePart and
-     *        returning true if the part should be included.
-     * @return IMessagePart[] An array of matching parts.
      */
     public function getAllParts($fnFilter = null);
 
@@ -81,15 +83,16 @@ interface IMultiPart extends IMessagePart
      * out.  Some default filters are provided by static functions returning
      * callables in {@see PartFilter}.
      *
+     * @param callable $fnFilter Optional function accepting an IMessagePart and
+     *                           returning true if the part should be included.
+     *
+     * @return int The number of matching parts.
+     * @see IMultiPart::getChildCount() to get a count of direct children of
+     *      this part.
      * @see IMultiPart::getPart() to find a part at a specific 0-based index
      *      with an optional filter.
      * @see IMultiPart::getAllParts() to get an array of all parts with an
      *      optional filter.
-     * @see IMultiPart::getChildCount() to get a count of direct children of
-     *      this part.
-     * @param callable $fnFilter Optional function accepting an IMessagePart and
-     *        returning true if the part should be included.
-     * @return int The number of matching parts.
      */
     public function getPartCount($fnFilter = null);
 
@@ -102,19 +105,20 @@ interface IMultiPart extends IMessagePart
      * out.  Some default filters are provided by static functions returning
      * callables in {@see PartFilter}.
      *
+     * @param int      $index    0-based index
+     * @param callable $fnFilter Optional function accepting an IMessagePart and
+     *                           returning true if the part should be included.
+     *
+     * @return IMessagePart|null The matching direct child part or null if not
+     *         found.
+     * @see IMultiPart::getPart() to find a part at a specific 0-based index
+     *      with an optional filter.
      * @see IMultiPart::getChildParts() to get an array of all direct children
      *      of the current part.
      * @see IMultiPart::getChildCount() to get a count of direct children of
      *      this part.
      * @see IMultiPart::getChildIterator() to get an iterator of children of
      *      this part.
-     * @see IMultiPart::getPart() to find a part at a specific 0-based index
-     *      with an optional filter.
-     * @param int $index 0-based index
-     * @param callable $fnFilter Optional function accepting an IMessagePart and
-     *        returning true if the part should be included.
-     * @return IMessagePart|null The matching direct child part or null if not
-     *         found.
      */
     public function getChild($index, $fnFilter = null);
 
@@ -127,16 +131,17 @@ interface IMultiPart extends IMessagePart
      * out.  Some default filters are provided by static functions returning
      * callables in {@see PartFilter}.
      *
-     * @see IMultiPart::getChild() to get a direct child of the current part.
-     * @see IMultiPart::getChildCount() to get a count of direct children of
-     *      this part.
+     * @param callable $fnFilter Optional function accepting an IMessagePart and
+     *                           returning true if the part should be included.
+     *
+     * @return IMessagePart[] An array of matching child parts.
      * @see IMultiPart::getChildIterator() to get an iterator of children of
      *      this part.
      * @see IMultiPart::getAllParts() to get an array of all parts with an
      *      optional filter.
-     * @param callable $fnFilter Optional function accepting an IMessagePart and
-     *        returning true if the part should be included.
-     * @return IMessagePart[] An array of matching child parts.
+     * @see IMultiPart::getChild() to get a direct child of the current part.
+     * @see IMultiPart::getChildCount() to get a count of direct children of
+     *      this part.
      */
     public function getChildParts($fnFilter = null);
 
@@ -149,17 +154,18 @@ interface IMultiPart extends IMessagePart
      * out.  Some default filters are provided by static functions returning
      * callables in {@see PartFilter}.
      *
-     * @see IMultiPart::getChild() to get a direct child of the current part.
-     * @see IMultiPart::getChildParts() to get an array of all direct children
-     *      of the current part.
+     * @param callable $fnFilter Optional function accepting an IMessagePart and
+     *                           returning true if the part should be included.
+     *
+     * @return int The number of children, or number of children matching the
+     *         the passed filtering callable.
      * @see IMultiPart::getChildIterator() to get an iterator of children of
      *      this part.
      * @see IMultiPart::getPartCount() to get the number of parts with an
      *      optional filter.
-     * @param callable $fnFilter Optional function accepting an IMessagePart and
-     *        returning true if the part should be included.
-     * @return int The number of children, or number of children matching the
-     *         the passed filtering callable.
+     * @see IMultiPart::getChild() to get a direct child of the current part.
+     * @see IMultiPart::getChildParts() to get an array of all direct children
+     *      of the current part.
      */
     public function getChildCount($fnFilter = null);
 
@@ -194,13 +200,14 @@ interface IMultiPart extends IMessagePart
      * {@see IMessagePart::getContentType()} for all parts (including the
      * current part) and returns a matching one at the given 0-based index.
      *
-     * @see IMultiPart::getAllPartsByMimeType() to get all parts that match a
-     *      mime type.
+     * @param string $mimeType The mime type to find.
+     * @param int    $index    Optional 0-based index (defaulting to '0').
+     *
+     * @return IMessagePart|null The part.
      * @see IMultiPart::getCountOfPartsByMimeType() to get a count of parts with
      *      a mime type.
-     * @param string $mimeType The mime type to find.
-     * @param int $index Optional 0-based index (defaulting to '0').
-     * @return IMessagePart|null The part.
+     * @see IMultiPart::getAllPartsByMimeType() to get all parts that match a
+     *      mime type.
      */
     public function getPartByMimeType($mimeType, $index = 0);
 
@@ -212,11 +219,12 @@ interface IMultiPart extends IMessagePart
      * {@see IMessagePart::getContentType()} for all parts (including the
      * current part), returning an array of matching parts.
      *
+     * @param string $mimeType The mime type to find.
+     *
+     * @return IMessagePart[] An array of matching parts.
      * @see IMultiPart::getPartByMimeType() to get a part by mime type.
      * @see IMultiPart::getCountOfPartsByMimeType() to get a count of parts with
      *      a mime type.
-     * @param string $mimeType The mime type to find.
-     * @return IMessagePart[] An array of matching parts.
      */
     public function getAllPartsByMimeType($mimeType);
 
@@ -224,11 +232,12 @@ interface IMultiPart extends IMessagePart
      * Returns the number of parts that have content types matching the passed
      * mime type.
      *
+     * @param string $mimeType The mime type to find.
+     *
+     * @return int The number of matching parts.
      * @see IMultiPart::getPartByMimeType() to get a part by mime type.
      * @see IMultiPart::getAllPartsByMimeType() to get all parts that match a
      *      mime type.
-     * @param string $mimeType The mime type to find.
-     * @return int The number of matching parts.
      */
     public function getCountOfPartsByMimeType($mimeType);
 
@@ -238,6 +247,7 @@ interface IMultiPart extends IMessagePart
      * Calls {@see IMessagePart::getContentId()} to find a matching part.
      *
      * @param string $contentId The content ID to find a part for.
+     *
      * @return IMessagePart|null The matching part.
      */
     public function getPartByContentId($contentId);
@@ -248,8 +258,8 @@ interface IMultiPart extends IMessagePart
      * If the $position parameter is non-null, adds the part at the passed
      * position index, otherwise adds it as the last child.
      *
-     * @param IMessagePart $part The part to add.
-     * @param int $position Optional insertion position 0-based index.
+     * @param IMessagePart $part     The part to add.
+     * @param int          $position Optional insertion position 0-based index.
      */
     public function addChild(IMessagePart $part, ?int $position = null);
 
@@ -267,10 +277,11 @@ interface IMultiPart extends IMessagePart
      * ```php $part->getParent()->removePart(); ```.
      *
      * @param IMessagePart $part The part to remove
+     *
      * @return int|null The previous index position of the part within its old
      *         parent.
      */
-    public function removePart(IMessagePart $part) : ?int;
+    public function removePart(IMessagePart $part): ?int;
 
     /**
      * Removes all parts below the current part.  If a callable filter is
@@ -283,8 +294,9 @@ interface IMultiPart extends IMessagePart
      * getAllParts but the current part is filtered out if returned.
      *
      * @param callable $fnFilter Optional function accepting an IMessagePart and
-     *        returning true if the part should be included.
+     *                           returning true if the part should be included.
+     *
      * @return int The number of removed parts.
      */
-    public function removeAllParts($fnFilter = null) : int;
+    public function removeAllParts($fnFilter = null): int;
 }

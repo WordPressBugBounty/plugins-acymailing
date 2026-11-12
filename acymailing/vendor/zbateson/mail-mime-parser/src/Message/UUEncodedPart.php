@@ -48,7 +48,7 @@ class UUEncodedPart extends NonMimePart implements IUUEncodedPart
      *
      * @return string
      */
-    public function getFilename() : ?string
+    public function getFilename(): ?string
     {
         return $this->filename;
     }
@@ -60,6 +60,7 @@ class UUEncodedPart extends NonMimePart implements IUUEncodedPart
     {
         $this->filename = $filename;
         $this->notify();
+
         return $this;
     }
 
@@ -72,7 +73,7 @@ class UUEncodedPart extends NonMimePart implements IUUEncodedPart
      *
      * @return false
      */
-    public function isTextPart() : bool
+    public function isTextPart(): bool
     {
         return false;
     }
@@ -82,7 +83,7 @@ class UUEncodedPart extends NonMimePart implements IUUEncodedPart
      *
      * @return string
      */
-    public function getContentType(string $default = 'application/octet-stream') : ?string
+    public function getContentType(string $default = 'application/octet-stream'): ?string
     {
         return 'application/octet-stream';
     }
@@ -90,7 +91,7 @@ class UUEncodedPart extends NonMimePart implements IUUEncodedPart
     /**
      * Returns null
      */
-    public function getCharset() : ?string
+    public function getCharset(): ?string
     {
         return null;
     }
@@ -98,7 +99,7 @@ class UUEncodedPart extends NonMimePart implements IUUEncodedPart
     /**
      * Returns 'attachment'.
      */
-    public function getContentDisposition(?string $default = 'attachment') : ?string
+    public function getContentDisposition(?string $default = 'attachment'): ?string
     {
         return 'attachment';
     }
@@ -106,12 +107,12 @@ class UUEncodedPart extends NonMimePart implements IUUEncodedPart
     /**
      * Returns 'x-uuencode'.
      */
-    public function getContentTransferEncoding(?string $default = 'x-uuencode') : ?string
+    public function getContentTransferEncoding(?string $default = 'x-uuencode'): ?string
     {
         return 'x-uuencode';
     }
 
-    public function getUnixFileMode() : ?int
+    public function getUnixFileMode(): ?int
     {
         return $this->mode;
     }
@@ -123,6 +124,7 @@ class UUEncodedPart extends NonMimePart implements IUUEncodedPart
     {
         $this->mode = $mode;
         $this->notify();
+
         return $this;
     }
 }

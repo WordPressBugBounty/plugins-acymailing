@@ -29,7 +29,7 @@ class GenericConsumer extends AbstractConsumer
      *
      * @return AbstractConsumer[] the sub-consumers
      */
-    protected function getSubConsumers() : array
+    protected function getSubConsumers(): array
     {
         return [
             $this->consumerService->getCommentConsumer(),
@@ -43,7 +43,7 @@ class GenericConsumer extends AbstractConsumer
      *
      * @return string[] an array of regex pattern matchers
      */
-    protected function getTokenSeparators() : array
+    protected function getTokenSeparators(): array
     {
         return ['\s+'];
     }
@@ -52,7 +52,7 @@ class GenericConsumer extends AbstractConsumer
      * GenericConsumer doesn't have start/end tokens, and so always returns
      * false.
      */
-    protected function isEndToken(string $token) : bool
+    protected function isEndToken(string $token): bool
     {
         return false;
     }
@@ -63,7 +63,7 @@ class GenericConsumer extends AbstractConsumer
      *
      * @codeCoverageIgnore
      */
-    protected function isStartToken(string $token) : bool
+    protected function isStartToken(string $token): bool
     {
         return false;
     }
@@ -73,7 +73,7 @@ class GenericConsumer extends AbstractConsumer
      * parts.
      *
      */
-    private function shouldAddSpace(HeaderPart $nextPart, HeaderPart $lastPart) : bool
+    private function shouldAddSpace(HeaderPart $nextPart, HeaderPart $lastPart): bool
     {
         return (!$lastPart->ignoreSpacesAfter() || !$nextPart->ignoreSpacesBefore());
     }
@@ -85,13 +85,14 @@ class GenericConsumer extends AbstractConsumer
      * @param HeaderPart[] $parts
      * @param HeaderPart[] $retParts
      */
-    private function addSpaceToRetParts(array $parts, array &$retParts, int $curIndex, HeaderPart &$spacePart, HeaderPart $lastPart) : self
+    private function addSpaceToRetParts(array $parts, array &$retParts, int $curIndex, HeaderPart &$spacePart, HeaderPart $lastPart): self
     {
         $nextPart = $parts[$curIndex];
         if ($this->shouldAddSpace($nextPart, $lastPart)) {
             $retParts[] = $spacePart;
             $spacePart = null;
         }
+
         return $this;
     }
 
@@ -104,14 +105,15 @@ class GenericConsumer extends AbstractConsumer
      *
      * @param HeaderPart[] $parts
      * @param HeaderPart[] $retParts
-     * @param HeaderPart $spacePart
+     * @param HeaderPart   $spacePart
      */
-    private function addSpaces(array $parts, array &$retParts, int $curIndex, ?HeaderPart &$spacePart = null) : self
+    private function addSpaces(array $parts, array &$retParts, int $curIndex, ?HeaderPart &$spacePart = null): self
     {
         $lastPart = \end($retParts);
         if ($spacePart !== null && $curIndex < \count($parts) && $parts[$curIndex]->getValue() !== '' && $lastPart !== false) {
             $this->addSpaceToRetParts($parts, $retParts, $curIndex, $spacePart, $lastPart);
         }
+
         return $this;
     }
 
@@ -119,7 +121,7 @@ class GenericConsumer extends AbstractConsumer
      * Returns true if the passed HeaderPart is a Token instance and a space.
      *
      */
-    private function isSpaceToken(HeaderPart $part) : bool
+    private function isSpaceToken(HeaderPart $part): bool
     {
         return ($part instanceof Token && $part->isSpace());
     }
@@ -133,6 +135,7 @@ class GenericConsumer extends AbstractConsumer
      * processParts, must be specifically called.
      *
      * @param HeaderPart[] $parts
+     *
      * @return HeaderPart[]
      */
     protected function filterIgnoredSpaces(array $parts)
@@ -150,6 +153,7 @@ class GenericConsumer extends AbstractConsumer
             $this->addSpaces($partsFiltered, $retParts, $i, $spacePart);
             $retParts[] = $part;
         }
+
         // ignore trailing spaces
         return $retParts;
     }
@@ -161,15 +165,17 @@ class GenericConsumer extends AbstractConsumer
      * The returned IHeaderParts are all LiteralParts.
      *
      * @param \ZBateson\MailMimeParser\Header\IHeaderPart[] $parts
+     *
      * @return \ZBateson\MailMimeParser\Header\IHeaderPart[]
      */
-    protected function processParts(array $parts) : array
+    protected function processParts(array $parts): array
     {
         $strValue = '';
         $filtered = $this->filterIgnoredSpaces($parts);
         foreach ($filtered as $part) {
             $strValue .= $part->getValue();
         }
+
         return [$this->partFactory->newLiteralPart($strValue)];
     }
 }

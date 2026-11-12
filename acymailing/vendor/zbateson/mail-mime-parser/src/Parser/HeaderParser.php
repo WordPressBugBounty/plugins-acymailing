@@ -20,15 +20,16 @@ class HeaderParser
      * Ensures the header isn't empty and contains a colon separator character,
      * then splits it and adds it to the passed PartHeaderContainer.
      *
-     * @param string $header the header line
+     * @param string              $header          the header line
      * @param PartHeaderContainer $headerContainer the container
      */
-    private function addRawHeaderToPart(string $header, PartHeaderContainer $headerContainer) : self
+    private function addRawHeaderToPart(string $header, PartHeaderContainer $headerContainer): self
     {
         if ($header !== '' && \strpos($header, ':') !== false) {
             $a = \explode(':', $header, 2);
             $headerContainer->add($a[0], \trim($a[1]));
         }
+
         return $this;
     }
 
@@ -36,10 +37,10 @@ class HeaderParser
      * Reads header lines up to an empty line, adding them to the passed
      * PartHeaderContainer.
      *
-     * @param resource $handle The resource handle to read from.
+     * @param resource            $handle    The resource handle to read from.
      * @param PartHeaderContainer $container the container to add headers to.
      */
-    public function parse($handle, PartHeaderContainer $container) : self
+    public function parse($handle, PartHeaderContainer $container): self
     {
         $header = '';
         do {
@@ -48,10 +49,11 @@ class HeaderParser
                 $this->addRawHeaderToPart($header, $container);
                 $header = '';
             } else {
-                $line = "\r\n" . $line;
+                $line = "\r\n".$line;
             }
             $header .= \rtrim($line, "\r\n");
         } while ($header !== '');
+
         return $this;
     }
 }

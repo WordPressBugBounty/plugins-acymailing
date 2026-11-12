@@ -2,6 +2,22 @@
 defined('ABSPATH') || die('Restricted Access');
 
 
+__('This is an enquiry email via {URL} from:\n{NAME} {EMAIL}\n\n{BODY}', 'acymailing');
+__('The subject entered by the visitor in the contact form', 'acymailing');
+__('The name entered by the visitor in the contact form', 'acymailing');
+__('The email address entered by the visitor in the contact form', 'acymailing');
+__('The message entered by the visitor in the contact form', 'acymailing');
+__('The automated tasks are disabled, enable them to send your emails automatically.', 'acymailing');
+__('Your automated tasks have not run for over 12 hours, check the cron task on your server or allow our IP 178.23.155.178 if you use our service.', 'acymailing');
+__('Profile page', 'acymailing');
+__('Change the title of the profile page', 'acymailing');
+__('Select profile page color theme', 'acymailing');
+__('Profile page logo', 'acymailing');
+__('Display an image on the profile page', 'acymailing');
+__('The unique index on the email column of the AcyMailing subscribers table is missing. The import has been stopped to prevent duplicate subscribers, please fix your database with the &quot;%s&quot; button in the Security tab of the configuration.', 'acymailing');
+__('Manage your subscription', 'acymailing');
+__('Someone, most likely you, asked to change the subscription linked to this email address on our website. Use the link below to manage it.', 'acymailing');
+__('If you did not ask for this, you can simply ignore this email: nothing has been changed.', 'acymailing');
 __('Error decoding the email %1$s: %2$s', 'acymailing');
 __('The structure of this email could not be read (%s), its raw content will be analysed', 'acymailing');
 __('Close', 'acymailing');
@@ -3006,7 +3022,6 @@ __('Weeks', 'acymailing');
 __('Months', 'acymailing');
 __('Manual send process', 'acymailing');
 __('Random', 'acymailing');
-__('Your cron does not seem to be enabled, don\'t forget to create it!', 'acymailing');
 __('Report', 'acymailing');
 __('Send a report', 'acymailing');
 __('Send the report to', 'acymailing');

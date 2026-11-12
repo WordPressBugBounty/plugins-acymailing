@@ -43,6 +43,7 @@ class ParserNonMimeMessageProxyFactory extends ParserMessageProxyFactory
 
         $streamContainer->setStream($this->streamFactory->newMessagePartStream($message));
         $message->attach($streamContainer);
+
         return $parserProxy;
     }
 }

@@ -42,10 +42,10 @@ class MessageParser
     protected $headerParser;
 
     public function __construct(
-        PartBuilderFactory $pbf,
+        PartBuilderFactory         $pbf,
         PartHeaderContainerFactory $phcf,
-        ParserManager $pm,
-        HeaderParser $hp
+        ParserManager              $pm,
+        HeaderParser               $hp
     ) {
         $this->partBuilderFactory = $pbf;
         $this->partHeaderContainerFactory = $phcf;
@@ -62,6 +62,7 @@ class MessageParser
      * returned.
      *
      * @param resource $handle
+     *
      * @return string|bool the read line or false on EOF or on error.
      */
     public static function readLine($handle)
@@ -71,6 +72,7 @@ class MessageParser
         while (\strlen($line) === $size - 1 && \substr($line, -1) !== "\n") {
             $line = \fgets($handle, $size);
         }
+
         return $ret;
     }
 
@@ -79,6 +81,7 @@ class MessageParser
      * object and returns it.
      *
      * @param StreamInterface $stream the stream to parse the message from
+     *
      * @return \ZBateson\MailMimeParser\IMessage
      */
     public function parse(StreamInterface $stream)
@@ -90,6 +93,7 @@ class MessageParser
             $headerContainer
         );
         $proxy = $this->parserManager->createParserProxyFor($partBuilder);
+
         return $proxy->getPart();
     }
 }

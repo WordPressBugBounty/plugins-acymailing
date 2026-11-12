@@ -28,7 +28,7 @@ function acym_addScript(bool $raw, string $script, array $params = []): string
             $handle,
             $script,
             $params['dependencies'],
-            '11.1.1',
+            '11.1.2',
             [
                 'in_footer' => false,
             ]

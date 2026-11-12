@@ -18,9 +18,10 @@ class DateConsumer extends GenericConsumer
     /**
      * Returns a Part\LiteralPart for the current token
      *
-     * @param string $token the token
-     * @param bool $isLiteral set to true if the token represents a literal -
-     *        e.g. an escaped token
+     * @param string $token     the token
+     * @param bool   $isLiteral set to true if the token represents a literal -
+     *                          e.g. an escaped token
+     *
      * @return \ZBateson\MailMimeParser\Header\IHeaderPart|null
      */
     protected function getPartForToken(string $token, bool $isLiteral)
@@ -33,16 +34,18 @@ class DateConsumer extends GenericConsumer
      * returning it in an array with a single element.
      *
      * @param \ZBateson\MailMimeParser\Header\IHeaderPart[] $parts The parsed
-     *        parts.
+     *                                                             parts.
+     *
      * @return \ZBateson\MailMimeParser\Header\IHeaderPart[] Array of resulting
      *         final parts.
      */
-    protected function processParts(array $parts) : array
+    protected function processParts(array $parts): array
     {
         $strValue = '';
         foreach ($parts as $part) {
             $strValue .= $part->getValue();
         }
+
         return [$this->partFactory->newDatePart($strValue)];
     }
 }

@@ -43,7 +43,7 @@ class AddressConsumer extends AbstractConsumer
      *
      * @return AbstractConsumer[] the sub-consumers
      */
-    protected function getSubConsumers() : array
+    protected function getSubConsumers(): array
     {
         return [
             $this->consumerService->getAddressGroupConsumer(),
@@ -59,7 +59,7 @@ class AddressConsumer extends AbstractConsumer
      *
      * @return string[] the patterns
      */
-    public function getTokenSeparators() : array
+    public function getTokenSeparators(): array
     {
         return [',', ';', '\s+'];
     }
@@ -70,7 +70,7 @@ class AddressConsumer extends AbstractConsumer
      * Although the semi-colon is not strictly the end token of an
      * AddressConsumer, it could end a parent AddressGroupConsumer.
      */
-    protected function isEndToken(string $token) : bool
+    protected function isEndToken(string $token): bool
     {
         return ($token === ',' || $token === ';');
     }
@@ -78,7 +78,7 @@ class AddressConsumer extends AbstractConsumer
     /**
      * AddressConsumer is "greedy", so this always returns true.
      */
-    protected function isStartToken(string $token) : bool
+    protected function isStartToken(string $token): bool
     {
         return true;
     }
@@ -96,9 +96,10 @@ class AddressConsumer extends AbstractConsumer
      * Part\AddressPart or a Part\AddressGroupPart.
      *
      * @param \ZBateson\MailMimeParser\Header\IHeaderPart[] $parts
+     *
      * @return \ZBateson\MailMimeParser\Header\IHeaderPart[]|array
      */
-    protected function processParts(array $parts) : array
+    protected function processParts(array $parts): array
     {
         $strName = '';
         $strEmail = '';
@@ -108,17 +109,18 @@ class AddressConsumer extends AbstractConsumer
                     $this->partFactory->newAddressGroupPart(
                         $part->getAddresses(),
                         $strName
-                    )
+                    ),
                 ];
             } elseif ($part instanceof AddressPart) {
                 return [$this->partFactory->newAddressPart($strName, $part->getEmail())];
             } elseif ((($part instanceof LiteralPart) && !($part instanceof CommentPart)) && $part->getValue() !== '') {
-                $strEmail .= '"' . \preg_replace('/(["\\\])/', '\\\$1', $part->getValue()) . '"';
+                $strEmail .= '"'.\preg_replace('/(["\\\])/', '\\\$1', $part->getValue()).'"';
             } else {
                 $strEmail .= \preg_replace('/\s+/', '', $part->getValue());
             }
             $strName .= $part->getValue();
         }
+
         return [$this->partFactory->newAddressPart('', $strEmail)];
     }
 }

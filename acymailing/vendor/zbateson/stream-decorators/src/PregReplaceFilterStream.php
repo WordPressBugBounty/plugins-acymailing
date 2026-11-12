@@ -55,7 +55,7 @@ class PregReplaceFilterStream implements StreamInterface
     /**
      * Returns true if the end of stream has been reached.
      */
-    public function eof() : bool
+    public function eof(): bool
     {
         return ($this->buffer->eof() && $this->stream->eof());
     }
@@ -65,9 +65,10 @@ class PregReplaceFilterStream implements StreamInterface
      *
      * @param int $offset
      * @param int $whence
+     *
      * @throws RuntimeException
      */
-    public function seek($offset, $whence = SEEK_SET) : void
+    public function seek($offset, $whence = SEEK_SET): void
     {
         throw new RuntimeException('Cannot seek a PregReplaceFilterStream');
     }
@@ -75,7 +76,7 @@ class PregReplaceFilterStream implements StreamInterface
     /**
      * Overridden to return false
      */
-    public function isSeekable() : bool
+    public function isSeekable(): bool
     {
         return false;
     }
@@ -84,9 +85,9 @@ class PregReplaceFilterStream implements StreamInterface
      * Fills the BufferStream with at least 8192 characters of input for future
      * read operations.
      */
-    private function fillBuffer(int $length) : void
+    private function fillBuffer(int $length): void
     {
-        $fill = (int) \max([$length, 8192]);
+        $fill = (int)\max([$length, 8192]);
         while ($this->buffer->getSize() < $length) {
             $read = $this->stream->read($fill);
             if ($read === '') {
@@ -101,11 +102,13 @@ class PregReplaceFilterStream implements StreamInterface
      * bytes.
      *
      * @param int $length
+     *
      * @return string
      */
-    public function read($length) : string
+    public function read($length): string
     {
         $this->fillBuffer($length);
+
         return $this->buffer->read($length);
     }
 }
